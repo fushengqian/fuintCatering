@@ -1,0 +1,254 @@
+.container {
+  padding-bottom: 112rpx;
+}
+
+/* 卡券信息 */
+.coupon-info {
+  background: #fff;
+  padding: 25rpx 30rpx;
+}
+
+.info-item__top {
+  min-height: 40rpx;
+  margin-bottom: 20rpx;
+}
+
+.info-item__top .active-tag {
+  width: 108rpx;
+  color: #fff;
+  background: #fe293f;
+  padding: 3rpx 5rpx;
+  border-radius: 15rpx;
+  font-size: 24rpx;
+  text-align: center;
+  margin-right: 15rpx;
+}
+
+.floor-price__samll {
+  font-size: 26rpx;
+  line-height: 1;
+  color: #FA2209;
+}
+
+/* 金额 */
+.floor-price {
+  color: #FA2209;
+  margin-right: 15rpx;
+  font-size: 38rpx;
+  line-height: 1;
+  margin-bottom: -2rpx;
+}
+
+.original-price {
+  font-size: 24rpx;
+  line-height: 1;
+  text-decoration: line-through;
+  color: #959595;
+}
+
+.coupon-sales {
+  font-size: 24rpx;
+  color: #959595;
+}
+
+.info-item {
+    font-size: 24rpx;
+    margin-bottom: 15rpx;
+    color:#666666;
+    .number{
+        color:#f9211c;
+        font-weight: bold;
+    }
+}
+.store-rule {
+    color:#666666;
+    font-size: 28rpx;
+    padding: 30rpx;
+    border: #cccccc dashed 5rpx;
+    border-radius: 5rpx;
+    margin-bottom: 20rpx;
+    .title {
+        color:#666666;
+        font-weight: bold;
+        font-size: 30rpx;
+        margin-bottom: 10rpx;
+    }
+    .item {
+        margin-bottom:0px;
+        height: 60rpx;
+        padding-top:15rpx;
+        font-weight: bold;
+    }
+}
+
+.info-item__name .coupon-name {
+  font-size: 30rpx;
+  font-weight:bold;
+  margin-bottom: 20rpx;
+  color:#666666;
+}
+
+/* 商品分享 */
+
+.coupon-share__line {
+  border-left: 1rpx solid #f4f4f4;
+  height: 60rpx;
+  margin: 0 30rpx;
+}
+
+.coupon-share .share-btn {
+  line-height: normal;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 8pt;
+  border: none;
+  color: #191919;
+}
+
+.coupon-share .share-btn::after {
+  border: none;
+}
+
+.coupon-share .share__icon {
+  font-size: 40rpx;
+  margin-bottom: 5rpx;
+}
+
+/* 卖点 */
+.info-item_selling-point {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #808080;
+}
+
+// 选择商品规格
+.coupon-choice {
+  padding: 26rpx 30rpx;
+  font-size: 28rpx;
+
+  .spec-list {
+    display: flex;
+    align-items: center;
+
+    .spec-name {
+      margin-right: 10rpx;
+    }
+  }
+}
+
+/* 卡券详情 */
+.coupon-content {
+    .item-title {
+          padding: 26rpx 30rpx;
+          font-size: 28rpx;
+    }
+    .coupon-content-detail {
+        padding:0rpx 25rpx 25rpx 25rpx;
+    }
+}
+
+// 快捷菜单
+.foo-item-fast {
+  box-sizing: border-box;
+  width: 100rpx;
+  line-height: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .fast-item {
+    position: relative;
+    padding: 4rpx 10rpx;
+    line-height: 1;
+
+    .fast-icon {
+      margin-bottom: 6rpx;
+    }
+    
+    // 角标
+    .fast-badge {
+      display: inline-block;
+          box-sizing: border-box;
+          min-width: 16px;
+          padding: 0 3px;
+          color: #fff;
+          font-weight: 500;
+          font-size: 12px;
+          font-family: -apple-system-font, Helvetica Neue, Arial, sans-serif;
+          line-height: 1.2;
+          text-align: center;
+          background-color: #ee0a24;
+          border: 1px solid #fff;
+          border-radius: 999px;
+    }
+    .fast-badge--fixed {
+      position: absolute;
+      top: 0;
+      right: 0;
+      transform-origin: 100%
+    }
+
+    .fast-icon {
+      font-size: 46rpx;
+    }
+
+    .fast-text {
+      font-size: 24rpx;
+    } 
+  }
+}
+
+
+/* 底部操作栏 */
+.footer-fixed {
+  position: fixed;
+  bottom: var(--window-bottom);
+  left: 0;
+  right: 0;
+  display: flex;
+  height: 180rpx;
+  z-index: 11;
+  box-shadow: 0 -4rpx 40rpx 0 rgba(144, 52, 52, 0.1);
+  background: #fff;
+}
+
+.footer-container {
+  width: 100%;
+  display: flex;
+  margin-bottom: 30rpx;
+}
+
+// 操作按钮
+.foo-item-btn {
+  flex: 1;
+
+  .btn-wrapper {
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .btn-item {
+    flex: 1;
+    font-size: 28rpx;
+    height: 80rpx;
+    line-height: 80rpx;
+    margin-right: 16rpx;
+    margin-left: 16rpx;
+    text-align: center;
+    color: #fff;
+    border-radius: 40rpx;
+  }
+
+  // 立即购买按钮
+  .btn-item-main {
+    background: linear-gradient(to right, #f9211c, #ff6335);
+  }
+
+  // 购物车按钮
+  .btn-item-deputy {
+    background: linear-gradient(to right, #ffa600, #ffbb00);
+  }
+}

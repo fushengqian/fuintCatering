@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fuint.repository.mapper.TGenCodeMapper">
+    <select id="findGenCodeByTableName" resultType="com.fuint.repository.model.TGenCode">
+        select * from t_gen_code t where t.table_name = #{tableName}
+    </select>
+
+    <select id="getTableColumnList" resultType="com.fuint.repository.bean.ColumnBean">
+        SELECT COLUMN_NAME AS FIELD,DATA_TYPE AS TYPE,IS_NULLABLE AS IS_NULL,COLUMN_COMMENT AS COMMENT FROM information_schema.columns
+        WHERE TABLE_SCHEMA = (SELECT DATABASE()) AND TABLE_NAME = #{tableName}
+    </select>
+</mapper>

@@ -1,0 +1,487 @@
+// 弹出层-支付方式
+.pay-type-popup {
+  padding: 25rpx 25rpx 70rpx 25rpx;
+ .title {
+   font-size: 30rpx;
+   margin-bottom: 50rpx;
+   font-weight: bold;
+   text-align: center;
+ }
+
+ .pop-content {
+   min-height: 140rpx;
+   padding: 0 20rpx;
+
+   .pay-item {
+     padding: 30rpx;
+     font-size: 30rpx;
+     background: #fff;
+     border: 1rpx solid $fuint-theme;
+     border-radius: 8rpx;
+     color: #888;
+     margin-bottom: 12rpx;
+     text-align: center;
+
+     .item-left_icon {
+       margin-right: 20rpx;
+       font-size: 48rpx;
+
+       &.wechat {
+         color: #00c800;
+       }
+
+       &.balance {
+         color: $fuint-theme;
+       }
+     }
+   }
+ }
+}
+
+.flow-mode {
+    background: #FFFFFF;
+    padding: 20rpx;
+    text-align: center;
+}
+// 配送信息
+.flow-delivery {
+  padding: 10rpx 20rpx 40rpx 20rpx;
+    background: #fff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANYAAAANCAYAAADVGpDCAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA4ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NTc3MiwgMjAxNC8wMS8xMy0xOTo0NDowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo3Yjk4M2ExYy1jMDhkLTQ1OTktYTI0Ny1kZjNjYzdiYTQ5ZTgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NDQwNkY3RkU5N0NGMTFFNUI3N0M4NTU4MzM2RjlFODIiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NDQwNkY3RkQ5N0NGMTFFNUI3N0M4NTU4MzM2RjlFODIiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKE1hY2ludG9zaCkiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDowNzgwZWI1NS03OGFhLTQzOTUtODQ4OC1lOWI5YmVlYTY1ZDciIHN0UmVmOmRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDo1OTRiYzUyMy1jMzc3LTExNzgtYTdkZS04NGY3YmM1ZGIxMDMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz556PLxAAACBElEQVR42tyaSyhEYRTHP48imlKibDQeSSlkSlEWLCRFsZNH5FE2FqQ8ErIRC9lIkTwXSpMkWWChhEJCSnlkoUZGSsr78f98n43CMFPu/Z/6NZuZ2zn33/+cb869XkmLx8IDEQaGQJbgiytQDSY3MyL+LYnL/HxPXSoHDIJQQq2WQQk4Dbbb/yUB29LJ+6e3B66VB3ZITbUIEqSpCGoJBP1ghtBUD6ARpEtTGSEhXzd+awE9oJzQUPegWdf3QlBPMhgDMYRa7YNisGWkpP5qrBQtVBShUHugUE9hs4fUtwG0utlEjRivoA/Ug1sj3vjffr8FNJEK1auPFHcE9UTq5pdK2PwcoAzMG7mjuRrRYEIfK9jiDJSCBZJ6ynSTsBBqNQ0qgdPISbq6vJCFbJOaagrEk5gqWNczRGiqG1Ah1LLMafRkf5pYIUKtZnMJDXUNasAIST2ZYFioRx9ssQaKwJFZEv5uYmWDXVJTrYBEElP562PfPKGpnkAbSDOTqb6aWAGgW6iHol5kQj2CdtAJngnqkc1hHMQRNr9DPaXWzZj8Z2PZtFCxhEIdaKE2CGqRJ4060AH8CLUaALX6f5VpBZLhI9SaeZXQVHKNLt84SCIxVbhQi5YuQlNd6OVElZlN9TGxrGBUn2PZ4lyoTdIsST0FQj0UDSLUak6ot3gcBLVY3wQYAJoVXxmNERajAAAAAElFTkSuQmCC') bottom left repeat-x;
+    background-size: 120rpx auto;
+  
+  .detail-location {
+    font-size: 36rpx;
+  }
+  .detail-content {
+    padding: 0 20rpx;
+    .detail-content__title-phone {
+      margin-left: 10rpx;
+    }
+    .detail-content__describe {
+      font-size: 28rpx;
+      color: #777;
+    }
+    .address-info {
+        .icon {
+            float: right;
+            font-weight: bold;
+        }
+    }
+    .select-address {
+        height: 90rpx;
+        line-height: 90rpx;
+        .icon {
+            margin-left: 15rpx;
+        }
+    }
+  }
+  .detail-content__title {
+    margin-bottom: 6rpx;
+  }
+  .store-name,.store-phone,.store-address {
+      margin-bottom: 6rpx;
+      font-size: 28rpx;
+      color: #777;
+  }
+}
+
+// 买家留言
+.flow-all-money {
+  .ipt-wrapper {
+    margin-right: 25rpx;
+    textarea {
+      font-size: 28rpx;
+      width: 100%;
+      padding: 10rpx;
+      border: solid 1rpx #f4f4f4;
+      border-radius: 5rpx;
+      height: 100rpx;
+      margin-bottom: 100rpx;
+    }
+  }
+}
+
+// 商品列表
+.checkout_list {
+  padding: 20rpx 30rpx 4rpx 30rpx;
+  background: #fff;
+  border-bottom: 1rpx solid rgb(248, 248, 248);
+  .flow-shopList {
+    padding: 5rpx 0 10rpx;
+    border-bottom: 1rpx solid rgb(248, 248, 248);
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}
+
+.flow-header-left {
+  padding-left: 90rpx;
+}
+
+/* 会员价 */
+.flow-shopList {
+  
+  .flow-list-right {
+    .flow-cont {
+      
+      &.price-delete {
+        font-size: 26rpx;
+        color: #777;
+        text-decoration: line-through;
+      }
+      
+    }
+  }
+
+  .goods-name{
+    font-size: 30rpx;
+    color: #333;
+  }
+
+}
+
+/* 优惠券选择 */
+.popup__coupon {
+  width: 750rpx;
+  background: #fff;
+  box-sizing: border-box;
+  padding: 30rpx;
+  
+  .coupon__do_not {
+    .control {
+      width: 90%;
+      height: 82rpx;
+      margin-top: 30rpx;
+      margin-bottom: 1rpx;
+      color: #fff;
+      background: $fuint-theme;
+      border: 1rpx solid $fuint-theme;
+      border-radius: 8rpx;
+    }
+  }
+  
+  .coupon__title {
+    text-align: center;
+    margin-bottom: 30rpx;
+  }
+  
+  .coupon-item {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 22rpx;
+  }
+  
+  .item-wrapper {
+    width: 100%;
+    display: flex;
+    background: #fff;
+    border-radius: 8rpx;
+    color: #fff;
+    height: 180rpx;
+  
+    .coupon-type {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 10;
+      width: 128rpx;
+      padding: 6rpx 0;
+      background: #fa2209;
+      font-size: 20rpx;
+      text-align: center;
+      color: #ffffff;
+      transform: rotate(45deg);
+      transform-origin: 64rpx 64rpx;
+    }
+  
+    &.color-default {
+      background: linear-gradient(-128deg, #6bf6f6, #008a8a);
+    }
+    
+    &.color-gray {
+      background: linear-gradient(-113deg, #bdbdbd, #a2a1a2);
+      .coupon-type {
+        background: #9e9e9e;
+      }
+    }
+  
+    .content {
+      flex: 1;
+      padding: 30rpx 20rpx;
+      border-radius: 16rpx 0 0 16rpx;
+  
+      .title {
+        font-size: 32rpx;
+      }
+  
+      .bottom {
+        .time {
+          font-size: 24rpx;
+        }
+  
+        .receive {
+          height: 46rpx;
+          width: 122rpx;
+          line-height: 46rpx;
+          text-align: center;
+          border: 1rpx solid #fff;
+          border-radius: 6rpx;
+          color: #fff;
+          font-size: 24rpx;
+  
+          &.state {
+            border: none;
+          }
+        }
+      }
+    }
+  
+    .tip {
+      position: relative;
+      flex: 0 0 32%;
+      text-align: center;
+      border-radius: 0 16rpx 16rpx 0;
+  
+      .money {
+        font-weight: bold;
+        font-size: 52rpx;
+      }
+  
+      .pay-line {
+        font-size: 22rpx;
+      }
+    }
+  
+    .split-line {
+      position: relative;
+      flex: 0 0 0;
+      border-left: 4rpx solid #fff;
+      margin: 0 10rpx 0 6rpx;
+      background: #fff;
+  
+      &:before,
+        {
+        border-radius: 0 0 16rpx 16rpx;
+        top: 0;
+      }
+  
+      &:after {
+        border-radius: 16rpx 16rpx 0 0;
+        bottom: 0;
+      }
+  
+      &:before,
+      &:after {
+        content: '';
+        position: absolute;
+        width: 24rpx;
+        height: 12rpx;
+        background: #f7f7f7;
+        left: -14rpx;
+        z-index: 1;
+      }
+    }
+  }
+  
+}
+
+/* 积分抵扣 */
+.points {
+  
+  .title {
+    margin-right: 5rpx;
+  }
+  
+  .icon-help {
+    font-size: 28rpx;
+  }
+  
+  .points-money {
+    margin-right: 20rpx;
+  }
+  
+}
+
+ // 积分说明
+.points-content {
+  padding: 30rpx 48rpx;
+  font-size: 28rpx;
+  line-height: 50rpx;
+  text-align: left;
+  color: #606266;
+  height: 620rpx;
+  box-sizing: border-box;
+}
+
+/* 支付方式 */
+.pay-method {
+  
+  .pay-item {
+    padding: 20rpx 0;
+    font-size: 28rpx;
+    border-bottom: 1rpx solid rgb(248, 248, 248);
+    
+    .item-left_icon {
+      margin-right: 20rpx;
+      font-size: 32rpx;
+      
+      &.wechat {
+        color: #00c800;
+      }
+      
+      &.balance {
+        color: #ff9700;
+      }
+    }
+  }
+}
+
+// 商品规格
+.goods-props {
+  padding-top: 10rpx;
+  font-size: 24rpx;
+  color: #999;
+
+  .goods-props-item {
+    float: left;
+    .group-name {
+      margin-right: 6rpx;
+    }
+  }
+}
+
+// 右侧箭头
+.right-arrow {
+  margin-left: 16rpx;
+  // color: #777;
+  font-size: 26rpx;
+}
+
+// 底部操作栏
+.flow-fixed-footer {
+  position: fixed;
+  bottom: var(--window-bottom);
+  width: 100%;
+  height: 180rpx;
+  background: #fff;
+  border-top: 1px solid #eee;
+  z-index: 11;
+  padding-top: 25rpx;
+  .chackout-left {
+    font-size: 28rpx;
+    height: 98rpx;
+    color: #777;
+    flex: 4;
+    padding-left: 12px;
+    text-align: right;
+    padding-right: 40rpx;
+    .col-amount-do {
+        font-size:35rpx;
+        padding-top: 2rpx;
+        height: 100%;
+        .pay-amount {
+            color: #f03c3c;
+            font-weight: bold;
+        }
+        .delivery-fee {
+            margin-top: 8rpx;
+            font-size: 24rpx;
+        }
+    }
+  }
+  
+  .chackout-right {
+    font-size: 34rpx;
+    flex: 2;
+  }
+  
+  
+  // 提交按钮
+  .flow-btn {
+    background: linear-gradient(to right, $fuint-theme, $fuint-theme);
+    color: #fff;
+    text-align: center;
+    height: 92rpx;
+    line-height: 92rpx;
+    display: block;
+    font-size: 28rpx;
+    border-radius: 5rpx;
+    margin-right: 20rpx;
+     // 禁用按钮
+     &.disabled {
+       background: #CCCCCC;
+     }
+  }
+}
+
+/* 共几张卡券 */
+.flow-num-box {
+  font-size: 28rpx;
+  color: #777;
+  padding: 16rpx 24rpx;
+  text-align: right;
+}
+
+/* app.scss */
+.flow-shopList {
+  padding: 18rpx 0;
+
+  .flow-list-left {
+    margin-right: 20rpx;
+
+    image {
+      width: 120rpx;
+      height: 100rpx;
+      border: 1rpx solid #eee;
+      border-radius: 5rpx;
+      background: #fff;
+    }
+
+  }
+
+  .flow-list-right {
+
+    .flow-cont {
+      font-size: 28rpx;
+      color: #fa2209;
+    }
+
+    .small {
+      font-size: 26rpx;
+      color: #777;
+    }
+
+    .flow-list-cont {
+      padding-top: 10rpx;
+    }
+
+  }
+
+}
+
+.flow-all-money {
+  padding: 0 24rpx;
+  color: #444;
+
+  .flow-all-list {
+    font-size: 28rpx;
+    padding: 20rpx 0;
+    border-bottom: 1rpx solid rgb(248, 248, 248);
+  }
+
+  .flow-all-list:last-child {
+    border-bottom: none;
+  }
+
+  .flow-all-list-cont {
+    font-size: 28rpx;
+    padding: 10rpx 0;
+  }
+
+  .flow-arrow {
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+}

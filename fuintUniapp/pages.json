@@ -1,0 +1,362 @@
+{
+  "tabBar": {
+    "color": "#000000",
+    "selectedColor": "#ff0000",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "fontSize":"30rpx",
+    "list": [{
+      "pagePath": "pages/index/index",
+      "iconPath": "static/tabbar/home.png",
+      "selectedIconPath": "static/tabbar/home-active.png",
+      "text": "首页"
+    }, {
+      "pagePath": "pages/category/index",
+      "iconPath": "static/tabbar/cart.png",
+      "selectedIconPath": "static/tabbar/cart-active.png",
+      "text": "点单"
+    }, {
+      "pagePath": "pages/order/index",
+      "iconPath": "static/tabbar/shop.png",
+      "selectedIconPath": "static/tabbar/shop-active.png",
+      "text": "订单"
+    },{
+      "pagePath": "pages/user/index",
+      "iconPath": "static/tabbar/user.png",
+      "selectedIconPath": "static/tabbar/user-active.png",
+      "text": "我的" 
+    }]
+  },
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationStyle": "custom",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/category/index",
+      "style": {
+        "navigationBarTitleText": "点单",
+        "navigationBarBackgroundColor": "#113a28",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/cart/index",
+      "style": {
+        "navigationBarTitleText": "结算确认"
+      }
+    },
+    {
+      "path": "pages/user/index",
+      "style": {
+        "navigationBarTitleText": "会员中心",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/user/setting",
+      "style": {
+        "navigationBarTitleText": "个人信息"
+      }
+    },
+    {
+      "path": "pages/user/code",
+      "style": {
+        "navigationBarTitleText": "我的会员码"
+      }
+    },
+    {
+      "path": "pages/user/card",
+      "style": {
+        "navigationBarTitleText": "领取会员卡"
+      }
+    },
+    {
+      "path": "pages/user/password",
+      "style": {
+        "navigationBarTitleText": "我的密码"
+      }
+    },
+    {
+      "path": "pages/custom/index",
+      "style": {
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/search/index",
+      "style": {
+        "navigationBarTitleText": "商品搜索"
+      }
+    },
+    {
+      "path": "pages/location/index",
+      "style": {
+        "navigationBarTitleText": "切换店铺"
+      }
+    },
+    {
+      "path": "pages/login/index",
+      "style": {
+        "navigationBarTitleText": "会员登录"
+      }
+    },
+    {
+      "path": "pages/login/auth",
+      "style": {
+        "navigationBarTitleText": "授权登录"
+      }
+    },
+    {
+      "path": "pages/help/index",
+      "style": {
+        "navigationBarTitleText": "帮助中心"
+      }
+    },
+    {
+      "path": "pages/coupon/list",
+      "style": {
+        "navigationBarTitleText": "领券中心"
+      }
+    },
+    {
+      "path": "pages/coupon/detail",
+      "style": {
+        "navigationBarTitleText": "优惠券详情"
+      }
+    },
+    {
+      "path": "pages/timer/detail",
+      "style": {
+        "navigationBarTitleText": "计次卡详情",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/prestore/buy",
+      "style": {
+        "navigationBarTitleText": "购买储值卡",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/prestore/detail",
+      "style": {
+        "navigationBarTitleText": "储值卡详情",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/confirm/doConfirm",
+      "style": {
+        "navigationBarTitleText": "核销确认"
+      }
+    },
+    {
+      "path": "pages/confirm/result",
+      "style": {
+        "navigationBarTitleText": "核销结果"
+      }
+    },
+    {
+      "path": "pages/goods/list",
+      "style": {
+        "navigationBarTitleText": "商品列表",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/goods/detail",
+      "style": {
+        "navigationBarTitleText": "商品详情"
+      }
+    },
+    {
+      "path": "pages/my-coupon/index",
+      "style": {
+        "navigationBarTitleText": "我的卡券",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/address/index",
+      "style": {
+        "navigationBarTitleText": "收货地址"
+      }
+    },
+    {
+      "path": "pages/address/create",
+      "style": {
+        "navigationBarTitleText": "新增收货地址"
+      }
+    },
+    {
+      "path": "pages/address/update",
+      "style": {
+        "navigationBarTitleText": "编辑收货地址"
+      }
+    },
+    {
+      "path": "pages/points/detail",
+      "style": {
+        "navigationBarTitleText": "积分明细"
+      }
+    },
+    {
+      "path": "pages/points/gift",
+      "style": {
+        "navigationBarTitleText": "积分转赠"
+      }
+    },
+    {
+      "path": "pages/give/index",
+      "style": {
+        "navigationBarTitleText": "转赠记录"
+      }
+    },
+    {
+      "path": "pages/wallet/index",
+      "style": {
+        "navigationBarTitleText": "我的余额"
+      }
+    },
+    {
+      "path": "pages/wallet/recharge/index",
+      "style": {
+        "navigationBarTitleText": "我要充值"
+      }
+    },
+    {
+      "path": "pages/wallet/recharge/order",
+      "style": {
+        "navigationBarTitleText": "充值记录"
+      }
+    },
+    {
+      "path": "pages/wallet/balance/log",
+      "style": {
+        "navigationBarTitleText": "账单详情"
+      }
+    },
+    {
+      "path": "pages/settlement/index",
+      "style": {
+        "navigationBarTitleText": "结算中心"
+      }
+    },
+    {
+      "path": "pages/settlement/goods",
+      "style": {
+        "navigationBarTitleText": "订单确认"
+      }
+    },
+    {
+      "path": "pages/order/index",
+      "style": {
+        "navigationBarTitleText": "我的订单",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/order/detail",
+      "style": {
+        "navigationBarTitleText": "订单详情",
+        "navigationBarTextStyle": "white",
+        "navigationBarBackgroundColor": "#113a28"
+      }
+    },
+    {
+      "path": "pages/order/result",
+      "style": {
+        "navigationBarTitleText": "支付结果"
+      }
+    },
+    {
+      "path": "pages/refund/index",
+      "style": {
+        "navigationBarTitleText": "退换/售后"
+      }
+    },
+    {
+      "path": "pages/refund/detail",
+      "style": {
+        "navigationBarTitleText": "售后详情"
+      }
+    },
+    {
+      "path": "pages/refund/apply",
+      "style": {
+        "navigationBarTitleText": "申请售后"
+      }
+    },
+    {
+      "path": "pages/pay/index",
+      "style": {
+        "navigationBarTitleText": "向商家付款"
+      }
+    },
+    {
+      "path": "pages/pay/result",
+      "style": {
+        "navigationBarTitleText": "支付结果"
+      }
+    },
+    {
+      "path": "pages/merchant/index",
+      "style": {
+        "navigationBarTitleText": "商家管理"
+      }
+    },
+    {
+      "path": "pages/pay/cashier",
+      "style": {
+        "navigationBarTitleText": "扫码收款"
+      }
+    },
+    {
+      "path": "pages/merchant/member/index",
+      "style": {
+        "navigationBarTitleText": "会员列表"
+      }
+    },
+    {
+      "path": "pages/merchant/order/index",
+      "style": {
+        "navigationBarTitleText": "订单列表"
+      }
+    },
+    {
+      "path": "pages/article/index",
+      "style": {
+        "navigationBarTitleText": "文章列表"
+      }
+    },
+    {
+      "path": "pages/article/detail",
+      "style": {
+        "navigationBarTitleText": "文章详情"
+      }
+    },
+    {
+      "path": "pages/coupon/receive",
+      "style": {
+        "navigationBarTitleText": "卡券兑换"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "",
+    "navigationBarTextStyle": "black",
+    "backgroundTextStyle": "dark"
+  },
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
+    }
+  }
+}

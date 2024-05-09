@@ -1,0 +1,14 @@
+package com.fuint.repository.mapper;
+
+import com.fuint.repository.model.${className};
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * ${moduleName} Mapper 接口
+ *
+ * Created by ${author}
+ * CopyRight https://www.fuint.cn
+ */
+public interface ${className}Mapper extends BaseMapper<${className}> {
+
+}

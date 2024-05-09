@@ -1,0 +1,23 @@
+{
+  "id": "1831825",
+  "name": "keywords",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "9673157",
+      "name": "关  闭",
+      "font_class": "guanbi",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "9512492",
+      "name": "退格",
+      "font_class": "backspace",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    }
+  ]
+}

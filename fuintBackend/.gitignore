@@ -1,0 +1,12 @@
+.buildpath
+.project
+.settings
+.idea/
+.mvn/
+wsdl/
+caches/
+target/
+src/main/resources/static/
+.DS_Store
+*.iml
+dump.rdb
