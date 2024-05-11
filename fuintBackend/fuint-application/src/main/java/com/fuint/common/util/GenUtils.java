@@ -66,7 +66,7 @@ public class GenUtils {
      */
     public static String convertClassName(String tableName) {
         boolean autoRemovePre = false;
-        String tablePrefix = "mt";
+        String tablePrefix = "mt_";
         if (autoRemovePre && StringUtils.isNotEmpty(tablePrefix)) {
             String[] searchList = StringUtils.split(tablePrefix, ",");
             tableName = replaceFirst(tableName, searchList);
@@ -84,8 +84,7 @@ public class GenUtils {
     public static String replaceFirst(String replacementm, String[] searchList) {
         String text = replacementm;
         for (String searchString : searchList) {
-            if (replacementm.startsWith(searchString))
-            {
+            if (replacementm.startsWith(searchString)) {
                 text = replacementm.replaceFirst(searchString, "");
                 break;
             }

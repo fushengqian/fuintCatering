@@ -1,6 +1,9 @@
 package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.dto.AccountInfo;
+import com.fuint.common.service.SettingService;
+import com.fuint.common.service.StoreService;
+import com.fuint.common.service.TableService;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
@@ -9,7 +12,8 @@ import com.fuint.common.enums.StatusEnum;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.repository.model.${className};
+import com.fuint.repository.model.MtStore;
+import com.fuint.repository.model.MtTable;
 import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,35 +22,46 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * ${moduleName}管理类controller
+ * 桌码管理类controller
  *
- * Created by ${author}
+ * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-${moduleName}相关接口")
+@Api(tags="管理端-桌码相关接口")
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = "/backendApi/${tableName}")
-public class Backend${tableClass}Controller extends BaseController {
+@RequestMapping(value = "/backendApi/table")
+public class BackendTableController extends BaseController {
 
     /**
-     * ${moduleName}服务接口
+     * 桌码服务接口
      */
-    private ${tableClass}Service ${tableName}Service;
+    private TableService tableService;
 
     /**
-     * ${moduleName}列表查询
+     * 系统设置服务接口
+     * */
+    private SettingService settingService;
+
+    /**
+     * 店铺服务接口
+     */
+    private StoreService storeService;
+
+    /**
+     * 桌码列表查询
      *
      * @param  request HttpServletRequest对象
-     * @return ${moduleName}列表
+     * @return 桌码列表
      */
-    @ApiOperation(value = "${moduleName}列表查询")
+    @ApiOperation(value = "桌码列表查询")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('${tableName}:list')")
+    @PreAuthorize("@pms.hasPermission('table:index')")
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
@@ -84,7 +99,7 @@ public class Backend${tableClass}Controller extends BaseController {
             params.put("storeId", storeId);
         }
         paginationRequest.setSearchParams(params);
-        PaginationResponse<${className}> paginationResponse = ${tableName}Service.query${tableClass}ListByPagination(paginationRequest);
+        PaginationResponse<MtTable> paginationResponse = tableService.queryTableListByPagination(paginationRequest);
 
         Map<String, Object> paramsStore = new HashMap<>();
         paramsStore.put("status", StatusEnum.ENABLED.getKey());
@@ -95,21 +110,26 @@ public class Backend${tableClass}Controller extends BaseController {
             paramsStore.put("merchantId", accountInfo.getMerchantId());
         }
 
+        List<MtStore> storeList = storeService.queryStoresByParams(paramsStore);
+        String imagePath = settingService.getUploadBasePath();
+
         Map<String, Object> result = new HashMap<>();
-        result.put("dataList", paginationResponse);
+        result.put("imagePath", imagePath);
+        result.put("storeList", storeList);
+        result.put("paginationResponse", paginationResponse);
 
         return getSuccessResult(result);
     }
 
     /**
-     * 更新${moduleName}状态
+     * 更新桌码状态
      *
      * @return
      */
-    @ApiOperation(value = "更新${moduleName}状态")
+    @ApiOperation(value = "更新桌码状态")
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('${tableName}:edit')")
+    @PreAuthorize("@pms.hasPermission('table:index')")
     public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
@@ -120,29 +140,29 @@ public class Backend${tableClass}Controller extends BaseController {
             return getFailureResult(1001, "请先登录");
         }
 
-        ${className} ${tablePrefix}${tableClass} = ${tableName}Service.query${tableClass}ById(id);
-        if (${tablePrefix}${tableClass} == null) {
+        MtTable mtTable = tableService.queryTableById(id);
+        if (mtTable == null) {
             return getFailureResult(201);
         }
 
         String operator = accountInfo.getAccountName();
-        ${tablePrefix}${tableClass}.setOperator(operator);
-        ${tablePrefix}${tableClass}.setStatus(status);
-        ${tableName}Service.update${tableClass}(${tablePrefix}${tableClass});
+        mtTable.setOperator(operator);
+        mtTable.setStatus(status);
+        tableService.updateTable(mtTable);
 
         return getSuccessResult(true);
     }
 
     /**
-     * 保存${moduleName}
+     * 保存桌码
      *
      * @param request HttpServletRequest对象
      * @return
      */
-    @ApiOperation(value = "保存${moduleName}")
+    @ApiOperation(value = "保存桌码")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('${tableName}:add')")
+    @PreAuthorize("@pms.hasPermission('table:index')")
     public ResponseObject saveHandler(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         String id = params.get("id") == null ? "" : params.get("id").toString();
@@ -155,7 +175,7 @@ public class Backend${tableClass}Controller extends BaseController {
             return getFailureResult(1001, "请先登录");
         }
 
-        ${className} info = new ${className}();
+        MtTable info = new MtTable();
         info.setOperator(accountInfo.getAccountName());
         info.setStatus(status);
         info.setStoreId(Integer.parseInt(storeId));
@@ -163,24 +183,24 @@ public class Backend${tableClass}Controller extends BaseController {
         info.setMerchantId(accountInfo.getMerchantId());
         if (StringUtil.isNotEmpty(id)) {
             info.setId(Integer.parseInt(id));
-            ${tableName}Service.update${tableClass}(info);
+            tableService.updateTable(info);
         } else {
-            ${tableName}Service.add${tableClass}(info);
+            tableService.addTable(info);
         }
 
         return getSuccessResult(true);
     }
 
     /**
-     * 获取${moduleName}详情
+     * 获取桌码详情
      *
      * @param id
      * @return
      */
-    @ApiOperation(value = "获取${moduleName}详情")
+    @ApiOperation(value = "获取桌码详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('${tableName}:list')")
+    @PreAuthorize("@pms.hasPermission('table:index')")
     public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
@@ -188,10 +208,10 @@ public class Backend${tableClass}Controller extends BaseController {
             return getFailureResult(1001, "请先登录");
         }
 
-        ${className} ${tableName}Info = ${tableName}Service.query${tableClass}ById(id);
+        MtTable tableInfo = tableService.queryTableById(id);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("${tableName}Info", ${tableName}Info);
+        result.put("tableInfo", tableInfo);
 
         return getSuccessResult(result);
     }
