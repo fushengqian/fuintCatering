@@ -66,7 +66,7 @@ public class BackendTableController extends BaseController {
         String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
-        String title = request.getParameter("title");
+        String code = request.getParameter("code");
         String status = request.getParameter("status");
         String searchStoreId = request.getParameter("storeId");
 
@@ -86,8 +86,8 @@ public class BackendTableController extends BaseController {
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             params.put("merchantId", accountInfo.getMerchantId());
         }
-        if (StringUtil.isNotEmpty(title)) {
-            params.put("title", title);
+        if (StringUtil.isNotEmpty(code)) {
+            params.put("code", code);
         }
         if (StringUtil.isNotEmpty(status)) {
             params.put("status", status);
@@ -169,23 +169,34 @@ public class BackendTableController extends BaseController {
         String status = params.get("status") == null ? "" : params.get("status").toString();
         String storeId = params.get("storeId") == null ? "0" : params.get("storeId").toString();
         String sort = params.get("sort") == null ? "0" : params.get("sort").toString();
+        String code = params.get("code") == null ? "" : params.get("code").toString();
+        String description = params.get("description") == null ? "" : params.get("description").toString();
+        String maxPeople = params.get("maxPeople") == null ? "0" : params.get("maxPeople").toString();
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
         if (accountInfo == null) {
             return getFailureResult(1001, "请先登录");
         }
-
-        MtTable info = new MtTable();
-        info.setOperator(accountInfo.getAccountName());
-        info.setStatus(status);
-        info.setStoreId(Integer.parseInt(storeId));
-        info.setSort(Integer.parseInt(sort));
-        info.setMerchantId(accountInfo.getMerchantId());
+        MtTable mtTable = new MtTable();
+        mtTable.setOperator(accountInfo.getAccountName());
+        mtTable.setStatus(status);
+        mtTable.setStoreId(Integer.parseInt(storeId));
+        mtTable.setSort(Integer.parseInt(sort));
+        mtTable.setMerchantId(accountInfo.getMerchantId());
+        mtTable.setCode(code);
+        mtTable.setDescription(description);
+        mtTable.setMaxPeople(Integer.parseInt(maxPeople));
+        if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() < 1) {
+            return getFailureResult(201, "平台方账户无操作权限");
+        }
+        if (mtTable.getStoreId() == null || mtTable.getStoreId() < 1) {
+            return getFailureResult(201, "所属店铺不能为空");
+        }
         if (StringUtil.isNotEmpty(id)) {
-            info.setId(Integer.parseInt(id));
-            tableService.updateTable(info);
+            mtTable.setId(Integer.parseInt(id));
+            tableService.updateTable(mtTable);
         } else {
-            tableService.addTable(info);
+            tableService.addTable(mtTable);
         }
 
         return getSuccessResult(true);

@@ -78,6 +78,7 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
         if (id > 0) {
             return mtTable;
         } else {
+            logger.error("新增桌码数据失败，mtTable：{}", mtTable);
             throw new BusinessCheckException("新增桌码数据失败");
         }
     }
