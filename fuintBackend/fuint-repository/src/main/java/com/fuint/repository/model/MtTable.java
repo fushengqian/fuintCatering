@@ -31,9 +31,6 @@ public class MtTable implements Serializable {
     @ApiModelProperty("桌子编码")
     private String code;
 
-    @ApiModelProperty("桌子二维码")
-    private String qrCode;
-
     @ApiModelProperty("所属商户ID")
     private Integer merchantId;
 

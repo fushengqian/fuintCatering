@@ -49,6 +49,15 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
         LambdaQueryWrapper<MtTable> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.ne(MtTable::getStatus, StatusEnum.DISABLE.getKey());
 
+        String code = paginationRequest.getSearchParams().get("code") == null ? "" : paginationRequest.getSearchParams().get("code").toString();
+        if (StringUtils.isNotBlank(code)) {
+            lambdaQueryWrapper.eq(MtTable::getCode, code);
+        }
+        String status = paginationRequest.getSearchParams().get("status") == null ? "" : paginationRequest.getSearchParams().get("status").toString();
+        if (StringUtils.isNotBlank(status)) {
+            lambdaQueryWrapper.eq(MtTable::getStatus, status);
+        }
+
         lambdaQueryWrapper.orderByAsc(MtTable::getSort);
         List<MtTable> dataList = mtTableMapper.selectList(lambdaQueryWrapper);
 
@@ -117,7 +126,7 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
     /**
      * 修改桌码数据
      *
-     * @param mtTable
+     * @param  mtTable
      * @throws BusinessCheckException
      * @return
      */
@@ -125,12 +134,33 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "更新桌码")
     public MtTable updateTable(MtTable mtTable) throws BusinessCheckException {
-        mtTable = queryTableById(mtTable.getId());
-        if (mtTable == null) {
+        MtTable table = queryTableById(mtTable.getId());
+        if (table == null) {
             throw new BusinessCheckException("该桌码状态异常");
         }
-        mtTable.setUpdateTime(new Date());
-        mtTableMapper.updateById(mtTable);
+        if (mtTable.getCode() != null) {
+            table.setCode(mtTable.getCode());
+        }
+        if (mtTable.getStoreId() != null) {
+            table.setStoreId(mtTable.getStoreId());
+        }
+        if (mtTable.getDescription() != null) {
+            table.setDescription(mtTable.getDescription());
+        }
+        if (mtTable.getMaxPeople() != null) {
+            table.setMaxPeople(mtTable.getMaxPeople());
+        }
+        if (mtTable.getStatus() != null) {
+            table.setStatus(mtTable.getStatus());
+        }
+        if (mtTable.getSort() != null) {
+            table.setSort(mtTable.getSort());
+        }
+        if (mtTable.getOperator() != null) {
+            table.setOperator(mtTable.getOperator());
+        }
+        table.setUpdateTime(new Date());
+        mtTableMapper.updateById(table);
         return mtTable;
     }
 
@@ -146,8 +176,12 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
         String status =  params.get("status") == null ? StatusEnum.ENABLED.getKey(): params.get("status").toString();
         String storeId =  params.get("storeId") == null ? "" : params.get("storeId").toString();
         String merchantId =  params.get("merchantId") == null ? "" : params.get("merchantId").toString();
+        String code =  params.get("code") == null ? "" : params.get("code").toString();
 
         LambdaQueryWrapper<MtTable> lambdaQueryWrapper = Wrappers.lambdaQuery();
+        if (StringUtils.isNotBlank(code)) {
+            lambdaQueryWrapper.eq(MtTable::getCode, code);
+        }
         if (StringUtils.isNotBlank(status)) {
             lambdaQueryWrapper.eq(MtTable::getStatus, status);
         }

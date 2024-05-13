@@ -171,6 +171,11 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     private PaymentService paymentService;
 
     /**
+     * 桌码服务接口
+     */
+    private TableService tableService;
+
+    /**
      * 获取用户订单列表
      * @param  orderListParam
      * @throws BusinessCheckException
@@ -189,6 +194,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         String dataType =  orderListParam.getDataType() == null ? "": orderListParam.getDataType();
         String type =  orderListParam.getType() == null ? "": orderListParam.getType();
         String orderSn =  orderListParam.getOrderSn() == null ? "": orderListParam.getOrderSn();
+        String tableCode =  orderListParam.getTableCode() == null ? "": orderListParam.getTableCode();
         String mobile =  orderListParam.getMobile() == null ? "": orderListParam.getMobile();
         String orderMode =  orderListParam.getOrderMode() == null ? "": orderListParam.getOrderMode();
         String staffId = orderListParam.getStaffId() == null ? "" : orderListParam.getStaffId();
@@ -208,7 +214,17 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         Page<MtOpenGift> pageHelper = PageHelper.startPage(pageNumber, pageSize);
         LambdaQueryWrapper<MtOrder> lambdaQueryWrapper = Wrappers.lambdaQuery();
-
+        if (StringUtil.isNotEmpty(tableCode)) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("code", tableCode);
+            params.put("status", StatusEnum.ENABLED.getKey());
+            List<MtTable> tables = tableService.queryTableListByParams(params);
+            if (tables != null && tables.size() > 0) {
+                lambdaQueryWrapper.eq(MtOrder::getTableId, tables.get(0).getId());
+            } else {
+                lambdaQueryWrapper.eq(MtOrder::getTableId, "00");
+            }
+        }
         if (StringUtil.isNotEmpty(orderSn)) {
             lambdaQueryWrapper.eq(MtOrder::getOrderSn, orderSn);
         }
@@ -323,6 +339,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         mtOrder.setUserId(orderDto.getUserId());
         mtOrder.setMerchantId(orderDto.getMerchantId());
         mtOrder.setStoreId(orderDto.getStoreId());
+        mtOrder.setTableId(orderDto.getTableId());
         mtOrder.setCouponId(orderDto.getCouponId());
         mtOrder.setParam(orderDto.getParam());
         mtOrder.setRemark(orderDto.getRemark());
@@ -618,6 +635,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     public Map<String, Object> doSettle(HttpServletRequest request, SettlementParam param) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
+        Integer tableId = request.getHeader("tableId") == null ? 0 : Integer.parseInt(request.getHeader("tableId"));
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String isWechat = param.getIsWechat() == null ? YesOrNoEnum.NO.getKey() : param.getIsWechat();
@@ -733,6 +751,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         orderDto.setUserId(userId);
         orderDto.setMerchantId(merchantId);
         orderDto.setStoreId(storeId);
+        orderDto.setTableId(tableId);
         orderDto.setType(type);
         orderDto.setGoodsId(goodsId);
         orderDto.setSkuId(skuId);
@@ -1556,6 +1575,12 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         // 订单所属店铺
         MtStore storeInfo = storeService.queryStoreById(orderInfo.getStoreId());
         userOrderDto.setStoreInfo(storeInfo);
+
+        // 订单所属桌码
+        if (orderInfo.getTableId() != null && orderInfo.getTableId() > 0) {
+            MtTable tableInfo = tableService.queryTableById(orderInfo.getTableId());
+            userOrderDto.setTableInfo(tableInfo);
+        }
 
         // 下单用户信息直接取会员个人信息
         OrderUserDto userInfo = new OrderUserDto();

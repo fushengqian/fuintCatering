@@ -77,6 +77,7 @@ public class ClientCartController extends BaseController {
         String token = request.getHeader("Access-Token");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
+        Integer tableId = request.getHeader("tableId") == null ? 0 : Integer.parseInt(request.getHeader("tableId"));
         Integer cartId = saveParam.getCartId() == null ? 0 : saveParam.getCartId();
         Integer goodsId = saveParam.getGoodsId() == null ? 0 : saveParam.getGoodsId();
         Integer skuId = saveParam.getSkuId() == null ? 0 : saveParam.getSkuId();
@@ -133,6 +134,7 @@ public class ClientCartController extends BaseController {
         mtCart.setHangNo(hangNo);
         mtCart.setIsVisitor(YesOrNoEnum.NO.getKey());
         mtCart.setMerchantId(merchantId);
+        mtCart.setTableId(tableId);
 
         Integer id = cartService.saveCart(mtCart, action);
         Map<String, Object> data = new HashMap();

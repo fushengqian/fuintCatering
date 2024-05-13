@@ -50,6 +50,9 @@ public class MtOrder implements Serializable {
     @ApiModelProperty("所属店铺ID")
     private Integer storeId;
 
+    @ApiModelProperty("所属桌码ID")
+    private Integer tableId;
+
     @ApiModelProperty("用户ID")
     private Integer userId;
 

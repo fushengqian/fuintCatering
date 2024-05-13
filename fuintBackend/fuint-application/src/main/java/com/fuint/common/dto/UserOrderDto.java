@@ -2,6 +2,7 @@ package com.fuint.common.dto;
 
 import com.fuint.repository.model.MtRefund;
 import com.fuint.repository.model.MtStore;
+import com.fuint.repository.model.MtTable;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -121,6 +122,9 @@ public class UserOrderDto implements Serializable {
 
     @ApiModelProperty("所属店铺信息")
     private MtStore storeInfo;
+
+    @ApiModelProperty("所属桌码信息")
+    private MtTable tableInfo;
 
     @ApiModelProperty("售后订单")
     private MtRefund refundInfo;

@@ -143,7 +143,7 @@ public class ${tableClass}ServiceImpl extends ServiceImpl<${className}Mapper, ${
     @Override
     public List<${className}> query${tableClass}ListByParams(Map<String, Object> params) {
         String status =  params.get("status") == null ? StatusEnum.ENABLED.getKey(): params.get("status").toString();
-        String storeId =  params.get("storeId") == null ? "" : params.get("storeId").toString();
+        String  =  params.get("storeId") == null ? "" : params.get("storeId").toString();
         String merchantId =  params.get("merchantId") == null ? "" : params.get("merchantId").toString();
 
         LambdaQueryWrapper<${className}> lambdaQueryWrapper = Wrappers.lambdaQuery();

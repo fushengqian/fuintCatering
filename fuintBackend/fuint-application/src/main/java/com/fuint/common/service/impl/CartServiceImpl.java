@@ -158,7 +158,7 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
         mtCart.setNum(reqDto.getNum());
         mtCart.setHangNo(reqDto.getHangNo());
         mtCart.setIsVisitor(reqDto.getIsVisitor());
-
+        mtCart.setTableId(reqDto.getTableId());
         Map<String, Object> params = new HashMap<>();
         params.put("userId", mtCart.getUserId());
         params.put("storeId", mtCart.getStoreId());
