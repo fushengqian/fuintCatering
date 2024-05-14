@@ -1,10 +1,12 @@
 package com.fuint.module.clientApi.controller;
 
 import com.fuint.common.service.StoreService;
+import com.fuint.common.service.TableService;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtStore;
+import com.fuint.repository.model.MtTable;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -30,6 +32,11 @@ public class ClientStoreController extends BaseController {
      * 店铺服务接口
      * */
     private StoreService storeService;
+
+    /**
+     * 桌码服务接口
+     */
+    private TableService tableService;
 
     /**
      * 获取店铺列表（根据距离排序）
@@ -63,6 +70,13 @@ public class ClientStoreController extends BaseController {
     @CrossOrigin
     public ResponseObject detail(HttpServletRequest request) throws BusinessCheckException {
         Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
+        Integer tableId = request.getHeader("tableId") == null ? 0 : Integer.parseInt(request.getHeader("tableId"));
+        if (tableId > 0) {
+            MtTable mtTable = tableService.queryTableById(tableId);
+            if (mtTable != null) {
+                storeId = mtTable.getStoreId();
+            }
+        }
 
         MtStore storeInfo = storeService.queryStoreById(storeId);
 

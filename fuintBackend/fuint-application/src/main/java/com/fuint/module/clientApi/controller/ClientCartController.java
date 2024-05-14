@@ -16,6 +16,7 @@ import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.mapper.MtGoodsSkuMapper;
 import com.fuint.repository.model.MtCart;
 import com.fuint.repository.model.MtGoodsSku;
+import com.fuint.repository.model.MtTable;
 import com.fuint.repository.model.MtUser;
 import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
@@ -68,6 +69,11 @@ public class ClientCartController extends BaseController {
     private MerchantService merchantService;
 
     /**
+     * 桌码服务接口
+     */
+    private TableService tableService;
+
+    /**
      * 保存购物车
      */
     @ApiOperation(value = "添加、保存购物车")
@@ -94,7 +100,12 @@ public class ClientCartController extends BaseController {
         } else {
             mtUser = memberService.queryMemberById(userInfo.getId());
         }
-
+        if (tableId > 0) {
+            MtTable mtTable = tableService.queryTableById(tableId);
+            if (mtTable != null && mtTable.getStoreId() > 0) {
+                storeId = mtTable.getStoreId();
+            }
+        }
         if (mtUser == null) {
             AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
             if (accountInfo != null) {
@@ -191,6 +202,7 @@ public class ClientCartController extends BaseController {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
+        Integer tableId = request.getHeader("tableId") == null ? 0 : Integer.parseInt(request.getHeader("tableId"));
         Integer goodsId = params.getGoodsId() == null ? 0 : params.getGoodsId();
         Integer skuId = params.getSkuId() == null ? 0 : params.getSkuId();
         Integer buyNum = params.getBuyNum() == null ? 1 : params.getBuyNum();
@@ -205,7 +217,12 @@ public class ClientCartController extends BaseController {
         if (point.equals(YesOrNoEnum.TRUE.getKey())) {
             isUsePoint = true;
         }
-
+        if (tableId > 0) {
+            MtTable mtTable = tableService.queryTableById(tableId);
+            if (mtTable != null && mtTable.getStoreId() > 0) {
+                storeId = mtTable.getStoreId();
+            }
+        }
         Map<String, Object> result = new HashMap<>();
         result.put("list", new ArrayList<>());
         result.put("totalNum", 0);
@@ -254,6 +271,9 @@ public class ClientCartController extends BaseController {
         }
         if (storeId > 0) {
             param.put("storeId", storeId);
+        }
+        if (tableId > 0) {
+            param.put("tableId", tableId);
         }
         List<MtCart> cartList = new ArrayList<>();
 

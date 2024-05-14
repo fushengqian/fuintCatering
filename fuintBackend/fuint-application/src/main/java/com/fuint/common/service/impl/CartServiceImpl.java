@@ -263,6 +263,7 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
         String skuId =  params.get("skuId") == null ? "" : params.get("skuId").toString();
         String storeId =  params.get("storeId") == null ? "" : params.get("storeId").toString();
         String merchantId =  params.get("merchantId") == null ? "" : params.get("merchantId").toString();
+        String tableId =  params.get("tableId") == null ? "" : params.get("tableId").toString();
 
         LambdaQueryWrapper<MtCart> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(MtCart::getStatus, status);
@@ -287,6 +288,9 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
         }
         if (StringUtil.isNotEmpty(storeId) && Integer.parseInt(storeId) > 0) {
             lambdaQueryWrapper.eq(MtCart::getStoreId, storeId);
+        }
+        if (StringUtil.isNotEmpty(tableId) && Integer.parseInt(tableId) > 0) {
+            lambdaQueryWrapper.eq(MtCart::getTableId, tableId);
         }
         if (StringUtil.isNotEmpty(skuId)) {
             lambdaQueryWrapper.eq(MtCart::getSkuId, skuId);

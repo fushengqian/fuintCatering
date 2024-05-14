@@ -383,6 +383,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         if (userGrade != null && userGrade.getDiscount() != null && userGrade.getDiscount() > 0) {
             // 会员折扣
             percent = new BigDecimal(userGrade.getDiscount()).divide(new BigDecimal("10"), BigDecimal.ROUND_CEILING, 3);
+            if (percent.compareTo(new BigDecimal("0")) <= 0) {
+                percent = new BigDecimal("1");
+            }
         }
 
         // 如果没有指定店铺，则读取默认的店铺
@@ -662,6 +665,12 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         MtUser userInfo = null;
         if (loginInfo != null) {
             userInfo = memberService.queryMemberById(loginInfo.getId());
+        }
+        if (tableId > 0) {
+            MtTable mtTable = tableService.queryTableById(tableId);
+            if (mtTable != null && mtTable.getStoreId() > 0) {
+                storeId = mtTable.getStoreId();
+            }
         }
 
         // 后台管理员或店员操作
@@ -2084,6 +2093,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         if (userGrade != null) {
             if (userGrade.getDiscount() > 0) {
                 payDiscount = new BigDecimal(userGrade.getDiscount()).divide(new BigDecimal("10"), BigDecimal.ROUND_CEILING, 3);
+                if (payDiscount.compareTo(new BigDecimal("0")) <= 0) {
+                    payDiscount = new BigDecimal("1");
+                }
             }
         }
         payPrice = payPrice.multiply(payDiscount).add(deliveryFee);

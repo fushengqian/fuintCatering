@@ -121,10 +121,14 @@
     /**
      * 生命周期函数--监听页面加载
      */
-    onLoad() {
-      const app = this
+    onLoad({ tableId }) {
+      const app = this;
+      tableId = tableId ? parseInt(tableId) : 0;
+      if (tableId > 0) {
+          uni.setStorageSync('tableId', tableId);
+      }
       // 设置分类列表高度
-      app.setListHeight()
+      app.setListHeight();
     },
 
     /**
