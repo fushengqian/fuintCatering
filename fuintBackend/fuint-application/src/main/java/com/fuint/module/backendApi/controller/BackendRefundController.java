@@ -14,7 +14,6 @@ import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
-import com.fuint.repository.model.MtRefund;
 import com.fuint.repository.model.MtUser;
 import com.fuint.repository.model.TAccount;
 import com.fuint.utils.StringUtil;
@@ -130,7 +129,7 @@ public class BackendRefundController extends BaseController {
             params.put("endTime", endTime);
         }
         paginationRequest.setSearchParams(params);
-        PaginationResponse<MtRefund> paginationResponse = refundService.getRefundListByPagination(paginationRequest);
+        PaginationResponse<RefundDto> paginationResponse = refundService.getRefundListByPagination(paginationRequest);
 
         // 售后状态列表
         RefundStatusEnum[] statusListEnum = RefundStatusEnum.values();
@@ -204,6 +203,7 @@ public class BackendRefundController extends BaseController {
         Integer refundId = param.get("refundId") == null ? 0 : Integer.parseInt(param.get("refundId").toString());
         String status = param.get("status") == null ? "" : param.get("status").toString();
         String remark = param.get("remark") == null ? "" : param.get("remark").toString();
+        String rejectReason = param.get("rejectReason") == null ? "" : param.get("rejectReason").toString();
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
         if (accountInfo == null) {
             return getFailureResult(1001, "请先登录");
@@ -215,6 +215,7 @@ public class BackendRefundController extends BaseController {
             dto.setOperator(operator);
             dto.setStatus(RefundStatusEnum.REJECT.getKey());
             dto.setRemark(remark);
+            dto.setRejectReason(rejectReason);
             refundService.updateRefund(dto);
         } else {
             RefundDto dto = new RefundDto();
