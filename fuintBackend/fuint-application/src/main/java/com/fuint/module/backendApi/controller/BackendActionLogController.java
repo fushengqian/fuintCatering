@@ -32,6 +32,9 @@ import java.util.Map;
 @RequestMapping(value = "/backendApi/actlog")
 public class BackendActionLogController extends BaseController {
 
+    /**
+     * 管理员接口
+     * */
     private ActionLogService tActionLogService;
 
     /**

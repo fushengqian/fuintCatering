@@ -1598,7 +1598,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             userInfo.setId(user.getId());
             userInfo.setName(user.getName());
             userInfo.setMobile(user.getMobile());
-            userInfo.setCardNo(user.getCarNo());
+            userInfo.setCardNo(user.getIdcard());
+            userInfo.setNo(user.getUserNo());
             userInfo.setAddress(user.getAddress());
             userOrderDto.setUserInfo(userInfo);
         }
