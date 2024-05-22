@@ -582,7 +582,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: 9999;
+    z-index: 999999999999;
     overflow: hidden;
     &.show {
       display: block;
@@ -622,7 +622,7 @@
     .layer {
       display: flex;
       width: 100%;
-      max-height: 960rpx;
+      max-height: 1200rpx;
       flex-direction: column;
       position: fixed;
       z-index: 999999;

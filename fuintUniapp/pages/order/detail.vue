@@ -233,7 +233,7 @@
             </view>
           </view>
           <!-- 余额支付 -->
-          <view v-if="order.type != 'recharge'" class="pay-item dis-flex flex-x-between" @click="onSelectPayType(PayTypeEnum.BALANCE.value)">
+          <view v-if="order.type != 'recharge' && order.type != 'prestore'" class="pay-item dis-flex flex-x-between" @click="onSelectPayType(PayTypeEnum.BALANCE.value)">
             <view class="item-left dis-flex flex-y-center">
               <view class="item-left_icon balance">
                 <text class="iconfont icon-qiandai"></text>

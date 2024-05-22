@@ -273,7 +273,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: 21;
+    z-index: 9999999999;
     overflow: hidden;
 
     &.show {
@@ -329,7 +329,7 @@
 
         .specification-wrapper-content {
           width: 100%;
-          max-height: 900rpx;
+          max-height: 1200rpx;
           min-height: 300rpx;
 
           &::-webkit-scrollbar {
