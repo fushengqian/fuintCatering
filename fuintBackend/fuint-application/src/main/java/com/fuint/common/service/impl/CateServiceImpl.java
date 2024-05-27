@@ -127,6 +127,9 @@ public class CateServiceImpl extends ServiceImpl<MtGoodsCateMapper, MtGoodsCate>
                 reqDto.setMerchantId(mtStore.getMerchantId());
             }
         }
+        if (reqDto.getMerchantId() == null || reqDto.getMerchantId() < 1) {
+            throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
+        }
         mtCate.setName(reqDto.getName());
         mtCate.setStatus(StatusEnum.ENABLED.getKey());
         mtCate.setLogo(reqDto.getLogo());

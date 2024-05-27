@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.AccountDto;
 import com.fuint.common.dto.AccountInfo;
+import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.service.AccountService;
 import com.fuint.common.service.CaptchaService;
 import com.fuint.common.service.StaffService;
@@ -380,6 +381,22 @@ public class AccountServiceImpl extends ServiceImpl<TAccountMapper, TAccount> im
             String inputPassword = getEntryptPassword(password, tAccount.getSalt());
             if (!myPassword.equals(inputPassword) || !tAccount.getAccountStatus().toString().equals("1")) {
                 throw new BusinessCheckException("登录账号或密码有误");
+            }
+
+            // 商户已禁用
+            if (tAccount.getMerchantId() != null && tAccount.getMerchantId() > 0) {
+                MtMerchant mtMerchant = mtMerchantMapper.selectById(tAccount.getMerchantId());
+                if (mtMerchant != null && !mtMerchant.getStatus().equals(StatusEnum.ENABLED.getKey())) {
+                    throw new BusinessCheckException("您的商户已被禁用，请联系平台方");
+                }
+            }
+
+            // 店铺已禁用
+            if (tAccount.getStoreId() != null && tAccount.getStoreId() > 0) {
+                MtStore mtStore = mtStoreMapper.selectById(tAccount.getStoreId());
+                if (mtStore != null && !mtStore.getStatus().equals(StatusEnum.ENABLED.getKey())) {
+                    throw new BusinessCheckException("您的店铺已被禁用，请联系平台方");
+                }
             }
 
             String token = TokenUtil.generateToken(userAgent, accountInfo);
