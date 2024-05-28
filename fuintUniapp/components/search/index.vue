@@ -39,9 +39,6 @@
     z-index: 999999;
     width: 100%;
     background: #ffffff;
-    /* #ifdef H5 */
-    margin-top: 13rpx;
-    /* #endif */
   }
 
   .index-search {

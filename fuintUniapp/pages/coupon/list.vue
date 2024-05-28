@@ -274,9 +274,11 @@
 <style lang="scss" scoped>
   // 页面头部
   .header {
-    display: flex;
+    display: block;
     align-items: center;
-    background-color: #fff;
+    text-align: center;
+    height: 103rpx;
+    background: #fff;
 
     // 搜索框
     .search {
