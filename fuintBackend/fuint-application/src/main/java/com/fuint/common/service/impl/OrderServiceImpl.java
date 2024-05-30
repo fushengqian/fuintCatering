@@ -976,6 +976,15 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
         }
 
+        // 订单起送费检查
+        MtSetting delivery = settingService.querySettingByName(merchantId, OrderSettingEnum.DELIVERY_MIN_AMOUNT.getKey());
+        if (delivery != null && orderInfo.getOrderMode().equals(OrderModeEnum.EXPRESS.getKey())) {
+            BigDecimal deliveryMinAmount = new BigDecimal(delivery.getValue());
+            if (deliveryMinAmount.compareTo(new BigDecimal("0")) > 0 && deliveryMinAmount.compareTo(orderInfo.getAmount()) > 0) {
+                throw new BusinessCheckException("订单起送金额：" + deliveryMinAmount + "元");
+            }
+        }
+
         ResponseObject paymentInfo = null;
         String errorMessage = "";
 

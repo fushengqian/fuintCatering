@@ -236,7 +236,7 @@ public class BackendRefundController extends BaseController {
     @RequestMapping(value = "doRefund", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('refund:edit')")
-    public ResponseObject doRefund(HttpServletRequest request, @RequestBody Map<String, Object> param) {
+    public ResponseObject doRefund(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         Integer orderId = param.get("orderId") == null ? 0 : Integer.parseInt(param.get("orderId").toString());
         String remark = param.get("remark") == null ? "" : param.get("remark").toString();
@@ -248,15 +248,11 @@ public class BackendRefundController extends BaseController {
         if (orderId <= 0 || StringUtil.isEmpty(refundAmount)) {
             return getFailureResult(201, "参数有误，发起退款失败");
         }
-        try {
-            Boolean result = refundService.doRefund(orderId, refundAmount, remark, accountInfo);
-            if (result) {
-                return getSuccessResult(true);
-            } else {
-                return getFailureResult(201, "退款失败");
-            }
-        } catch (BusinessCheckException e) {
-            return getFailureResult(201, e.getMessage() == null ? "退款失败" : e.getMessage());
+        Boolean result = refundService.doRefund(orderId, refundAmount, remark, accountInfo);
+        if (result) {
+            return getSuccessResult(true);
+        } else {
+            return getFailureResult(201, "退款失败");
         }
     }
 }
