@@ -46,7 +46,8 @@
     {
       "path": "pages/cart/index",
       "style": {
-        "navigationBarTitleText": "结算确认"
+        "navigationBarTitleText": "结算确认",
+        "enablePullDownRefresh": true
       }
     },
     {
@@ -250,7 +251,8 @@
     {
       "path": "pages/settlement/goods",
       "style": {
-        "navigationBarTitleText": "订单确认"
+        "navigationBarTitleText": "订单确认",
+        "enablePullDownRefresh": true
       }
     },
     {

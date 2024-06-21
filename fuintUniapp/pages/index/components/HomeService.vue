@@ -3,7 +3,7 @@
 		<view class="entrance">
             <view class="item">
                 <image class="icon" src="/static/nav/store.png" @click="goUrl('oneself')"></image>
-                <view class="title">门店自取</view>
+                <view class="title">堂食自提</view>
             </view>
             <view class="item">
                 <image class="icon" src="/static/nav/send.png" @click="goUrl('express')"></image>

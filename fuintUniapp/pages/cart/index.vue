@@ -160,10 +160,10 @@
         app.isLoading = true
         CartApi.list()
           .then(result => {
-            app.list = result.data.list
-            app.total = result.data.totalNum
+            app.list = result.data.list;
+            app.total = result.data.totalNum;
             // 清除checkedIds中无效的ID
-            app.onClearInvalidId()
+            app.onClearInvalidId();
           })
           .finally(() => app.isLoading = false)
       }, 
@@ -268,8 +268,17 @@
         const app = this
         CartApi.clear(app.checkedIds)
           .then(result => app.getCartList())
+      },
+      
+      /**
+       * 下拉刷新
+       */
+      onPullDownRefresh() {
+          setTimeout(() => {
+            this.getCartList();
+            uni.stopPullDownRefresh();
+          }, 1000)
       }
-
     }
   }
 </script>
@@ -488,7 +497,7 @@
         margin-right: 20rpx;
         // 禁用按钮
         &.disabled {
-          background: #6cb0b0;
+          background: #cccccc;
         }
       }
 

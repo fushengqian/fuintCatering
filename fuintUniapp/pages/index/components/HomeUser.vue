@@ -1,7 +1,7 @@
 <template>
 	<view class="com-user">
         <view class="user-main">
-            <image class="avatar" :src="userInfo.avatar ? userInfo.avatar : '/static/default-avatar.png'"></image>
+            <image class="avatar" :src="userInfo && userInfo.avatar ? userInfo.avatar : '/static/default-avatar.png'"></image>
             <view class="uc">
                 <view class="name">Hi，你好！</view>
                 <view class="tip" v-if="!userInfo.id">为了向您提供更好的服务，请登录！</view>

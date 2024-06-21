@@ -3,7 +3,8 @@
       <view class="success">
         <view v-if="isSuccess" class="result">
            <image class="icon" src='/static/pay/success.png'></image>
-           <text class="text">恭喜，支付成功！</text>
+           <text class="text" v-if="message && message != undefined">{{ message }}</text>
+           <text class="text" v-if="!message || message == undefined">恭喜，支付成功！</text>
         </view>
         <view v-if="!isSuccess" class="result">
            <image class="icon" src='/static/pay/fail.png'></image>
@@ -61,8 +62,8 @@
      */
     onLoad(options) {
         // 当前页面参数
-        this.orderId = options.orderId ? options.orderId : 0
-        this.message = options.message ? options.message : ''
+        this.orderId = options.orderId ? options.orderId : 0;
+        this.message = options.message ? options.message : '';
         this.getOrderDetail();
     },
 
@@ -117,12 +118,19 @@
       getOrderDetail() {
         const app = this
         app.isLoading = true
-        OrderApi.detail(app.orderId)
-          .then(result => {
-              app.isSuccess = result.data.payStatus === 'B' ? true : false;
-              app.isLoading = false;
-          })
-      },
+        const tableId = uni.getStorageSync("tableId") ? uni.getStorageSync("tableId") : 0;
+        if (tableId <= 0) {
+            OrderApi.detail(app.orderId)
+              .then(result => {
+                  app.isSuccess = result.data.payStatus === 'B' ? true : false;
+                  app.isLoading = false;
+              })
+        } else {
+            app.isSuccess = true;
+            app.isLoading = false;
+            uni.setStorageSync("tableId", 0);
+        }
+      }
     }
   }
 </script>

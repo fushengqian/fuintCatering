@@ -272,7 +272,7 @@
         payPrice: 0,
         totalNum: 0,
         deliveryFee: 0,
-        orderModeList: ['门店自提', '物流配送'],
+        orderModeList: ['堂食自提', '配送到家'],
         orderMode: true,
         address: null,
         useCouponInfo: null,
@@ -436,6 +436,11 @@
               return false
           }
           
+          const tableId = uni.getStorageSync("tableId") ? uni.getStorageSync("tableId") : 0;
+          if (tableId > 0) {
+              return app.doSubmitOrder(PayTypeEnum.WECHAT.value);
+          }
+          
           if (app.totalPrice < 0 || app.goodsCart.length < 1) {
               app.disabled = true
               return false
@@ -515,6 +520,12 @@
             return false;
         }
         
+        const tableId = uni.getStorageSync("tableId") ? uni.getStorageSync("tableId") : 0;
+        if (tableId > 0) {
+            app.navToOrderResult(result.data.orderInfo.id, '订单提交成功');
+            return false;
+        }
+        
         // 发起微信支付
         if (result.data.payType == PayTypeEnum.WECHAT.value) {
             // #ifdef H5
@@ -540,6 +551,22 @@
       // 跳转到订单结果页
       navToOrderResult(orderId, message) {
         this.$navTo('pages/order/result?orderId='+orderId+'&message=' + message);
+      },
+      
+      /**
+       * 下拉刷新
+       */
+      onPullDownRefresh() {
+          const app = this;
+          setTimeout(() => {
+            // 获取购物车信息
+            app.getCartList();
+            // 获取默认收货地址
+            app.getDefaultAddress();
+            // 获取店铺信息
+            app.getStoreInfo();
+            uni.stopPullDownRefresh();
+          }, 1000)
       }
     }
   }

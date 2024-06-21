@@ -115,7 +115,7 @@
           const app = this;
           UserApi.info()
             .then(result => {
-              app.userInfo = result.data.userInfo;
+              app.userInfo = result.data.userInfo ? result.data.userInfo : {};
             })
         },
         
@@ -124,6 +124,7 @@
          */
         onPullDownRefresh() {
           // 获取数据
+          this.getUserInfo();
           this.getPageData(() => {
              uni.stopPullDownRefresh()
           })

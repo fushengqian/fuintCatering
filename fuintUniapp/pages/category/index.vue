@@ -98,6 +98,7 @@
     },
     data() {
       return {
+        orderId: 0,
         goodsCart: [],
         totalNum: 0,
         totalPrice: 0.00,
@@ -121,14 +122,16 @@
     /**
      * 生命周期函数--监听页面加载
      */
-    onLoad({ tableId }) {
+    onLoad({ tableId, orderId }) {
       const app = this;
       tableId = tableId ? parseInt(tableId) : 0;
       if (tableId > 0) {
           uni.setStorageSync('tableId', tableId);
       }
+      app.orderId = orderId;
       // 设置分类列表高度
       app.setListHeight();
+      console.log('orderId = ', app.orderId);
     },
 
     /**

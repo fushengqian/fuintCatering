@@ -67,17 +67,6 @@
     <!-- 弹窗 -->
     <Popup v-if="!isLoading" v-model="showPopup" @onPaySuccess="getPageData" :memberGrade="curGrade"/>
     <!--会员升级 end-->
-    
-    <!-- 订单操作 -->
-    <view class="order-navbar">
-      <view class="order-navbar-item" v-for="(item, index) in orderNavbar" :key="index" @click="onTargetOrder(item)">
-        <view class="item-icon">
-          <text class="iconfont" :class="[`icon-${item.icon}`]"></text>
-        </view>
-        <view class="item-name">{{ item.name }}</view>
-        <text class="order-badge" v-if="item.count && item.count > 0">{{ item.count }}</text>
-      </view>
-    </view>
 
     <!-- 我的资产 -->
     <view class="my-asset">
@@ -373,12 +362,6 @@
       toRecharge(userId) {
           !this.isLogin && this.$navTo('pages/login/index')
           this.$navTo('pages/wallet/recharge/index', { userId: userId})
-      },
-
-      // 跳转到订单页
-      onTargetOrder(item) {
-          !this.isLogin && this.$navTo('pages/login/index')
-          this.$navTo('pages/order/index', { dataType: item.id })
       },
 
       // 跳转到我的积分页面

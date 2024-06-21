@@ -141,9 +141,6 @@ export const setCartTotalNum = (value) => {
 export const setCartTabBadge = () => {
   const cartTabbarIndex = 1
   const cartTotal = uni.getStorageSync('cartTotalNum') || 0;
-  
-  console.log('cartTotal = ', cartTotal);
-  
   if (cartTotal > 0) {
       uni.setTabBarBadge({
           index: cartTabbarIndex,

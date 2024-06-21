@@ -147,7 +147,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
         if (accountInfo != null) {
             // 输入了会员ID就用会员的账号下单，否则用员工账号下单
-            if (userId > 0) {
+            if (userId != null && userId > 0) {
                 mtUser = queryMemberById(userId);
             } else {
                 Integer accountId = accountInfo.getId();
@@ -159,8 +159,12 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
                             mtUser = queryMemberById(staff.getUserId());
                             if (mtUser != null && (mtUser.getStoreId() == null || mtUser.getStoreId() <= 0)) {
                                 mtUser.setStoreId(staff.getStoreId());
-                                updateById(mtUser);
                             }
+                            if (account.getMerchantId() != null && account.getMerchantId() > 0 && !account.getMerchantId().equals(mtUser.getMerchantId())) {
+                                mtUser.setMerchantId(account.getMerchantId());
+                            }
+                            mtUser.setUpdateTime(new Date());
+                            updateById(mtUser);
                         }
                     }
                 }

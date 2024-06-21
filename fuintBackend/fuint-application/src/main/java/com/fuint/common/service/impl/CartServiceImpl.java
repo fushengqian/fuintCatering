@@ -164,6 +164,7 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
         params.put("storeId", mtCart.getStoreId());
         params.put("goodsId", mtCart.getGoodsId());
         params.put("skuId", mtCart.getSkuId());
+        params.put("tableId", mtCart.getTableId());
         params.put("hangNo", reqDto.getHangNo() == null ? "" : reqDto.getHangNo());
 
         List<MtCart> cartList = queryCartListByParams(params);

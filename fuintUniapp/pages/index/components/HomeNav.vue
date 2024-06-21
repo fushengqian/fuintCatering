@@ -23,12 +23,6 @@
 
 <script>
 export default {
-	props: {
-		data: {
-			type: Array,
-			default: []
-		}
-	},
 	methods: {
 		goUrl(url) {
 			this.$navTo(url);

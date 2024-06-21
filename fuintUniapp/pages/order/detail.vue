@@ -187,8 +187,11 @@
     <!-- 底部操作按钮 -->
     <view class="footer-fixed" v-if="order.status == OrderStatusEnum.CREATED.value">
       <view class="btn-wrapper">
-        <block>
+        <block v-if="!order.tableInfo">
           <view class="btn-item" @click="onCancel(order.id)">取消订单</view>
+        </block>
+        <block v-if="order.tableInfo">
+          <view class="btn-item" @click="onContinue(order.id, order.tableInfo.id)">继续点单</view>
         </block>
         <block>
           <view class="btn-item active" @click="onPay(order.id)">去支付</view>
@@ -280,6 +283,8 @@
         ReceiptStatusEnum,
         // 当前订单ID
         orderId: null,
+        // 桌码ID
+        tableId: 0,
         // 加载中
         isLoading: true,
         // 当前订单详情
@@ -299,6 +304,7 @@
     onLoad({ orderId }) {
       // 当前订单ID
       this.orderId = orderId;
+      this.tableId = uni.getStorageSync("tableId") ? uni.getStorageSync("tableId") : 0;
     },
 
     /**
@@ -367,6 +373,11 @@
             }
           }
         });
+      },
+      // 继续点单
+      onContinue(tableId) {
+         this.$navTo('pages/category/index');
+         uni.setStorageSync('tableId', tableId);
       },
 
       // 点击去支付
