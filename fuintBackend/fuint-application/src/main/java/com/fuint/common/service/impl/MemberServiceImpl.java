@@ -184,6 +184,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         Page<MtUser> pageHelper = PageHelper.startPage(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
         LambdaQueryWrapper<MtUser> wrapper = Wrappers.lambdaQuery();
         wrapper.ne(MtUser::getStatus, StatusEnum.DISABLE.getKey());
+        wrapper.eq(MtUser::getIsStaff, YesOrNoEnum.NO.getKey());
 
         String name = paginationRequest.getSearchParams().get("name") == null ? "" : paginationRequest.getSearchParams().get("name").toString();
         if (StringUtils.isNotBlank(name)) {
@@ -366,6 +367,9 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
             mtUser.setStoreId(mtUser.getStoreId());
         } else {
             mtUser.setStoreId(0);
+        }
+        if (mtUser.getIsStaff() == null) {
+            mtUser.setIsStaff(YesOrNoEnum.NO.getKey());
         }
         // 密码加密
         if (mtUser.getPassword() != null && StringUtil.isNotEmpty(mtUser.getPassword())) {

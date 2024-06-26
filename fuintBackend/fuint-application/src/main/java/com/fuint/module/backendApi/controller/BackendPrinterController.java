@@ -1,6 +1,7 @@
 package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.dto.AccountInfo;
+import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.service.PrinterService;
 import com.fuint.common.service.StoreService;
 import com.fuint.common.util.TokenUtil;
@@ -166,6 +167,7 @@ public class BackendPrinterController extends BaseController {
         String name = params.get("name") == null ? "" : params.get("name").toString();
         String sn = params.get("sn") == null ? "" : params.get("sn").toString();
         String description = params.get("description") == null ? "" : params.get("description").toString();
+        String autoPrint = params.get("autoPrint") == null ? YesOrNoEnum.NO.getKey() : params.get("autoPrint").toString();
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
         if (accountInfo == null) {
@@ -180,6 +182,7 @@ public class BackendPrinterController extends BaseController {
         mtPrinter.setSn(sn);
         mtPrinter.setDescription(description);
         mtPrinter.setMerchantId(accountInfo.getMerchantId());
+        mtPrinter.setAutoPrint(autoPrint);
         if (StringUtil.isNotEmpty(id)) {
             mtPrinter.setId(Integer.parseInt(id));
             printerService.updatePrinter(mtPrinter);

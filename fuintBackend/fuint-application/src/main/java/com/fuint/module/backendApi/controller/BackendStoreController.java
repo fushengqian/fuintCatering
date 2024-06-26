@@ -235,7 +235,14 @@ public class BackendStoreController extends BaseController {
             longitude = latAndLng.get("lng").toString();
         }
 
+        if (StringUtil.isEmpty(storeId)) {
+
+        }
+
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
+            if (StringUtil.isEmpty(storeId)) {
+                return getFailureResult(201, "当前登录帐户是店铺的帐户，无法添加新店铺");
+            }
             storeId = accountInfo.getStoreId().toString();
         }
 

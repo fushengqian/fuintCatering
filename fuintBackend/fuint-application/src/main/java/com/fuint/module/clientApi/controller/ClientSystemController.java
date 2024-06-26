@@ -4,16 +4,14 @@ import com.fuint.common.dto.ParamDto;
 import com.fuint.common.dto.StoreDto;
 import com.fuint.common.dto.UserInfo;
 import com.fuint.common.enums.StatusEnum;
-import com.fuint.common.service.MemberService;
-import com.fuint.common.service.MerchantService;
-import com.fuint.common.service.SettingService;
-import com.fuint.common.service.StoreService;
+import com.fuint.common.service.*;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtMerchant;
 import com.fuint.repository.model.MtStore;
+import com.fuint.repository.model.MtTable;
 import com.fuint.repository.model.MtUser;
 import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
@@ -60,6 +58,11 @@ public class ClientSystemController extends BaseController {
     private MerchantService merchantService;
 
     /**
+     * 桌码服务接口
+     */
+    private TableService tableService;
+
+    /**
      * 获取系统配置
      *
      * @param request Request对象
@@ -74,6 +77,7 @@ public class ClientSystemController extends BaseController {
         String storeId = request.getHeader("storeId") == null ? "" : request.getHeader("storeId");
         String latitude = request.getHeader("latitude") == null ? "" : request.getHeader("latitude");
         String longitude = request.getHeader("longitude") == null ? "" : request.getHeader("longitude");
+        String tableId =  request.getHeader("tableId") == null ? "" : request.getHeader("tableId");
 
         UserInfo loginInfo = TokenUtil.getUserInfoByToken(token);
         Integer merchantId = merchantService.getMerchantId(merchantNo);
@@ -92,6 +96,14 @@ public class ClientSystemController extends BaseController {
                 if (!mtUser.getMerchantId().equals(merchantId)) {
                     return getFailureResult(1001);
                 }
+            }
+        }
+
+        // 扫码下单
+        if (StringUtil.isNotEmpty(tableId)) {
+            MtTable mtTable = tableService.queryTableById(Integer.parseInt(tableId));
+            if (mtTable != null && mtTable.getStoreId() != null) {
+                storeId = mtTable.getStoreId().toString();
             }
         }
 

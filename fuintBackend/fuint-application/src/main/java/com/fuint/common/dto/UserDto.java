@@ -90,6 +90,9 @@ public class UserDto implements Serializable {
     @ApiModelProperty("默认店铺名称")
     private String storeName;
 
+    @ApiModelProperty("是否员工")
+    private String isStaff;
+
     @ApiModelProperty("创建时间")
     private Date createTime;
 
