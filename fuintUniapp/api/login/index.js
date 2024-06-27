@@ -7,7 +7,8 @@ const api = {
   mpWxLogin: 'clientApi/sign/mpWxLogin',
   mpWxAuth: 'clientApi/sign/mpWxAuth',
   captcha: 'clientApi/captcha/getCode',
-  sendSmsCaptcha: 'clientApi/sms/sendVerifyCode'
+  sendSmsCaptcha: 'clientApi/sms/sendVerifyCode',
+  authLoginConfig: 'clientApi/sign/authLoginConfig'
 }
 
 // 用户注册
@@ -38,4 +39,9 @@ export function captcha() {
 // 发送短信验证码
 export function sendSmsCaptcha(data) {
   return request.post(api.sendSmsCaptcha, data)
+}
+
+// 获取授权登录配置
+export function authLoginConfig() {
+  return request.get(api.authLoginConfig)
 }

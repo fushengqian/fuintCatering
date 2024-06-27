@@ -49,7 +49,7 @@
         banner: [],
         ads: [],
         storeInfo: null,
-        userInfo: null,
+        userInfo: {},
         isReflash: false,
         isLoading: false
       }

@@ -7,7 +7,7 @@
     <view>
         <view class="auth-subtitle">获得你的公开信息（昵称、头像等）</view>
         <view class="login-btn">
-          <button class="button btn-normal" @click.stop="doAuth()">授权登录</button>
+          <button class="button btn-normal" @click.stop="doLogin">授权登录</button>
         </view>
     </view>
     <view class="no-login-btn">
@@ -23,8 +23,6 @@
 
     data() {
       return {
-        // 微信小程序登录凭证 (code)
-        // 提交到后端，用于换取openid
         code: ''
       }
     },
@@ -38,79 +36,68 @@
        } else {
            this.code = this.getQueryVariable('code');
        }
-       this.doAuth();
     },
 
     methods: {
-        
-      // 授权登录
-      doAuth() {
-        const app = this;
-        if (!app.code) {
-            app.$toast("抱歉，授权失败！");
-            // 跳转回原页面
-            setTimeout(() => {
-              app.$navTo('pages/user/index')
-            }, 1000);
-            return false;
-        }
-        return new Promise((resolve, reject) => {
-            LoginApi.mpWxAuth({
-              code: app.code
-          })
-            .then(result => {
-                // 显示登录成功
-                app.$toast(result.message);
-                // 跳转个人中心
+        doLogin() {
+          this.doAuth();
+        },
+        // 授权登录
+        async doAuth() {
+            const app = this;
+            if (!app.code) {
+                app.$toast("抱歉，授权失败！");
+                // 跳转回原页面
                 setTimeout(() => {
-                  app.$navTo('pages/user/index');
+                  app.$navTo('pages/user/index')
                 }, 1000);
+                return false;
+            }
+            
+            // 提交到后端
+            store.dispatch('MpWxAuthLogin', { code: app.code })
+              .then(result => {
+                if (result.code == '200') {
+                    // 显示登录成功
+                    app.$toast(result.message);
+                    app.$navTo('pages/user/index');
+                } else {
+                    store.dispatch('Logout')
+                }
+              })
+              .catch(() => {
+                 app.$toast("抱歉，授权失败！");
+              })
+          },
+          
+          getQueryVariable(variable) {
+            const query = window.location.search.substring(1);
+            const vars = query.split("&");
+            for (let i = 0; i < vars.length; i++) {
+              let pair = vars[i].split("=");
+              if (pair[0] == variable) { return pair[1]; }
+            }
+            return (false);
+          },
+
+          /**
+           * 暂不登录
+           */
+          handleCancel() {
+            // 跳转回原页面
+            store.dispatch('Logout');
+            this.$navTo('pages/user/index');
+          },
+
+          /**
+           * 授权成功 跳转回原页面
+           */
+          onNavigateBack(delta = 1) {
+            uni.navigateBack({
+              delta: Number(delta)
             })
-            .catch(err => {
-                 store.dispatch('Logout');
-                 app.onEmitSuccess(userInfo);
-            })
-        })
-      },
-      
-      getQueryVariable(variable) {
-        const query = window.location.search.substring(1);
-        const vars = query.split("&");
-        for (let i = 0; i < vars.length; i++) {
-          let pair = vars[i].split("=");
-          if (pair[0] == variable) { return pair[1]; }
+          }
         }
-        return (false);
-      },
-
-      // 将oauth提交给父级
-      // 这里要重新获取code, 因为上一次获取的code不能复用(会报错)
-      async onEmitSuccess(userInfo) {
-        const app = this
-        app.$emit('success', {
-          oauth: 'MP-WEIXIN', // 第三方登录类型: MP-WEIXIN
-          code: await app.getCode(), // 微信登录的code, 用于换取openid
-          userInfo // 微信用户信息
-        })
-      },
-
-      /**
-       * 暂不登录
-       */
-      handleCancel() {
-        // 跳转回原页面
-        this.onNavigateBack()
-      },
-
-      /**
-       * 授权成功 跳转回原页面
-       */
-      onNavigateBack(delta = 1) {
-        uni.navigateBack({
-          delta: Number(delta)
-        })
-      }
-    }
   }
 </script>
 
@@ -157,7 +144,7 @@
     .button {
       height: 88rpx;
       line-height: 88rpx;
-      background: #04be01;
+      background: $fuint-theme;
       color: #fff;
       font-size: 30rpx;
       border-radius: 12rpx;

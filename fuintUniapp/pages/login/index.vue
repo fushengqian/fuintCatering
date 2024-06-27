@@ -7,7 +7,7 @@
 
 <script>
 import store from '@/store'
-import { checkLogin } from '../../utils/app'
+import { checkLogin, isWechat } from '../../utils/app'
 import Main from './components/main'
 import MpWeixin from './components/mp-weixin'
 import * as LoginApi from '@/api/login'
@@ -33,9 +33,27 @@ import * as LoginApi from '@/api/login'
      * 生命周期函数--监听页面显示
      */
     onShow() {
+      const app = this
       const isLogin = checkLogin();
       if (isLogin) {
           store.dispatch('Logout');
+      }
+      if (isWechat()) {
+          // #ifdef H5
+          uni.showLoading({ title: '页面加载中..', mask:true });
+          LoginApi.authLoginConfig()
+            .then(result => {
+                uni.hideLoading();
+                if (result.data.appId && result.data.domain) {
+                   const appId = result.data.appId;
+                   const domain = result.data.domain;
+                   const redirect_uri = encodeURIComponent(domain + "#pages/login/auth");
+                   const url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appId + "&redirect_uri="+ redirect_uri +"&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect";
+                   window.location.href = url;
+                   return true; 
+                }
+          })
+          // #endif
       }
     },
 

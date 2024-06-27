@@ -74,6 +74,19 @@ const user = {
           .catch(reject)
       })
     },
+    
+    // 微信公众号授权登录
+    MpWxAuthLogin({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        LoginApi.mpWxAuth(data, { isPrompt: false })
+          .then(response => {
+            const result = response.data
+            loginSuccess(commit, result)
+            resolve(response)
+          })
+          .catch(reject)
+      })
+    },
 
     // 退出登录
     Logout({ commit }, data) {

@@ -419,18 +419,6 @@
        * 去授权认证
        * */
       isNeedAuth(loginInfo) {
-         console.log("loginInfo == ", loginInfo);
-         if (isWechat() && loginInfo && loginInfo.appId && loginInfo.domain && !loginInfo.openId) {
-             console.log('to auth...')
-             // #ifdef H5
-             const appId = loginInfo.appId;
-             const domain = loginInfo.domain;
-             const redirect_uri = encodeURIComponent(domain + "#pages/login/auth");
-             const url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appId + "&redirect_uri="+ redirect_uri +"&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect";
-             window.location.href = url;
-             return true;
-             // #endif
-         }
          this.onNavigateBack(1);
       },
 

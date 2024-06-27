@@ -106,7 +106,7 @@
         "enable" : false
     },
     "h5" : {
-        "title" : "fuint会员营销系统",
+        "title" : "fuint餐饮系统",
         "domain" : "www.fuint.cn",
         "router" : {
             "base" : "/food/",

@@ -4,14 +4,14 @@
             <image class="avatar" :src="userInfo && userInfo.avatar ? userInfo.avatar : '/static/default-avatar.png'"></image>
             <view class="uc">
                 <view class="name">Hi，你好！</view>
-                <view class="tip" v-if="!userInfo.id">为了向您提供更好的服务，请登录！</view>
-                <view class="tip" v-if="userInfo.id">
+                <view class="tip" v-if="!userInfo || !userInfo.id">为了向您提供更好的服务，请登录！</view>
+                <view class="tip" v-if="userInfo && userInfo.id">
                     <view>余额：<text>{{ userInfo.balance }}</text></view>
                     <view>积分：<text>{{ userInfo.point }}</text></view>
                 </view>
             </view>
-            <view class="ur" v-if="!userInfo.id" @click="goLogin">登录</view>
-            <view class="qr iconfont icon-qr-extract" v-if="userInfo.id" @click="goMemberCode"></view>
+            <view class="ur" v-if="!userInfo || !userInfo.id" @click="goLogin">登录</view>
+            <view class="qr iconfont icon-qr-extract" v-if="userInfo && userInfo.id" @click="goMemberCode"></view>
         </view>
     </view>
 </template>
