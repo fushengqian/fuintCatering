@@ -40,7 +40,7 @@ public class MtPrinter implements Serializable {
     @ApiModelProperty("打印机名称")
     private String name;
 
-    @ApiModelProperty("是否自动打印机")
+    @ApiModelProperty("是否自动打印")
     private String autoPrint;
 
     @ApiModelProperty("创建时间")

@@ -726,7 +726,6 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
                 }
             } catch (Exception e) {
                 logger.error("卡券发放失败：{}", e.getMessage());
-                throw new BusinessCheckException("抱歉，卡券发放失败");
             }
         }
     }

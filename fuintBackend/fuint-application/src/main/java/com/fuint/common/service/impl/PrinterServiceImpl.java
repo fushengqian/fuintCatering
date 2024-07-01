@@ -3,11 +3,14 @@ package com.fuint.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fuint.common.util.PrintUtil;
-import com.fuint.common.util.PrinterConfig;
-import com.fuint.common.vo.printer.AddPrinterRequest;
-import com.fuint.common.vo.printer.AddPrinterRequestItem;
-import com.fuint.common.vo.printer.DelPrinterRequest;
+import com.fuint.common.dto.UserOrderDto;
+import com.fuint.common.enums.PrinterSettingEnum;
+import com.fuint.common.enums.SettingTypeEnum;
+import com.fuint.common.enums.YesOrNoEnum;
+import com.fuint.common.service.SettingService;
+import com.fuint.common.util.HashSignUtil;
+import com.fuint.common.util.PrinterUtil;
+import com.fuint.common.vo.printer.*;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
@@ -16,6 +19,8 @@ import com.fuint.repository.model.MtPrinter;
 import com.fuint.common.service.PrinterService;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.repository.mapper.MtPrinterMapper;
+import com.fuint.repository.model.MtSetting;
+import com.fuint.repository.model.MtStore;
 import com.fuint.utils.StringUtil;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
@@ -43,6 +48,11 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
     private static final Logger logger = LoggerFactory.getLogger(PrinterServiceImpl.class);
 
     private MtPrinterMapper mtPrinterMapper;
+
+    /**
+     * 系统配置服务接口
+     * */
+    private SettingService settingService;
 
     /**
      * 分页查询数据列表
@@ -100,6 +110,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "新增打印机")
     public MtPrinter addPrinter(MtPrinter mtPrinter) throws BusinessCheckException {
         mtPrinter.setStatus(StatusEnum.ENABLED.getKey());
@@ -114,19 +125,65 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             // 添加云打印机
             if (mtPrinter.getSn() != null && mtPrinter.getName() != null) {
                 AddPrinterRequest restRequest = new AddPrinterRequest();
-                PrinterConfig.createRequestHeader(restRequest);
+                createRequestHeader(0, restRequest);
                 AddPrinterRequestItem item = new AddPrinterRequestItem();
                 item.setName(mtPrinter.getName());
                 item.setSn(mtPrinter.getSn());
-                AddPrinterRequestItem[] items = {item};
+                AddPrinterRequestItem[] items = { item };
                 restRequest.setItems(items);
-                PrintUtil.addPrinters(restRequest);
+                PrinterUtil.addPrinters(restRequest);
             }
             return mtPrinter;
         } else {
             logger.error("新增打印机数据失败.");
             throw new BusinessCheckException("新增打印机数据失败");
         }
+    }
+
+    /**
+     * 打印订单
+     *
+     * @param orderInfo 订单信息
+     * @return
+     * */
+    @Override
+    public Boolean printOrder(UserOrderDto orderInfo) throws BusinessCheckException {
+        PrintRequest printRequest = new PrintRequest();
+        createRequestHeader(0, printRequest);
+        if (orderInfo.getStoreInfo() == null) {
+            return false;
+        }
+
+        // 获取打印机列表
+        Map<String, Object> params = new HashMap<>();
+        params.put("storeId", orderInfo.getStoreInfo().getId());
+        params.put("status", StatusEnum.ENABLED.getKey());
+        params.put("autoPrint", YesOrNoEnum.YES.getKey());
+        List<MtPrinter> printers = queryPrinterListByParams(params);
+        if (printers == null || printers.size() < 1) {
+            return false;
+        }
+
+        MtStore storeInfo = orderInfo.getStoreInfo();
+        for (MtPrinter mtPrinter : printers) {
+            printRequest.setSn(mtPrinter.getSn());
+            StringBuilder printContent = new StringBuilder();
+            printContent.append("<C>下单店铺：").append("<BOLD>"+storeInfo.getName()+"</BOLD>").append("<BR></C>");
+            printContent.append("<BR>");
+            printContent.append("订单号：").append("<BOLD>" + orderInfo.getOrderSn()+ "<BR></BOLD>");
+            printContent.append("订单金额：").append("<BOLD>" + orderInfo.getPayAmount()+ "<BR></BOLD>");
+            // 订单号条形码
+            printContent.append("<BR>");
+            printContent.append("<C><BARCODE>"+ orderInfo.getOrderSn() +"</BARCODE></C>");
+
+            printRequest.setContent(printContent.toString());
+            printRequest.setCopies(1);
+            printRequest.setVoice(2);
+            printRequest.setMode(0);
+            ObjectRestResponse<String> resp = PrinterUtil.print(printRequest);
+        }
+
+        return true;
     }
 
     /**
@@ -150,7 +207,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "删除打印机")
-    public void deletePrinter(Integer id, String operator) {
+    public void deletePrinter(Integer id, String operator) throws BusinessCheckException {
         MtPrinter mtPrinter = queryPrinterById(id);
         if (null == mtPrinter) {
             return;
@@ -158,10 +215,10 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
         // 删除云打印机
         if (StringUtil.isNotEmpty(mtPrinter.getSn())) {
             DelPrinterRequest restRequest = new DelPrinterRequest();
-            PrinterConfig.createRequestHeader(restRequest);
+            createRequestHeader(0, restRequest);
             String[] snList = { mtPrinter.getSn() };
             restRequest.setSnlist(snList);
-            PrintUtil.delPrinters(restRequest);
+            PrinterUtil.delPrinters(restRequest);
         }
         mtPrinter.setStatus(StatusEnum.DISABLE.getKey());
         mtPrinter.setUpdateTime(new Date());
@@ -171,7 +228,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
     /**
      * 修改打印机数据
      *
-     * @param mtPrinter
+     * @param mtPrinter 打印机参数
      * @throws BusinessCheckException
      * @return
      */
@@ -221,14 +278,39 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             lambdaQueryWrapper.eq(MtPrinter::getName, name);
         }
         if (StringUtils.isNotBlank(storeId)) {
-            lambdaQueryWrapper.and(wq -> wq
-                    .eq(MtPrinter::getStoreId, 0)
-                    .or()
-                    .eq(MtPrinter::getStoreId, storeId));
+            lambdaQueryWrapper.eq(MtPrinter::getStoreId, storeId);
         }
-
         lambdaQueryWrapper.orderByAsc(MtPrinter::getId);
-        List<MtPrinter> dataList = mtPrinterMapper.selectList(lambdaQueryWrapper);
-        return dataList;
+
+        return mtPrinterMapper.selectList(lambdaQueryWrapper);
+    }
+
+    /**
+     * 创建接口请求header
+     *
+     * @param merchantId 商户ID
+     * @param request RestRequest
+     * @return
+     * */
+    public void createRequestHeader(Integer merchantId, RestRequest request) throws BusinessCheckException {
+        List<MtSetting> settings = settingService.getSettingList(merchantId, SettingTypeEnum.PRINTER.getKey());
+        if (settings != null && settings.size() > 0) {
+            String userName = "";
+            String userKey = "";
+            for (MtSetting mtSetting : settings) {
+                if (mtSetting.getName().equals(PrinterSettingEnum.USER_NAME.getKey())) {
+                    userName = mtSetting.getValue();
+                }
+                if (mtSetting.getName().equals(PrinterSettingEnum.USER_KEY.getKey())) {
+                    userKey = mtSetting.getValue();
+                }
+            }
+            if (StringUtil.isNotEmpty(userName) && StringUtil.isNotEmpty(userKey)) {
+                request.setUser(userName);
+                request.setTimestamp(System.currentTimeMillis() + "");
+                request.setSign(HashSignUtil.sign(request.getUser() + userKey + request.getTimestamp()));
+                request.setDebug("0");
+            }
+        }
     }
 }

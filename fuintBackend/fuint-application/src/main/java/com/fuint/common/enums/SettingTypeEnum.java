@@ -12,6 +12,7 @@ public enum SettingTypeEnum {
     USER("user", "会员配置"),
     ORDER("order", "交易配置"),
     SUB_MESSAGE("sub_message", "订阅消息"),
+    PRINTER("printer", "打印设置"),
     SMS_CONFIG("sms_config", "短信配置");
 
     private String key;

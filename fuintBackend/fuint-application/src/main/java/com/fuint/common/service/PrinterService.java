@@ -1,6 +1,7 @@
 package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.fuint.common.dto.UserOrderDto;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtPrinter;
@@ -32,6 +33,14 @@ public interface PrinterService extends IService<MtPrinter> {
      * @return
      */
     MtPrinter addPrinter(MtPrinter mtPrinter) throws BusinessCheckException;
+
+    /**
+     * 打印订单
+     *
+     * @param orderInfo 订单信息
+     * @return
+     * */
+    Boolean printOrder(UserOrderDto orderInfo) throws BusinessCheckException;
 
     /**
      * 根据ID获取打印机信息
