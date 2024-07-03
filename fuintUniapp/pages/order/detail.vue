@@ -42,7 +42,7 @@
           <text v-else-if="order.status == OrderStatusEnum.CANCEL.value">{{OrderStatusEnum.CANCEL.name}}</text>
           <text v-else-if="order.status == OrderStatusEnum.REFUND.value">{{OrderStatusEnum.REFUND.name}}</text>
         </view>
-        <view class="verify-code" v-if="order.orderMode == 'oneself' && order.verifyCode && order.payStatus == 'B'">
+        <view class="verify-code" v-if="order.orderMode == 'oneself' && order.verifyCode && order.payStatus == 'B' && !order.tableInfo">
             <view>提取码：</view>
             <view class="code">{{ order.verifyCode }}</view>
         </view>
@@ -202,7 +202,7 @@
     <!-- 已支付的订单 -->
     <view class="footer-fixed" v-if="(order.status == OrderStatusEnum.PAID.value)">
       <view class="btn-wrapper">
-        <block v-if="!order.refundInfo">
+        <block v-if="!order.refundInfo && !order.tableInfo">
           <view class="btn-item active" @click="handleApplyRefund(order.id)">申请售后</view>
         </block>
         <block v-if="order.refundInfo">

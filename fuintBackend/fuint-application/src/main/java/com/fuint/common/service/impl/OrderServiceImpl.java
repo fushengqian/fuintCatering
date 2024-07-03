@@ -185,7 +185,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     public PaginationResponse getUserOrderList(OrderListParam orderListParam) throws BusinessCheckException {
         Integer pageNumber = orderListParam.getPage() == null ? Constants.PAGE_NUMBER : orderListParam.getPage();
         Integer pageSize = orderListParam.getPageSize() == null ? Constants.PAGE_SIZE : orderListParam.getPageSize();
-        String userId = orderListParam.getUserId() == null ? "" : orderListParam.getUserId();
+        String userId = orderListParam.getUserId() == null ? "" : orderListParam.getUserId().toString();
         Integer merchantId = orderListParam.getMerchantId() == null ? 0 : orderListParam.getMerchantId();
         Integer storeId = orderListParam.getStoreId() == null ? 0 : orderListParam.getStoreId();
         String status =  orderListParam.getStatus() == null ? "": orderListParam.getStatus();
@@ -1296,6 +1296,10 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         if (null != orderDto.getPayTime()) {
             mtOrder.setPayTime(orderDto.getPayTime());
+        }
+
+        if (null != orderDto.getPayType()) {
+            mtOrder.setPayType(orderDto.getPayType());
         }
 
         if (null != orderDto.getPayStatus()) {

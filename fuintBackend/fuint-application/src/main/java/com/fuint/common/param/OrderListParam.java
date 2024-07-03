@@ -16,7 +16,7 @@ public class OrderListParam extends PageParam implements Serializable {
     private String id;
 
     @ApiModelProperty(value="会员ID", name="userId")
-    private String userId;
+    private Integer userId;
 
     @ApiModelProperty(value="商户ID", name="merchantId")
     private Integer merchantId;

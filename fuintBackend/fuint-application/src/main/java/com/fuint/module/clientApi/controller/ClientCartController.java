@@ -76,7 +76,7 @@ public class ClientCartController extends BaseController {
     /**
      * 保存购物车
      */
-    @ApiOperation(value = "添加、保存购物车")
+    @ApiOperation(value = "保存购物车")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject save(HttpServletRequest request, @RequestBody CartSaveParam saveParam) throws BusinessCheckException {
@@ -280,6 +280,7 @@ public class ClientCartController extends BaseController {
         }
         if (tableId > 0) {
             param.put("tableId", tableId);
+            param.remove("userId");
         }
         List<MtCart> cartList = new ArrayList<>();
 

@@ -6,12 +6,14 @@ import com.fuint.common.dto.UserOrderDto;
 import com.fuint.common.enums.OrderStatusEnum;
 import com.fuint.common.param.OrderListParam;
 import com.fuint.common.service.OrderService;
+import com.fuint.common.service.TableService;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtOrder;
+import com.fuint.repository.model.MtTable;
 import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,6 +42,11 @@ public class ClientOrderController extends BaseController {
     private OrderService orderService;
 
     /**
+     * 桌码服务接口
+     */
+    private TableService tableService;
+
+    /**
      * 获取我的订单列表
      */
     @ApiOperation(value = "获取我的订单列表")
@@ -47,15 +54,23 @@ public class ClientOrderController extends BaseController {
     @CrossOrigin
     public ResponseObject list(HttpServletRequest request, @RequestBody OrderListParam orderListParam) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
+        Integer tableId = request.getHeader("tableId") == null ? 0 : Integer.parseInt(request.getHeader("tableId"));
         UserInfo userInfo = TokenUtil.getUserInfoByToken(token);
 
         if (userInfo == null) {
             return getFailureResult(1001, "用户未登录");
         }
+        orderListParam.setUserId(userInfo.getId());
+        if (tableId > 0) {
+            MtTable mtTable = tableService.queryTableById(tableId);
+            if (mtTable != null) {
+                orderListParam.setTableCode(mtTable.getCode());
+                orderListParam.setUserId(null);
+                orderListParam.setStatus(OrderStatusEnum.CREATED.getKey());
+            }
+        }
 
-        orderListParam.setUserId(userInfo.getId().toString());
         PaginationResponse orderData = orderService.getUserOrderList(orderListParam);
-
         return getSuccessResult(orderData);
     }
 

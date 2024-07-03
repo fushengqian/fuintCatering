@@ -6,19 +6,13 @@ import com.fuint.common.dto.*;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.param.GoodsInfoParam;
-import com.fuint.common.service.CateService;
-import com.fuint.common.service.GoodsService;
-import com.fuint.common.service.MerchantService;
-import com.fuint.common.service.SettingService;
+import com.fuint.common.service.*;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
-import com.fuint.repository.model.MtGoods;
-import com.fuint.repository.model.MtGoodsCate;
-import com.fuint.repository.model.MtGoodsSku;
-import com.fuint.repository.model.MtGoodsSpec;
+import com.fuint.repository.model.*;
 import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -64,6 +58,11 @@ public class ClientGoodsController extends BaseController {
     private MerchantService merchantService;
 
     /**
+     * 桌码服务接口
+     */
+    private TableService tableService;
+
+    /**
      * 获取商品分类列表
      */
     @ApiOperation(value = "获取商品分类列表")
@@ -72,10 +71,17 @@ public class ClientGoodsController extends BaseController {
     public ResponseObject cateList(HttpServletRequest request) throws BusinessCheckException {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
+        Integer tableId = request.getHeader("tableId") == null ? 0 : Integer.parseInt(request.getHeader("tableId"));
 
         Map<String, Object> param = new HashMap<>();
         param.put("status", StatusEnum.ENABLED.getKey());
         Integer merchantId = merchantService.getMerchantId(merchantNo);
+        if (tableId > 0) {
+            MtTable mtTable = tableService.queryTableById(tableId);
+            if (mtTable != null && mtTable.getStoreId() > 0) {
+                storeId = mtTable.getStoreId();
+            }
+        }
         if (merchantId > 0) {
             param.put("merchantId", merchantId);
         }

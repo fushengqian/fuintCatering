@@ -100,13 +100,13 @@ public class BackendMemberGroupController extends BaseController {
     }
 
     /**
-     * 保存分组信息
+     * 保存会员分组
      *
      * @param request
      * @param memberGroupDto
      * @return
      */
-    @ApiOperation(value = "保存分组信息")
+    @ApiOperation(value = "保存会员分组")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('member:group:index')")
@@ -116,6 +116,11 @@ public class BackendMemberGroupController extends BaseController {
         if (accountInfo == null) {
             return getFailureResult(1001, "请先登录");
         }
+
+        if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
+            return getFailureResult(201, "平台方帐号无法执行该操作，请使用商户帐号操作");
+        }
+
         memberGroupDto.setMerchantId(accountInfo.getMerchantId());
         memberGroupDto.setStoreId(accountInfo.getStoreId());
         memberGroupDto.setOperator(accountInfo.getAccountName());
