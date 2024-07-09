@@ -270,7 +270,7 @@ public class ClientCartController extends BaseController {
         }
         param.put("status", StatusEnum.ENABLED.getKey());
         if (StringUtil.isNotEmpty(hangNo)) {
-            param = new HashMap<>();
+            param.remove("userId");
             param.put("hangNo", hangNo);
         } else {
             param.put("hangNo", "");

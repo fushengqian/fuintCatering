@@ -78,14 +78,14 @@
     width: 16rpx;
     height: 16rpx;
     margin-right: 8rpx;
-    background-color: #fff;
-
+    background-color: #333;
+    border: solid 5rpx #fff;
     &:last-child {
       margin-right: 0;
     }
 
     &.active {
-      background-color: #000 !important;
+      background-color: #fff !important;
     }
   }
 
@@ -93,7 +93,7 @@
   &.round .dots-item {
     width: 18rpx;
     height: 18rpx;
-    border-radius: 30rpx;
+    border-radius: 18rpx;
   }
 }
 </style>
