@@ -237,6 +237,7 @@ public class UserCouponServiceImpl extends ServiceImpl<MtUserCouponMapper, MtUse
                  userCoupon = mtUserCouponMapper.selectById(userCouponId);
              }
              userCoupon.setMerchantId(userInfo.getMerchantId());
+             userCoupon.setStoreId(couponInfo.getStoreId());
              userCoupon.setCouponId(couponInfo.getId());
              userCoupon.setType(couponInfo.getType());
              userCoupon.setAmount(couponInfo.getAmount());
@@ -290,6 +291,8 @@ public class UserCouponServiceImpl extends ServiceImpl<MtUserCouponMapper, MtUse
      * @param paramMap 储值参数
      * @return
      * */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean preStore(Map<String, Object> paramMap) throws BusinessCheckException {
         Integer couponId = paramMap.get("couponId") == null ? 0 : Integer.parseInt(paramMap.get("couponId").toString());
         Integer userId = paramMap.get("userId") == null ? 0 : Integer.parseInt(paramMap.get("userId").toString());
@@ -351,7 +354,6 @@ public class UserCouponServiceImpl extends ServiceImpl<MtUserCouponMapper, MtUse
      * @return
      * */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public ResponseObject getUserCouponList(Map<String, Object> paramMap) throws BusinessCheckException {
         Integer pageNumber = paramMap.get("pageNumber") == null ? Constants.PAGE_NUMBER : Integer.parseInt(paramMap.get("pageNumber").toString());
         Integer pageSize = paramMap.get("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(paramMap.get("pageSize").toString());
@@ -628,66 +630,76 @@ public class UserCouponServiceImpl extends ServiceImpl<MtUserCouponMapper, MtUse
      * @param couponId 卡券ID
      * @param userId 会员ID
      * @param mobile 手机号
+     * @param num 购买数量
      * @return
      * */
-    public boolean buyCouponItem(Integer orderId, Integer couponId, Integer userId, String mobile) throws BusinessCheckException {
-        MtCoupon couponInfo = couponService.queryCouponById(couponId);
-        MtUserCoupon userCoupon = new MtUserCoupon();
-        userCoupon.setCouponId(couponId);
-        userCoupon.setType(couponInfo.getType());
-        userCoupon.setGroupId(couponInfo.getGroupId());
-        userCoupon.setMobile(mobile);
-        userCoupon.setUserId(userId);
-        userCoupon.setStatus(UserCouponStatusEnum.UNUSED.getKey());
-        userCoupon.setCreateTime(new Date());
-        userCoupon.setUpdateTime(new Date());
-        userCoupon.setExpireTime(couponInfo.getEndTime());
-        if (couponInfo.getExpireType().equals(CouponExpireTypeEnum.FLEX.getKey())) {
-            Date expireTime = new Date();
-            Calendar c = Calendar.getInstance();
-            c.setTime(expireTime);
-            c.add(Calendar.DATE, couponInfo.getExpireTime());
-            expireTime = c.getTime();
-            userCoupon.setExpireTime(expireTime);
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean buyCouponItem(Integer orderId, Integer couponId, Integer userId, String mobile, Integer num) throws BusinessCheckException {
+        if (num == null || num <= 0) {
+            num = 1;
         }
-        userCoupon.setOrderId(orderId);
+        for (int j = 0; j < num; j++) {
+            MtCoupon couponInfo = couponService.queryCouponById(couponId);
+            MtUserCoupon userCoupon = new MtUserCoupon();
+            userCoupon.setMerchantId(couponInfo.getMerchantId());
+            userCoupon.setStoreId(couponInfo.getStoreId());
+            userCoupon.setCouponId(couponId);
+            userCoupon.setType(couponInfo.getType());
+            userCoupon.setGroupId(couponInfo.getGroupId());
+            userCoupon.setMobile(mobile);
+            userCoupon.setUserId(userId);
+            userCoupon.setStatus(UserCouponStatusEnum.UNUSED.getKey());
+            userCoupon.setCreateTime(new Date());
+            userCoupon.setUpdateTime(new Date());
+            userCoupon.setExpireTime(couponInfo.getEndTime());
+            if (couponInfo.getExpireType().equals(CouponExpireTypeEnum.FLEX.getKey())) {
+                Date expireTime = new Date();
+                Calendar c = Calendar.getInstance();
+                c.setTime(expireTime);
+                c.add(Calendar.DATE, couponInfo.getExpireTime());
+                expireTime = c.getTime();
+                userCoupon.setExpireTime(expireTime);
+            }
+            userCoupon.setOrderId(orderId);
 
-        // 如果购买的是储值卡
-        if (couponInfo.getType().equals(CouponTypeEnum.PRESTORE.getKey()) && couponInfo.getInRule() != null) {
-            String[] paramArr = couponInfo.getInRule().split(","); // 100_200,300_500
-            MtOrder orderInfo = orderService.getOrderInfo(orderId);
-            if (orderInfo != null) {
-                BigDecimal payAmount = orderInfo.getPayAmount();
-                BigDecimal totalAmount = new BigDecimal(0);
-                if (paramArr.length > 0) {
-                    for (int i = 0; i < paramArr.length; i++) {
-                        String[] storeItem = paramArr[i].split("_");
-                        if (storeItem.length > 0) {
-                            BigDecimal amount = new BigDecimal(paramArr[i].split("_")[0]);
-                            if (payAmount.compareTo(amount) >= 0) {
-                                totalAmount = new BigDecimal(paramArr[i].split("_")[1]);
-                                payAmount = payAmount.subtract(amount);
+            // 如果购买的是储值卡
+            if (couponInfo.getType().equals(CouponTypeEnum.PRESTORE.getKey()) && couponInfo.getInRule() != null) {
+                String[] paramArr = couponInfo.getInRule().split(","); // 100_200,300_500
+                MtOrder orderInfo = orderService.getOrderInfo(orderId);
+                if (orderInfo != null) {
+                    BigDecimal payAmount = orderInfo.getPayAmount();
+                    BigDecimal totalAmount = new BigDecimal(0);
+                    if (paramArr.length > 0) {
+                        for (int i = 0; i < paramArr.length; i++) {
+                            String[] storeItem = paramArr[i].split("_");
+                            if (storeItem.length > 0) {
+                                BigDecimal amount = new BigDecimal(paramArr[i].split("_")[0]);
+                                if (payAmount.compareTo(amount) >= 0) {
+                                    totalAmount = new BigDecimal(paramArr[i].split("_")[1]);
+                                    payAmount = payAmount.subtract(amount);
+                                }
                             }
                         }
                     }
+                    couponInfo.setAmount(totalAmount);
                 }
-                couponInfo.setAmount(totalAmount);
             }
+
+            userCoupon.setAmount(couponInfo.getAmount());
+            userCoupon.setBalance(couponInfo.getAmount());
+
+            // 12位随机数
+            StringBuffer code = new StringBuffer();
+            code.append(SeqUtil.getRandomNumber(4));
+            code.append(SeqUtil.getRandomNumber(4));
+            code.append(SeqUtil.getRandomNumber(4));
+            code.append(SeqUtil.getRandomNumber(4));
+            userCoupon.setCode(code.toString());
+            userCoupon.setUuid(code.toString());
+
+            mtUserCouponMapper.insert(userCoupon);
         }
-
-        userCoupon.setAmount(couponInfo.getAmount());
-        userCoupon.setBalance(couponInfo.getAmount());
-
-        // 12位随机数
-        StringBuffer code = new StringBuffer();
-        code.append(SeqUtil.getRandomNumber(4));
-        code.append(SeqUtil.getRandomNumber(4));
-        code.append(SeqUtil.getRandomNumber(4));
-        code.append(SeqUtil.getRandomNumber(4));
-        userCoupon.setCode(code.toString());
-        userCoupon.setUuid(code.toString());
-
-        mtUserCouponMapper.insert(userCoupon);
         return true;
     }
 
@@ -705,6 +717,7 @@ public class UserCouponServiceImpl extends ServiceImpl<MtUserCouponMapper, MtUse
         userCoupon.setGroupId(couponInfo.getGroupId());
         userCoupon.setMobile(userInfo.getMobile());
         userCoupon.setMerchantId(couponInfo.getMerchantId());
+        userCoupon.setStoreId(couponInfo.getStoreId());
         userCoupon.setUserId(userInfo.getId());
         userCoupon.setStatus(UserCouponStatusEnum.UNUSED.getKey());
         userCoupon.setCreateTime(new Date());

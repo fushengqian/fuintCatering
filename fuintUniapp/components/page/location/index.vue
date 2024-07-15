@@ -46,6 +46,9 @@
 <style lang="scss" scoped>
 .main-loc {
   height: 90rpx;
+  /* #ifdef H5 */
+  height: 100rpx;
+  /* #endif */
   color: #ffffff;
   .diy-location {
     background: linear-gradient(to bottom, $fuint-theme, $fuint-theme);

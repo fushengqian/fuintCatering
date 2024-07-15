@@ -1388,7 +1388,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                                 String couponIds[] = mtGoods.getCouponIds().split(",");
                                 if (couponIds.length > 0) {
                                     for (int i = 0; i < couponIds.length; i++) {
-                                         userCouponService.buyCouponItem(orderInfo.getId(), Integer.parseInt(couponIds[i]), orderInfo.getUserId(), orderInfo.getUserInfo().getMobile());
+                                         userCouponService.buyCouponItem(orderInfo.getId(), Integer.parseInt(couponIds[i]), orderInfo.getUserId(), orderInfo.getUserInfo().getMobile(), goodsDto.getNum());
                                     }
                                 }
                             }

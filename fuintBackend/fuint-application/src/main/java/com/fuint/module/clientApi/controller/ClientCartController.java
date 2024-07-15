@@ -106,7 +106,7 @@ public class ClientCartController extends BaseController {
                 storeId = mtTable.getStoreId();
             }
         }
-        if (mtUser == null) {
+        if (mtUser == null && StringUtil.isNotEmpty(token)) {
             AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
             if (accountInfo != null) {
                 return getFailureResult(201, "该管理员还未关联店铺员工");
@@ -138,6 +138,9 @@ public class ClientCartController extends BaseController {
             AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
             if (accountInfo != null && accountInfo.getMerchantId() != null) {
                 merchantId = accountInfo.getMerchantId();
+                if (merchantId <= 0) {
+                    return getFailureResult(201, "平台方账户无操作权限");
+                }
             }
         }
 
