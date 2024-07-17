@@ -136,12 +136,15 @@ public class ClientCartController extends BaseController {
         }
         if (merchantId <= 0) {
             AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-            if (accountInfo != null && accountInfo.getMerchantId() != null) {
+            if (accountInfo != null) {
                 merchantId = accountInfo.getMerchantId();
-                if (merchantId <= 0) {
+                if (merchantId == null || merchantId <= 0) {
                     return getFailureResult(201, "平台方账户无操作权限");
                 }
             }
+        }
+        if (storeId <= 0 && mtUser.getStoreId() != null) {
+            storeId = mtUser.getStoreId();
         }
 
         MtCart mtCart = new MtCart();
