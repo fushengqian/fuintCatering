@@ -49,6 +49,15 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
         LambdaQueryWrapper<MtTable> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.ne(MtTable::getStatus, StatusEnum.DISABLE.getKey());
 
+        String merchantId = paginationRequest.getSearchParams().get("merchantId") == null ? "" : paginationRequest.getSearchParams().get("merchantId").toString();
+        if (StringUtils.isNotBlank(merchantId)) {
+            lambdaQueryWrapper.eq(MtTable::getMerchantId, merchantId);
+        }
+        String storeId = paginationRequest.getSearchParams().get("storeId") == null ? "" : paginationRequest.getSearchParams().get("storeId").toString();
+        if (StringUtils.isNotBlank(storeId)) {
+            lambdaQueryWrapper.eq(MtTable::getStoreId, storeId);
+        }
+
         String code = paginationRequest.getSearchParams().get("code") == null ? "" : paginationRequest.getSearchParams().get("code").toString();
         if (StringUtils.isNotBlank(code)) {
             lambdaQueryWrapper.eq(MtTable::getCode, code);
@@ -189,10 +198,7 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
             lambdaQueryWrapper.eq(MtTable::getMerchantId, merchantId);
         }
         if (StringUtils.isNotBlank(storeId)) {
-            lambdaQueryWrapper.and(wq -> wq
-                    .eq(MtTable::getStoreId, 0)
-                    .or()
-                    .eq(MtTable::getStoreId, storeId));
+            lambdaQueryWrapper.eq(MtTable::getStoreId, storeId);
         }
 
         lambdaQueryWrapper.orderByAsc(MtTable::getSort);
