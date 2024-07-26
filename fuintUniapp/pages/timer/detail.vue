@@ -134,8 +134,10 @@
                    app.dataList[i] = {"data": []}
                    for (let j = 1; j <= 4; j++) {
                        if (c <= num) {
-                           const k = (i * j) + i;
-                           const showTime = confirmLogs[k] ? confirmLogs[k].createTime : '';
+                           let showTime = '';
+                           if (c <= use && confirmLogs[c-1]) {
+                               showTime = confirmLogs[c-1].createTime; 
+                           }
                            app.dataList[i].data.push({ "isActive": (c <= use ? true : false), showTime: showTime });
                            c++;
                        }

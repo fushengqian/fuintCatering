@@ -281,19 +281,15 @@ public class OpenGiftServiceImpl extends ServiceImpl<MtOpenGiftMapper, MtOpenGif
                }
                // 返卡券
                if (item.getCouponId() > 0) {
-                   try {
-                       MtCoupon mtCoupon = couponService.queryCouponById(item.getCouponId());
-                       if (mtCoupon != null && mtCoupon.getStatus().equals(StatusEnum.ENABLED.getKey())) {
-                           CouponReceiveParam param = new CouponReceiveParam();
-                           param.setCouponId(item.getCouponId());
-                           param.setUserId(userId);
-                           param.setNum(item.getCouponNum() == null ? 1 : item.getCouponNum());
-                           String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-                           couponService.sendCoupon(item.getCouponId(), userId, param.getNum(), true, uuid, "");
-                           totalAmount = totalAmount.add(mtCoupon.getAmount());
-                       }
-                   } catch (Exception e) {
-                       throw new BusinessCheckException(e.getMessage());
+                   MtCoupon mtCoupon = couponService.queryCouponById(item.getCouponId());
+                   if (mtCoupon != null && mtCoupon.getStatus().equals(StatusEnum.ENABLED.getKey())) {
+                       CouponReceiveParam param = new CouponReceiveParam();
+                       param.setCouponId(item.getCouponId());
+                       param.setUserId(userId);
+                       param.setNum(item.getCouponNum() == null ? 1 : item.getCouponNum());
+                       String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+                       couponService.sendCoupon(item.getCouponId(), userId, param.getNum(), true, uuid, "");
+                       totalAmount = totalAmount.add(mtCoupon.getAmount());
                    }
                }
             }

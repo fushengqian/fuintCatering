@@ -2,10 +2,7 @@ package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.dto.AccountInfo;
 import com.fuint.common.enums.QrCodeEnum;
-import com.fuint.common.service.CouponService;
-import com.fuint.common.service.SettingService;
-import com.fuint.common.service.StoreService;
-import com.fuint.common.service.WeixinService;
+import com.fuint.common.service.*;
 import com.fuint.common.util.Base64Util;
 import com.fuint.common.util.QRCodeUtil;
 import com.fuint.common.util.TokenUtil;
@@ -14,6 +11,7 @@ import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtCoupon;
 import com.fuint.repository.model.MtStore;
+import com.fuint.repository.model.MtTable;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -58,6 +56,11 @@ public class BackendCommonController extends BaseController {
     private StoreService storeService;
 
     /**
+     * 桌码服务接口
+     */
+    private TableService tableService;
+
+    /**
      * 卡券服务接口
      */
     private CouponService couponService;
@@ -79,10 +82,14 @@ public class BackendCommonController extends BaseController {
         if (accountInfo == null) {
             return getFailureResult(1001, "请先登录");
         }
-        Integer merchantId = 0;
+        Integer merchantId = accountInfo.getMerchantId() == null ? 0 : accountInfo.getMerchantId();
         String page = QrCodeEnum.STORE.getPage() + "?" + QrCodeEnum.STORE.getKey() + "Id=" + id;
         if (type.equals(QrCodeEnum.TABLE.getKey())) {
             page = QrCodeEnum.TABLE.getPage() + "?" + QrCodeEnum.TABLE.getKey() + "Id=" + id;
+            MtTable mtTable = tableService.queryTableById(id);
+            if (mtTable != null) {
+                merchantId = mtTable.getMerchantId();
+            }
         }
         if (type.equals(QrCodeEnum.COUPON.getKey())) {
             page = QrCodeEnum.COUPON.getPage() + "?" + QrCodeEnum.COUPON.getKey() + "Id=" + id;
