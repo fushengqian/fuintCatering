@@ -1,8 +1,9 @@
 @font-face {
-  font-family: "iconfont"; /* Project id 4514721 */
-  src: url('//at.alicdn.com/t/c/font_4514721_jhj4doibcze.woff2?t=1713490860276') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4514721_jhj4doibcze.woff?t=1713490860276') format('woff'),
-       url('//at.alicdn.com/t/c/font_4514721_jhj4doibcze.ttf?t=1713490860276') format('truetype');
+  font-family: 'iconfont';  /* Project id 4514721 */
+  src: url('//at.alicdn.com/t/c/font_4514721_cvr3z4lc04l.woff2?t=1722241706974') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4514721_cvr3z4lc04l.woff?t=1722241706974') format('woff'),
+       url('//at.alicdn.com/t/c/font_4514721_cvr3z4lc04l.ttf?t=1722241706974') format('truetype'),
+       url('//at.alicdn.com/t/c/font_4514721_cvr3z4lc04l.svg?t=1722241706974#iconfont') format('svg');
 }
 
 .iconfont {
@@ -37,3 +38,18 @@
   content: "\e799";
 }
 
+.icon-fenxiang-post:before {
+  content: "\e7c5";
+}
+
+.icon-download-post:before {
+  content: "\e63f";
+}
+
+.icon-gift:before {
+  content: "\e682";
+}
+
+.icon-copy:before {
+  content: "\e61c";
+}

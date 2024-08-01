@@ -162,13 +162,13 @@
         CartApi.save(goods_id, '+', sku_id, buy_num)
           .then(result => {
             // 隐藏当前弹窗
-            app.onChangeValue(false)
+            app.onChangeValue(false);
             // 购物车商品总数量
-            const cartTotal = result.data.cartTotal
+            const cartTotal = result.data ? result.data.cartTotal : 0;
             // 缓存购物车数量
-            setCartTotalNum(cartTotal)
+            setCartTotalNum(cartTotal);
             // 传递给父级
-            app.$emit('addCart', cartTotal)
+            app.$emit('addCart', cartTotal);
           })
       },
 

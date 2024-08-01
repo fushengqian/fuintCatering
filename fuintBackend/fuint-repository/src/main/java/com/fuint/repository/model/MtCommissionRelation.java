@@ -28,6 +28,9 @@ public class MtCommissionRelation implements Serializable {
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
 
+    @ApiModelProperty("所属商户ID")
+    private Integer merchantId;
+
     @ApiModelProperty("会员ID")
     private Integer userId;
 
@@ -36,6 +39,9 @@ public class MtCommissionRelation implements Serializable {
 
     @ApiModelProperty("被邀请会员ID")
     private Integer subUserId;
+
+    @ApiModelProperty("等级")
+    private Integer level;
 
     @ApiModelProperty("备注")
     private String description;

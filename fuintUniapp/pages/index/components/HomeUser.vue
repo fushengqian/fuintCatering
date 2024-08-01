@@ -1,5 +1,5 @@
 <template>
-	<view class="com-user">
+    <view class="com-user">
         <view class="user-main">
             <image class="avatar" :src="userInfo && userInfo.avatar ? userInfo.avatar : '/static/default-avatar.png'"></image>
             <view class="uc">
@@ -19,28 +19,28 @@
 <script>
     export default {
         props: {
-        	userInfo: {
-        		type: Object,
-        		default: { id: '', avatar: '', name: '', balance: '', point: '' }
-        	}
+            userInfo: {
+                type: Object,
+                default: { id: '', avatar: '', name: '', balance: '', point: '' }
+            }
         },
         methods: {
             // 去登录
-			goLogin() {
-				this.$navTo('pages/login/index')
-			},
+            goLogin() {
+                this.$navTo('pages/login/index')
+            },
             // 跳转会员码
             goMemberCode(userId) {
                 this.$navTo('pages/user/code', { userId: this.userInfo.id })
             },
-		}
+        }
     }
 </script>
 
 <style lang="scss" scoped>
 .com-user {
-	width: 100%;
-	height: auto;
+    width: 100%;
+    height: auto;
     padding: 0 20rpx 20rpx;
     margin-top: -60rpx;
     position: relative;

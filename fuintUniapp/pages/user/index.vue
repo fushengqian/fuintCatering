@@ -162,6 +162,7 @@
     { id: 'address', name: '收货地址', icon: 'shouhuodizhi', type: 'link', url: 'pages/address/index' },
     { id: 'refund', name: '售后服务', icon: 'shouhou', type: 'link', url: 'pages/refund/index' },
     { id: 'setting', name: '个人信息', icon: 'shezhi1', type: 'link', url: 'pages/user/setting' },
+    { id: 'share', name: '邀请有礼', icon: 'fenxiang-post', type: 'link', url: 'pages/share/index' },
   ]
 
   export default {

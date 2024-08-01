@@ -11,7 +11,7 @@
         <view class="coupon-share__line"></view>
         <view class="coupon-share">
           <button class="share-btn dis-flex flex-dir-column" open-type="share">
-            <text class="share__icon iconfont icon-fenxiang"></text>
+            <text class="share__icon iconfont icon-fenxiang-post"></text>
             <text class="f-24">分享</text>
           </button>
         </view>

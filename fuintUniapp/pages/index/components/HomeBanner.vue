@@ -1,36 +1,36 @@
 <template>
-	<view class="banner">
-		<swiper class="bg" circular :indicator-dots="false" :autoplay="true" :interval="5000" :duration="200" @change="_bindChange">
-			<swiper-item v-for="(item, index) in banners" :key="index">
-				<view class="swiper">
-					<image :src="item.image" @click.stop="goUrl(item.url)"></image>
-				</view>
-			</swiper-item>
+    <view class="banner">
+        <swiper class="bg" circular :indicator-dots="false" :autoplay="true" :interval="5000" :duration="200" @change="_bindChange">
+            <swiper-item v-for="(item, index) in banners" :key="index">
+                <view class="swiper">
+                    <image :src="item.image" @click.stop="goUrl(item.url)"></image>
+                </view>
+            </swiper-item>
         </swiper>
         <!-- 指示点 -->
         <view class="indicator-dots round">
           <view class="dots-item" :class="{ active: current == index }" v-for="(dataItem, index) in banners" :key="index"></view>
         </view>
-	</view>
+    </view>
 </template>
 
 <script>
-	export default {
-		props: {
-			banners: {
-				type: Array,
-				default: []
-			}
-		},
+    export default {
+        props: {
+            banners: {
+                type: Array,
+                default: []
+            }
+        },
         data() {
           return {
             current: 1 // 轮播图指针
           }
         },
-		methods: {
-			goUrl(url) {
-			  this.$navTo(url);
-			},
+        methods: {
+            goUrl(url) {
+              this.$navTo(url);
+            },
             
             /**
              * 记录当前指针
@@ -38,29 +38,29 @@
             _bindChange(e) {
               this.current = e.detail.current;
             }
-		},
-	}
+        },
+    }
 </script>
 
 <style lang="scss" scoped>
 .banner {
-	position: relative;
-	width: 100%;
-	height: 600rpx;
-	.bg {
-		width: 100%;
-		height: 600rpx;
-	}
+    position: relative;
+    width: 100%;
+    height: 600rpx;
+    .bg {
+        width: 100%;
+        height: 600rpx;
+    }
 }
 .banner,
 .bg,
 .swiper {
-	width: 100%;
-	height: 600rpx;
-	image {
-		width: 100%;
-		height: 100%;
-	}
+    width: 100%;
+    height: 600rpx;
+    image {
+        width: 100%;
+        height: 100%;
+    }
 }
 /* 指示点 */
 .indicator-dots {

@@ -347,6 +347,12 @@
       "style": {
         "navigationBarTitleText": "卡券兑换"
       }
+    },
+    {
+      "path": "pages/share/index",
+      "style": {
+        "navigationBarTitleText": "邀请有礼"
+      }
     }
   ],
   "globalStyle": {

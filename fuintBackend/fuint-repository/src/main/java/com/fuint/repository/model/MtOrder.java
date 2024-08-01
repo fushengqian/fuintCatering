@@ -116,4 +116,7 @@ public class MtOrder implements Serializable {
     @ApiModelProperty("分佣提成计算状态")
     private String commissionStatus;
 
+    @ApiModelProperty("分佣提成用户ID")
+    private Integer commissionUserId;
+
 }
