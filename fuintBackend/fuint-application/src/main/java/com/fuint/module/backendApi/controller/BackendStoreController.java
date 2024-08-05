@@ -235,15 +235,14 @@ public class BackendStoreController extends BaseController {
             longitude = latAndLng.get("lng").toString();
         }
 
-        if (StringUtil.isEmpty(storeId)) {
-
-        }
-
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
             if (StringUtil.isEmpty(storeId)) {
-                return getFailureResult(201, "当前登录帐户是店铺的帐户，无法添加新店铺");
+                return getFailureResult(201, "店铺帐号不能新增店铺，请使用商户帐号添加！");
             }
             storeId = accountInfo.getStoreId().toString();
+        }
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+            merchantId = accountInfo.getMerchantId().toString();
         }
 
         storeInfo.setName(storeName);
@@ -275,8 +274,8 @@ public class BackendStoreController extends BaseController {
             return getFailureResult(201, "店铺名称不能为空");
         } else {
             if (!StringUtil.isNotEmpty(storeName)) {
-                StoreDto tempDto = storeService.queryStoreByName(storeName);
-                if (null != tempDto && tempDto.getName().equals(storeName) && !tempDto.getId().equals(storeId)) {
+                StoreDto storeDto = storeService.queryStoreByName(storeName);
+                if (null != storeDto && storeDto.getName().equals(storeName) && !storeDto.getId().equals(storeId)) {
                     return getFailureResult(201, "该店铺名称已经存在");
                 }
             }
