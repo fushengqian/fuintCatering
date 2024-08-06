@@ -191,7 +191,7 @@
           <view class="btn-item" @click="onCancel(order.id)">取消订单</view>
         </block>
         <block v-if="order.tableInfo">
-          <view class="btn-item" @click="onContinue(order.id, order.tableInfo.id)">继续点单</view>
+          <view class="btn-item" @click="onContinue(order.tableInfo.id)">继续点单</view>
         </block>
         <block>
           <view class="btn-item active" @click="onPay(order.id)">去支付</view>
