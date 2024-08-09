@@ -648,6 +648,10 @@ public class WeixinServiceImpl implements WeixinService {
     public String createQrCode(Integer merchantId, String type, Integer id, String page, Integer width) throws BusinessCheckException {
         try {
             String accessToken = getAccessToken(merchantId, true,true);
+            if (StringUtil.isEmpty(accessToken)) {
+                throw new BusinessCheckException("生成二维码出错，请检查小程序配置");
+            }
+
             String url = "https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=" + accessToken;
             String reqDataJsonStr = "";
 
@@ -657,34 +661,56 @@ public class WeixinServiceImpl implements WeixinService {
             reqData.put("width", width);
             reqDataJsonStr = JsonUtil.toJSONString(reqData);
 
-            byte[] bytes = HttpRESTDataClient.requestPost(url, reqDataJsonStr);
-            logger.info("WechatService createStoreQrCode reqData：{}", reqDataJsonStr);
+            JSONObject jsonParam = new JSONObject();
+            jsonParam.put("path", page);
+            jsonParam.put("width", width);
 
-            String pathRoot = env.getProperty("images.root");
-            String baseImage = env.getProperty("images.path");
+            InputStream inputStream = HttpRESTDataClient.doWXPost(url, jsonParam);
 
-            String filePath = "Qr" + type + id + ".png";
-            String path = pathRoot + baseImage + filePath;
-            QRCodeUtil.saveQrCodeToLocal(bytes, path);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int n;
+            while (-1 != (n = inputStream.read(buffer))) {
+                output.write(buffer, 0, n);
+            }
+            byte[] bytes = output.toByteArray();
+            String resStr = output.toString();
+            logger.info("WechatService createStoreQrCode reqData：{},resStr:{}", reqDataJsonStr, resStr);
+            try {
+                JSONObject res = JSON.parseObject(resStr);
+                String errCode = res.get("errcode").toString();
+                if (errCode.equals("40001")) {
+                    getAccessToken(merchantId, true, false);
+                }
+            } catch (Exception e) {
+                String pathRoot = env.getProperty("images.root");
+                String baseImage = env.getProperty("images.path");
 
-            // 上传阿里云oss
-            String mode = env.getProperty("aliyun.oss.mode");
-            if (mode.equals("1")) { // 检查是否开启上传
-                String endpoint = env.getProperty("aliyun.oss.endpoint");
-                String accessKeyId = env.getProperty("aliyun.oss.accessKeyId");
-                String accessKeySecret = env.getProperty("aliyun.oss.accessKeySecret");
-                String bucketName = env.getProperty("aliyun.oss.bucketName");
-                String folder = env.getProperty("aliyun.oss.folder");
-                OSS ossClient = AliyunOssUtil.getOSSClient(accessKeyId, accessKeySecret, endpoint);
-                File ossFile = new File(path);
-                return AliyunOssUtil.upload(ossClient, ossFile, bucketName, folder);
-            } else {
-                return baseImage + filePath;
+                String filePath = "Qr" + type + id + ".png";
+                String path = pathRoot + baseImage + filePath;
+                QRCodeUtil.saveQrCodeToLocal(bytes, path);
+
+                // 上传阿里云oss
+                String mode = env.getProperty("aliyun.oss.mode");
+                if (mode.equals("1")) { // 检查是否开启上传
+                    String endpoint = env.getProperty("aliyun.oss.endpoint");
+                    String accessKeyId = env.getProperty("aliyun.oss.accessKeyId");
+                    String accessKeySecret = env.getProperty("aliyun.oss.accessKeySecret");
+                    String bucketName = env.getProperty("aliyun.oss.bucketName");
+                    String folder = env.getProperty("aliyun.oss.folder");
+                    OSS ossClient = AliyunOssUtil.getOSSClient(accessKeyId, accessKeySecret, endpoint);
+                    File ossFile = new File(path);
+                    return AliyunOssUtil.upload(ossClient, ossFile, bucketName, folder);
+                } else {
+                    return baseImage + filePath;
+                }
             }
         } catch (Exception e) {
             logger.error("生成店铺二维码出错啦：{}", e.getMessage());
-            throw new BusinessCheckException("生成店铺二维码出错，请检查小程序配置");
+            throw new BusinessCheckException("生成二维码出错，请检查小程序配置.");
         }
+
+        throw new BusinessCheckException("生成二维码出错，请稍后再试.");
     }
 
     /**
