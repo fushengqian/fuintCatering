@@ -99,13 +99,21 @@ public interface OrderService extends IService<MtOrder> {
     void deleteOrder(Integer orderId, String operator) throws BusinessCheckException;
 
     /**
-     * 根据订单号获取订单
+     * 根据订单号获取订单详情
      *
      * @param  orderSn
      * @throws BusinessCheckException
      * @return
      */
     UserOrderDto getOrderByOrderSn(String orderSn) throws BusinessCheckException;
+
+    /**
+     * 根据订单号获取订单详情
+     *
+     * @param orderSn 订单号
+     * @return
+     * */
+    MtOrder getOrderInfoByOrderSn(String orderSn);
 
     /**
      * 更新订单

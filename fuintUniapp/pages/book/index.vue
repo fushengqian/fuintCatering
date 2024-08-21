@@ -177,7 +177,7 @@
 
   .tabs-wrapper {
     position: sticky;
-    top: var(--window-top);
+    top: 1rpx;
     display: flex;
     width: 100%;
     height: 88rpx;
@@ -212,7 +212,7 @@
 
   /* 预约列表 */
   .book-list {
-    padding-top: 20rpx;
+    padding-top: 0rpx;
     line-height: 1;
     background: #f7f7f7;
   }

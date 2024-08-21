@@ -550,6 +550,9 @@
 
       // 跳转到订单结果页
       navToOrderResult(orderId, message) {
+        if (!message || message == undefined) {
+            message = "";
+        }
         this.$navTo('pages/order/result?orderId='+orderId+'&message=' + message);
       },
       
