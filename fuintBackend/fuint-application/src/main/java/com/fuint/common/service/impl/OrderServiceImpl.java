@@ -176,6 +176,11 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     private TableService tableService;
 
     /**
+     * 云打印服务接口
+     * */
+    private PrinterService printerService;
+
+    /**
      * 获取用户订单列表
      * @param  orderListParam
      * @throws BusinessCheckException
@@ -1484,8 +1489,11 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
         }
 
-        // 给商家发送通知短信
         try {
+            // 打印订单
+            printerService.printOrder(orderInfo);
+
+            // 给商家发送通知短信
             MtStore mtStore = storeService.queryStoreById(mtOrder.getStoreId());
             if (mtStore != null && orderInfo.getIsVisitor().equals(YesOrNoEnum.NO.getKey())) {
                 Map<String, String> params = new HashMap<>();

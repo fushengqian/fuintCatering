@@ -87,9 +87,13 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
         if (StringUtils.isNotBlank(sn)) {
             lambdaQueryWrapper.eq(MtPrinter::getSn, sn);
         }
-        String name =  paginationRequest.getSearchParams().get("name") == null ? "" : paginationRequest.getSearchParams().get("name").toString();
+        String name = paginationRequest.getSearchParams().get("name") == null ? "" : paginationRequest.getSearchParams().get("name").toString();
         if (StringUtils.isNotBlank(name)) {
             lambdaQueryWrapper.eq(MtPrinter::getName, name);
+        }
+        String autoPrint = paginationRequest.getSearchParams().get("autoPrint") == null ? "" : paginationRequest.getSearchParams().get("autoPrint").toString();
+        if (StringUtils.isNotBlank(autoPrint)) {
+            lambdaQueryWrapper.eq(MtPrinter::getAutoPrint, autoPrint);
         }
 
         lambdaQueryWrapper.orderByAsc(MtPrinter::getId);
@@ -127,7 +131,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             // 添加云打印机
             if (mtPrinter.getSn() != null && mtPrinter.getName() != null) {
                 AddPrinterRequest restRequest = new AddPrinterRequest();
-                createRequestHeader(0, restRequest);
+                createRequestHeader(mtPrinter.getMerchantId(), restRequest);
                 AddPrinterRequestItem item = new AddPrinterRequestItem();
                 item.setName(mtPrinter.getName());
                 item.setSn(mtPrinter.getSn());
@@ -151,7 +155,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
     @Override
     public Boolean printOrder(UserOrderDto orderInfo) throws Exception {
         PrintRequest printRequest = new PrintRequest();
-        createRequestHeader(0, printRequest);
+        createRequestHeader(orderInfo.getMerchantId(), printRequest);
         if (orderInfo.getStoreInfo() == null) {
             return false;
         }
@@ -174,7 +178,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             printContent.append("<C>").append("<B>" + storeInfo.getName() + "</B>").append("<BR></C>");
             printContent.append("<BR>");
 
-            printContent.append("菜名").append(org.apache.commons.lang3.StringUtils.repeat(" ", 16))
+            printContent.append("品名").append(org.apache.commons.lang3.StringUtils.repeat(" ", 16))
                         .append("数量").append(org.apache.commons.lang3.StringUtils.repeat(" ", 2))
                         .append("单价").append(org.apache.commons.lang3.StringUtils.repeat(" ", 2))
                         .append("<BR>");
@@ -244,7 +248,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
         // 删除云打印机
         if (StringUtil.isNotEmpty(mtPrinter.getSn())) {
             DelPrinterRequest restRequest = new DelPrinterRequest();
-            createRequestHeader(0, restRequest);
+            createRequestHeader(mtPrinter.getMerchantId(), restRequest);
             String[] snList = { mtPrinter.getSn() };
             restRequest.setSnlist(snList);
             PrinterUtil.delPrinters(restRequest);
@@ -257,7 +261,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
     /**
      * 修改打印机数据
      *
-     * @param mtPrinter 打印机参数
+     * @param  mtPrinter 打印机参数
      * @throws BusinessCheckException
      * @return
      */
@@ -273,6 +277,18 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
         if (printer.getMerchantId() == null || printer.getMerchantId() < 1) {
             throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
         }
+
+        if (mtPrinter.getSn() != null && mtPrinter.getName() != null && !mtPrinter.getStatus().equals(StatusEnum.DISABLE.getKey())) {
+            UpdPrinterRequest restRequest = new UpdPrinterRequest();
+            createRequestHeader(mtPrinter.getMerchantId(), restRequest);
+            restRequest.setName(mtPrinter.getName());
+            restRequest.setSn(mtPrinter.getSn());
+            PrinterUtil.updPrinter(restRequest);
+        }
+        if (mtPrinter.getStatus().equals(StatusEnum.DISABLE.getKey())) {
+            deletePrinter(mtPrinter.getId(), mtPrinter.getOperator());
+        }
+
         mtPrinter.setUpdateTime(new Date());
         mtPrinterMapper.updateById(printer);
         return printer;
@@ -287,11 +303,12 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
     * */
     @Override
     public List<MtPrinter> queryPrinterListByParams(Map<String, Object> params) {
-        String status =  params.get("status") == null ? StatusEnum.ENABLED.getKey(): params.get("status").toString();
-        String storeId =  params.get("storeId") == null ? "" : params.get("storeId").toString();
-        String merchantId =  params.get("merchantId") == null ? "" : params.get("merchantId").toString();
-        String sn =  params.get("sn") == null ? "" : params.get("sn").toString();
-        String name =  params.get("name") == null ? "" : params.get("name").toString();
+        String status = params.get("status") == null ? StatusEnum.ENABLED.getKey(): params.get("status").toString();
+        String storeId = params.get("storeId") == null ? "" : params.get("storeId").toString();
+        String merchantId = params.get("merchantId") == null ? "" : params.get("merchantId").toString();
+        String sn = params.get("sn") == null ? "" : params.get("sn").toString();
+        String name = params.get("name") == null ? "" : params.get("name").toString();
+        String autoPrint = params.get("autoPrint") == null ? "" : params.get("autoPrint").toString();
 
         LambdaQueryWrapper<MtPrinter> lambdaQueryWrapper = Wrappers.lambdaQuery();
         if (StringUtils.isNotBlank(status)) {
@@ -308,6 +325,9 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
         }
         if (StringUtils.isNotBlank(storeId)) {
             lambdaQueryWrapper.eq(MtPrinter::getStoreId, storeId);
+        }
+        if (StringUtils.isNotBlank(autoPrint)) {
+            lambdaQueryWrapper.eq(MtPrinter::getAutoPrint, autoPrint);
         }
         lambdaQueryWrapper.orderByAsc(MtPrinter::getId);
 
@@ -339,7 +359,11 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
                 request.setTimestamp(System.currentTimeMillis() + "");
                 request.setSign(HashSignUtil.sign(request.getUser() + userKey + request.getTimestamp()));
                 request.setDebug("0");
+            } else {
+                throw new BusinessCheckException("请先设置芯烨云打印账号！");
             }
+        } else {
+            throw new BusinessCheckException("请先设置芯烨云打印账号！");
         }
     }
 }

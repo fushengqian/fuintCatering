@@ -1,7 +1,7 @@
 # fuint餐饮系统系统介绍
 
 #### 介绍
-fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统，支持构建多租户、多商户的SaaS模式。系统基于前后端分离的架构，后端采用<b>Java SpringBoot</b> + <b>Mysql</b>，前端基于当前流行的<b>Uniapp</b>，<b>Element UI</b>，支持小程序、h5。提供小程序点餐，收银台，优惠券核销，点餐订单管理，会员积分，会员权益等功能。。
+fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系统基于前后端分离的架构，后端采用<b>Java SpringBoot</b> + <b>Mysql</b>，前端基于当前流行的<b>Uniapp</b>，<b>Element UI</b>，支持小程序、h5。提供小程序点餐，收银台，优惠券核销，点餐订单管理，会员积分，会员权益等功能。。
 以下是前台的页面展示：
 <p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/g1.png?v=1" alt="前台页面1"></p>
 <p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/g2.png?v=2" alt="前台页面2"></p>
@@ -16,19 +16,17 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统，支
 <p>6、支持手机短信、站内弹框消息、微信订阅消息：支持包括发货消息、卡券到期提醒、活动提醒、会员到期提醒、积分余额变动提醒等消息。</p>
 <b>官网演示地址：</b><br>
 <p>
-   1、会员点餐：<a target="_blank" href="https://www.fuint.cn/food/">https://www.fuint.cn/fuint/</a> <br>
-      <p><img src="https://fuint-cn.oss-cn-shenzhen.aliyuncs.com/uploads/3ffa2b5487064753816ea98a5a046360.png" alt="h5"></p>
-   2、后台管理：<a target="_blank" href="https://www.fuint.cn/fuintFood/">https://www.fuint.cn/fuintFood/</a> 演示账号：fuint / 123456<br>
-   3、swagger接口文档：<a target="_blank" href="https://www.fuint.cn/fuint-application/swagger-ui.html">https://www.fuint.cn/fuint-application/swagger-ui.html</a>
+   1、后台地址：<a target="_blank" href="https://www.fuint.cn/fuintFood/">https://www.fuint.cn/fuintFood/</a> 演示账号：fuint / 123456<br>
+   2、swagger接口文档：<a target="_blank" href="https://www.fuint.cn/fuint-application/swagger-ui.html">https://www.fuint.cn/fuint-application/swagger-ui.html</a>
 </p>
 
 #### 软件架构
 后端：JAVA SpringBoot + MYSQL Mybatis Plus + Redis
 前端：采用基于Vue的Uniapp、Element UI，前后端分离，支持微信小程序、h5等
 <p>后台截图：</p>
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b0.png?v=fuint1" alt="登录界面"></p>
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b1.png?v=fuint2" alt="后台首页"></p>
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b2.png?v=fuint3" alt="统计"></p>
+<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b0.png?v=fuint" alt="登录界面"></p>
+<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b1.png?v=fuint" alt="后台首页"></p>
+<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b2.png?v=fuint" alt="统计"></p>
 
 前端使用技术<br>
 2.1 Vue2<br>
@@ -62,6 +60,7 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统，支
 #### 前台使用说明
 
 1.  会员登录，登录成功后可看到会员的卡券列表。
+2.  点餐功能，积分流转，支付等餐饮常见功能。
 2.  卡券领取和购买，预存券的充值等。
 3.  核销卡券，会员在前台出示二维码，管理员用微信扫一扫即可核销。
 4.  卡券转赠，会员可将自己的卡券转赠给其他用户，输入对方的手机号即可完成转赠，获赠的好友会收到卡券赠送的短信。
@@ -74,19 +73,19 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统，支
 5. 转赠管理：卡券转赠记录。
 6. 短信管理：短信营销功能，已发送的短信列表。
 7. 系统配置：配置系统管理员权限等。
-8. 店铺管理：支持多店铺模式。
+8. 店铺管理：商户管理、店铺管理、云打印机管理、预约管理等模块，支持多店铺模式。
 9. 核销管理员:核销人员管理主要包含3个功能：核销人员列表、核销人员审核、核销人员信息编辑。
 10. 短信模板管理：可配置不同场景和业务的短信内容。
 11. 卡券发放：单独发放、批量发放，发放成功后给会员发送短信通知
 12. 操作日志主要针对电子券系统后台的一些关键操作进行日志记录，方便排查相关操作人的行为等问题。
 13. 发券记录主要根据发券的实际操作情况来记录，分为单用户发券和批量发券，同时可针对该次发券记录进行作废操作。
-14. 代客下单、收银功能。
+14. 代客下单、收银功能，支付收款。
 
 #### 开发计划
 1. 完善的报表统计；
 2. 分享助力、分享领券、分享获得积分；
 3. 员工提成、分销功能；
-4. 店铺结算功能；
+4. 店铺装修功能；
 5. 更多营销工具，比如签到等。
 
 
