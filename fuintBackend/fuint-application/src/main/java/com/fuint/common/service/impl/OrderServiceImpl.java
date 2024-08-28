@@ -1072,6 +1072,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      */
     @Override
     public MtOrder getOrderInfo(Integer orderId) {
+        if (orderId == null || orderId <= 0) {
+            return null;
+        }
         return mtOrderMapper.selectById(orderId);
     }
 
@@ -1084,6 +1087,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      */
     @Override
     public UserOrderDto getOrderById(Integer orderId) throws BusinessCheckException {
+        if (orderId == null || orderId <= 0) {
+            return null;
+        }
         MtOrder mtOrder = mtOrderMapper.selectById(orderId);
         return getOrderDetail(mtOrder, true, true);
     }
@@ -1097,6 +1103,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      */
     @Override
     public UserOrderDto getMyOrderById(Integer orderId) throws BusinessCheckException {
+        if (orderId == null || orderId <= 0) {
+            return null;
+        }
         MtOrder mtOrder = mtOrderMapper.selectById(orderId);
         UserOrderDto orderInfo = getOrderDetail(mtOrder, true, true);
 
@@ -1425,7 +1434,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             String needPayAmount = setting.getValue();
             Integer needPayAmountInt = Math.round(Integer.parseInt(needPayAmount));
             Double pointNum = 0d;
-            if (needPayAmountInt > 0 && orderInfo.getPayAmount().compareTo(new BigDecimal(needPayAmountInt)) > 0) {
+            if (needPayAmountInt > 0 && orderInfo.getPayAmount().compareTo(new BigDecimal(needPayAmountInt)) >= 0) {
                 BigDecimal point = orderInfo.getPayAmount().divide(new BigDecimal(needPayAmountInt), BigDecimal.ROUND_CEILING, 3);
                 pointNum = Math.ceil(point.doubleValue());
             }

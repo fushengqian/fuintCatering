@@ -3,16 +3,16 @@
 #### 介绍
 fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系统基于前后端分离的架构，后端采用<b>Java SpringBoot</b> + <b>Mysql</b>，前端基于当前流行的<b>Uniapp</b>，<b>Element UI</b>，支持小程序、h5。提供小程序点餐，收银台，优惠券核销，点餐订单管理，会员积分，会员权益等功能。。
 以下是前台的页面展示：
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/g1.png?v=1" alt="前台页面1"></p>
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/g2.png?v=2" alt="前台页面2"></p>
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/g2.png?v=2" alt="前台页面3"></p>
+<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/g1.png?v=11" alt="前台页面1"></p>
+<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/g2.png?v=22" alt="前台页面2"></p>
+<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/g3.png?v=23" alt="前台页面3"></p>
 
 本系统侧重于线下实体店的私域流量的运营，同时提供会员端小程序和收银系统的线上线下统一渠道，帮助商户降低获客成本。顾客通过扫码支付成为私域流量，支付即可成为会员。积分和卡券功能建立起会员等级体系，通过消息推送和短信营销方便触达用户。
 <p>1、会员运营自动化：商家通过日常活动设置，如开卡礼设置，沉睡唤醒等，成为会员后自动给顾客送优惠券，让顾客更有黏性，提升会员运营效率。</p>
 <p>2、打通收银系统和会员营销的壁垒，代客下单收银，支付即成为会员。</p>
 <p>3、会员体系完整化：积分兑换、积分转赠、会员等级权益、积分加速、买单折扣。</p>
 <p>4、会员卡券齐全：储值卡、电子券、优惠券、集次卡、计次卡、实体卡购买并兑换、会员充值、余额支付。</p>
-<p>5、线上代客下单收银系统，后台管理员可帮助临柜的会员下单、扫码支付。</p>
+<p>5、线上代客下单收银系统，后台管理员可帮助临柜的会员下单、扫码支付、订单云打印（自动打印小票）。</p>
 <p>6、支持手机短信、站内弹框消息、微信订阅消息：支持包括发货消息、卡券到期提醒、活动提醒、会员到期提醒、积分余额变动提醒等消息。</p>
 <b>官网演示地址：</b><br>
 <p>
