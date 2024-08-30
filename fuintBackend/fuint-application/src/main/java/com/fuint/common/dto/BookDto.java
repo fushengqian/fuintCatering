@@ -54,7 +54,7 @@ public class BookDto implements Serializable {
     private String serviceTimes;
 
     @ApiModelProperty("可预约时间段列表")
-    private List<com.fuint.common.dto.TimeDto> timeList;
+    private List<TimeDto> timeList;
 
     @ApiModelProperty("可预约员工ID")
     private String serviceStaffIds;
