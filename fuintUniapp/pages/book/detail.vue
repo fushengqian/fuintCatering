@@ -18,7 +18,7 @@
                 ｜请选择时段
             </view>
                 <view class="list-v">
-                    <view @click="timeClick(index)" v-for="(item, index) in timeArr" :key="index"  :class="[timeIndex==index?'activeItem':'item-v']">
+                    <view @click="timeClick(index)" v-for="(item, index) in timeArr" :key="index"  :class="[timeIndex==index?'activeItem' : (bookable.indexOf(item.time) >= 0 ? 'item-v' : 'disable') ]">
                         <view>{{ item.time }}</view>
                     </view>
                 </view>
@@ -40,8 +40,9 @@
                 dateArr: [ { week: '星期六', date : '8月17号' }, { week: '星期日', date : '8月18号' }], 
                 timeArr: [ '09:00-12:00', '14:00-15:00' ],
                 dateIndex: 0,
-                timeIndex: 0,
+                timeIndex: 100000,
                 storeInfo: null,
+                bookable: []
             }
         },
         onLoad(options) {
@@ -54,7 +55,7 @@
             uni.removeStorageSync('bookData');
             this.getStoreInfo();
             this.dateIndex = 0;
-            this.timeIndex = 0;
+            this.timeIndex = 100000;
         },
         methods: {
             // 获取预约项目详情
@@ -66,6 +67,7 @@
                     app.bookInfo = result.data.bookInfo;
                     app.dateArr = app.bookInfo.dateList;
                     app.timeArr = app.bookInfo.timeList;
+                    app.dateClick(app.dateIndex);
                 })
                 .finally(() => app.isLoading = false)
             },
@@ -93,7 +95,6 @@
                             let week = app.dateArr[app.dateIndex].week;
                             let data = { bookId: app.bookId, week: week, date : dates[app.dateIndex], time: app.timeArr[app.timeIndex].time };
                             uni.setStorageSync('bookData', data);
-                            console.log("预约数据：", data);
                             app.$navTo('pages/book/submit');
                         }
                     }
@@ -101,12 +102,27 @@
             },
             // 选择时段
             timeClick(index) {
-                this.timeIndex = index;
+                const app = this;
+                if (app.bookable.indexOf(app.timeArr[index].time) < 0) {
+                    return false;
+                }
+                app.timeIndex = index;
             },
             // 选择日期
             dateClick(index) {
-                this.dateIndex = index;
-                this.timeIndex = 0;
+                const app = this;
+                app.dateIndex = index;
+                app.timeIndex = 100000;
+                let dates = app.bookInfo.serviceDates.split(",");
+                let times = app.timeArr;
+                BookApi.bookable({ bookId: app.bookId, date: dates[app.dateIndex], time: '' })
+                  .then(result => {
+                     if (result.data) {
+                         app.bookable = result.data;
+                     } else {
+                         app.bookable = [];
+                     }
+                  })
             }
         }
     }
@@ -191,6 +207,19 @@
                 border: 1rpx solid #ccc;
                 color: #fff;
                 text-align: center;
+                padding: 20rpx;
+            }
+            .disable {
+                border-radius: 12rpx;
+                font-size: 30rpx;
+                margin-top: 10rpx;
+                margin-left: 10rpx;
+                font-weight: bold;
+                width: 30%;
+                border: 1rpx solid #ccc;
+                text-align: center;
+                color: white !important;
+                background-color: rgb(188, 188, 188) !important;
                 padding: 20rpx;
             }
         }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.BookDto;
 import com.fuint.common.dto.DayDto;
 import com.fuint.common.dto.TimeDto;
+import com.fuint.common.param.BookableParam;
 import com.fuint.common.service.BookService;
 import com.fuint.common.service.StoreService;
 import com.fuint.common.util.DateUtil;
@@ -13,6 +14,7 @@ import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
+import com.fuint.repository.mapper.MtBookItemMapper;
 import com.fuint.repository.mapper.MtBookMapper;
 import com.fuint.repository.model.MtBanner;
 import com.fuint.common.service.SettingService;
@@ -49,6 +51,8 @@ public class BookServiceImpl extends ServiceImpl<MtBookMapper, MtBook> implement
     private static final Logger logger = LoggerFactory.getLogger(BookServiceImpl.class);
 
     private MtBookMapper mtBookMapper;
+
+    private MtBookItemMapper mtBookItemMapper;
 
     /**
      * 系统设置服务接口
@@ -134,6 +138,12 @@ public class BookServiceImpl extends ServiceImpl<MtBookMapper, MtBook> implement
         }
         if (mtBook.getMerchantId() == null || mtBook.getMerchantId() <= 0) {
             throw new BusinessCheckException("新增预约失败：所属商户不能为空！");
+        }
+        if (StringUtil.isEmpty(mtBook.getName())) {
+            throw new BusinessCheckException("新增预约失败：项目名称不能为空！");
+        }
+        if (StringUtil.isEmpty(mtBook.getLogo())) {
+            throw new BusinessCheckException("新增预约失败：封面图片不能为空！");
         }
         mtBook.setStoreId(storeId);
         mtBook.setStatus(StatusEnum.ENABLED.getKey());
@@ -256,6 +266,59 @@ public class BookServiceImpl extends ServiceImpl<MtBookMapper, MtBook> implement
         book.setUpdateTime(new Date());
         mtBookMapper.updateById(book);
         return book;
+    }
+
+    /**
+     * 是否可预约
+     *
+     * @param  param
+     * @throws BusinessCheckException
+     * @return
+     * */
+    @Override
+    public List<String> isBookable(BookableParam param) throws BusinessCheckException {
+       MtBook mtBook = mtBookMapper.selectById(param.getBookId());
+       List<String> result = new ArrayList<>();
+       if (mtBook == null) {
+           throw new BusinessCheckException("预约项目不存在");
+       }
+       List<String> bookList = mtBookItemMapper.getBookList(param.getBookId(), param.getDate(), param.getTime());
+       Integer bookNum = bookList.size();
+
+       Integer limit = 0;
+       String serviceTime = mtBook.getServiceTimes();
+       if (StringUtil.isNotEmpty(serviceTime)) {
+           String[] times = serviceTime.split(",");
+           if (times.length > 0) {
+               for (String str : times) {
+                    if (str.indexOf(param.getTime()) >= 0) {
+                        String[] timeArr = str.split("-");
+                        if (timeArr.length > 2) {
+                            limit = Integer.parseInt(timeArr[2]);
+                        }
+                    }
+               }
+           }
+       }
+       if (bookNum < limit) {
+           if (StringUtil.isNotEmpty(param.getTime())) {
+               result.add(param.getTime());
+           } else {
+               String[] times = mtBook.getServiceTimes().split(",");
+               if (times.length > 0) {
+                   for (String str : times) {
+                        String[] arr = str.split("-");
+                        if (arr.length > 2) {
+                            String item = arr[0] + "-" + arr[1];
+                            if (!bookList.contains(item)) {
+                                result.add(item);
+                            }
+                        }
+                   }
+               }
+           }
+       }
+       return result;
     }
 
     /**

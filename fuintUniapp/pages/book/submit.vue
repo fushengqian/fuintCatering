@@ -105,11 +105,21 @@
                         time: app.bookData.time };
         BookApi.submit(param)
            .then(result => {
-                app.$toast('提交预约成功，请等待确认！')
-                setTimeout(() => {
-                  app.disabled = false;
-                  uni.navigateBack();
-                }, 3000)
+                if (result.code == '200') {
+                    app.$toast('提交预约成功，请等待确认！')
+                    setTimeout(() => {
+                      app.disabled = false;
+                      uni.navigateBack();
+                    }, 3000)
+                } else {
+                    if (result.message) {
+                        app.$error(result.message);
+                    } else {
+                        app.$error('预约提交失败');
+                    }
+                    app.disabled = false;
+                    return false;
+                }
             }).catch(err => app.disabled = false)
       }
     }

@@ -6,6 +6,7 @@ const api = {
   detail: 'clientApi/book/detail',
   cate: 'clientApi/book/cateList',
   submit: 'clientApi/book/submit',
+  bookable: 'clientApi/book/bookable'
 }
 
 // 预约项目列表
@@ -26,4 +27,9 @@ export const cateList = (param) => {
 // 提交预约
 export const submit = (data) => {
   return request.post(api.submit, data)
+}
+
+// 是否可预约
+export const bookable = (data) => {
+  return request.post(api.bookable, data)
 }

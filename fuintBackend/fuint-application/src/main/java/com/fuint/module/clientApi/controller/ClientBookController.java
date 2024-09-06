@@ -6,6 +6,7 @@ import com.fuint.common.dto.UserInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.BookDetailParam;
 import com.fuint.common.param.BookListParam;
+import com.fuint.common.param.BookableParam;
 import com.fuint.common.service.*;
 import com.fuint.common.util.DateUtil;
 import com.fuint.common.util.TokenUtil;
@@ -150,6 +151,17 @@ public class ClientBookController extends BaseController {
     }
 
     /**
+     * 是否可预约
+     */
+    @ApiOperation(value="获取预约项目详情", notes="根据ID获取预约项目详情")
+    @RequestMapping(value = "/bookable", method = RequestMethod.POST)
+    @CrossOrigin
+    public ResponseObject bookable(@RequestBody BookableParam param) throws BusinessCheckException {
+        List<String> result = bookService.isBookable(param);
+        return getSuccessResult(result);
+    }
+
+    /**
      * 预约提交
      */
     @ApiOperation(value = "预约提交")
@@ -185,7 +197,7 @@ public class ClientBookController extends BaseController {
         mtBookItem.setMobile(mobile);
         mtBookItem.setContact(contact);
         mtBookItem.setBookId(bookInfo.getId());
-        mtBookItem.setServiceDate(DateUtil.parseDate(date));
+        mtBookItem.setServiceDate(date);
         mtBookItem.setServiceTime(time);
         MtBookItem result = bookItemService.addBookItem(mtBookItem);
 
