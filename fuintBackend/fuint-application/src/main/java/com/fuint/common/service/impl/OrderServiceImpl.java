@@ -1642,6 +1642,12 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             userOrderDto.setTableInfo(tableInfo);
         }
 
+        // 所属员工
+        if (orderInfo.getStaffId() != null && orderInfo.getStaffId() > 0) {
+            MtStaff staffInfo = staffService.queryStaffById(orderInfo.getStaffId());
+            userOrderDto.setStaffInfo(staffInfo);
+        }
+
         // 下单用户信息直接取会员个人信息
         OrderUserDto userInfo = new OrderUserDto();
         MtUser user = memberService.queryMemberById(orderInfo.getUserId());
