@@ -23,6 +23,8 @@ import com.fuint.utils.StringUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.PageImpl;
@@ -41,6 +43,8 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implements StoreService {
+
+    private static final Logger logger = LoggerFactory.getLogger(StoreServiceImpl.class);
 
     private MtStoreMapper mtStoreMapper;
 
@@ -190,9 +194,14 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
         }
 
         // 保存二维码
-        String page = QrCodeEnum.STORE.getPage() + "?" + QrCodeEnum.STORE.getKey() + "Id=" + mtStore.getId();
-        String qr = weixinService.createQrCode(mtStore.getMerchantId(), QrCodeEnum.STORE.getKey(), mtStore.getId(), page, 320);
-        mtStore.setQrCode(qr);
+        try {
+            String page = QrCodeEnum.STORE.getPage() + "?" + QrCodeEnum.STORE.getKey() + "Id=" + mtStore.getId();
+            String qr = weixinService.createQrCode(mtStore.getMerchantId(), QrCodeEnum.STORE.getKey(), mtStore.getId(), page, 320);
+            mtStore.setQrCode(qr);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
         mtStoreMapper.updateById(mtStore);
 
         return mtStore;
