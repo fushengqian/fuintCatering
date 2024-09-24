@@ -67,6 +67,17 @@
     <!-- 弹窗 -->
     <Popup v-if="!isLoading" v-model="showPopup" @onPaySuccess="getPageData" :memberGrade="curGrade"/>
     <!--会员升级 end-->
+    
+    <!-- 订单操作 -->
+    <view class="order-navbar">
+      <view class="order-navbar-item" v-for="(item, index) in orderNavbar" :key="index" @click="onTargetOrder(item)">
+        <view class="item-icon">
+          <text class="iconfont" :class="[`icon-${item.icon}`]"></text>
+        </view>
+        <view class="item-name">{{ item.name }}</view>
+        <text class="order-badge" v-if="item.count && item.count > 0">{{ item.count }}</text>
+      </view>
+    </view>
 
     <!-- 我的资产 -->
     <view class="my-asset">
@@ -157,12 +168,13 @@
     { id: 'myCoupon', name: '卡券兑换', icon: 'youhuiquan', type: 'link', url: 'pages/coupon/receive' },
     { id: 'coupon', name: '转赠记录', icon: 'lingquan', type: 'link', url: 'pages/give/index' },
     { id: 'points', name: '我的积分', icon: 'jifen', type: 'link', url: 'pages/points/detail' },
+    { id: 'book', name: '我的预约', icon: 'tuxingyanzhengma', type: 'link', url: 'pages/book/my' },
     { id: 'help', name: '我的帮助', icon: 'bangzhu', type: 'link', url: 'pages/help/index' },
     { id: 'contact', name: '在线客服', icon: 'kefu', type: 'button', openType: 'contact' },
     { id: 'address', name: '收货地址', icon: 'shouhuodizhi', type: 'link', url: 'pages/address/index' },
     { id: 'refund', name: '售后服务', icon: 'shouhou', type: 'link', url: 'pages/refund/index' },
     { id: 'setting', name: '个人信息', icon: 'shezhi1', type: 'link', url: 'pages/user/setting' },
-    { id: 'book', name: '门店预约', icon: 'naozhong', type: 'link', url: 'pages/book/index' },
+    { id: 'book', name: '立即预约', icon: 'naozhong', type: 'link', url: 'pages/book/index' },
     { id: 'share', name: '邀请有礼', icon: 'fenxiang-post', type: 'link', url: 'pages/share/index' },
   ]
 
@@ -364,6 +376,12 @@
       toRecharge(userId) {
           !this.isLogin && this.$navTo('pages/login/index')
           this.$navTo('pages/wallet/recharge/index', { userId: userId})
+      },
+
+      // 跳转到订单页
+      onTargetOrder(item) {
+          !this.isLogin && this.$navTo('pages/login/index')
+          this.$navTo('pages/order/index', { dataType: item.id })
       },
 
       // 跳转到我的积分页面

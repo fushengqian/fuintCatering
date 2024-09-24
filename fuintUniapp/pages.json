@@ -371,6 +371,12 @@
       "style": {
         "navigationBarTitleText": "预约提交"
       }
+    },
+    {
+      "path": "pages/book/my",
+      "style": {
+        "navigationBarTitleText": "我的预约"
+      }
     }
   ],
   "globalStyle": {

@@ -3,7 +3,9 @@ package com.fuint.module.clientApi.controller;
 import com.fuint.common.Constants;
 import com.fuint.common.dto.BookDto;
 import com.fuint.common.dto.BookItemDto;
+import com.fuint.common.dto.ParamDto;
 import com.fuint.common.dto.UserInfo;
+import com.fuint.common.enums.BookStatusEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.BookDetailParam;
 import com.fuint.common.param.BookListParam;
@@ -26,6 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -215,9 +218,9 @@ public class ClientBookController extends BaseController {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
+        String status = request.getParameter("status") == null ? "" : request.getParameter("status");
 
         Map<String, Object> param = new HashMap<>();
-        param.put("status", StatusEnum.ENABLED.getKey());
         Integer merchantId = merchantService.getMerchantId(merchantNo);
         if (merchantId > 0) {
             param.put("merchantId", merchantId);
@@ -228,11 +231,28 @@ public class ClientBookController extends BaseController {
             return getFailureResult(1001);
         }
         param.put("userId", loginInfo.getId());
+        if (StringUtil.isNotEmpty(status)) {
+            param.put("status", status);
+        }
 
         PaginationRequest paginationRequest = new PaginationRequest();
         paginationRequest.setCurrentPage(page);
         paginationRequest.setPageSize(pageSize);
+        paginationRequest.setSearchParams(param);
         PaginationResponse<BookItemDto> paginationResponse = bookItemService.queryBookItemListByPagination(paginationRequest);
+
+        // 预约状态列表
+        BookStatusEnum[] enums = BookStatusEnum.values();
+        List<ParamDto> statusList = new ArrayList<>();
+        for (BookStatusEnum enumItem : enums) {
+            if (!enumItem.getKey().equals(BookStatusEnum.DELETE.getKey())) {
+                ParamDto paramDto = new ParamDto();
+                paramDto.setKey(enumItem.getKey());
+                paramDto.setName(enumItem.getValue());
+                paramDto.setValue(enumItem.getKey());
+                statusList.add(paramDto);
+            }
+        }
 
         Map<String, Object> result = new HashMap<>();
         result.put("content", paginationResponse.getContent());
@@ -240,6 +260,7 @@ public class ClientBookController extends BaseController {
         result.put("pageNumber", paginationResponse.getCurrentPage());
         result.put("totalRow", paginationResponse.getTotalElements());
         result.put("totalPage", paginationResponse.getTotalPages());
+        result.put("statusList", statusList);
 
         return getSuccessResult(result);
     }

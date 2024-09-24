@@ -194,7 +194,7 @@
     display: inline-block;
     padding: 0 10rpx;
     text-align: center;
-    min-width: 20%;
+    min-width: 10%;
     height: 87rpx;
     line-height: 88rpx;
     box-sizing: border-box;

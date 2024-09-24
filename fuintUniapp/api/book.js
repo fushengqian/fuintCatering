@@ -6,7 +6,10 @@ const api = {
   detail: 'clientApi/book/detail',
   cate: 'clientApi/book/cateList',
   submit: 'clientApi/book/submit',
-  bookable: 'clientApi/book/bookable'
+  bookable: 'clientApi/book/bookable',
+  myBookList: 'clientApi/book/myBook',
+  myBookDetail: 'clientApi/book/myBookDetail',
+  cancel: 'clientApi/book/cancel',
 }
 
 // 预约项目列表
@@ -32,4 +35,15 @@ export const submit = (data) => {
 // 是否可预约
 export const bookable = (data) => {
   return request.post(api.bookable, data)
+}
+
+// 我的预约列表
+export const myBookList = (param) => {
+  return request.get(api.myBookList, param)
+}
+
+
+// 我的预约详情
+export const myBookDetail = (myBookId) => {
+  return request.post(api.myBookDetail, { myBookId })
 }
