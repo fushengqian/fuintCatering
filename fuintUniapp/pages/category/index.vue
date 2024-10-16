@@ -450,7 +450,8 @@
 
   .cate-cont-box .cate-info {
     text-align: left;
-    display: block;
+    display: flex;
+    flex-direction: column;
     font-size: 26rpx;
     margin-left: 168rpx;
     padding-bottom: 14rpx;
