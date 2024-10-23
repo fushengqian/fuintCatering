@@ -370,7 +370,7 @@
   .cate-right {
     display: flex;
     flex-direction: column;
-    width: 550rpx;
+    width: 100%;
     height: 100%;
     overflow: hidden;
     margin-bottom: 80rpx;

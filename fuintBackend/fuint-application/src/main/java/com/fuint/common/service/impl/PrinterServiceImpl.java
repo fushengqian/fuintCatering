@@ -175,6 +175,18 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             printContent.append("<C>").append("<B>" + storeInfo.getName() + "</B>").append("<BR></C>");
             printContent.append("<BR>");
 
+            // 分割线
+            printContent.append(org.apache.commons.lang3.StringUtils.repeat("-", 32)).append("<BR>");
+
+            // 单号桌码
+            printContent.append("<L>订单号：").append(orderInfo.getOrderSn()).append("</L>");
+            if (orderInfo.getTableInfo() != null && StringUtil.isNotEmpty(orderInfo.getTableInfo().getCode())) {
+                printContent.append("<R>桌码：").append(orderInfo.getTableInfo().getCode()).append("</R>");
+            }
+
+            // 分割线
+            printContent.append(org.apache.commons.lang3.StringUtils.repeat("-", 32)).append("<BR>");
+
             printContent.append("品名").append(org.apache.commons.lang3.StringUtils.repeat(" ", 16))
                         .append("数量").append(org.apache.commons.lang3.StringUtils.repeat(" ", 2))
                         .append("单价").append(org.apache.commons.lang3.StringUtils.repeat(" ", 2))
@@ -190,20 +202,20 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
                 }
             }
 
+            // 分割线
+            printContent.append(org.apache.commons.lang3.StringUtils.repeat("-", 32)).append("<BR>");
+
+            printContent.append("<R>").append("合计：").append(orderInfo.getPayAmount()).append("元").append("<BR></R>");
+
             // 配送订单，打印配送信息
             if (orderInfo.getOrderMode().equals(OrderModeEnum.EXPRESS.getKey())) {
-                // 分割线
+                printContent.append("<BR>");
                 printContent.append(org.apache.commons.lang3.StringUtils.repeat("-", 32)).append("<BR>");
                 printContent.append("<L>")
                         .append("配送姓名：").append(orderInfo.getAddress().getName()).append("<BR>")
                         .append("联系电话：").append(orderInfo.getAddress().getMobile()).append("<BR>")
                         .append("详细地址：").append(orderInfo.getAddress().getProvinceName() + orderInfo.getAddress().getCityName() + orderInfo.getAddress().getRegionName() + orderInfo.getAddress().getDetail()).append("<BR>");
             }
-
-            // 分割线
-            printContent.append(org.apache.commons.lang3.StringUtils.repeat("-", 32)).append("<BR>");
-
-            printContent.append("<R>").append("合计：").append(orderInfo.getPayAmount()).append("元").append("<BR></R>");
 
             printContent.append("<BR>");
             printContent.append("<L>")

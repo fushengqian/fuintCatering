@@ -192,8 +192,13 @@
       moveHandle() {
         // 禁止父元素滑动
       },
+      // 确认支付
       toPay() {
-         that.showPayPopup = true
+        if (parseFloat(that.payInfo.payAmount) <= 0) {
+            that.payNow(PayTypeEnum.BALANCE.value);
+        } else {
+            that.showPayPopup = true;
+        }
       },
       // 立即支付
       payNow(payType) {
