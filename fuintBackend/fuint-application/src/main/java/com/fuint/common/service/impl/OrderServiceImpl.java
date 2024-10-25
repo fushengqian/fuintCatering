@@ -652,7 +652,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         Integer tableId = request.getHeader("tableId") == null ? 0 : Integer.parseInt(request.getHeader("tableId"));
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
-        String isWechat = param.getIsWechat() == null ? YesOrNoEnum.NO.getKey() : param.getIsWechat();
+        String isWechat = request.getHeader("isWechat") == null ? YesOrNoEnum.NO.getKey() : request.getHeader("isWechat");
         String cartIds = param.getCartIds() == null ? "" : param.getCartIds();
         Integer targetId = param.getTargetId() == null ? 0 : Integer.parseInt(param.getTargetId()); // 储值卡、升级等级必填
         String selectNum = param.getSelectNum() == null ? "" : param.getSelectNum(); // 储值卡必填

@@ -204,8 +204,8 @@
     }
 
     &.active .value {
-      color: #fd4a5f;
-      border-bottom: 4rpx solid #fd4a5f;
+      color: #000;
+      border-bottom: 4rpx solid #000;
       font-weight: bold;
     }
   }

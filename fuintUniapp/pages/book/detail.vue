@@ -6,22 +6,24 @@
             <view class="title">
                 ｜请选择预约日期
             </view>
-                <view class="list-v">
+                <view v-if="dateArr && dateArr.length > 0" class="list-v">
                     <view @click="dateClick(index)" v-for="(item, index) in dateArr" :key="index" :class="[dateIndex==index?'activeItem':'item-v']">
                         <view>{{item.week}}</view>
                         <view>{{ item.date }}</view>
                     </view>
                 </view>
+                <none v-if="!dateArr.length" :isLoading="false" :custom-style="{ padding: '30px 10px' }" tips="暂无可预约日期"></none>
         </view>
         <view class="info-v">
             <view class="title">
-                ｜请选择时段
+                ｜请选择预约时段
             </view>
-                <view class="list-v">
+                <view v-if="timeArr && timeArr.length > 0" class="list-v">
                     <view @click="timeClick(index)" v-for="(item, index) in timeArr" :key="index"  :class="[timeIndex==index?'activeItem' : (bookable.indexOf(item.time) >= 0 ? 'item-v' : 'disable') ]">
                         <view>{{ item.time }}</view>
                     </view>
                 </view>
+                <none v-if="!timeArr.length" :isLoading="false" :custom-style="{ padding: '30rpx 10rpx' }" tips="暂无可预约时段"></none>
         </view>
         <view class="btn" @click="doSubmit">确定预约</view>
     </view>
@@ -30,7 +32,11 @@
 <script>
     import * as BookApi from '@/api/book'
     import * as SettingApi from '@/api/setting'
+    import None from '@/components/none'
     export default {
+        components: {
+          None
+        },
         data() {
             return {
                 // 预约项目ID
@@ -42,7 +48,8 @@
                 dateIndex: 0,
                 timeIndex: 100000,
                 storeInfo: null,
-                bookable: []
+                bookable: [],
+                isCheck: false
             }
         },
         onLoad(options) {
@@ -86,6 +93,11 @@
             // 确定预约
             doSubmit() {
                 let app = this;
+                if (!app.isCheck) {
+                    app.$toast("请选择预约时间！");
+                    return false;
+                }
+                
                 uni.showModal({
                     title: '提示',
                     content: '确定预约【'+app.storeInfo.name+'】吗?',
@@ -107,6 +119,7 @@
                     return false;
                 }
                 app.timeIndex = index;
+                app.isCheck = true;
             },
             // 选择日期
             dateClick(index) {
