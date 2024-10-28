@@ -43,8 +43,8 @@ export const myBookList = (param) => {
 }
 
 // 我的预约详情
-export const myBookDetail = (myBookId) => {
-  return request.post(api.myBookDetail, { myBookId })
+export const myBookDetail = (bookId) => {
+  return request.post(api.myBookDetail, { bookId })
 }
 
 // 取消预约

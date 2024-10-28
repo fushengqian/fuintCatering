@@ -377,6 +377,12 @@
       "style": {
         "navigationBarTitleText": "我的预约"
       }
+    },
+    {
+      "path": "pages/book/bookDetail",
+      "style": {
+        "navigationBarTitleText": "预约详情"
+      }
     }
   ],
   "globalStyle": {

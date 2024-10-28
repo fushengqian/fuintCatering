@@ -85,6 +85,7 @@ export const getTabBarLinks = () => {
   const tabBarLinks = [
     'pages/index/index',
     'pages/category/index',
+    'pages/order/index',
     'pages/user/index'
   ]
   return tabBarLinks

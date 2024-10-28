@@ -17,7 +17,7 @@
 
     <!-- 预约列表 -->
     <view class="book-list">
-      <view class="book-item" v-for="(item, index) in list.content" :key="index" @click="onTargetDetail(item.id)">
+      <view class="book-item" v-for="(item, index) in list.content" :key="index" @click="onView(item.id)">
         <block>
           <view class="flex-box">
             <view class="book-item-title">
@@ -29,7 +29,7 @@
             </view>
             <view class="book-item-footer m-top10">
               <text class="book-views f-24 col-8">{{ item.createTime | timeFormat('yyyy-mm-dd hh:MM') }}</text>
-              <view class="btn-cancel" @click="onCancel(item.id)">取消</view>
+              <view class="btn-cancel" v-if="item.status == 'A'" @click="onView(item.id)">取消</view>
               <view class="btn-view" @click="onView(item.id)">详情</view>
             </view>
           </view>
@@ -142,12 +142,10 @@
          });
       },
       
-      /**
-       * 确认取消预约
-       */
+      // 确认取消预约
       doCancel(myBookId) {
         const app = this;
-        BookApi.remove(addressId, 'D')
+        BookApi.cancel(myBookId)
           .then(result => {
             app.getPageData()
           })
@@ -215,7 +213,7 @@
     padding: 30rpx;
     background: #fff;
     border-radius: 20rpx;
-
+    min-height: 280rpx;
     &:last-child {
       margin-bottom: 0;
     }

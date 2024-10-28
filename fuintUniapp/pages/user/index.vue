@@ -380,6 +380,7 @@
 
       // 跳转到订单页
       onTargetOrder(item) {
+          console.log('我的订单..')
           !this.isLogin && this.$navTo('pages/login/index')
           this.$navTo('pages/order/index', { dataType: item.id })
       },
