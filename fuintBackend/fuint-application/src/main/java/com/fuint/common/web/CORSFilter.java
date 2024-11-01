@@ -23,7 +23,7 @@ public class CORSFilter extends OncePerRequestFilter {
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
         response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "Authorization,Origin,X-Requested-With,token,Content-Type,Accept,Access-Token,platform,latitude,longitude,storeId,merchantNo,isWechat,tableId");
+        response.setHeader("Access-Control-Allow-Headers", "Authorization,Origin,X-Requested-With,token,Content-Type,Accept,Access-Token,platform,latitude,longitude,storeId,merchantNo,isWechat,tableId,orderId");
         filterChain.doFilter(request, response);
     }
 

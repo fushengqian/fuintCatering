@@ -129,6 +129,7 @@
             app.isSuccess = true;
             app.isLoading = false;
             uni.setStorageSync("tableId", 0);
+            uni.setStorageSync("orderId", 0);
         }
       }
     }

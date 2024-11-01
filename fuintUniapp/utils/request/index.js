@@ -74,6 +74,7 @@ $http.requestStart = options => {
   options.header['merchantNo'] = uni.getStorageSync("merchantNo") ? uni.getStorageSync("merchantNo") : merchantNo; 
   // 店铺ID
   options.header['storeId'] = uni.getStorageSync("storeId") ? uni.getStorageSync("storeId") : 0;
+  options.header['orderId'] = uni.getStorageSync("orderId") ? uni.getStorageSync("orderId") : 0;
   options.header['tableId'] = uni.getStorageSync("tableId") ? uni.getStorageSync("tableId") : 0;
   options.header['latitude'] = uni.getStorageSync("latitude") ? uni.getStorageSync("latitude") : '';
   options.header['longitude'] = uni.getStorageSync("longitude") ? uni.getStorageSync("longitude") : '';

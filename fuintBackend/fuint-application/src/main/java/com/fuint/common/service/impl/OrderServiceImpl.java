@@ -320,11 +320,12 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     @OperationServiceLog(description = "提交订单信息")
     public MtOrder saveOrder(OrderDto orderDto) throws BusinessCheckException {
         logger.info("orderService.saveOrder orderDto = {}", JsonUtil.toJSONString(orderDto));
-        MtOrder mtOrder;
+        MtOrder mtOrder = new MtOrder();
         if (null != orderDto.getId() && orderDto.getId() > 0) {
-            mtOrder = mtOrderMapper.selectById(orderDto.getId());
-        } else {
-            mtOrder = new MtOrder();
+            MtOrder order = mtOrderMapper.selectById(orderDto.getId());
+            if (order != null) {
+                mtOrder = order;
+            }
         }
 
         // 检查店铺是否已被禁用
@@ -382,7 +383,11 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         }
 
         // 首先生成订单
-        mtOrderMapper.insert(mtOrder);
+        if (mtOrder.getId() == null || mtOrder.getId() < 1) {
+            mtOrderMapper.insert(mtOrder);
+        } else {
+            mtOrderMapper.updateById(mtOrder);
+        }
         MtOrder orderInfo = mtOrderMapper.selectById(mtOrder.getId());
         mtOrder.setId(orderInfo.getId());
 
@@ -648,6 +653,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> doSettle(HttpServletRequest request, SettlementParam param) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
+        Integer myOrderId = request.getHeader("orderId") == null ? 0 : Integer.parseInt(request.getHeader("orderId")); // 继续点单的订单ID
         Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
         Integer tableId = request.getHeader("tableId") == null ? 0 : Integer.parseInt(request.getHeader("tableId"));
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
@@ -677,11 +683,28 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         if (loginInfo != null) {
             userInfo = memberService.queryMemberById(loginInfo.getId());
         }
+
         if (tableId > 0) {
             MtTable mtTable = tableService.queryTableById(tableId);
             if (mtTable != null && mtTable.getStoreId() > 0) {
                 storeId = mtTable.getStoreId();
             }
+            MtOrder tableOrder = mtOrderMapper.findByTableId(tableId);
+            if (tableOrder != null) {
+                myOrderId = tableOrder.getId();
+            }
+        }
+
+        MtOrder myOrder = null;
+        BigDecimal myAmount = new BigDecimal(0);
+        BigDecimal myPayAmount = new BigDecimal(0);
+        BigDecimal myPointAmount = new BigDecimal(0);
+        if (myOrderId > 0) {
+            orderId = myOrderId;
+            myOrder = getOrderInfo(orderId);
+            myAmount = myOrder.getAmount();
+            myPayAmount = myOrder.getPayAmount();
+            myPointAmount = myOrder.getPointAmount();
         }
 
         // 后台管理员或店员操作
@@ -896,6 +919,14 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             orderInfo = saveOrder(orderDto);
         } catch (BusinessCheckException e) {
             throw new BusinessCheckException(e.getMessage() == null ?  "生成订单失败" : e.getMessage());
+        }
+
+        // 继续点单，合并订单金额等信息
+        if (myOrder != null) {
+            orderInfo.setAmount(orderInfo.getAmount().add(myAmount));
+            orderInfo.setPayAmount(orderInfo.getPayAmount().add(myPayAmount));
+            orderInfo.setPointAmount(orderInfo.getPointAmount().add(myPointAmount));
+            orderInfo = updateOrder(orderInfo);
         }
 
         orderDto.setId(orderInfo.getId());

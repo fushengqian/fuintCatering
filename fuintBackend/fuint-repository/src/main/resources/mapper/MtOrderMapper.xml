@@ -27,6 +27,10 @@
         select * from mt_order o where o.ORDER_SN = #{orderSn}
     </select>
 
+    <select id="findByTableId" resultType="com.fuint.repository.model.MtOrder">
+        select * from mt_order o where o.TABLE_ID = #{tableId} and PAY_STATUS = 'A'
+    </select>
+
     <select id="getPayMoney" resultType="java.math.BigDecimal">
         SELECT sum(t.PAY_AMOUNT) as num FROM mt_order t where t.PAY_STATUS='B' and t.STATUS not in('C', 'G', 'H')
         <if test="merchantId != null and merchantId > 0">
