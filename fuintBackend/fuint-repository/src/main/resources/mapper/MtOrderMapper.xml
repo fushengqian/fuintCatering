@@ -28,7 +28,7 @@
     </select>
 
     <select id="findByTableId" resultType="com.fuint.repository.model.MtOrder">
-        select * from mt_order o where o.TABLE_ID = #{tableId} and PAY_STATUS = 'A'
+        select * from mt_order o where o.TABLE_ID = #{tableId} and o.STATUS = 'A' and o.PAY_STATUS = 'A' order by ID desc LIMIT 1
     </select>
 
     <select id="getPayMoney" resultType="java.math.BigDecimal">

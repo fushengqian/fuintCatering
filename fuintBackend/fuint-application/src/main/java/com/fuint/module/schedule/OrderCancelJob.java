@@ -49,7 +49,7 @@ public class OrderCancelJob {
     /**
      * 订单超时分钟
      * */
-    private int OVER_TIME = 1440;
+    private int OVER_TIME = 720;
 
     @Scheduled(cron = "${orderCancel.job.time}")
     @Transactional(rollbackFor = Exception.class)
