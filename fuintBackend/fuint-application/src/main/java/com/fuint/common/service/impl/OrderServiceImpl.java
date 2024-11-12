@@ -1979,13 +1979,31 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         Integer totalNum = 0;
         BigDecimal totalPrice = new BigDecimal("0");
         BigDecimal totalCanUsePointAmount = new BigDecimal("0");
+        BigDecimal memberDiscount = new BigDecimal("0");
+        BigDecimal percent = new BigDecimal("0");
 
         if (cartList.size() > 0) {
+            // 会员折扣
+            MtUserGrade userGrade = userGradeService.queryUserGradeById(userInfo.getMerchantId(), userInfo.getGradeId() != null ? Integer.parseInt(userInfo.getGradeId()) : 1, userId);
+            if (userGrade != null && userGrade.getDiscount() != null && userGrade.getDiscount() > 0 && !userInfo.getIsStaff().equals(YesOrNoEnum.YES.getKey())) {
+                percent = new BigDecimal(userGrade.getDiscount()).divide(new BigDecimal("10"), BigDecimal.ROUND_CEILING, 4);
+                if (percent.compareTo(new BigDecimal("0")) <= 0) {
+                    percent = new BigDecimal("1");
+                }
+            }
+
             for (MtCart cart : cartList) {
                 // 购物车商品信息
                 MtGoods mtGoodsInfo = goodsService.queryGoodsById(cart.getGoodsId());
                 if (mtGoodsInfo == null || !mtGoodsInfo.getStatus().equals(StatusEnum.ENABLED.getKey())) {
                     continue;
+                }
+
+                // 会员支付折扣
+                boolean isDiscount = mtGoodsInfo.getIsMemberDiscount().equals(YesOrNoEnum.YES.getKey()) ? true : false;
+                if (percent.compareTo(new BigDecimal("0")) > 0 && isDiscount) {
+                    BigDecimal discount = mtGoodsInfo.getPrice().subtract(mtGoodsInfo.getPrice().multiply(percent)).multiply(new BigDecimal(cart.getNum()));
+                    memberDiscount = memberDiscount.add(discount);
                 }
 
                 totalNum = totalNum + cart.getNum();
@@ -2180,9 +2198,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         // 支付金额 = 商品总额 - 积分抵扣金额
         payPrice = payPrice.subtract(usePointAmount);
-        if (payPrice.compareTo(new BigDecimal("0")) < 0) {
-            payPrice = new BigDecimal("0");
-        }
 
         // 配送费用
         BigDecimal deliveryFee = new BigDecimal("0");
@@ -2191,18 +2206,12 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             deliveryFee = new BigDecimal(mtSetting.getValue());
         }
 
-        // 会员折扣
-        BigDecimal payDiscount = new BigDecimal("1");
-        MtUserGrade userGrade = userGradeService.queryUserGradeById(merchantId, Integer.parseInt(userInfo.getGradeId()), userInfo.getId());
-        if (userGrade != null && !userInfo.getIsStaff().equals(YesOrNoEnum.YES.getKey())) {
-            if (userGrade.getDiscount() > 0) {
-                payDiscount = new BigDecimal(userGrade.getDiscount()).divide(new BigDecimal("10"), BigDecimal.ROUND_CEILING, 4);
-                if (payDiscount.compareTo(new BigDecimal("0")) <= 0) {
-                    payDiscount = new BigDecimal("1");
-                }
-            }
+        payPrice = payPrice.add(deliveryFee).subtract(memberDiscount);
+        BigDecimal discount = totalPrice.subtract(payPrice).divide(new BigDecimal("10"), BigDecimal.ROUND_CEILING, 2);
+
+        if (payPrice.compareTo(new BigDecimal("0")) < 0) {
+            payPrice = new BigDecimal("0");
         }
-        payPrice = payPrice.multiply(payDiscount).add(deliveryFee);
 
         result.put("list", cartDtoList);
         result.put("totalNum", totalNum);
@@ -2215,6 +2224,13 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         result.put("couponAmount", couponAmount);
         result.put("usePointAmount", usePointAmount);
         result.put("deliveryFee", deliveryFee);
+        result.put("discount", discount);
+        if (memberDiscount.compareTo(new BigDecimal("0")) > 0) {
+            result.put("memberDiscount", (new BigDecimal("10").multiply(percent)));
+        } else {
+            result.put("memberDiscount", 0);
+        }
+
 
         return result;
     }

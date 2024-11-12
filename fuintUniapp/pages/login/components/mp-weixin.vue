@@ -21,21 +21,39 @@
     <view class="no-login-btn">
       <button class="button btn-normal" @click="cancelLogin">暂不登录</button>
     </view>
+    <view class="privacy">
+        <label @click="privacyChange"><checkbox :checked="agreePrivacy" value="agree" color="#fa2209" style="transform:scale(0.7)"/>已阅读并同意</label>
+        <text class="privacy-ptl" @click="openPrivacy(1)">《隐私协议》</text>
+        <text class="member-ptl" @click="openPrivacy(2)">《用户协议》</text>
+        <wx-privacy ref="popPrivacy" @agree="handleAgree" :title="protocolTitle" :subDesc="protocolSubDesc" @disagree="handleDisagree"></wx-privacy>
+    </view>
+    
   </view>
 </template>
 
 <script>
   import store from '@/store'
   import * as UserApi from '@/api/user'
+  import WxPrivacy from './wx-privacy'
+  import ProtocolEnum from '@/common/enum/protocol/Protocol'
+  import SettingKeyEnum from '@/common/enum/setting/Key'
   export default {
-
+    components: {
+      WxPrivacy
+    },
     data() {
       return {
         // 微信小程序登录凭证 (code)
         // 提交到后端，用于换取openid
         code: '',
         needPhone: false,
-        isProfile: false
+        isProfile: false,
+        isOpenPrivacy: false,
+        agreePrivacy: false,
+        protocolTitle: '',
+        protocolSubDesc: '',
+        ProtocolEnum,
+        SettingKeyEnum
       }
     },
 
@@ -48,6 +66,27 @@
     },
 
     methods: {
+      privacyChange() {
+         this.agreePrivacy = !this.agreePrivacy;
+      },
+      openPrivacy(type) {
+         if (type == 1) {
+             this.protocolTitle = ProtocolEnum.data[0].name;
+             this.protocolSubDesc = ProtocolEnum.data[0].value;
+         } else {
+             this.protocolTitle = ProtocolEnum.data[1].name;
+             this.protocolSubDesc = ProtocolEnum.data[1].value;
+         }
+         this.$refs.popPrivacy.openPrivacy();
+      },
+      handleDisagree() {
+         this.agreePrivacy = false;
+         this.$refs.popPrivacy.closePrivacy();
+      },
+      handleAgree() {
+         this.agreePrivacy = true;
+         this.$refs.popPrivacy.closePrivacy();
+      },
 
       // 获取code
       // https://developers.weixin.qq.com/miniprogram/dev/api/open-api/login/wx.login.html
@@ -80,6 +119,10 @@
       // 获取微信用户信息
       getUserProfile() {
         const app = this;
+        if (!app.agreePrivacy) {
+            app.$error("请仔细阅读《用户协议》和《隐私协议》，点击同意代表您已认上述协议内容！");
+            return false;
+        }
         wx.canIUse('getUserProfile') && wx.getUserProfile({
           lang: 'zh_CN',
           desc: '获取用户相关信息',
@@ -113,7 +156,7 @@
       async onAuthSuccess(userInfo) {
         const app = this
         // 提交到后端
-        store.dispatch('MpWxLogin', { code: await app.getCode(), userInfo })
+        store.dispatch('MpWxLogin', { code: await app.getCode(), shareId: (uni.getStorageSync('shareId') ? uni.getStorageSync('shareId') : 0), userInfo })
           .then(result => {
             if (!app.needPhone || userInfo.type == "phone") {
                 // 显示登录成功
@@ -237,5 +280,17 @@
       border-radius: 12rpx;
       text-align: center;
     }
+  }
+  
+  .privacy {
+      margin-top: 50rpx;
+      padding-left: 5rpx;
+      font-size: 28rpx;
+      .member-ptl {
+          color: $fuint-theme;
+      }
+      .privacy-ptl {
+          color: $fuint-theme;
+      }
   }
 </style>

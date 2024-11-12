@@ -85,8 +85,14 @@
   }
 }
 
-// 买家留言
+// 费用明细
 .flow-all-money {
+   .detail-title {
+      padding-top: 10rpx;
+      margin-bottom: 10rpx;
+      font-weight: bold;
+      font-size: 30rpx;
+   }
   .ipt-wrapper {
     margin-right: 25rpx;
     textarea {

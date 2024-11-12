@@ -90,6 +90,7 @@
     
     <!-- 订单折扣 -->
     <view class="flow-all-money b-f m-top20">
+      <view class="detail-title">费用明细</view>
       <!-- 卡券 -->
       <view class="flow-all-list dis-flex">
         <text class="flex-five">使用卡券抵扣：</text>
@@ -112,6 +113,24 @@
           <text class="points-money col-m">-￥{{ usePointAmount }}</text>
           <u-switch v-model="isUsePoints" size="48" active-color="#113a28" @change="getCartList()"></u-switch>
         </view>
+      </view>
+      <!-- 会员折扣 -->
+      <view class="points flow-all-list dis-flex flex-y-center">
+          <view class="block-left flex-five">
+            <text class="title">会员支付折扣：</text>
+          </view>
+          <view class="flex-five dis-flex flex-x-end flex-y-center">
+            <text>{{ (memberDiscount < 10 && memberDiscount > 0) ? memberDiscount : '无折扣' }}折</text>
+          </view>
+      </view>
+      <!-- 运费 -->
+      <view class="points flow-all-list dis-flex flex-y-center" v-if="deliveryFee > 0 && orderMode == false">
+          <view class="block-left flex-five">
+            <text class="title">配送费用：</text>
+          </view>
+          <view class="flex-five dis-flex flex-x-end flex-y-center">
+            <text class="points-money col-m">￥{{ deliveryFee }}</text>
+          </view>
       </view>
     </view>
 
@@ -149,7 +168,6 @@
         <view class="chackout-left pl-12">
           <view class="col-amount-do">支付金额：
               <text class="pay-amount">￥{{ payPrice ? payPrice.toFixed(2) : '0.00' }}</text>
-              <view v-if="deliveryFee > 0 && orderMode == false" class="delivery-fee">（ 配送费：￥{{ deliveryFee.toFixed(2) }} ）</view>
           </view>
         </view>
         <view class="chackout-right" @click="onSubmitOrder()">
