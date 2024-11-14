@@ -182,6 +182,8 @@ public class BackendPrinterController extends BaseController {
         String sn = params.get("sn") == null ? "" : params.get("sn").toString();
         String description = params.get("description") == null ? "" : params.get("description").toString();
         String autoPrint = params.get("autoPrint") == null ? YesOrNoEnum.NO.getKey() : params.get("autoPrint").toString();
+        String beforePay = params.get("beforePay") == null ? YesOrNoEnum.YES.getKey() : params.get("beforePay").toString();
+        String afterPay = params.get("afterPay") == null ? YesOrNoEnum.NO.getKey() : params.get("afterPay").toString();
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
         if (accountInfo == null) {
@@ -195,6 +197,8 @@ public class BackendPrinterController extends BaseController {
         mtPrinter.setName(name);
         mtPrinter.setSn(sn);
         mtPrinter.setAutoPrint(autoPrint);
+        mtPrinter.setBeforePay(beforePay);
+        mtPrinter.setAfterPay(afterPay);
         mtPrinter.setDescription(description);
         mtPrinter.setMerchantId(accountInfo.getMerchantId());
         if (StringUtil.isNotEmpty(id)) {
@@ -341,7 +345,7 @@ public class BackendPrinterController extends BaseController {
         }
 
         // 打印订单
-        Boolean result = printerService.printOrder(orderInfo);
+        Boolean result = printerService.printOrder(orderInfo, false, false, false);
 
         return getSuccessResult(result);
     }

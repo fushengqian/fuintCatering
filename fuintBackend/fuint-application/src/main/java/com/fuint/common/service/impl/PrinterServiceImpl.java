@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.github.pagehelper.Page;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,11 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
      * 系统配置服务接口
      * */
     private SettingService settingService;
+
+    /**
+     * 环境变量
+     * */
+    private Environment env;
 
     /**
      * 分页查询数据列表
@@ -147,10 +153,13 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
      * 打印订单
      *
      * @param orderInfo 订单信息
+     * @param autoPrint 自动打印
+     * @param beforePay 支付前打印
+     * @param afterPay 支付后打印
      * @return
      * */
     @Override
-    public Boolean printOrder(UserOrderDto orderInfo) throws Exception {
+    public Boolean printOrder(UserOrderDto orderInfo, boolean autoPrint, boolean beforePay, boolean afterPay) throws Exception {
         PrintRequest printRequest = new PrintRequest();
         createRequestHeader(orderInfo.getMerchantId(), printRequest);
         if (orderInfo.getStoreInfo() == null) {
@@ -161,7 +170,17 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
         Map<String, Object> params = new HashMap<>();
         params.put("storeId", orderInfo.getStoreInfo().getId());
         params.put("status", StatusEnum.ENABLED.getKey());
-        params.put("autoPrint", YesOrNoEnum.YES.getKey());
+
+        if (autoPrint) {
+            params.put("autoPrint", YesOrNoEnum.YES.getKey());
+        }
+
+        if (beforePay) {
+            params.put("beforePay", YesOrNoEnum.YES.getKey());
+        } else if (afterPay) {
+            params.put("afterPay", YesOrNoEnum.YES.getKey());
+        }
+
         List<MtPrinter> printers = queryPrinterListByParams(params);
         if (printers == null || printers.size() < 1) {
             return false;
@@ -224,8 +243,11 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
                     .append("下单时间：").append(orderInfo.getCreateTime()).append("<BR>")
                     .append("订单备注：").append(StringUtil.isEmpty(orderInfo.getRemark()) ? "无" : orderInfo.getRemark()).append("<BR>");
 
-            // 二维码
-            printContent.append("<C>").append("<QR>https://www.fuint.cn</QR>").append("</C>");
+            // 网站二维码
+            String webSite = env.getProperty("website.url");
+            if (StringUtil.isNotEmpty(webSite)) {
+                printContent.append("<C>").append("<QR>" + webSite + "</QR>").append("</C>");
+            }
 
             printRequest.setContent(printContent.toString());
             printRequest.setCopies(1);
@@ -327,6 +349,8 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
         String sn = params.get("sn") == null ? "" : params.get("sn").toString();
         String name = params.get("name") == null ? "" : params.get("name").toString();
         String autoPrint = params.get("autoPrint") == null ? "" : params.get("autoPrint").toString();
+        String beforePay = params.get("beforePay") == null ? YesOrNoEnum.YES.getKey() : params.get("beforePay").toString();
+        String afterPay = params.get("afterPay") == null ? YesOrNoEnum.NO.getKey() : params.get("afterPay").toString();
 
         LambdaQueryWrapper<MtPrinter> lambdaQueryWrapper = Wrappers.lambdaQuery();
         if (StringUtils.isNotBlank(status)) {
@@ -349,6 +373,12 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
         }
         if (StringUtils.isNotBlank(autoPrint)) {
             lambdaQueryWrapper.eq(MtPrinter::getAutoPrint, autoPrint);
+        }
+        if (StringUtils.isNotBlank(beforePay)) {
+            lambdaQueryWrapper.eq(MtPrinter::getBeforePay, beforePay);
+        }
+        if (StringUtils.isNotBlank(afterPay)) {
+            lambdaQueryWrapper.eq(MtPrinter::getAfterPay, afterPay);
         }
         lambdaQueryWrapper.orderByAsc(MtPrinter::getId);
 

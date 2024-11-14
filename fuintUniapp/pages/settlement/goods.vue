@@ -302,6 +302,8 @@
         isUsePoints: true,
         // 是否显示积分说明
         showPoints: false,
+        // 会员折扣
+        memberDiscount: 0,
         // 是否显示卡券弹窗
         showPopup: false,
         storeInfo: null,
@@ -364,6 +366,7 @@
                   app.isUsePoints = false;
               }
               app.usePointAmount = result.data.usePointAmount;
+              app.memberDiscount = result.data.memberDiscount ? result.data.memberDiscount : 0;
               resolve(result);
             })
             .catch(err => reject(err))

@@ -12,7 +12,7 @@ import lombok.Setter;
 
 /**
  * 打印机实体
- * 
+ *
  * @Created by FSQ
  * CopyRight https://www.fuint.cn
  */
@@ -42,6 +42,12 @@ public class MtPrinter implements Serializable {
 
     @ApiModelProperty("是否自动打印")
     private String autoPrint;
+
+    @ApiModelProperty("支付前打印")
+    private String beforePay;
+
+    @ApiModelProperty("支付后打印")
+    private String afterPay;
 
     @ApiModelProperty("创建时间")
     private Date createTime;
