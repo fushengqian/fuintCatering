@@ -156,10 +156,11 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
      * @param autoPrint 自动打印
      * @param beforePay 支付前打印
      * @param afterPay 支付后打印
+     * @param goodsIds 打印的商品Id
      * @return
      * */
     @Override
-    public Boolean printOrder(UserOrderDto orderInfo, boolean autoPrint, boolean beforePay, boolean afterPay) throws Exception {
+    public Boolean printOrder(UserOrderDto orderInfo, boolean autoPrint, boolean beforePay, boolean afterPay, List<Integer> goodsIds) throws Exception {
         PrintRequest printRequest = new PrintRequest();
         createRequestHeader(orderInfo.getMerchantId(), printRequest);
         if (orderInfo.getStoreInfo() == null) {
@@ -200,6 +201,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             // 单号桌码
             printContent.append("<L>订单号：").append(orderInfo.getOrderSn()).append("</L>");
             if (orderInfo.getTableInfo() != null && StringUtil.isNotEmpty(orderInfo.getTableInfo().getCode())) {
+                printContent.append("<BR>");
                 printContent.append("<R>桌码：").append(orderInfo.getTableInfo().getCode()).append("</R>");
             }
 
@@ -217,7 +219,13 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             // 商品列表
             if (orderInfo.getGoods() != null && orderInfo.getGoods().size() > 0) {
                 for (OrderGoodsDto goodsDto : orderInfo.getGoods()) {
-                     printContent.append(NoteFormatter.formatPrintOrderItemForNewLine80(goodsDto.getName(), goodsDto.getNum(), Double.parseDouble(goodsDto.getPrice())));
+                     if (goodsIds != null && goodsIds.size() > 0) {
+                         if (goodsIds.contains(goodsDto.getGoodsId())) {
+                             printContent.append(NoteFormatter.formatPrintOrderItemForNewLine80(goodsDto.getName(), goodsDto.getNum(), Double.parseDouble(goodsDto.getPrice())));
+                         }
+                     } else {
+                         printContent.append(NoteFormatter.formatPrintOrderItemForNewLine80(goodsDto.getName(), goodsDto.getNum(), Double.parseDouble(goodsDto.getPrice())));
+                     }
                 }
             }
 

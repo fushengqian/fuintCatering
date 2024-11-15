@@ -345,7 +345,7 @@ public class BackendPrinterController extends BaseController {
         }
 
         // 打印订单
-        Boolean result = printerService.printOrder(orderInfo, false, false, false);
+        Boolean result = printerService.printOrder(orderInfo, false, false, false, null);
 
         return getSuccessResult(result);
     }
