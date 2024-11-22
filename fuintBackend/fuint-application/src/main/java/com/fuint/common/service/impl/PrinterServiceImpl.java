@@ -202,8 +202,16 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             printContent.append("<L>订单号：").append(orderInfo.getOrderSn()).append("</L>");
             if (orderInfo.getTableInfo() != null && StringUtil.isNotEmpty(orderInfo.getTableInfo().getCode())) {
                 printContent.append("<BR>");
-                printContent.append("<R>桌码：").append(orderInfo.getTableInfo().getCode()).append("</R>");
+                printContent.append("<R><BOLD>桌码：").append(orderInfo.getTableInfo().getCode()).append("</BOLD></R>");
             }
+
+            // 订单状态
+            String payStatus = PayStatusEnum.WAIT.getValue();
+            if (orderInfo.getPayStatus().equals(PayStatusEnum.SUCCESS.getKey())) {
+                payStatus = PayStatusEnum.SUCCESS.getValue();
+            }
+            printContent.append("<BR>");
+            printContent.append("<L>").append("支付状态：").append(payStatus).append("<BR></L>");
 
             // 分割线
             printContent.append(org.apache.commons.lang3.StringUtils.repeat("-", 32)).append("<BR>");

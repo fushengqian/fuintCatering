@@ -8,5 +8,6 @@ export default new Enum([
   { key: 'A', name: '待审核' },
   { key: 'B', name: '已同意' },
   { key: 'C', name: '已拒绝' },
-  { key: 'D', name: '已取消' }
+  { key: 'D', name: '已取消' },
+  { key: 'E', name: '已完成' }
 ])

@@ -25,6 +25,6 @@ export const detail = (refundId, param) => {
 }
 
 // 用户发货
-export const delivery = (refundId, data) => {
-  return request.post(api.delivery, { refundId, form: data })
+export const delivery = (refundId, expressName, expressNo) => {
+  return request.post(api.delivery, { refundId, expressName, expressNo })
 }

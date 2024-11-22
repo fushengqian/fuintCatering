@@ -874,8 +874,18 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         }
 
         // 商品订单
+        List<Integer> goodsIds = new ArrayList<>();
         if (orderDto.getType().equals(OrderTypeEnum.GOOGS.getKey())) {
             orderDto.setCouponId(couponId);
+            Map<String, Object> cartParams = new HashMap<>();
+            cartParams.put("status", StatusEnum.ENABLED.getKey());
+            cartParams.put("ids", orderDto.getCartIds());
+            List<MtCart> cartList = cartService.queryCartListByParams(cartParams);
+            if (cartList != null && cartList.size() > 0) {
+                for (MtCart mtCart : cartList) {
+                     goodsIds.add(mtCart.getGoodsId());
+                }
+            }
         }
 
         // 商品订单且配送要加上配送费用
@@ -1100,18 +1110,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         // 打印订单
         try {
-            List<Integer> goodsIds = new ArrayList<>();
-            if (orderInfo.getType().equals(OrderTypeEnum.GOOGS.getKey())) {
-                Map<String, Object> cartParams = new HashMap<>();
-                cartParams.put("status", StatusEnum.ENABLED.getKey());
-                cartParams.put("ids", orderDto.getCartIds());
-                List<MtCart> cartList = cartService.queryCartListByParams(cartParams);
-                if (cartList != null && cartList.size() > 0) {
-                    for (MtCart mtCart : cartList) {
-                         goodsIds.add(mtCart.getGoodsId());
-                    }
-                }
-            }
             UserOrderDto userOrderDto = getOrderByOrderSn(orderInfo.getOrderSn());
             printerService.printOrder(userOrderDto, true, true, false, goodsIds);
         } catch (Exception e) {
@@ -1733,21 +1731,23 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         // 储值卡的订单
         if (orderInfo.getType().equals(OrderTypeEnum.PRESTORE.getKey())) {
             MtCoupon coupon = couponService.queryCouponById(orderInfo.getCouponId());
-            String[] paramArr = orderInfo.getParam().split(",");
-            for(int i = 0; i < paramArr.length; i++) {
-                String[] item = paramArr[i].split("_");
-                if (Integer.parseInt(item[2]) > 0) {
-                    OrderGoodsDto goodsDto = new OrderGoodsDto();
-                    goodsDto.setId(coupon.getId());
-                    goodsDto.setType(OrderTypeEnum.PRESTORE.getKey());
-                    goodsDto.setName("预存￥" + item[0] + "到账￥" + item[1]);
-                    goodsDto.setNum(Integer.parseInt(item[2]));
-                    goodsDto.setPrice(item[0]);
-                    goodsDto.setDiscount("0");
-                    if (coupon.getImage().indexOf(baseImage) == -1) {
-                        goodsDto.setImage(baseImage + coupon.getImage());
+            if (coupon != null) {
+                String[] paramArr = orderInfo.getParam().split(",");
+                for (int i = 0; i < paramArr.length; i++) {
+                    String[] item = paramArr[i].split("_");
+                    if (Integer.parseInt(item[2]) > 0) {
+                        OrderGoodsDto goodsDto = new OrderGoodsDto();
+                        goodsDto.setId(coupon.getId());
+                        goodsDto.setType(OrderTypeEnum.PRESTORE.getKey());
+                        goodsDto.setName("预存￥" + item[0] + "到账￥" + item[1]);
+                        goodsDto.setNum(Integer.parseInt(item[2]));
+                        goodsDto.setPrice(item[0]);
+                        goodsDto.setDiscount("0");
+                        if (coupon.getImage().indexOf(baseImage) == -1) {
+                            goodsDto.setImage(baseImage + coupon.getImage());
+                        }
+                        goodsList.add(goodsDto);
                     }
-                    goodsList.add(goodsDto);
                 }
             }
         }

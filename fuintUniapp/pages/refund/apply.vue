@@ -415,7 +415,7 @@
       line-height: 80rpx;
       text-align: center;
       color: #fff;
-      border-radius: 8rpx;
+      border-radius: 40rpx;
     }
 
     .btn-item-main {

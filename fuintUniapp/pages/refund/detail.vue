@@ -11,6 +11,7 @@
         <text class="f-32 col-f" v-if="detail.status == RefundStatusEnum.B.key">{{RefundStatusEnum.B.name}}</text>
         <text class="f-32 col-f" v-if="detail.status == RefundStatusEnum.C.key">{{RefundStatusEnum.C.name}}</text>
         <text class="f-32 col-f" v-if="detail.status == RefundStatusEnum.D.key">{{RefundStatusEnum.D.name}}</text>
+        <text class="f-32 col-f" v-if="detail.status == RefundStatusEnum.E.key">{{RefundStatusEnum.E.name}}</text>
       </view>
     </view>
 
@@ -69,7 +70,7 @@
           <text>{{ detail.remark }}</text>
         </view>
       </view>
-      <view v-if="detail.imageList.length > 0" class="detail-refund__row dis-flex">
+      <view v-if="detail.imageList && detail.imageList.length > 0" class="detail-refund__row dis-flex">
         <view class="text">
           <text>申请凭证：</text>
         </view>
@@ -132,17 +133,13 @@
         <view class="form-group dis-flex flex-y-center">
           <view class="field">物流公司：</view>
           <view class="flex-box">
-            <picker mode="selector" :range="expressList" range-key="express_name" :value="expressIndex"
-              @change="onChangeExpress">
-              <text v-if="expressIndex > -1">{{ expressList[expressIndex].express_name }}</text>
-              <text v-else class="col-80">请选择物流公司</text>
-            </picker>
+            <input class="input" v-model="expressName" placeholder="请填写物流公司名称"></input>
           </view>
         </view>
         <view class="form-group dis-flex flex-y-center">
           <view class="field">物流单号：</view>
           <view class="flex-box">
-            <input class="input" v-model="formData.expressNo" placeholder="请填写物流单号"></input>
+            <input class="input" v-model="expressNo" placeholder="请填写物流单号"></input>
           </view>
         </view>
       </view>
@@ -173,17 +170,10 @@
         refundId: null,
         // 售后单详情
         detail: {},
-        // 物流公司列表
-        expressList: [],
-        // 表单数据
-        formData: {
-          // 物流公司ID
-          expressId: null,
-          // 物流单号
-          expressNo: ''
-        },
-        // 选择的物流公司索引
-        expressIndex: -1,
+        // 物流公司
+        expressName: '',
+        // 物流单号
+        expressNo: '',
         // 按钮禁用
         disabled: false
       }
@@ -205,7 +195,7 @@
       getPageData() {
         const app = this
         app.isLoading = true
-        Promise.all([app.getRefundDetail(), app.getExpressList()])
+        Promise.all([app.getRefundDetail()])
           .then(result => {
             app.isLoading = false
           })
@@ -224,19 +214,6 @@
         })
       },
 
-      // 获取物流公司列表 
-      getExpressList() {
-        const app = this
-        /*return new Promise((resolve, reject) => {
-          ExpressApi.list()
-            .then(result => {
-              app.expressList = result.data.list
-              resolve()
-            })
-            .catch(err => reject(err))
-        })*/
-      },
-
       // 跳转商品详情页
       onGoodsDetail(goodsId) {
         this.$navTo('pages/goods/detail', { goodsId })
@@ -252,14 +229,6 @@
         })
       },
 
-      // 选择物流公司
-      onChangeExpress(e) {
-        const expressIndex = e.detail.value
-        const { expressList } = this
-        this.expressIndex = expressIndex
-        this.formData.expressId = expressList[expressIndex].express_id
-      },
-
       // 表单提交
       onSubmit() {
         const app = this
@@ -268,13 +237,18 @@
         // 按钮禁用
         app.disabled = true
         // 提交到后端
-        RefundApi.delivery(app.refundId, app.formData)
+        RefundApi.delivery(app.refundId, app.expressName, app.expressNo)
           .then(result => {
-            app.$toast(result.message)
-            setTimeout(() => {
-              app.disabled = false
-              uni.navigateBack()
-            }, 1500)
+              if (result.code == 200) {
+                  app.$toast("提交成功");
+                  setTimeout(() => {
+                    app.disabled = false
+                    uni.navigateBack()
+                  }, 1500)
+              } else {
+                  app.$error(result.message);
+                  app.disabled = false;
+              }
           })
           .catch(err => app.disabled = false)
       }
@@ -305,9 +279,9 @@
   }
 
   .header-state {
-    z-index: 1;
-    margin-top: 20rpx;
-    padding: 40rpx 110rpx;
+     padding: 0rpx 130rpx;
+     font-size: 60rpx;
+     font-weight: bold;
   }
 
   /* 商品详情 */
