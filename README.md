@@ -16,8 +16,10 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系
 <p>6、支持手机短信、站内弹框消息、微信订阅消息：支持包括发货消息、卡券到期提醒、活动提醒、会员到期提醒、积分余额变动提醒等消息。</p>
 <b>官网演示地址：</b><br>
 <p>
-   1、后台地址：<a target="_blank" href="https://www.fuint.cn/fuintFood/">https://www.fuint.cn/fuintFood/</a> 演示账号：fuint / 123456<br>
-   2、swagger接口文档：<a target="_blank" href="https://www.fuint.cn/fuint-application/swagger-ui.html">https://www.fuint.cn/fuint-application/swagger-ui.html</a>
+   1、会员点餐H5：<a target="_blank" href="https://www.fuint.cn/food/">https://www.fuint.cn/food/</a><br>
+   2、后台地址：<a target="_blank" href="https://www.fuint.cn/fuintFood/">https://www.fuint.cn/fuintFood/</a> 演示账号：fuint / 123456<br>
+   3、swagger接口文档：<a target="_blank" href="https://www.fuint.cn/fuint-application/swagger-ui.html">https://www.fuint.cn/fuint-application/swagger-ui.html</a><br>
+   4、完整演示功能：<a target="_blank" href="https://www.fuint.cn/docs/detail?id=25">https://www.fuint.cn/docs/detail?id=25</a>
 </p>
 
 #### 软件架构
