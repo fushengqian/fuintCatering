@@ -224,6 +224,7 @@ public class BannerServiceImpl extends ServiceImpl<MtBannerMapper, MtBanner> imp
         String position = params.get("position") == null ? "" : params.get("position").toString();
 
         LambdaQueryWrapper<MtBanner> lambdaQueryWrapper = Wrappers.lambdaQuery();
+        lambdaQueryWrapper.ne(MtBanner::getStatus, StatusEnum.DISABLE.getKey());
         if (StringUtils.isNotBlank(title)) {
             lambdaQueryWrapper.like(MtBanner::getTitle, title);
         }

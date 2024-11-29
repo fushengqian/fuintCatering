@@ -209,6 +209,7 @@ public class BookCateServiceImpl extends ServiceImpl<MtBookCateMapper, MtBookCat
         String name = params.get("name") == null ? "" : params.get("name").toString();
 
         LambdaQueryWrapper<MtBookCate> lambdaQueryWrapper = Wrappers.lambdaQuery();
+        lambdaQueryWrapper.ne(MtBookCate::getStatus, StatusEnum.DISABLE.getKey());
         if (StringUtils.isNotBlank(name)) {
             lambdaQueryWrapper.like(MtBookCate::getName, name);
         }

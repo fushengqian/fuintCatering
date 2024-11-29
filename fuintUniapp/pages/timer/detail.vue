@@ -272,11 +272,11 @@
           border-radius: 40rpx;
           color: #ffffff;
           font-weight: bold;
-          background: url('/static/confirm/undo.png') no-repeat center center;
+          background: url('~@/static/confirm/undo.png') no-repeat center center;
           background-size: contain;
       }
       .active {
-        background: url('/static/confirm/do.png') no-repeat center center;
+        background: url('~@/static/confirm/do.png') no-repeat center center;
         background-size: contain;
         border: solid 1px #ffffff;
       }

@@ -246,6 +246,7 @@ public class ArticleServiceImpl extends ServiceImpl<MtArticleMapper, MtArticle> 
         String merchantId = params.get("merchantId") == null ? "" : params.get("merchantId").toString();
 
         LambdaQueryWrapper<MtArticle> lambdaQueryWrapper = Wrappers.lambdaQuery();
+        lambdaQueryWrapper.ne(MtArticle::getStatus, StatusEnum.DISABLE.getKey());
         if (StringUtils.isNotBlank(merchantId)) {
             lambdaQueryWrapper.like(MtArticle::getMerchantId, merchantId);
         }
