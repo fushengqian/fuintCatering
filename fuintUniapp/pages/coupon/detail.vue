@@ -2,16 +2,17 @@
   <view v-if="!isLoading" class="container b-f p-b">
     <view class="base">
         <view class="coupon-main">
-            <image class="image" :src="detail.image"></image>
-            <view v-if="detail.code && detail.status == 'A' && detail.isGive" class="gift" @click="give()"><text>转赠好友</text></view>
-        </view>
-        <view class="item">
-          <view class="label">卡券名称：</view>
-          <view class="name">{{ detail.name ? detail.name : '' }}</view>
-        </view>
-        <view v-if="detail.amount > 0" class="item">
-          <view class="label">卡券面额：</view>
-          <view class="amount">￥{{ detail.amount }}</view>
+            <view class="left">
+               <image class="image" :src="detail.image"></image>
+            </view>
+            <view class="right">
+                <view class="item">
+                  <view class="name">{{ detail.name ? detail.name : '' }}</view>
+                </view>
+                <view v-if="detail.amount > 0" class="item">
+                  <view class="amount">￥<text class="num">{{ detail.amount }}</text></view>
+                </view>
+            </view>
         </view>
         <view v-if="detail.point > 0" class="item">
           <view class="label">兑换积分：</view>
@@ -25,6 +26,7 @@
           <view class="label">适用门店：</view>
           <view>{{ detail.storeNames ? detail.storeNames : '全部'}}</view>
         </view>
+        <view v-if="detail.code && detail.status == 'A' && detail.isGive" class="gift" @click="give()"><text>转赠好友</text></view>
     </view>
     <view class="coupon-qr" v-if="detail.code">
       <view>
@@ -91,6 +93,7 @@
   import * as giveApi from '@/api/give'
   import * as couponApi from '@/api/coupon'
   import * as MessageApi from '@/api/message'
+  import config from '@/config'
 
   export default {
     components: {
@@ -116,7 +119,7 @@
      */
     onLoad(options) {
       this.userCouponId = options.userCouponId ? options.userCouponId : 0;
-      this.couponId = options.couponId ?options.couponId : 0;
+      this.couponId = options.couponId ? options.couponId : 0;
       this.getCouponDetail();
     },
 
@@ -127,7 +130,7 @@
         myCouponApi.detail(app.couponId, app.userCouponId, "")
           .then(result => {
             app.detail = result.data;
-            if (!app.couponId) {
+            if (!app.couponId || app.couponId < 1) {
                 app.couponId = app.detail.couponId;
             }
           })
@@ -259,10 +262,11 @@
     onShareAppMessage() {
       const app = this
       return {
-         title: "卡券分享",
-         path: "/pages/coupon/detail?couponId=" + app.couponId
+         title: config.name + "卡券分享",
+         path: "/pages/coupon/detail?couponId=" + app.couponId + "&" + app.$getShareUrlParams()
       }
     },
+    
     /**
      * 分享到朋友圈
      * 本接口为 Beta 版本，暂只在 Android 平台支持，详见分享到朋友圈 (Beta)
@@ -272,8 +276,8 @@
       const app = this
       const { page } = app
       return {
-        title: "卡券分享",
-        path: "/pages/coupon/detail?couponId=" + app.couponId
+        title: config.name + "卡券分享",
+        path: "/pages/coupon/detail?couponId=" + app.couponId + "&" + app.$getShareUrlParams()
       }
     }
   }
@@ -295,15 +299,36 @@
         height: auto;
         min-height: 420rpx;
         .coupon-main {
-            .image {
-                width: 200rpx;
-                height: 158rpx;
-                border-radius: 8rpx;
-                border: #cccccc solid 1rpx;
+            clear: both;
+            min-height: 164rpx;
+            border: #ccc dashed 2rpx;
+            border-radius: 5rpx;
+            margin-bottom: 20rpx;
+            .left {
+                width: 215rpx;
+                float: left;
+                .image {
+                    width: 210rpx;
+                    height: 160rpx;
+                    border-radius: 8rpx;
+                    border-right: #cccccc dashed 2rpx;
+                }
             }
-            width: 100%;
+            .right {
+                width: 380rpx;
+                float: left;
+                overflow: hidden;
+                .name {
+                    font-size: 38rpx;
+                }
+                .num {
+                    font-size: 58rpx;
+                    color: red;
+                }
+            }
         }
         .item {
+             clear: both;
              margin-bottom: 10rpx;
              font-size: 30rpx;
              color: #666666;
@@ -311,7 +336,6 @@
                  float: left;
              }
              .amount {
-                 color: red;
                  font-weight: bold;
              }
              .name {

@@ -285,7 +285,8 @@
   .privacy {
       margin-top: 50rpx;
       padding-left: 5rpx;
-      font-size: 28rpx;
+      font-size: 24rpx;
+      text-align: center;
       .member-ptl {
           color: $fuint-theme;
       }

@@ -2,12 +2,18 @@
   <view v-if="!isLoading" class="container b-f p-b">
     <view class="base">
          <view class="coupon-main">
-            <image class="image" :src="detail.image"></image>
-         </view>
-         <view class="item">
-           <view class="label">卡券名称：</view>
-           <view class="name">{{ detail.name ? detail.name : '' }}</view>
-         </view>
+             <view class="left">
+                <image class="image" :src="detail.image"></image>
+             </view>
+             <view class="right">
+                 <view class="item">
+                   <view class="name">{{ detail.name ? detail.name : '' }}</view>
+                 </view>
+                 <view v-if="detail.useRule > 0" class="item">
+                   <view class="amount"><text class="num">{{ detail.useRule }}</text>次卡</view>
+                 </view>
+             </view>
+        </view>
         <view class="item">
            <view class="label">有效期至：</view>
            <view>{{ detail.effectiveDate }}</view>
@@ -218,15 +224,36 @@
         height: auto;
         min-height: 365rpx;
         .coupon-main {
-            .image {
-                width: 200rpx;
-                height: 158rpx;
-                border-radius: 8rpx;
-                border: solid 1rpx #cccccc;
+            clear: both;
+            min-height: 164rpx;
+            border: #ccc dashed 2rpx;
+            border-radius: 5rpx;
+            margin-bottom: 20rpx;
+            .left {
+                width: 215rpx;
+                float: left;
+                .image {
+                    width: 210rpx;
+                    height: 160rpx;
+                    border-radius: 8rpx;
+                    border-right: #cccccc dashed 2rpx;
+                }
             }
-            width: 100%;
+            .right {
+                width: 380rpx;
+                float: left;
+                overflow: hidden;
+                .name {
+                    font-size: 38rpx;
+                }
+                .num {
+                    font-size: 58rpx;
+                    color: red;
+                }
+            }
         }
         .item {
+             clear: both;
              margin-bottom: 10rpx;
              font-size: 30rpx;
              color: #666666;
@@ -234,7 +261,6 @@
                  float: left;
              }
              .amount {
-                 color: red;
                  font-weight: bold;
              }
              .name {

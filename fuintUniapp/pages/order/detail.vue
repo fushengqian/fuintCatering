@@ -342,7 +342,9 @@
 
       // 跳转到商品详情页面
       handleTargetGoods(goodsId, type) {
-        this.$navTo('pages/goods/detail', { goodsId })
+        if (goodsId && parseInt(goodsId) > 0) {
+            this.$navTo('pages/goods/detail', { goodsId })
+        }
       },
 
       // 跳转到申请售后页面
