@@ -605,8 +605,7 @@ public class UserCouponServiceImpl extends ServiceImpl<MtUserCouponMapper, MtUse
      * */
     @Override
     public MtUserCoupon getUserCouponDetail(Integer userCouponId) {
-        MtUserCoupon userCoupon = mtUserCouponMapper.selectById(userCouponId);
-        return userCoupon;
+        return mtUserCouponMapper.selectById(userCouponId);
     }
 
     /**
@@ -620,8 +619,7 @@ public class UserCouponServiceImpl extends ServiceImpl<MtUserCouponMapper, MtUse
      * */
     @Override
     public List<MtUserCoupon> getUserCouponListByExpireTime(Integer userId, String status, String startTime, String endTime) {
-        List<MtUserCoupon> result = mtUserCouponMapper.getUserCouponListByExpireTime(userId, status, startTime, endTime);
-        return result;
+        return mtUserCouponMapper.getUserCouponListByExpireTime(userId, status, startTime, endTime);
     }
 
     /**

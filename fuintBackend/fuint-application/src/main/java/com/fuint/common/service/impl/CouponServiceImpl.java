@@ -894,7 +894,7 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
             }
             String[] gradeIds = couponInfo.getGradeIds().split(",");
             if (gradeIds.length > 0 && !Arrays.asList(gradeIds).contains(mtUser.getGradeId())) {
-                throw new BusinessCheckException("该卡券不适用该会员等级");
+                throw new BusinessCheckException("该卡券不适用于该会员等级");
             }
         }
 

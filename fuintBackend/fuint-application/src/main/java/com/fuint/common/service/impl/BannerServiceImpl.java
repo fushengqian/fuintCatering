@@ -114,6 +114,9 @@ public class BannerServiceImpl extends ServiceImpl<MtBannerMapper, MtBanner> imp
                 mtBanner.setMerchantId(mtStore.getMerchantId());
             }
         }
+        if (mtBanner.getMerchantId() == null || mtBanner.getMerchantId() < 1) {
+            throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
+        }
         mtBanner.setStoreId(storeId);
         mtBanner.setStatus(StatusEnum.ENABLED.getKey());
         mtBanner.setUpdateTime(new Date());
@@ -174,7 +177,9 @@ public class BannerServiceImpl extends ServiceImpl<MtBannerMapper, MtBanner> imp
         if (mtBanner == null) {
             throw new BusinessCheckException("该Banner状态异常");
         }
-
+        if (bannerDto.getMerchantId() == null || bannerDto.getMerchantId() < 1) {
+            throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
+        }
         mtBanner.setId(bannerDto.getId());
         if (bannerDto.getImage() != null) {
             mtBanner.setImage(bannerDto.getImage());
