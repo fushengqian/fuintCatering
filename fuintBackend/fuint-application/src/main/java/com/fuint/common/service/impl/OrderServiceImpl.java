@@ -1720,7 +1720,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         if (user != null) {
             userInfo.setId(user.getId());
             userInfo.setName(user.getName());
-            userInfo.setMobile(user.getMobile());
+            if (StringUtil.isNotEmpty(user.getMobile())) {
+                userInfo.setMobile(user.getMobile().replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2"));
+            }
             userInfo.setCardNo(user.getIdcard());
             userInfo.setNo(user.getUserNo());
             userInfo.setAddress(user.getAddress());

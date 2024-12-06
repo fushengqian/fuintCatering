@@ -3,6 +3,8 @@ package com.fuint.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fuint.common.dto.TableOverviewDto;
+import com.fuint.common.param.TableParam;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
@@ -203,6 +205,22 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
 
         lambdaQueryWrapper.orderByAsc(MtTable::getSort);
         List<MtTable> dataList = mtTableMapper.selectList(lambdaQueryWrapper);
+        return dataList;
+    }
+
+    /**
+     * 获取桌台概览
+     *
+     * @param  tableParam 请求参数
+     * @throws BusinessCheckException
+     * @return
+     * */
+    @Override
+    public List<TableOverviewDto> getTableOverView(TableParam tableParam) throws BusinessCheckException {
+        if (tableParam.getStoreId() == null || tableParam.getStoreId() <= 0) {
+            throw new BusinessCheckException("店铺ID异常");
+        }
+        List<TableOverviewDto> dataList = new ArrayList<>();
         return dataList;
     }
 }

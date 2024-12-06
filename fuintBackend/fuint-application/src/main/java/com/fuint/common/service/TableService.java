@@ -1,6 +1,8 @@
 package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.fuint.common.dto.TableOverviewDto;
+import com.fuint.common.param.TableParam;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtTable;
@@ -68,4 +70,14 @@ public interface TableService extends IService<MtTable> {
      * @return
      * */
     List<MtTable> queryTableListByParams(Map<String, Object> params) throws BusinessCheckException;
+
+    /**
+     * 获取桌台概览
+     *
+     * @param tableParam 请求参数
+     * @throws BusinessCheckException
+     * @return
+     * */
+    List<TableOverviewDto> getTableOverView(TableParam tableParam) throws BusinessCheckException;
+
 }

@@ -115,7 +115,7 @@ public class CouponExpireJob {
                         }
                         if (couponInfo != null && userInfo != null && StringUtil.isNotEmpty(userInfo.getOpenId())) {
                             mtUserCoupon.getUpdateTime();
-                            Integer days = DateUtil.daysBetween(DateUtil.formatDate(mtUserCoupon.getUpdateTime(), "yyyy-MM-dd HH:mm:ss"), endTime);
+                            Integer days = DateUtil.daysBetween(DateUtil.formatDate(mtUserCoupon.getUpdateTime(), "yyyy-MM-dd HH:mm:ss"), startTime);
                             if (days > 1) {
                                 Date now = new Date();
                                 Date sendTime = new Date(now.getTime());
