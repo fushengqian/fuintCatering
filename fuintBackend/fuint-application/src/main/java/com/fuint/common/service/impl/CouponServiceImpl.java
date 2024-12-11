@@ -579,8 +579,7 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
      * @return
      * */
     public List<MtCoupon> queryCouponListByGroupId(Integer groupId) {
-        List<MtCoupon> couponList = mtCouponMapper.queryByGroupId(groupId.intValue());
-        return couponList;
+        return mtCouponMapper.queryByGroupId(groupId.intValue());
     }
 
     /**
@@ -710,22 +709,16 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
         sendLogDto.setStoreId(couponInfo.getStoreId());
         sendLogService.addSendLog(sendLogDto);
 
-        if (sendMessage) {
+        if (sendMessage && couponInfo.getAmount() != null && couponInfo.getAmount().compareTo(new BigDecimal("0")) > 0) {
             try {
                 // 发送手机短信
                 if (StringUtil.isNotEmpty(mobile)) {
                     List<String> mobileList = new ArrayList<>();
                     mobileList.add(mobile);
-                    Integer totalNum = 0;
-                    BigDecimal totalMoney = new BigDecimal("0.0");
-                    List<MtCoupon> couponList = queryCouponListByGroupId(couponInfo.getGroupId());
-                    for (MtCoupon coupon : couponList) {
-                        totalNum = totalNum + (coupon.getSendNum() * num);
-                        totalMoney = totalMoney.add((coupon.getAmount().multiply(new BigDecimal(num).multiply(new BigDecimal(coupon.getSendNum())))));
-                    }
+                    BigDecimal totalMoney = (couponInfo.getAmount() == null) ? (new BigDecimal("0.00")) : couponInfo.getAmount();
                     Map<String, String> params = new HashMap<>();
-                    params.put("totalNum", totalNum + "");
-                    params.put("totalMoney", totalMoney + "");
+                    params.put("totalNum", num.toString());
+                    params.put("totalMoney", totalMoney.toString());
                     sendSmsService.sendSms(couponInfo.getMerchantId(), "received-coupon", mobileList, params);
                 }
                 // 发送小程序订阅消息
