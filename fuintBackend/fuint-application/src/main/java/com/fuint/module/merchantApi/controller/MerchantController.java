@@ -1,5 +1,6 @@
 package com.fuint.module.merchantApi.controller;
 
+import com.fuint.common.dto.StaffDto;
 import com.fuint.common.dto.UserInfo;
 import com.fuint.common.service.ConfirmLogService;
 import com.fuint.common.service.MemberService;
@@ -10,7 +11,6 @@ import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
-import com.fuint.repository.model.MtStaff;
 import com.fuint.repository.model.MtUser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -73,7 +73,7 @@ public class MerchantController extends BaseController {
         Map<String, Object> outParams = new HashMap<>();
         outParams.put("userInfo", mtUser);
 
-        MtStaff staffInfo = staffService.queryStaffByMobile(mtUser.getMobile());
+        StaffDto staffInfo = staffService.getStaffInfoByMobile(mtUser.getMobile());
         if (null == staffInfo) {
             return getFailureResult(1002, "该账号不是商户");
         }

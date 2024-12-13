@@ -1,19 +1,17 @@
 <template>
   <view v-if="!isLoading" class="container">
     <!-- 页面头部 -->
-    <view class="main-header" :style="{ paddingTop: $platform == 'H5' ? '0' : '50rpx' }">
-      <!-- 用户信息 -->
+    <view class="main-header">
+      <!-- 商户信息 -->
       <view v-if="isLogin" class="user-info">
         <view class="user-content">
-          <!-- 会员昵称 -->
-          <view class="nick-name">{{ dataInfo.confirmInfo.realName }}</view>
-          <!-- 手机号 -->
-          <view  class="mobile">{{ dataInfo.confirmInfo.mobile }}</view>
+          <view v-if="dataInfo.confirmInfo.storeInfo" class="belong">{{ dataInfo.confirmInfo.storeInfo.name }}<text class="nick-name">{{ dataInfo.confirmInfo.realName }}</text></view>
+          <view v-else class="belong">{{ dataInfo.confirmInfo.merchantInfo.name }}<text class="nick-name">{{ dataInfo.confirmInfo.realName }}</text></view>
         </view>
         <view class="amount-info">
-            <view class="amount-tip">交易金额（元）</view>
-            <view v-if="dataInfo.payMoney" class="amount-num">{{ dataInfo.payMoney.toFixed(2) }}</view>
-            <view v-if="!dataInfo.payMoney" class="amount-num">0.00</view>
+          <view class="amount-tip">今日交易金额（元）</view>
+          <view v-if="dataInfo.payMoney" class="amount-num">{{ dataInfo.payMoney.toFixed(2) }}</view>
+          <view v-if="!dataInfo.payMoney" class="amount-num">0.00</view>
         </view>
       </view>
       <!-- 未登录 -->
@@ -310,79 +308,50 @@
     height: 240rpx;
     background-size: 100% 100%;
     overflow: hidden;
-    display: flex;
+    display: block;
     align-items: center;
-    padding-left: 30rpx;
     background: $fuint-theme;
-    margin: 0 20rpx;
+    padding: 10rpx;
+    margin: 20rpx 20rpx 0rpx 20rpx;
     border-top-left-radius: 8rpx;
     border-top-right-radius: 8rpx;
 
     .user-info {
-      display: flex;
+      display: block;
       height: 100rpx;
-      margin-top: 20rpx;
-      z-index: 1;
+      margin-top: 1rpx;
       text-align: center;
-      padding-left: 70rpx;
       width: 100%;
       .user-content {
         display: block;
-        flex-direction: column;
-        justify-content: center;
-        margin-left: 30rpx;
+        margin-left: 0rpx;
         text-align: left;
         color: #ffffff;
-        
-        .nick-name {
+
+        .belong {
           font-size: 28rpx;
-          font-weight: bold;
-        }
-
-        .mobile {
-          margin-top: 15rpx;
-          font-size: 26rpx;
-        }
-
-        .user-grade {
-          display: flex;
-          align-items: center;
-          background: #3c3c3c;
-          margin-top: 12rpx;
-          border-radius: 10rpx;
-          padding: 4rpx 12rpx;
-
-          .user-grade_icon .image {
-            display: block;
-            width: 32rpx;
-            height: 32rpx;
-          }
-
-          .user-grade_name {
-            margin-left: 5rpx;
-            font-size: 24rpx;
-            color: #EEE0C3;
+          color: #fff;
+          .nick-name {
+            padding-left: 15rpx;
           }
         }
-
         .login-tips {
           margin-top: 12rpx;
           font-size: 28rpx;
         }
       }
       .amount-info {
-          margin-top: 1rpx;
-          margin-left: 220rpx;
+          margin-top: 25rpx;
           color: #fff;
           display: block;
-          text-align: left;
+          text-align: center;
           .amount-tip {
               font-size: 28rpx;
           }
           .amount-num {
               margin-top: 10rpx;
               font-weight: bold;
-              font-size: 35rpx;
+              font-size: 58rpx;
           }
       }
     }
@@ -394,9 +363,9 @@
     color: #fff;
     background: $fuint-theme;
     margin: 0 20rpx;
-    border-bottom-right-radius: 8rpx;
     border-bottom-left-radius: 8rpx;
-    padding-bottom: 80rpx;
+    border-bottom-right-radius: 8rpx;
+    padding-bottom: 60rpx;
     .item {
         width: 50%;
         height: 100%;
@@ -404,23 +373,25 @@
         padding: 20rpx;
         text-align: right;
         .tool {
-            width: 160rpx;
+            width: 280rpx;
             clear: both;
-            padding: 10rpx;
-            border-bottom: solid 3px #ffffff;
-            border-radius: 10rpx;
+            padding: 20rpx;
+            border: 1rpx solid #fff;
+            border-radius: 30rpx;
             text-align: center;
             margin:0 auto;
             .icon {
                 .image {
-                    height: 60rpx;
-                    width: 60rpx;
+                    height: 68rpx;
+                    width: 68rpx;
+                    font-weight: bold;
                 }
             }
             .text {
                 margin-top: 10rpx;
                 font-size: 30rpx;
                 text-align: center;
+                font-weight: bold;
             }
         }
     }

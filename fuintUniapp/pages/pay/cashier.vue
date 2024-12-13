@@ -9,15 +9,15 @@
       </view>
     </view>
     <view class="recharge-panel">
-      <view class="recharge-label">
-        <text>收款金额</text>
-      </view>
       <!-- 收款金额输入框 -->
       <view class="recharge-input">
-        <input type="digit" placeholder="请输入收款金额" v-model="inputValue" @input="onChangeMoney" />
+          <view class="label">收款金额</view>
+          <text class="uni">￥</text>
+          <input type="number" class="uni-input" placeholder="请输入收款金额（单位：元）" placeholder-class="placeholder" v-model="inputValue" @input="onChangeMoney" />
       </view>
       <view class="remark-input">
-        <input type="text" v-model="remark" placeholder="请输入收款备注"/>
+        <view class="label">备注信息</view>
+        <input type="text" v-model="remark" placeholder-class="placeholder" placeholder="请输入收款备注"/>
       </view>
       <!-- 确认按钮 -->
       <view class="recharge-submit btn-submit">
@@ -105,10 +105,10 @@
           .then(result => app.onSubmitCallback(result))
           .catch(err => {
             if (err.result) {
-              const errData = err.result.data;
-              if (errData) {
-                  return false;
-              }
+                const errData = err.result.data;
+                if (errData) {
+                    return false;
+                }
             }
         })
       },
@@ -116,7 +116,7 @@
       onSubmitCallback(result) {
           const app = this
           if (result.code != '200') {
-              app.$error(result.message ? result.message : '收款失败！');
+              app.$error(result.message ? result.message : '收款失败');
               app.disabled = false;
               return false;
           }
@@ -138,6 +138,14 @@
     }
   }
 </script>
+
+<style>
+    .placeholder {
+        color: #ccc;
+        font-size: 28rpx;
+        font-weight: normal;
+    }
+</style>
 
 <style lang="scss" scoped>
   page,
@@ -181,22 +189,32 @@
     margin-top: 60rpx;
     padding: 0 60rpx;
   }
-
   .recharge-input {
     margin-top: 25rpx;
+    .label {
+        margin-bottom: 10rpx;
+    }
+    .uni {
+        font-weight: bold;
+        font-size: 32rpx;
+    }
     input {
       border: 1rpx solid rgb(228, 228, 228);
       border-radius: 6rpx;
-      padding: 15rpx 16rpx;
-      font-size: 26rpx;
+      padding: 20rpx;
+      font-weight: bold;
+      font-size: 58rpx;
     }
   }
   .remark-input {
+      .label {
+          margin-bottom: 10rpx;
+      }
       margin-top: 50rpx;
       input {
         border: 1rpx solid rgb(228, 228, 228);
         border-radius: 6rpx;
-        padding: 15rpx 16rpx;
+        padding: 20rpx;
         font-size: 26rpx;
       }
   }
