@@ -318,7 +318,6 @@ public class GiveServiceImpl extends ServiceImpl<MtGiveMapper, MtGive> implement
         if (params == null) {
             params = new HashMap<>();
         }
-        List<MtGiveItem> result = mtGiveItemMapper.selectByMap(params);
-        return result;
+        return mtGiveItemMapper.selectByMap(params);
     }
 }
