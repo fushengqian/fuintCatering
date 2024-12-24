@@ -104,7 +104,6 @@ public class TimeUtils {
         calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) - past);
         Date today = calendar.getTime();
         SimpleDateFormat format = new SimpleDateFormat("MM月dd日");
-        String result = format.format(today);
-        return result;
+        return format.format(today);
     }
 }

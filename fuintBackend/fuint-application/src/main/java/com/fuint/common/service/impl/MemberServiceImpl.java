@@ -795,8 +795,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         if (params == null) {
             params = new HashMap<>();
         }
-        List<MtUserGrade> result = mtUserGradeMapper.selectByMap(params);
-        return result;
+        return mtUserGradeMapper.selectByMap(params);
     }
 
     /**
