@@ -21,6 +21,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -38,6 +40,8 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 public class GiveServiceImpl extends ServiceImpl<MtGiveMapper, MtGive> implements GiveService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GiveServiceImpl.class);
 
     private MtGiveMapper mtGiveMapper;
 
@@ -288,11 +292,10 @@ public class GiveServiceImpl extends ServiceImpl<MtGiveMapper, MtGive> implement
             params.put("totalMoney", money+"");
             sendSmsService.sendSms(merchantId, "received-coupon", mobileList, params);
         } catch (Exception e) {
-            //empty
+            logger.error("卡券转赠发送短信出错：", e.getMessage());
         }
 
-        ResponseObject result = new ResponseObject(200, "", giveInfo);
-        return result;
+        return new ResponseObject(200, "", giveInfo);
     }
 
     /**

@@ -461,7 +461,6 @@ public class StringUtil {
     /**
      * 除去字符串头尾部的空白，如果字符串是<code>null</code>，则返回空字符串<code>""</code>。
      *
-     * <p>
      * 注意，和<code>String.trim</code>不同，此方法使用<code>Character.isWhitespace</code>来判定空白，
      * 因而可以除去英文字符集之外的其它空白，如中文空格。
      * <pre>
@@ -473,7 +472,6 @@ public class StringUtil {
      * StringUtil.trim(" abc ", null)    = "abc"
      * StringUtil.trim("  abcyx", "xyz") = "  abc"
      * </pre>
-     * </p>
      *
      * @param str 要处理的字符串
      *
