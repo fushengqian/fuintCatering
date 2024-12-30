@@ -20,6 +20,8 @@ import com.fuint.utils.StringUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.PageImpl;
@@ -36,6 +38,8 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 public class StaffServiceImpl extends ServiceImpl<MtStaffMapper, MtStaff> implements StaffService {
+
+    private static final Logger logger = LoggerFactory.getLogger(StaffServiceImpl.class);
 
     private MtStaffMapper mtStaffMapper;
 
@@ -224,7 +228,7 @@ public class StaffServiceImpl extends ServiceImpl<MtStaffMapper, MtStaff> implem
                 params.put("storeId", mtStaff.getStoreId().toString());
                 sendSmsService.sendSms(mtStaff.getMerchantId(), "confirmer-authed", mobileList, params);
             } catch (Exception e) {
-                // empty
+                logger.error("修改店铺员工状态发送短信出错：", e.getMessage());
             }
         } else {
             return 0;

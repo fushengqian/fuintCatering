@@ -80,8 +80,7 @@ public class DutyServiceImpl extends ServiceImpl<TDutyMapper, TDuty> implements 
      */
     @Override
     public TDuty getRoleById(Long roleId) {
-        TDuty htDuty = tDutyMapper.selectById(roleId);
-        return htDuty;
+        return tDutyMapper.selectById(roleId);
     }
 
     /**
@@ -189,7 +188,7 @@ public class DutyServiceImpl extends ServiceImpl<TDutyMapper, TDuty> implements 
      */
     @Override
     public TDuty findByName(Integer merchantId, String name) {
-        return this.tDutyMapper.findByName(merchantId, name);
+        return tDutyMapper.findByName(merchantId, name);
     }
 
     /**

@@ -5,14 +5,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * <p>
- * 
- * </p>
+ * 角色权限实体
+ *
  *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
@@ -20,7 +18,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @TableName("t_duty_source")
-@ApiModel(value = "TDutySource对象", description = "")
+@ApiModel(value = "TDutySource对象", description = "角色权限实体")
 public class TDutySource implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -31,6 +29,5 @@ public class TDutySource implements Serializable {
     private Integer dutyId;
 
     private Integer sourceId;
-
 
 }
