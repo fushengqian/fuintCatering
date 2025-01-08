@@ -3,6 +3,7 @@ import request from '@/utils/request'
 // api地址
 const api = {
   list: 'clientApi/myCoupon/list',
+  remove: 'clientApi/myCoupon/remove',
   mydetail: 'clientApi/userCouponApi/detail',
   detail: 'clientApi/coupon/detail'
 }
@@ -30,4 +31,9 @@ export function detail(couponId, userCouponId, userCouponCode) {
     } else {
         return request.post(api.detail, { couponId })    
     }
+}
+
+// 删除卡券
+export function remove(userCouponId) {
+    return request.get(api.remove, { userCouponId })    
 }

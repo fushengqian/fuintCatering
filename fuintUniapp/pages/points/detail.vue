@@ -182,13 +182,14 @@
             margin-top: 20rpx;
             line-height: 60rpx;
             text-align: center;
+            align-items: center;
+            justify-content: center;
             float: left;
-            margin-right: 20rpx;
-            margin-left: 20rpx;
-            border: 1px solid #f86d48;
+            margin-right: 40rpx;
+            margin-left: 40rpx;
             border-radius: 6rpx;
-            color: #FFFFFF;
-            background: #f86d48;
+            color: #f86d48;
+            background: #f8df98;
             font-size: 22rpx;
           }
       }

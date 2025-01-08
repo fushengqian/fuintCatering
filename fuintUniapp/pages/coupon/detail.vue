@@ -62,14 +62,20 @@
         </view>
       </view>
     </view>
-    <view v-if="detail.isReceive" class="footer-fixed">
+    <view class="footer-fixed" v-if="userCouponId || detail.isReceive">
       <view class="footer-container">
         <!-- 操作按钮 -->
         <view class="foo-item-btn">
           <view class="btn-wrapper">
-            <view class="btn-item btn-item-main state">
+            <view v-if="detail.isReceive" class="btn-item btn-item-main state">
               <text v-if="!detail.point || detail.point < 1">您已领取</text>
               <text v-if="detail.point && detail.point > 0">您已兑换</text>
+            </view>
+            <view v-if="userCouponId && detail.status != 'D'" class="btn-item btn-item-main" @click="remove(userCouponId)">
+              <text>删除卡券</text>
+            </view>
+            <view v-else class="btn-item btn-item-main state">
+              <text>已删除</text>
             </view>
           </view>
         </view>
@@ -254,7 +260,29 @@
                 }
             })
         }
-      }
+      },
+      // 删除卡券
+      remove() {
+        const app = this;
+        if (app.isLoading == true) {
+            return false;
+        }
+        uni.showModal({
+          title: "提示",
+          content: "您确定要删除吗?",
+          success({ confirm }) {
+            if (confirm) {
+                app.isLoading = true;
+                myCouponApi.remove(app.userCouponId)
+                  .then(result => {
+                     app.getCouponDetail();
+                     app.isLoading = false;
+                  })
+                  .finally(() => app.isLoading = false)
+            }
+          }
+        });
+     }
     },
     /**
      * 分享当前页面
@@ -340,6 +368,7 @@
              }
              .name {
                  font-weight: bold;
+                 margin-left: 6rpx;
              }
         }
   }
@@ -371,7 +400,7 @@
     padding: 30rpx;
     border: dashed 5rpx #cccccc;
     border-radius: 5rpx;
-    margin: 20rpx;
+    margin: 20rpx 20rpx 200rpx 20rpx;
     min-height: 400rpx;
     .title {
         margin-bottom: 15rpx;

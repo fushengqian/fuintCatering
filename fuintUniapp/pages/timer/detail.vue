@@ -60,13 +60,18 @@
     <!--领取码 end-->
     
     <!-- 底部选项卡 -->
-    <view v-if="!detail.code && !detail.isReceive" class="footer-fixed">
+    <view class="footer-fixed">
       <view class="footer-container">
-        <!-- 操作按钮 -->
         <view class="foo-item-btn">
           <view class="btn-wrapper">
-            <view class="btn-item btn-item-main" @click="receive(detail.id)">
+            <view v-if="!detail.code && !detail.isReceive" class="btn-item btn-item-main" @click="receive(detail.id)">
               <text>领取次卡</text>
+            </view>
+            <view v-if="userCouponId && detail.status != 'D'" class="btn-item btn-item-main" @click="remove(userCouponId)">
+              <text>删除卡券</text>
+            </view>
+            <view v-if="detail.status == 'D'" class="btn-item btn-item-main state">
+              <text>已删除</text>
             </view>
           </view>
         </view>
@@ -174,6 +179,7 @@
           this.$refs.receiveCodePopup.close();
           this.receive(this.couponId);
       },
+      // 领取卡券
       receive(couponId) {
         const app = this;
         if (app.detail.needReceiveCode && !app.receiveCode) {
@@ -191,6 +197,28 @@
                 app.$error(result.message);
             }
           })
+      },
+      // 删除卡券
+      remove() {
+         const app = this;
+         if (app.isLoading == true) {
+             return false;
+         }
+         uni.showModal({
+           title: "提示",
+           content: "您确定要删除吗?",
+           success({ confirm }) {
+             if (confirm) {
+                 app.isLoading = true;
+                 myCouponApi.remove(app.userCouponId)
+                   .then(result => {
+                      app.getCouponDetail();
+                      app.isLoading = false;
+                   })
+                   .finally(() => app.isLoading = false)
+             }
+           }
+         });
       },
       timeStamp: function(value) {
           var date = new Date(value);
@@ -265,6 +293,7 @@
              }
              .name {
                  font-weight: bold;
+                 margin-left: 6rpx;
              }
         }
   }
@@ -342,7 +371,7 @@
     padding: 30rpx;
     border: dashed 5rpx #cccccc;
     border-radius: 5rpx;
-    margin: 20rpx;
+    margin: 20rpx 20rpx 200rpx 20rpx;
     min-height: 450rpx;
   }
   
@@ -387,6 +416,11 @@
     // 领取按钮
     .btn-item-main {
       background: linear-gradient(to right, #f9211c, #ff6335);
+      &.state {
+        border: none;
+          color: #cccccc;
+          background: #F5F5F5;
+      }
     }
   }
 </style>

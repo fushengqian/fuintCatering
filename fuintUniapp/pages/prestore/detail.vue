@@ -37,6 +37,23 @@
         <view class="title">使用须知</view>
         <view class="content"><jyf-parser :html="detail.description ? detail.description : '暂无...'"></jyf-parser></view>
     </view>
+    
+    <!-- 底部选项卡 -->
+    <view class="footer-fixed">
+      <view class="footer-container">
+        <view class="foo-item-btn">
+          <view class="btn-wrapper">
+            <view v-if="detail.status != 'D'" class="btn-item btn-item-main" @click="remove(userCouponId)">
+              <text>删除卡券</text>
+            </view>
+            <view v-if="detail.status == 'D'" class="btn-item btn-item-main state">
+              <text>已删除</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
     <!-- 快捷导航 -->
     <shortcut />
     <view class="give-popup">
@@ -91,11 +108,13 @@
       },
       // 转赠
       give() {
-              this.$refs.givePopup.open('top')
+         this.$refs.givePopup.open('top')
       },
+      // 取消转赠
       cancelGive() {
-              this.$refs.givePopup.close()
+         this.$refs.givePopup.close()
       },
+      // 确定转赠
       doGive(friendMobile) {
               const app = this
               if (friendMobile.length < 11) {
@@ -124,6 +143,28 @@
                         }
                   })
               }
+      },
+      // 删除卡券
+      remove() {
+         const app = this;
+         if (app.isLoading == true) {
+             return false;
+         }
+         uni.showModal({
+           title: "提示",
+           content: "您确定要删除吗?",
+           success({ confirm }) {
+             if (confirm) {
+                 app.isLoading = true;
+                 myCouponApi.remove(app.userCouponId)
+                   .then(result => {
+                      app.getCouponDetail();
+                      app.isLoading = false;
+                   })
+                   .finally(() => app.isLoading = false)
+             }
+           }
+         });
       }
     }
   }
@@ -164,6 +205,7 @@
                 overflow: hidden;
                 .name {
                     font-size: 38rpx;
+                    margin-left: 6rpx;
                 }
                 .num {
                     font-size: 58rpx;
@@ -187,7 +229,7 @@
              }
         }
   }
-  .coupon-qr{
+  .coupon-qr {
       border: dashed 5rpx #cccccc;
       border-radius: 10rpx;
       margin: 20rpx;
@@ -216,7 +258,7 @@
     padding: 30rpx;
     border: dashed 5rpx #cccccc;
     border-radius: 5rpx;
-    margin: 20rpx;
+    margin: 20rpx 20rpx 200rpx 20rpx;
     min-height: 400rpx;
     .title {
         margin-bottom: 15rpx;
@@ -238,6 +280,55 @@
       border: none;
         color: #cccccc;
         background: #F5F5F5;
+    }
+  }
+  
+  /* 底部操作栏 */
+  .footer-fixed {
+    position: fixed;
+    bottom: var(--window-bottom);
+    left: 0;
+    right: 0;
+    display: flex;
+    height: 180rpx;
+    padding-bottom: 30rpx;
+    z-index: 11;
+    box-shadow: 0 -4rpx 40rpx 0 rgba(144, 52, 52, 0.1);
+    background: #fff;
+  }
+  
+  .footer-container {
+    width: 100%;
+    display: flex;
+  }
+  
+  // 操作按钮
+  .foo-item-btn {
+    flex: 1;
+    .btn-wrapper {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .btn-item {
+      flex: 1;
+      font-size: 28rpx;
+      height: 80rpx;
+      line-height: 80rpx;
+      margin-right: 16rpx;
+      margin-left: 16rpx;
+      text-align: center;
+      color: #fff;
+      border-radius: 80rpx;
+    }
+    // 领取按钮
+    .btn-item-main {
+      background: linear-gradient(to right, #f9211c, #ff6335);
+      &.state {
+        border: none;
+          color: #cccccc;
+          background: #F5F5F5;
+      }
     }
   }
 </style>

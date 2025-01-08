@@ -145,7 +145,7 @@
     line-height: 84rpx;
     margin: 100rpx auto;
     text-align: center;
-    border-radius: 5rpx;
+    border-radius: 40rpx;
     background: linear-gradient(to right, #f9211c, #ff6335);
     color: white;
     font-size: 30rpx;
