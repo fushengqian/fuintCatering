@@ -49,7 +49,7 @@ public class ${tableClass}ServiceImpl extends ServiceImpl<${className}Mapper, ${
         LambdaQueryWrapper<${className}> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.ne(${className}::getStatus, StatusEnum.DISABLE.getKey());
 
-        lambdaQueryWrapper.orderByAsc(${className}::getSort);
+        lambdaQueryWrapper.orderByAsc(${className}::getId);
         List<${className}> dataList = ${tablePrefix}${tableClass}Mapper.selectList(lambdaQueryWrapper);
 
         PageRequest pageRequest = PageRequest.of(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
@@ -136,14 +136,14 @@ public class ${tableClass}ServiceImpl extends ServiceImpl<${className}Mapper, ${
    /**
     * 根据条件搜索${moduleName}
     *
-    * @param params 查询参数
+    * @param  params 查询参数
     * @throws BusinessCheckException
     * @return
     * */
     @Override
     public List<${className}> query${tableClass}ListByParams(Map<String, Object> params) {
         String status =  params.get("status") == null ? StatusEnum.ENABLED.getKey(): params.get("status").toString();
-        String  =  params.get("storeId") == null ? "" : params.get("storeId").toString();
+        String storeId =  params.get("storeId") == null ? "" : params.get("storeId").toString();
         String merchantId =  params.get("merchantId") == null ? "" : params.get("merchantId").toString();
 
         LambdaQueryWrapper<${className}> lambdaQueryWrapper = Wrappers.lambdaQuery();
@@ -160,7 +160,7 @@ public class ${tableClass}ServiceImpl extends ServiceImpl<${className}Mapper, ${
                     .eq(${className}::getStoreId, storeId));
         }
 
-        lambdaQueryWrapper.orderByAsc(${className}::getSort);
+        lambdaQueryWrapper.orderByAsc(${className}::getId);
         List<${className}> dataList = ${tablePrefix}${tableClass}Mapper.selectList(lambdaQueryWrapper);
         return dataList;
     }
