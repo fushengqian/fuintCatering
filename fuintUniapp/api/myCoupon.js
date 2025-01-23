@@ -35,5 +35,5 @@ export function detail(couponId, userCouponId, userCouponCode) {
 
 // 删除卡券
 export function remove(userCouponId) {
-    return request.get(api.remove, { userCouponId })    
+    return request.post(api.remove, { userCouponId })    
 }
