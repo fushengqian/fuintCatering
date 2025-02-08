@@ -143,7 +143,8 @@ public class ClientSignController extends BaseController {
     public ResponseObject mpWxAuth(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String storeId = request.getHeader("storeId") == null ? "0" : request.getHeader("storeId");
-
+        String shareId = param.get("shareId") == null ? "0" : param.get("shareId").toString();
+        String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
         Integer merchantId = merchantService.getMerchantId(merchantNo);
         JSONObject userInfo = weixinService.getWxOpenId(merchantId, param.get("code").toString());
         if (userInfo == null) {
@@ -151,6 +152,8 @@ public class ClientSignController extends BaseController {
         }
 
         userInfo.put("storeId", storeId);
+        userInfo.put("shareId", shareId);
+        userInfo.put("platform", platform);
         MtUser mtUser = memberService.queryMemberByOpenId(merchantId, userInfo.get("openid").toString(), userInfo);
         if (mtUser == null) {
             return getFailureResult(201, "微信公众号授权失败");
@@ -292,8 +295,6 @@ public class ClientSignController extends BaseController {
                     return getFailureResult(201, "账号状态异常，登录失败");
                 }
 
-                // 更新验证码
-                verifyCodeService.updateValidFlag(mtVerifyCode.getId(), "1");
                 String userToken = TokenUtil.generateToken(userAgent, mtUser.getId());
                 UserInfo loginInfo = new UserInfo();
                 loginInfo.setId(mtUser.getId());

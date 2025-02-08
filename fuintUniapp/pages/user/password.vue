@@ -3,19 +3,19 @@
     <view class="info-item" v-if="hasPassword == 'Y'">
       <view class="contacts">
         <text class="name">旧密码：</text>
-        <input class="weui-input value" type="password" disabled="true" @click="inputPassword(1)" v-model="passwordOld" placeholder="请输入旧密码"/>
+        <input class="weui-input value" type="password" v-model="passwordOld" placeholder="请输入旧密码"/>
       </view>
     </view>
     <view class="info-item">
       <view class="contacts">
         <text class="name">新密码：</text>
-        <input class="weui-input value" type="password" disabled="true" @click="inputPassword(2)" v-model="password" placeholder="请输入新密码"/>
+        <input class="weui-input value" type="password" v-model="password" placeholder="请输入新密码"/>
       </view>
     </view>
     <view class="info-item">
       <view class="contacts">
         <text class="name">新密码确认：</text>
-        <input class="weui-input value" type="password" disabled="true" @click="inputPassword(3)" v-model="passwordCopy" placeholder="请输入新密码确认"/>
+        <input class="weui-input value" type="password" v-model="passwordCopy" placeholder="请输入新密码确认"/>
       </view>
     </view>
     <!-- 底部操作按钮 -->
@@ -24,20 +24,13 @@
         <view class="btn-item btn-item-main" @click="doSubmit()">保存</view>
       </view>
     </view>
-    
-    <!-- 设置密码对话框 -->
-    <key-words :mix="true" :title="title" :show_key="showPass" :price="0" @closeFuc="closeFuc" @getPassword="getPassword"></key-words>
   </view>
 </template>
 
 <script>
   import * as UserApi from '@/api/user'
   import store from '@/store'
-  import keyWords from "@/components/bian-keywords/index.vue"
   export default {
-    components: {
-      keyWords
-    },
     data() {
       return {
         //当前页面参数
@@ -46,9 +39,6 @@
         isLoading: false,
         userInfo: {},
         qrCode: "",
-        title: "",
-        showPass: false,
-        popType: 1,
         password: "",
         passwordCopy: "",
         passwordOld: "",
@@ -64,38 +54,12 @@
     },
 
     methods: {
-      // 关闭密码对话框
-      closeFuc() {
-         this.showPass = false;
-      },
-      // 输入密码
-      inputPassword(type) {
-         if (type == 1) {
-             this.title = "请输入旧密码";
-         } else if (type == 2) {
-             this.title = "请输入新密码";
-         } else {
-             this.title = "请输入新密码确认";
-         }
-         this.popType = type;
-         this.showPass = true;
-      },
-      // 获取输入的密码
-      getPassword(password) {
-         if (this.popType == 1) {
-             this.passwordOld = password.password;
-         } else if (this.popType == 2) {
-             this.password = password.password;
-         } else {
-             this.passwordCopy = password.password;
-         }
-         this.closeFuc();
-      },
       // 提交保存
       doSubmit() {
          const app = this;
          app.isLoading = true;
          if (app.hasPassword == 'Y' && (!app.password || !app.passwordOld)) {
+             app.$error('请先填写表单！');
              return false;
          }
          if (app.password != app.passwordCopy) {

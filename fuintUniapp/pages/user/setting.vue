@@ -16,7 +16,7 @@
       <view class="info-item">
         <view class="contacts">
           <text class="name">手机</text>
-          <button class="button btn-normal value" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">
+          <button class="button btn-normal value" open-type="getPhoneNumber" @click="changeMobile" @getphonenumber="getPhoneNumber">
               <text v-if="userInfo.mobile">{{ userInfo.mobile }}</text>
               <text style="color: #f9211c;margin-left: 2px;">更换</text>
           </button>
@@ -67,11 +67,7 @@
   import * as UserApi from '@/api/user'
   import * as UploadApi from '@/api/upload'
   import store from '@/store'
-  import keyWords from "@/components/bian-keywords/index.vue"
   export default {
-    components: {
-      keyWords
-    },
     data() {
       return {
         //当前页面参数
@@ -155,6 +151,12 @@
       changePassword() {
          this.$navTo('pages/user/password?hasPassword=' + this.userInfo.hasPassword);
          console.log(this.userInfo.hasPassword);
+      },
+      // 修改手机号
+      changeMobile() {
+         // #ifdef H5
+         this.$navTo('pages/user/mobile');
+         // #endif
       },
       // 选择图片
       chooseImage() {

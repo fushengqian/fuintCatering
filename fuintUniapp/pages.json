@@ -82,6 +82,12 @@
       }
     },
     {
+      "path": "pages/user/mobile",
+      "style": {
+        "navigationBarTitleText": "修改手机号"
+      }
+    },
+    {
       "path": "pages/custom/index",
       "style": {
         "enablePullDownRefresh": true

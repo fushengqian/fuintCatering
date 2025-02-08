@@ -439,6 +439,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         }
         String mobile = mtUser.getMobile();
         if (PhoneFormatCheckUtils.isChinaPhoneLegal(mobile)) {
+            mtUserMapper.resetMobile(mobile, mtUser.getId());
             mtUser.setMobile(mobile);
         }
 
@@ -642,9 +643,10 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         String nickName = StringUtil.isNotEmpty(userInfo.getString("nickName")) ? userInfo.getString("nickName") : "";
         String mobile = StringUtil.isNotEmpty(userInfo.getString("phone")) ? userInfo.getString("phone") : "";
         String source = StringUtil.isNotEmpty(userInfo.getString("source")) ? userInfo.getString("source") : MemberSourceEnum.WECHAT_LOGIN.getKey();
+        String platform = StringUtil.isNotEmpty(userInfo.getString("platform")) ? userInfo.getString("platform") : "";
 
         // 需要手机号登录
-        if (StringUtil.isEmpty(mobile) && user == null) {
+        if (StringUtil.isEmpty(mobile) && user == null && !platform.equals(PlatformTypeEnum.H5.getCode())) {
             MtSetting mtSetting = settingService.querySettingByName(merchantId, SettingTypeEnum.USER.getKey(), UserSettingEnum.LOGIN_NEED_PHONE.getKey());
             if (mtSetting != null) {
                 if (mtSetting.getValue().equals(YesOrNoEnum.TRUE.getKey())) {
