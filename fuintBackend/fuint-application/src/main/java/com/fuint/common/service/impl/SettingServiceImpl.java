@@ -173,6 +173,9 @@ public class SettingServiceImpl extends ServiceImpl<MtSettingMapper, MtSetting> 
      * */
     @Override
     public List<ParamDto> getPayTypeList(String platform) {
+        if (platform == null) {
+            platform = "";
+        }
         List<ParamDto> payTypeList = new ArrayList<>();
 
         // 微信jsapi
