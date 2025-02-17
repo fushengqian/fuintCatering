@@ -194,6 +194,15 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         if (StringUtils.isNotBlank(id)) {
             wrapper.eq(MtUser::getId, id);
         }
+        String keyword = paginationRequest.getSearchParams().get("keyword") == null ? "" : paginationRequest.getSearchParams().get("keyword").toString();
+        if (StringUtils.isNotBlank(keyword)) {
+            wrapper.and(wq -> wq
+                    .eq(MtUser::getMobile, keyword)
+                    .or()
+                    .eq(MtUser::getUserNo, keyword)
+                    .or()
+                    .eq(MtUser::getName, keyword));
+        }
         String mobile = paginationRequest.getSearchParams().get("mobile") == null ? "" : paginationRequest.getSearchParams().get("mobile").toString();
         if (StringUtils.isNotBlank(mobile)) {
             wrapper.like(MtUser::getMobile, mobile);
