@@ -1,13 +1,13 @@
 package com.fuint.module.merchantApi.controller;
 
 import com.fuint.common.dto.*;
-import com.fuint.common.param.RechargeParam;
+import com.fuint.common.param.CouponReceiveParam;
 import com.fuint.common.service.*;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
-import com.fuint.repository.model.MtOrder;
+import com.fuint.repository.model.MtCoupon;
 import com.fuint.repository.model.MtStaff;
 import com.fuint.repository.model.MtUser;
 import com.fuint.utils.StringUtil;
@@ -17,26 +17,16 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * 余额接口controller
+ * 卡券接口controller
  *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="商户端-余额相关接口")
+@Api(tags="商户端-卡券相关接口")
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = "/merchantApi/balance")
-public class MerchantBalanceController extends BaseController {
-
-    /**
-     * 订单服务接口
-     * */
-    private OrderService orderService;
-
-    /**
-     * 支付服务接口
-     * */
-    private PaymentService paymentService;
+@RequestMapping(value = "/merchantApi/coupon")
+public class MerchantCouponController extends BaseController {
 
     /**
      * 会员服务接口
@@ -54,11 +44,16 @@ public class MerchantBalanceController extends BaseController {
     private MerchantService merchantService;
 
     /**
+     * 卡券服务接口
+     */
+    private CouponService couponService;
+
+    /**
      * 充值余额
      * */
-    @RequestMapping(value = "/doRecharge", method = RequestMethod.POST)
+    @RequestMapping(value = "/sendCoupon", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject doRecharge(HttpServletRequest request, @RequestBody RechargeParam rechargeParam) throws BusinessCheckException {
+    public ResponseObject sendCoupon(HttpServletRequest request, @RequestBody CouponReceiveParam receiveParam) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer merchantId = merchantService.getMerchantId(merchantNo);
@@ -71,26 +66,33 @@ public class MerchantBalanceController extends BaseController {
             return getFailureResult(1001);
         }
 
-        MtStaff staffInfo = null;
+        MtStaff staff = null;
         MtUser mtUser = memberService.queryMemberById(userInfo.getId());
         if (mtUser != null && mtUser.getMobile() != null) {
-            staffInfo = staffService.queryStaffByMobile(mtUser.getMobile());
+            staff = staffService.queryStaffByMobile(mtUser.getMobile());
         }
-        if (staffInfo == null) {
+        if (staff == null) {
             return getFailureResult(201, "该账号不是商户");
         }
-        if (!merchantId.equals(staffInfo.getMerchantId())) {
+        if (!merchantId.equals(staff.getMerchantId())) {
             return getFailureResult(201, "您没有操作权限");
         }
-        MtOrder mtOrder = orderService.doRecharge(request, rechargeParam);
-        Boolean result = false;
-        if (mtOrder != null) {
-            UserOrderDto orderInfo = orderService.getOrderByOrderSn(mtOrder.getOrderSn());
-            if (orderInfo != null) {
-                result = paymentService.paymentCallback(orderInfo);
+        // 判断店铺权限
+        MtCoupon couponInfo = couponService.queryCouponById(receiveParam.getCouponId());
+        if (StringUtil.isNotEmpty(couponInfo.getStoreIds())) {
+            String[] storeIds = couponInfo.getStoreIds().split(",");
+            Boolean isSameStore = false;
+            for (String hid : storeIds) {
+                if (staff.getStoreId().toString().equals(hid)) {
+                    isSameStore = true;
+                    break;
+                }
+            }
+            if (!isSameStore) {
+                return getFailureResult(1003, "抱歉，该卡券存在店铺使用范围限制，您所在的店铺无发券权限！");
             }
         }
-
-        return getSuccessResult(result);
+        couponService.sendCoupon(receiveParam.getCouponId(), receiveParam.getUserId(), receiveParam.getNum(), true, null, staff.getRealName());
+        return getSuccessResult(true);
     }
 }

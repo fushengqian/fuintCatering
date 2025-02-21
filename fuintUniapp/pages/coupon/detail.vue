@@ -319,7 +319,7 @@
     color:#666666;
   }
   .base {
-        border: dashed 5rpx #cccccc;
+        border: #cccccc solid 1rpx;
         padding: 30rpx;
         border-radius: 10rpx;
         margin: 20rpx;
@@ -329,7 +329,7 @@
         .coupon-main {
             clear: both;
             min-height: 164rpx;
-            border: #ccc dashed 2rpx;
+            background: #f5f5f5;
             border-radius: 5rpx;
             margin-bottom: 20rpx;
             .left {
@@ -373,7 +373,7 @@
         }
   }
   .coupon-qr {
-      border: dashed 5rpx #cccccc;
+      border: #cccccc solid 1rpx;
       border-radius: 10rpx;
       margin: 20rpx;
       text-align: center;
@@ -398,8 +398,8 @@
   }
   .coupon-content {
     padding: 30rpx;
-    border: dashed 5rpx #cccccc;
-    border-radius: 5rpx;
+    border: #cccccc solid 1rpx;
+    border-radius: 10rpx;
     margin: 20rpx 20rpx 200rpx 20rpx;
     min-height: 400rpx;
     .title {

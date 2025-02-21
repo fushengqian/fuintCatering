@@ -128,14 +128,15 @@
    * id: 标识; name: 标题名称; icon: 图标; type 类型(link和button); url: 跳转的链接
    */
   const service = [
-    { id: 'myCoupon', name: '卡券管理', icon: 'youhuiquan', type: 'link', url: 'pages/my-coupon/index' },
-    { id: 'coupon', name: '营销活动', icon: 'lingquan', type: 'link', url: 'pages/merchant/activity/index' },
-    { id: 'points', name: '订单管理', icon: 'dingdan', type: 'link', url: 'pages/merchant/order/index' },
-    { id: 'help', name: '会员管理', icon: 'tuandui', type: 'link', url: 'pages/merchant/member/index' },
-    { id: 'address', name: '报表数据', icon: 'zhibozhong', type: 'link', url: 'pages/merchant/data/index' },
-    { id: 'refund', name: '售后服务', icon: 'shouhou', type: 'link', url: 'pages/refund/index' },
-    { id: 'setting', name: '商家设置', icon: 'shezhi1', type: 'link', url: 'pages/user/setting' },
-    { id: 'staff', name: '店铺员工', icon: 'sy-yh', type: 'link', url: 'pages/staff/index' },
+    { id: 'addMember', name: '会员登记', icon: 'add', type: 'link', url: 'pages/merchant/member/add' },
+    { id: 'memberSearch', name: '会员查找', icon: 'tuandui', type: 'link', url: 'pages/merchant/member/index' },
+    { id: 'coupon', name: '卡券管理', icon: 'youhuiquan', type: 'link', url: 'pages/merchant/coupon' },
+    { id: 'activity', name: '营销活动', icon: 'lingquan', type: 'link', url: 'pages/merchant/activity' },
+    { id: 'order', name: '订单管理', icon: 'dingdan', type: 'link', url: 'pages/merchant/order/index' },
+    { id: 'report', name: '报表数据', icon: 'zhibozhong', type: 'link', url: 'pages/merchant/data/index' },
+    { id: 'refund', name: '售后服务', icon: 'shouhou', type: 'link', url: 'pages/merchant/refund/index' },
+    { id: 'setting', name: '商家设置', icon: 'shezhi1', type: 'link', url: 'pages/merchant/setting' },
+    { id: 'staff', name: '员工管理', icon: 'sy-yh', type: 'link', url: 'pages/merchant/staff/index' },
   ]
 
   export default {
@@ -305,7 +306,7 @@
   // 页面头部
   .main-header {
     position: relative;
-    height: 240rpx;
+    height: 210rpx;
     background-size: 100% 100%;
     overflow: hidden;
     display: block;

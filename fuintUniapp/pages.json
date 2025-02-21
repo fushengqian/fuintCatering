@@ -331,9 +331,39 @@
       }
     },
     {
+      "path": "pages/merchant/member/detail",
+      "style": {
+        "navigationBarTitleText": "会员详情"
+      }
+    },
+    {
+      "path": "pages/merchant/member/add",
+      "style": {
+        "navigationBarTitleText": "会员登记"
+      }
+    },
+    {
+      "path": "pages/merchant/member/setting",
+      "style": {
+        "navigationBarTitleText": "会员编辑"
+      }
+    },
+    {
       "path": "pages/merchant/order/index",
       "style": {
         "navigationBarTitleText": "订单列表"
+      }
+    },
+    {
+      "path": "pages/merchant/coupon/receive",
+      "style": {
+        "navigationBarTitleText": "卡券发放"
+      }
+    },
+    {
+      "path": "pages/merchant/balance/recharge",
+      "style": {
+        "navigationBarTitleText": "会员充值"
       }
     },
     {

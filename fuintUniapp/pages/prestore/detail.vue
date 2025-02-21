@@ -22,6 +22,10 @@
            <view class="label">有效期至：</view>
            <view>{{ detail.effectiveDate }}</view>
         </view>
+        <view class="item">
+          <view class="label">适用门店：</view>
+          <view>{{ detail.storeNames ? detail.storeNames : '全部'}}</view>
+        </view>
         <view v-if="detail.code && detail.status == 'A' && detail.isGive" class="gift" @click="give()"><text>转赠好友</text></view>
     </view>
     <view class="coupon-qr">
@@ -177,8 +181,8 @@
     background: #fff;
   }
   .base {
-        border: dashed 5rpx #cccccc;
-        padding: 15rpx 0rpx 15rpx 15rpx;
+        border: solid 1rpx #cccccc;
+        padding: 30rpx;
         border-radius: 10rpx;
         margin: 20rpx;
         height: auto;
@@ -186,7 +190,7 @@
         .coupon-main {
             clear: both;
             min-height: 164rpx;
-            border: #ccc dashed 2rpx;
+            background: #f5f5f5;
             border-radius: 5rpx;
             margin-bottom: 20rpx;
             .left {
@@ -230,7 +234,7 @@
         }
   }
   .coupon-qr {
-      border: dashed 5rpx #cccccc;
+      border: solid 1rpx #cccccc;
       border-radius: 10rpx;
       margin: 20rpx;
       text-align: center;
@@ -256,8 +260,8 @@
   .coupon-content {
     font-size: 28rpx;
     padding: 30rpx;
-    border: dashed 5rpx #cccccc;
-    border-radius: 5rpx;
+    border: solid 1rpx #cccccc;
+    border-radius: 10rpx;
     margin: 20rpx 20rpx 200rpx 20rpx;
     min-height: 400rpx;
     .title {

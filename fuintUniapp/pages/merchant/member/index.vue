@@ -1,5 +1,6 @@
 <template>
-  <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ use: false }" :up="upOption" @up="upCallback">
+  <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ native: true }" @down="downCallback"
+    :up="upOption" @up="upCallback">
 
     <!-- 分类列表tab -->
     <view class="tabs-wrapper">
@@ -14,9 +15,25 @@
         </view>
       </scroll-view>
     </view>
+    
+    <view class="search-wrapper">
+      <view class="search-input">
+        <view class="search-input-wrapper">
+          <view class="left">
+            <text class="search-icon iconfont icon-sousuo"></text>
+          </view>
+          <view class="right">
+            <input v-model="keyword" class="input" placeholder="请输入会员手机号 / 会员号" type="text"></input>
+          </view>
+        </view>
+      </view>
+      <view class="search-button">
+        <button class="button" @click="doSearch" type="warn"> 搜索 </button>
+      </view>
+    </view>
 
     <!-- 会员列表 -->
-    <view class="member-list">
+    <view class="member-list" v-if="memberList.content">
       <view class="member-item" v-for="(item, index) in memberList.content" :key="index" @click="onTargetDetail(item.id)">
         <block>
           <view class="left flex-box">
@@ -62,6 +79,8 @@
         memberList: getEmptyPaginateObj(),
         // 当前选中的分类id (all则代表全部)
         curId: 'all',
+        // 搜索关键字
+        keyword: '',
         // 上拉加载配置
         upOption: {
           // 首次自动执行
@@ -70,6 +89,9 @@
           page: { size: pageSize },
           // 数量要大于12条才显示无更多数据
           noMoreSize: 12,
+          empty: {
+            tip: '亲，暂无数据'
+          }
         }
       }
     },
@@ -102,6 +124,15 @@
           })
           .catch(() => app.mescroll.endErr())
       },
+      
+      /**
+       * 搜索提交
+       */
+      doSearch() {
+        this.curId = 'all';
+        // 刷新列表数据
+        this.mescroll.resetUpScroll();
+      },
 
       /**
        * 获取会员列表
@@ -110,7 +141,7 @@
       getMemberList(pageNo = 1) {
         const app = this;
         return new Promise((resolve, reject) => {
-          MemberApi.list({ dataType: app.curId, page: pageNo }, { load: false })
+          MemberApi.list({ dataType: app.curId, keyword: app.keyword, page: pageNo }, { load: false })
             .then(result => {
               // 合并新数据
               const newList = result.data.paginationResponse;
@@ -126,6 +157,7 @@
         const app = this;
         // 切换当前的分类ID
         app.curId = dataType;
+        app.keyword = '';
         // 刷新列表数据
         app.mescroll.resetUpScroll();
       },
@@ -154,8 +186,6 @@
   }
   .tabs-wrapper {
     position: sticky;
-    top: var(--window-top);
-
     display: flex;
     width: 100%;
     height: 88rpx;
@@ -184,10 +214,72 @@
       border-bottom: 4rpx solid #fd4a5f;
     }
   }
+  
+  .search-wrapper {
+    display: flex;
+    height: 80rpx;
+    margin-top: 10rpx;
+    padding: 0rpx 10rpx;
+  }
+  
+  // 搜索输入框
+  .search-input {
+    width: 80%;
+    background: #fff;
+    border-radius: 50rpx 0 0 50rpx;
+    box-sizing: border-box;
+    overflow: hidden;
+    border: solid 1px #cccccc;
+    line-height: 80rpx;
+    .search-input-wrapper {
+      display: flex;
+      .left {
+        display: flex;
+        width: 60rpx;
+        justify-content: center;
+        align-items: center;
+        .search-icon {
+          display: block;
+          color: #666666;
+          font-size: 30rpx;
+          font-weight: bold;
+        }
+      }
+  
+      .right {
+        flex: 1;
+  
+        input {
+          font-size: 28rpx;
+          height: 80rpx;
+          line-height: 80rpx;
+          .input-placeholder {
+            color: #aba9a9;
+          }
+        }
+  
+      }
+    }
+  }
+  
+  // 搜索按钮
+  .search-button {
+    width: 20%;
+    box-sizing: border-box;
+  
+    .button {
+      line-height: 78rpx;
+      height: 78rpx;
+      font-size: 28rpx;
+      border-radius: 0 20px 20px 0;
+      background: $fuint-theme;
+    }
+  }
+  
 
   /* 会员列表 */
   .member-list {
-    padding-top: 20rpx;
+    padding-top: 10rpx;
     line-height: 1;
     background: #f7f7f7;
   }

@@ -83,6 +83,8 @@
         curTab: 0,
         // 卡券类型
         type: "",
+        // 会员ID
+        memberId: '',
         // 优惠券列表数据
         list: getEmptyPaginateObj(),
         // 正在加载
@@ -109,6 +111,7 @@
     onLoad(options) {
        let type = options.type !== undefined ? options.type : '';
        this.type = type;
+       this.memberId = options.memberId ? options.memberId : '';
        uni.setNavigationBarTitle({
            title: "我的" + CouponTypeEnum[type].name
        })
@@ -135,13 +138,18 @@
       
       // 卡券详情
       onDetail(userCouponId, type) {
-          if (type === 'C') {
-              this.$navTo(`pages/coupon/detail`, { userCouponId });
-          } else if(type === 'T') {
-              this.$navTo(`pages/timer/detail`, { userCouponId });
-          } else if(type === 'P') {
-              this.$navTo(`pages/prestore/detail`, { userCouponId });
-          }
+        const app = this
+        if (app.memberId) {
+            app.$navTo('pages/confirm/doConfirm?id='+userCouponId)
+            return false;
+        }
+        if (type === 'C') {
+            app.$navTo(`pages/coupon/detail`, { userCouponId });
+        } else if(type === 'T') {
+            app.$navTo(`pages/timer/detail`, { userCouponId });
+        } else if(type === 'P') {
+            app.$navTo(`pages/prestore/detail`, { userCouponId });
+        }
       },
       
       /**
@@ -150,7 +158,7 @@
       getCouponList(pageNo = 1) {
         const app = this;
         return new Promise((resolve, reject) => {
-          MyCouponApi.list({ type: app.type, status: app.getTabValue(), page: pageNo }, { load: false })
+          MyCouponApi.list({ type: app.type, userId: app.memberId, status: app.getTabValue(), page: pageNo }, { load: false })
             .then(result => {
               // 合并新数据
               const newList = result.data;

@@ -9,7 +9,8 @@
           <view v-if="detail.amount > 0" class="price"><span class="label">面额：</span>￥{{ detail.amount }}</view>
           <view v-if="detail.type == 'P'" class="balance"><span class="label">余额：</span>￥{{ detail.balance }}</view>
           <view v-if="detail.tips" class="tips">{{ detail.tips }}</view>
-          <view class="time">有效期：{{ detail.effectiveDate }}</view>
+          <view class="time">有效期至：{{ detail.effectiveDate }}</view>
+          <view class="store">适用门店：{{ detail.storeNames ? detail.storeNames : '全部'}}</view>
         </view>
         <view v-if="detail.status=='B'" class="icon-can"></view>
         <view v-else-if="detail.status=='C'" class="icon-cannot"></view>
@@ -33,19 +34,25 @@
           </u-form-item>
         </u-form>
     </view>
+    
     <view class="coupon-content m-top20">
         <view class="title">使用须知</view>
-        <view class="content"><jyf-parser :html="detail.description"></jyf-parser></view>
+        <view class="content"><jyf-parser :html="detail.description ? detail.description : '暂无...'"></jyf-parser></view>
     </view>
+    
     <view class="footer-fixed">
-      <view v-if="detail.status == 'A'" class="btn-wrapper">
-        <view class="btn-item btn-item-main" @click="doConfirm()">确定核销</view>
-      </view>
-      <view v-else-if="detail.status == 'B'" class="btn-wrapper">
-        <view class="btn-item cannot">已经核销</view>
-      </view>
-      <view v-else class="btn-wrapper">
-        <view class="btn-item cannot">不可核销</view>
+      <view class="footer-container">
+          <view class="foo-item-btn">
+              <view v-if="detail.status == 'A'" class="btn-wrapper">
+                <view class="btn-item btn-item-main" @click="doConfirm()">确定核销</view>
+              </view>
+              <view v-else-if="detail.status == 'B'" class="btn-wrapper">
+                <view class="btn-item cannot">已经核销</view>
+              </view>
+              <view v-else class="btn-wrapper">
+                <view class="btn-item cannot">不可核销</view>
+              </view>
+          </view>
       </view>
     </view>
     <!-- 快捷导航 -->
@@ -175,12 +182,13 @@
 <style lang="scss" scoped>
   .container {
     min-height: 100vh;
+    padding: 20rpx;
     background: #fff;
     color:#666666;
   }
   
   .base {
-      border: dashed 5rpx #cccccc;
+      border: solid 1rpx #cccccc;
       padding: 30rpx;
       border-radius: 10rpx;
       margin: 20rpx;
@@ -225,13 +233,20 @@
              font-size: 20rpx;
              color: #666666;
           }
+          .store {
+             margin-top: 10rpx;
+             font-size: 20rpx;
+             color: #666666;
+          }
       }
   }
   .confirm-form {
-    border: dashed 5rpx #cccccc;
+    border: solid 1rpx #cccccc;
     padding: 30rpx;
     border-radius: 10rpx;
     margin: 20rpx;
+    display: block;
+    height: auto;
     .input {
         border: solid 1px #ccc;
         padding-left: 20rpx;
@@ -280,53 +295,68 @@
     }
   }
   .coupon-content {
-    font-size: 28rpx;
-    padding: 15rpx;
-    border: dashed 5rpx #cccccc;
-    border-radius: 5rpx;
-    margin: 20rpx;
+    padding: 30rpx;
+    border: #cccccc solid 1rpx;
+    border-radius: 10rpx;
+    margin: 20rpx 20rpx 200rpx 20rpx;
     min-height: 400rpx;
+    display: block;
     .title {
         margin-bottom: 15rpx;
     }
+    .content {
+        color: #666666;
+        font-size: 24rpx;
+    }
   }
   
+  /* 底部操作栏 */
   .footer-fixed {
-      position: fixed;
-      width: 100%;
-      bottom: var(--window-bottom);
-      height: 180rpx;
-      padding-bottom: 30rpx;
-      z-index: 11;
-      margin-top: 20rpx;
-      .btn-wrapper {
-        height: 100%;
-        display: flex;
-        align-items: center;
-        padding: 0 20rpx;
-      .cannot {
-        border-radius: 38rpx;
-        color: #fff;
-        line-height: 80rpx;
-        text-align: center;
-        font-weight: 500;
-        font-size: 28rpx;
-        background:linear-gradient(to right, #cccccc, #cccccc)
-      }
-      }
+    position: fixed;
+    bottom: var(--window-bottom);
+    left: 0;
+    right: 0;
+    display: flex;
+    height: 180rpx;
+    z-index: 11;
+    box-shadow: 0 -4rpx 40rpx 0 rgba(144, 52, 52, 0.1);
+    background: #fff;
+  }
   
-      .btn-item {
-        flex: 1;
-        font-size: 28rpx;
-        height: 80rpx;
-        line-height: 80rpx;
-        text-align: center;
-        color: #ffffff;
-        border-radius: 40rpx;
-      }
+  .footer-container {
+    width: 100%;
+    display: flex;
+    margin-bottom: 40rpx;
+  }
   
-      .btn-item-main {
-        background: linear-gradient(to right, #f9211c, #ff6335);
+  // 操作按钮
+  .foo-item-btn {
+    flex: 1;
+    .btn-wrapper {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+  
+    .btn-item {
+      flex: 1;
+      font-size: 28rpx;
+      height: 80rpx;
+      line-height: 80rpx;
+      margin-right: 16rpx;
+      margin-left: 16rpx;
+      text-align: center;
+      color: #fff;
+      border-radius: 40rpx;
+    }
+    // 立即领取按钮
+    .btn-item-main {
+      background: linear-gradient(to right, #f9211c, #ff6335);
+      &.state {
+        border: none;
+          color: #cccccc;
+          background: #F5F5F5;
       }
+    }
   }
 </style>

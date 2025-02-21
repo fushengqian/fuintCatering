@@ -245,7 +245,7 @@
     color:#666666;
   }
   .base {
-        border: dashed 5rpx #cccccc;
+        border: solid 1rpx #cccccc;
         padding: 30rpx;
         border-radius: 10rpx;
         margin: 20rpx;
@@ -254,7 +254,7 @@
         .coupon-main {
             clear: both;
             min-height: 164rpx;
-            border: #ccc dashed 2rpx;
+            background: #f5f5f5;
             border-radius: 5rpx;
             margin-bottom: 20rpx;
             .left {
@@ -264,7 +264,6 @@
                     width: 210rpx;
                     height: 160rpx;
                     border-radius: 8rpx;
-                    border-right: #cccccc dashed 2rpx;
                 }
             }
             .right {
@@ -298,7 +297,7 @@
         }
   }
   .coupon-timer {
-      border: dashed 5rpx #cccccc;
+      border: solid 1rpx #cccccc;
       margin-top:20rpx;
       padding: 15px 30rpx 5rpx 30rpx;
       border-radius: 10rpx;
@@ -343,7 +342,7 @@
       min-height: 160rpx;
   }
   .coupon-qr{
-      border: dashed 5rpx #cccccc;
+      border: solid 1rpx #cccccc;
       border-radius: 10rpx;
       margin: 20rpx;
       text-align: center;
@@ -369,8 +368,8 @@
   .coupon-content {
     font-size: 28rpx;
     padding: 30rpx;
-    border: dashed 5rpx #cccccc;
-    border-radius: 5rpx;
+    border: solid 1rpx #cccccc;
+    border-radius: 10rpx;
     margin: 20rpx 20rpx 200rpx 20rpx;
     min-height: 450rpx;
   }
