@@ -158,11 +158,14 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
         mtCart.setIsVisitor(reqDto.getIsVisitor());
         mtCart.setTableId(reqDto.getTableId());
         Map<String, Object> params = new HashMap<>();
-        params.put("userId", mtCart.getUserId());
         params.put("storeId", mtCart.getStoreId());
         params.put("goodsId", mtCart.getGoodsId());
         params.put("skuId", mtCart.getSkuId());
-        params.put("tableId", mtCart.getTableId());
+        if (mtCart.getTableId() != null && mtCart.getTableId() > 0) {
+            params.put("tableId", mtCart.getTableId());
+        } else {
+            params.put("userId", mtCart.getUserId());
+        }
         params.put("hangNo", reqDto.getHangNo() == null ? "" : reqDto.getHangNo());
 
         List<MtCart> cartList = queryCartListByParams(params);
@@ -180,7 +183,7 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
             } else {
                 Integer num = mtCart.getNum() - 1;
                 if (num <= 0) {
-                    this.removeCart(mtCart.getId()+"");
+                    removeCart(mtCart.getId()+"");
                     return mtCart.getId();
                 } else {
                     mtCart.setNum(mtCart.getNum() - 1);
