@@ -1615,6 +1615,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         userOrderDto.setId(orderInfo.getId());
         userOrderDto.setMerchantId(orderInfo.getMerchantId());
+        userOrderDto.setStoreId(orderInfo.getStoreId());
         userOrderDto.setUserId(orderInfo.getUserId());
         userOrderDto.setCouponId(orderInfo.getCouponId());
         userOrderDto.setOrderSn(orderInfo.getOrderSn());
