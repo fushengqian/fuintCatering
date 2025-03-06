@@ -239,6 +239,9 @@ public class OpenGiftServiceImpl extends ServiceImpl<MtOpenGiftMapper, MtOpenGif
             return false;
         }
         MtUser user = mtUserMapper.selectById(userId);
+        if (user.getIsStaff().equals(YesOrNoEnum.YES.getKey())) {
+            return false;
+        }
         if (user == null) {
             throw new BusinessCheckException("会员状态异常");
         }

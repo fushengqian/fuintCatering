@@ -469,6 +469,15 @@ public class UserCouponServiceImpl extends ServiceImpl<MtUserCouponMapper, MtUse
                 dto.setStoreInfo(storeInfo);
                 dto.setNum(0);
 
+                // 次卡核销情况
+                if (dto.getType().equals(CouponTypeEnum.TIMER.getKey())) {
+                    if (StringUtil.isNotEmpty(couponInfo.getOutRule())) {
+                        dto.setAmount(new BigDecimal(couponInfo.getOutRule()));
+                    }
+                    Long confirmCount = confirmLogService.getConfirmNum(dto.getId());
+                    dto.setBalance(new BigDecimal(confirmCount));
+                }
+
                 boolean canUse = couponService.isCouponEffective(couponInfo, userCouponDto);
                 if (!userCouponDto.getStatus().equals(UserCouponStatusEnum.UNUSED.getKey())) {
                     canUse = false;
