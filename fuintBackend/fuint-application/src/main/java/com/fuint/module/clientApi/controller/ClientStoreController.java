@@ -1,5 +1,6 @@
 package com.fuint.module.clientApi.controller;
 
+import com.fuint.common.dto.StoreInfo;
 import com.fuint.common.service.StoreService;
 import com.fuint.common.service.TableService;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -52,7 +53,7 @@ public class ClientStoreController extends BaseController {
         String longitude = request.getHeader("longitude") == null ? "" : request.getHeader("longitude");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
 
-        List<MtStore> storeList = storeService.queryByDistance(merchantNo, keyword, latitude, longitude);
+        List<StoreInfo> storeList = storeService.queryByDistance(merchantNo, keyword, latitude, longitude);
 
         Map<String, Object> outParams = new HashMap<>();
         outParams.put("data", storeList);
