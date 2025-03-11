@@ -763,8 +763,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      */
     @Override
     public MtUserGrade queryMemberGradeByGradeId(Integer id) {
-        MtUserGrade gradeInfo = mtUserGradeMapper.selectById(id);
-        return gradeInfo;
+        return mtUserGradeMapper.selectById(id);
     }
 
     /**
@@ -817,7 +816,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      * */
     @Override
     public Long getUserCount(Integer merchantId, Integer storeId) {
-        if (storeId > 0) {
+        if (storeId != null && storeId > 0) {
             return mtUserMapper.getStoreUserCount(storeId);
         } else {
             return mtUserMapper.getUserCount(merchantId);
@@ -835,7 +834,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      * */
     @Override
     public Long getUserCount(Integer merchantId, Integer storeId, Date beginTime, Date endTime) {
-        if (storeId > 0) {
+        if (storeId != null && storeId > 0) {
             return mtUserMapper.getStoreUserCountByTime(storeId, beginTime, endTime);
         } else {
             return mtUserMapper.getUserCountByTime(merchantId, beginTime, endTime);
@@ -853,7 +852,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      * */
     @Override
     public Long getActiveUserCount(Integer merchantId, Integer storeId, Date beginTime, Date endTime) {
-        if (storeId > 0) {
+        if (storeId != null && storeId > 0) {
             return mtUserActionMapper.getStoreActiveUserCount(storeId, beginTime, endTime);
         } else {
             return mtUserActionMapper.getActiveUserCount(merchantId, beginTime, endTime);

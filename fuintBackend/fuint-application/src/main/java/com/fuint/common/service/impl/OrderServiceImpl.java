@@ -773,7 +773,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         if (userInfo == null) {
             if (StringUtil.isNotEmpty(operator)) {
-                throw new BusinessCheckException("该管理员还未关联店铺员工");
+                throw new BusinessCheckException("该管理员还未关联店铺员工，请先关联！");
             } else {
                 throw new BusinessCheckException("请先登录");
             }
