@@ -16,7 +16,7 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系
 <p>6、支持手机短信、站内弹框消息、微信订阅消息：支持包括发货消息、卡券到期提醒、活动提醒、会员到期提醒、积分余额变动提醒等消息。</p>
 <b>官网演示地址：</b><br>
 <p>
-   1、会员点餐H5：<a target="_blank" href="https://www.fuint.cn/food/">https://www.fuint.cn/food/</a><br>
+   1、会员点餐H5：<a target="_blank" href="https://www.fuint.cn/food/">https://www.fuint.cn/food/</a>（需要体验小程序版本可添加管理员微信：YanheJiShu）<br>
    2、后台地址：<a target="_blank" href="https://www.fuint.cn/fuintFood/">https://www.fuint.cn/fuintFood/</a> 演示账号：fuint / 123456<br>
    3、swagger接口文档：<a target="_blank" href="https://www.fuint.cn/fuint-application/swagger-ui.html">https://www.fuint.cn/fuint-application/swagger-ui.html</a><br>
    4、完整演示功能：<a target="_blank" href="https://www.fuint.cn/docs/detail?id=25">https://www.fuint.cn/docs/detail?id=25</a>
@@ -29,6 +29,11 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系
 <p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b0.png?v=fuint" alt="登录界面"></p>
 <p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b1.png?v=fuint" alt="后台首页"></p>
 <p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b2.png?v=fuint" alt="统计"></p>
+
+<p>收银系统：</p>
+代客下单和收银系统，支持余额、微信、支付宝等支付渠道，已对接好扫码枪、扫码盒子、云打印机，订单提交后自动打印小票。
+<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/cashierV1.png" alt="收银首页"></p>
+<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/cashierV2.png" alt="提交订单"></p>
 
 前端使用技术<br>
 2.1 Vue2<br>
