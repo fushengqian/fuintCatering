@@ -33,11 +33,12 @@ public interface GoodsService {
     /**
      * 保存商品
      *
-     * @param  reqDto
+     * @param  reqDto 商品信息
+     * @param  storeIds 分配店铺
      * @throws BusinessCheckException
      * @return
      */
-    MtGoods saveGoods(MtGoods reqDto) throws BusinessCheckException;
+    MtGoods saveGoods(MtGoods reqDto, String storeIds) throws BusinessCheckException;
 
     /**
      * 根据ID获取商品信息
@@ -140,4 +141,13 @@ public interface GoodsService {
      * @return
      * */
     List<GoodsTopDto> getGoodsSaleTopList(Integer merchantId, Integer storeId, Date startTime, Date endTime);
+
+    /**
+     * 获取商品分配的店铺
+     *
+     * @param goodsId 商品ID
+     * @return
+     * */
+    String getStoreIds(Integer goodsId);
+
 }
