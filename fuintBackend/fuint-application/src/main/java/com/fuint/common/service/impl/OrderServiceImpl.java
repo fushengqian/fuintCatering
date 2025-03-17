@@ -2018,7 +2018,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
 
             for (MtCart cart : cartList) {
-                if (storeId <= 0) {
+                if (storeId <= 0 && cart.getStoreId() != null) {
                     storeId = cart.getStoreId();
                 }
                 // 购物车商品信息
@@ -2123,7 +2123,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                     // 判断在当前门店是否适用
                     if (StringUtil.isNotEmpty(couponInfo.getStoreIds())) {
                         String[] storeIds = couponInfo.getStoreIds().split(",");
-                        if (storeIds.length > 0 && !Arrays.asList(storeIds).contains(storeId.toString())) {
+                        if (storeIds.length > 0 && storeId != null && !Arrays.asList(storeIds).contains(storeId.toString())) {
                             continue;
                         }
                     }

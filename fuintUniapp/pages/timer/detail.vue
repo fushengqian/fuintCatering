@@ -270,6 +270,7 @@
                 width: 380rpx;
                 float: left;
                 overflow: hidden;
+                padding-left: 6rpx;
                 .name {
                     font-size: 38rpx;
                 }
