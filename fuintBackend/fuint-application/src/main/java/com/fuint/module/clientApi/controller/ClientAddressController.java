@@ -65,14 +65,7 @@ public class ClientAddressController extends BaseController {
         String isDefault = address.getIsDefault() == null ? "" : address.getIsDefault();
         Integer addressId = address.getAddressId() == null ? 0 : address.getAddressId();
 
-        if (StringUtil.isEmpty(token)) {
-            return getFailureResult(1001);
-        }
-
         UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
-        if (null == mtUser) {
-            return getFailureResult(1001);
-        }
 
         MtAddress mtAddress = new MtAddress();
         mtAddress.setId(addressId);

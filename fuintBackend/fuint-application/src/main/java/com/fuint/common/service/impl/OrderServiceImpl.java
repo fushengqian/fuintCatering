@@ -1049,56 +1049,55 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         ResponseObject paymentInfo = null;
         String errorMessage = "";
 
-        // 应付金额大于0才提交微信支付，点餐不用支付
-        if (tableId <= 0) {
-            if (realPayAmount.compareTo(new BigDecimal("0")) > 0) {
-                if (payType.equals(PayTypeEnum.CASH.getKey()) && StringUtil.isNotEmpty(operator)) {
-                    // 收银台现金支付，更新为已支付
-                    setOrderPayed(orderInfo.getId(), null);
-                } else if (payType.equals(PayTypeEnum.BALANCE.getKey())) {
-                    // 余额支付
-                    MtBalance balance = new MtBalance();
-                    balance.setMobile(userInfo.getMobile());
-                    balance.setOrderSn(orderInfo.getOrderSn());
-                    balance.setUserId(userInfo.getId());
-                    balance.setMerchantId(userInfo.getMerchantId());
-                    BigDecimal balanceAmount = realPayAmount.subtract(realPayAmount).subtract(realPayAmount);
-                    balance.setAmount(balanceAmount);
-                    boolean isPay = balanceService.addBalance(balance, true);
-                    if (isPay) {
-                        setOrderPayed(orderInfo.getId(), realPayAmount);
-                    } else {
-                        errorMessage = PropertiesUtil.getResponseErrorMessageByCode(5001);
-                    }
+        // 应付金额大于0才提交微信支付
+        if (realPayAmount.compareTo(new BigDecimal("0")) > 0) {
+            if (payType.equals(PayTypeEnum.CASH.getKey()) && StringUtil.isNotEmpty(operator)) {
+                // 收银台现金支付，更新为已支付
+                setOrderPayed(orderInfo.getId(), null);
+            } else  if (payType.equals(PayTypeEnum.STORE.getKey())) {
+                // 门店支付，不做任何操作
+            } else if (payType.equals(PayTypeEnum.BALANCE.getKey())) {
+                // 余额支付
+                MtBalance balance = new MtBalance();
+                balance.setMobile(userInfo.getMobile());
+                balance.setOrderSn(orderInfo.getOrderSn());
+                balance.setUserId(userInfo.getId());
+                balance.setMerchantId(userInfo.getMerchantId());
+                BigDecimal balanceAmount = realPayAmount.subtract(realPayAmount).subtract(realPayAmount);
+                balance.setAmount(balanceAmount);
+                boolean isPay = balanceService.addBalance(balance, true);
+                if (isPay) {
+                    setOrderPayed(orderInfo.getId(), realPayAmount);
                 } else {
-                    BigDecimal wxPayAmount = realPayAmount.multiply(new BigDecimal("100"));
-                    // 扫码支付，先返回不处理，后面拿到支付二维码再处理
-                    if ((payType.equals(PayTypeEnum.MICROPAY.getKey()) || payType.equals(PayTypeEnum.ALISCAN.getKey())) && StringUtil.isEmpty(authCode)) {
-                        paymentInfo = new ResponseObject(200, "请求成功", new HashMap<>());
-                    } else {
-                        paymentInfo = paymentService.createPrepayOrder(userInfo, orderInfo, (wxPayAmount.intValue()), authCode, 0, ip, platform, isWechat);
-                    }
-                    if (paymentInfo.getData() == null) {
-                        errorMessage = StringUtil.isNotEmpty(paymentInfo.getMessage()) ? paymentInfo.getMessage() : PropertiesUtil.getResponseErrorMessageByCode(3000);
-                    }
+                    errorMessage = PropertiesUtil.getResponseErrorMessageByCode(5001);
                 }
             } else {
-                // 应付金额是0，直接更新为已支付
-                setOrderPayed(orderInfo.getId(), null);
+                BigDecimal wxPayAmount = realPayAmount.multiply(new BigDecimal("100"));
+                // 扫码支付，先返回不处理，后面拿到支付二维码再处理
+                if ((payType.equals(PayTypeEnum.MICROPAY.getKey()) || payType.equals(PayTypeEnum.ALISCAN.getKey())) && StringUtil.isEmpty(authCode)) {
+                    paymentInfo = new ResponseObject(200, "请求成功", new HashMap<>());
+                } else {
+                    paymentInfo = paymentService.createPrepayOrder(userInfo, orderInfo, (wxPayAmount.intValue()), authCode, 0, ip, platform, isWechat);
+                }
+                if (paymentInfo.getData() == null) {
+                    errorMessage = StringUtil.isNotEmpty(paymentInfo.getMessage()) ? paymentInfo.getMessage() : PropertiesUtil.getResponseErrorMessageByCode(3000);
+                }
             }
+        } else {
+            // 应付金额是0，直接更新为已支付
+            setOrderPayed(orderInfo.getId(), null);
         }
 
         orderInfo = getOrderInfo(orderInfo.getId());
         Map<String, Object> outParams = new HashMap();
         outParams.put("isCreated", true);
         outParams.put("orderInfo", orderInfo);
+        outParams.put("payType", payType);
 
         if (paymentInfo != null) {
             outParams.put("payment", paymentInfo.getData());
-            outParams.put("payType", payType);
         } else {
             outParams.put("payment", null);
-            outParams.put("payType", "BALANCE");
         }
 
         // 1分钟后发送小程序订阅消息

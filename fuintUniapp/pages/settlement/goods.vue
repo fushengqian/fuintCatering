@@ -248,6 +248,17 @@
                   </view>
                 </view>
               </view>
+              <!-- 前台支付 -->
+              <view class="pay-item dis-flex flex-x-between" v-if="payOffLine" @click="doSubmitOrder(PayTypeEnum.STORE.value)">
+                  <view class="item-left dis-flex flex-y-center">
+                    <view class="item-left_icon balance">
+                      <text class="iconfont icon-qianbao"></text>
+                    </view>
+                    <view class="item-left_text">
+                      <text>{{ PayTypeEnum.STORE.name }}</text>
+                    </view>
+                  </view>
+              </view>
             </view>
           </view>
         </u-popup>
@@ -310,7 +321,9 @@
         // 支付方式弹窗
         showPayPopup: false,
         // 订单ID
-        orderId: ""
+        orderId: "",
+        // 门店支付
+        payOffLine: false
       }
     },
 
@@ -448,6 +461,19 @@
                  app.storeInfo = result.data.storeInfo;
              })
          }
+         app.payOffLine = false;
+         settingApi.systemConfig()
+           .then(result => {
+               app.storeInfo = result.data.storeInfo;
+               const payTypeList = result.data.payTypeList;
+               if (payTypeList && payTypeList.length > 0) {
+                   for (let i = 0; i < payTypeList.length; i++) {
+                        if (payTypeList[i] && payTypeList[i].key && payTypeList[i].key == 'STORE') {
+                            app.payOffLine = true;
+                        }
+                   }
+               }
+          })
       },
       
       // 弹出支付方式
@@ -568,6 +594,12 @@
         
         // 余额支付
         if (result.data.payType == PayTypeEnum.BALANCE.value) {
+            app.disabled = false;
+            app.navToOrderResult(result.data.orderInfo.id, result.message);
+        }
+        
+        // 门店支付
+        if (result.data.payType == PayTypeEnum.STORE.value) {
             app.disabled = false;
             app.navToOrderResult(result.data.orderInfo.id, result.message);
         }

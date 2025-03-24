@@ -85,17 +85,19 @@
             background-color: $fuint-theme;
         }
         .qr{
-            width: 80rpx;
-            height: 80rpx;
+            width: 40rpx;
+            height: 40rpx;
             display: flex;
             align-items: center;
             border-radius: 6rpx;
             justify-content: center;
             text-align: center;
             color: $fuint-theme;
-            font-size: 68rpx;
+            font-size: 48rpx;
+            font-weight: bold;
             background-color: #fff;
-            border: solid 1rpx $fuint-theme;
+            margin-top: 15rpx;
+            margin-right: 6rpx;
             padding: 2rpx;
         }
     }

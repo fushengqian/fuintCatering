@@ -241,7 +241,7 @@
         if (result.data.payType == PayTypeEnum.WECHAT.value) {
             wxPayment(result.data.payment)
            .then(() => {
-                  app.$navTo(`pages/pay/result`, { amount: parseFloat(result.data.orderInfo.amount).toFixed(2), point: parseInt(result.data.orderInfo.usePoint)})
+                  app.$navTo(`pages/pay/result`, { amount: parseFloat(result.data.orderInfo.payAmount).toFixed(2), point: parseInt(result.data.orderInfo.usePoint)})
               })
             .catch(err => 
                 app.$error('订单未支付'))
@@ -253,7 +253,7 @@
           // 余额支付
         if (result.data.payType == PayTypeEnum.BALANCE.value) {
             if (result.data.orderInfo.payStatus == 'B') {
-                app.$navTo(`pages/pay/result`, { amount: parseFloat(result.data.orderInfo.amount).toFixed(2), point: parseInt(result.data.orderInfo.usePoint)})
+                app.$navTo(`pages/pay/result`, { amount: parseFloat(result.data.orderInfo.payAmount).toFixed(2), point: parseInt(result.data.orderInfo.usePoint)})
             } else {
                 if (result.message) {
                     app.$error(result.message);

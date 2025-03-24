@@ -50,13 +50,12 @@
     <!-- 提交订单 -->
     <view class="flow-fixed-footer b-f m-top10">
       <view class="dis-flex chackout-box">
-        <view class="chackout-left pl-12">
-          <view class="col-amount-do">应付金额：￥{{ totalAmount.toFixed(2) }}</view>
-          <view class="col-amount-view">实得金额：￥{{ getTotalAmount.toFixed(2) }}</view>
-        </view>
-        <view class="chackout-right" @click="onSubmitOrder()">
-          <view class="flow-btn f-32" :class="{ disabled }">提交订单</view>
-        </view>
+          <view class="col-amount-do">应付金额：
+            <text class="pay-amount">￥{{ totalAmount ? totalAmount.toFixed(2) : '0.00' }}</text>
+          </view>
+          <view class="col-amount-view">实得金额：
+            <text class="pay-amount">￥{{ getTotalAmount ? getTotalAmount.toFixed(2) : '0.00' }}</text>
+          </view>
       </view>
     </view>
   </view>

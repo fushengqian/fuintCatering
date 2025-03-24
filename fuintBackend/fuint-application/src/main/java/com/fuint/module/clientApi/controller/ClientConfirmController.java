@@ -69,14 +69,7 @@ public class ClientConfirmController extends BaseController {
         String amount = (confirmParam.getAmount() == null || confirmParam.getAmount() == "") ? "0" : confirmParam.getAmount();
         String remark = confirmParam.getRemark() == null ? "" : confirmParam.getRemark();
 
-        if (StringUtil.isEmpty(token)) {
-            return getFailureResult(1001);
-        }
-
         UserInfo loginInfo = TokenUtil.getUserInfoByToken(token);
-        if (loginInfo == null) {
-            return getFailureResult(1001);
-        }
 
         MtUserCoupon userCoupon = mtUserCouponMapper.findByCode(code);
         if (null == userCoupon) {

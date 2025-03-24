@@ -1,10 +1,6 @@
 <template>
   <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ native: true }" @down="downCallback"
     :up="upOption" @up="upCallback">
-    <!-- 页面头部 -->
-    <view class="header">
-      <search class="search" :tips="options.search ? options.search : '搜索卡券'" @event="handleSearch" />
-    </view>
 
     <!-- 排序标签 -->
     <view class="store-sort">
@@ -227,20 +223,6 @@
                 this.$navTo(`pages/timer/detail`, { couponId: couponId, userCouponId: userCouponId })
             }
         }
-      },
-
-      //卡券搜索
-      handleSearch() {
-        const searchPageUrl = 'pages/search/index'
-        // 判断来源页面
-        let pages = getCurrentPages()
-        if (pages.length > 1 &&
-          pages[pages.length - 2].route === searchPageUrl) {
-          uni.navigateBack()
-          return
-        }
-        // 跳转到卡券搜索页
-        this.$navTo(searchPageUrl)
       }
     },
 
@@ -425,20 +407,21 @@
       color: #e49a3d;
     }
     .receive {
-      height: 46rpx;
-      width: 128rpx;
-      line-height: 46rpx;
-      text-align: center;
-      border: 1px solid #f8df00;
-      border-radius: 5rpx;
-      color: #f86d48;
-      background: #f8df98;
-      font-size: 22rpx;
-      &.state {
-        border: none;
-        color: #cccccc;
-        background: #F5F5F5;
-      }
+        height: 50rpx;
+        width: 108rpx;
+        padding: 0rpx 10rpx 0rpx 10rpx;
+        line-height: 50rpx;
+        text-align: center;
+        border: 1px solid #f86d48;
+        border-radius: 40rpx;
+        color: #fff;
+        background: linear-gradient(to right, #f9211c, #ff6335);
+        font-size: 22rpx;
+        &.state {
+          border: none;
+          color: #888888;
+          background: #F5F5F5;
+        }
     }
 
     .desc-goods_sales {

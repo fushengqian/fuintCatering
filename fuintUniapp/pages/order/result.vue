@@ -123,6 +123,10 @@
             OrderApi.detail(app.orderId)
               .then(result => {
                   app.isSuccess = result.data.payStatus === 'B' ? true : false;
+                  if (result.data.payType == 'STORE') {
+                      app.isSuccess = true;
+                      app.message = "订单已提交！";
+                  }
                   app.isLoading = false;
               })
         } else {

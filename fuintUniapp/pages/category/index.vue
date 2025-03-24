@@ -525,10 +525,11 @@
                     border-radius: 50%;
                     min-width: 36rpx;
                     padding: 2rpx;
+                    right: 90rpx;
                 }
                 .select-spec {
                     border: solid 1rpx $fuint-theme;
-                    padding: 10rpx 20rpx 10rpx 36rpx;
+                    padding: 10rpx 20rpx 10rpx 20rpx;
                     font-size: 25rpx;
                     border-radius: 5rpx;
                     color: #ffffff;

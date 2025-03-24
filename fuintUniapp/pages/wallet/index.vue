@@ -16,10 +16,10 @@
       </view>
       <view class="space-lower_item item-lable dis-flex flex-x-around">
         <view class="lable-text" @click="onTargetRechargeOrder()">
-          <text>充值记录</text>
+          <text>充值订单</text>
         </view>
         <view class="lable-text" @click="onTargetBalanceLog()">
-          <text>账单详情</text>
+          <text>余额明细</text>
         </view>
       </view>
     </view>

@@ -16,7 +16,6 @@ import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtOrder;
 import com.fuint.repository.model.MtSetting;
 import com.fuint.repository.model.MtUser;
-import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -77,12 +76,7 @@ public class ClientBalanceController extends BaseController {
     @RequestMapping(value = "/setting", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject setting(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String merchantNo = request.getHeader("merchantNo");
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(token);
-        if (userInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         Map<String, Object> outParams = new HashMap<>();
         Integer merchantId = merchantService.getMerchantId(merchantNo);
@@ -135,14 +129,7 @@ public class ClientBalanceController extends BaseController {
         String isWechat = request.getHeader("isWechat") == null ? "" : request.getHeader("isWechat");
 
         String token = request.getHeader("Access-Token");
-        if (StringUtil.isEmpty(token)) {
-            return getFailureResult(1001);
-        }
-
         UserInfo userInfo = TokenUtil.getUserInfoByToken(token);
-        if (null == userInfo) {
-            return getFailureResult(1001);
-        }
 
         rechargeParam.setMemberId(userInfo.getId());
         MtOrder orderInfo = orderService.doRecharge(request, rechargeParam);
@@ -179,14 +166,7 @@ public class ClientBalanceController extends BaseController {
         String token = request.getHeader("Access-Token");
         Integer page = balanceListParam.getPage() == null ? Constants.PAGE_NUMBER : balanceListParam.getPage();
         Integer pageSize = balanceListParam.getPageSize() == null ? Constants.PAGE_SIZE : balanceListParam.getPageSize();
-        if (StringUtil.isEmpty(token)) {
-            return getFailureResult(1001);
-        }
-
         UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
-        if (null == mtUser) {
-            return getFailureResult(1001);
-        }
 
         PaginationRequest paginationRequest = new PaginationRequest();
         paginationRequest.setCurrentPage(page);
