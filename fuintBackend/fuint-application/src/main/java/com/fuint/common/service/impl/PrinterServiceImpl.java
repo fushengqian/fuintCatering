@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fuint.common.dto.GoodsSpecValueDto;
 import com.fuint.common.dto.OrderGoodsDto;
 import com.fuint.common.dto.UserOrderDto;
 import com.fuint.common.enums.*;
@@ -232,12 +233,25 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             // 商品列表
             if (orderInfo.getGoods() != null && orderInfo.getGoods().size() > 0) {
                 for (OrderGoodsDto goodsDto : orderInfo.getGoods()) {
+                     List<GoodsSpecValueDto> specList = goodsDto.getSpecList();
+                     String name = goodsDto.getName();
+                     List<String> specValue = new ArrayList<>();
+                     if (specList != null && specList.size() > 0) {
+                        for (GoodsSpecValueDto spec : specList) {
+                            if (StringUtil.isNotEmpty(spec.getSpecValue())) {
+                                specValue.add(spec.getSpecValue());
+                            }
+                        }
+                        if (specValue.size() > 0) {
+                            name = name + "(" + String.join(",", specValue) + ")";
+                        }
+                     }
                      if (goodsIds != null && goodsIds.size() > 0) {
                          if (goodsIds.contains(goodsDto.getGoodsId())) {
-                             printContent.append(NoteFormatter.formatPrintOrderItemForNewLine80(goodsDto.getName(), goodsDto.getNum(), Double.parseDouble(goodsDto.getPrice())));
+                             printContent.append(NoteFormatter.formatPrintOrderItemForNewLine80(name, goodsDto.getNum(), Double.parseDouble(goodsDto.getPrice())));
                          }
                      } else {
-                         printContent.append(NoteFormatter.formatPrintOrderItemForNewLine80(goodsDto.getName(), goodsDto.getNum(), Double.parseDouble(goodsDto.getPrice())));
+                         printContent.append(NoteFormatter.formatPrintOrderItemForNewLine80(name, goodsDto.getNum(), Double.parseDouble(goodsDto.getPrice())));
                      }
                 }
             }
