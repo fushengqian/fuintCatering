@@ -66,9 +66,7 @@ public class BackendStaffController extends BaseController {
         String category = request.getParameter("category");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
+
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
             storeId = accountInfo.getStoreId().toString();
         }
@@ -130,11 +128,8 @@ public class BackendStaffController extends BaseController {
         Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
-        staffService.updateAuditedStatus(id, status);
+        staffService.updateAuditedStatus(id, status, accountInfo.getAccountName());
         return getSuccessResult(true);
     }
 
@@ -159,9 +154,6 @@ public class BackendStaffController extends BaseController {
         String status = params.get("auditedStatus") == null ? StatusEnum.FORBIDDEN.getKey() : CommonUtil.replaceXSS(params.get("auditedStatus").toString());
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
             return getFailureResult(201, "平台方帐号无法执行该操作，请使用商户帐号操作");
@@ -209,14 +201,7 @@ public class BackendStaffController extends BaseController {
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('staff:list')")
-    public ResponseObject getStaffInfo(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
-
+    public ResponseObject getStaffInfo(@PathVariable("id") Integer id) throws BusinessCheckException {
         MtStaff staffInfo = staffService.queryStaffById(id);
         if (staffInfo != null) {
             staffInfo.setMobile(CommonUtil.hidePhone(staffInfo.getMobile()));
@@ -240,9 +225,6 @@ public class BackendStaffController extends BaseController {
         String token = request.getHeader("Access-Token");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         Map<String, Object> params = new HashMap<>();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
@@ -252,7 +234,9 @@ public class BackendStaffController extends BaseController {
             storeId = accountInfo.getStoreId();
         }
         params.put("AUDITED_STATUS", StatusEnum.ENABLED.getKey());
-        params.put("STORE_ID", storeId);
+        if (storeId != null && storeId > 0) {
+            params.put("STORE_ID", storeId);
+        }
         List<MtStaff> staffList = staffService.queryStaffByParams(params);
 
         Map<String, Object> result = new HashMap<>();
@@ -275,11 +259,8 @@ public class BackendStaffController extends BaseController {
         String token = request.getHeader("Access-Token");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
-        staffService.updateAuditedStatus(id, StatusEnum.DISABLE.getKey());
+        staffService.updateAuditedStatus(id, StatusEnum.DISABLE.getKey(), accountInfo.getAccountName());
         return getSuccessResult(true);
     }
 }
