@@ -75,12 +75,7 @@ public class BackendBannerController extends BaseController {
         String searchStoreId = request.getParameter("storeId");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        Integer storeId;
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        } else {
-            storeId = accountInfo.getStoreId();
-        }
+        Integer storeId = accountInfo.getStoreId();
 
         PaginationRequest paginationRequest = new PaginationRequest();
         paginationRequest.setCurrentPage(page);
@@ -152,9 +147,6 @@ public class BackendBannerController extends BaseController {
         Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         MtBanner mtBanner = bannerService.queryBannerById(id);
         if (mtBanner == null) {
@@ -195,9 +187,6 @@ public class BackendBannerController extends BaseController {
         String position = params.get("position") == null ? "" : params.get("position").toString();
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         BannerDto bannerDto = new BannerDto();
         bannerDto.setTitle(title);
@@ -241,6 +230,12 @@ public class BackendBannerController extends BaseController {
 
         MtBanner bannerInfo = bannerService.queryBannerById(id);
         String imagePath = settingService.getUploadBasePath();
+
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+            if (!bannerInfo.getMerchantId().equals(accountInfo.getMerchantId())) {
+                return getFailureResult(1004);
+            }
+        }
 
         Map<String, Object> result = new HashMap<>();
         result.put("bannerInfo", bannerInfo);
