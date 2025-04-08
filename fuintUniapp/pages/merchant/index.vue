@@ -73,7 +73,7 @@
 
     <!-- 待办操作 -->
     <view class="order-navbar">
-      <view class="order-navbar-item" v-for="(item, index) in orderNavbar" :key="index" @click="onTargetTodo(item)">
+      <view class="order-navbar-item" v-for="(item, index) in orderNavbar" :key="index" @click="handleService(item)">
         <view class="item-icon">
           <text class="iconfont" :class="[`icon-${item.icon}`]"></text>
         </view>
@@ -117,10 +117,9 @@
 
   // 订单操作
   const orderNavbar = [
-    { id: 'all', name: '全部待办', icon: 'qpdingdan' },
-    { id: 'refund', name: '售后处理', icon: 'daifukuan', count: 1 },
-    { id: 'confirm', name: '待核销', icon: 'shouhou', count: 1 },
-    { id: 'book', name: '预约确认', icon: 'daishouhuo', count: 3 },
+       { id: 'confirm', name: '核销订单', icon: 'dingdan', count: 1, url:'pages/merchant/order/index?dataType=todo' },
+       { id: 'refund', name: '售后审核', icon: 'daifukuan', count: 1, url:'pages/merchant/refund/index?dataType=todo' },
+       { id: 'book', name: '预约确认', icon: 'daishouhuo', count: 3, url:'pages/merchant/book/index??dataType=todo' },
   ]
 
   /**
@@ -134,7 +133,7 @@
     { id: 'activity', name: '营销活动', icon: 'lingquan', type: 'link', url: 'pages/merchant/activity' },
     { id: 'order', name: '订单管理', icon: 'dingdan', type: 'link', url: 'pages/merchant/order/index' },
     { id: 'report', name: '报表数据', icon: 'zhibozhong', type: 'link', url: 'pages/merchant/data/index' },
-    { id: 'refund', name: '售后服务', icon: 'shouhou', type: 'link', url: 'pages/merchant/refund/index' },
+    { id: 'refund', name: '售后订单', icon: 'shouhou', type: 'link', url: 'pages/merchant/refund/index' },
     { id: 'setting', name: '商家设置', icon: 'shezhi1', type: 'link', url: 'pages/merchant/setting' },
     { id: 'staff', name: '员工管理', icon: 'sy-yh', type: 'link', url: 'pages/merchant/staff/index' },
   ]
@@ -403,7 +402,7 @@
     display: flex;
     padding: 40rpx 0;
     box-shadow: 0 1rpx 5rpx 0px rgba(0, 0, 0, 0.05);
-    border-radius: 5rpx;
+    border-radius: 10rpx;
     margin: 25rpx 20rpx 5rpx 20rpx;
     background: #ffffff;
     .asset-right {
@@ -459,12 +458,12 @@
     width: 94%;
     box-shadow: 0 1rpx 5rpx 0px rgba(0, 0, 0, 0.05);
     font-size: 30rpx;
-    border-radius: 5rpx;
+    border-radius: 10rpx;
     background: #fff;
 
     &-item {
       position: relative;
-      width: 25%;
+      width: 33.33%;
 
       .item-icon {
         text-align: center;
@@ -504,7 +503,7 @@
     padding: 20rpx 0;
     width: 94%;
     box-shadow: 0 1rpx 5rpx 0px rgba(0, 0, 0, 0.05);
-    border-radius: 5rpx;
+    border-radius: 10rpx;
     background: #fff;
 
     .service-title {

@@ -63,9 +63,6 @@ public class BackendUserGradeController extends BaseController {
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         PaginationRequest paginationRequest = new PaginationRequest();
         paginationRequest.setCurrentPage(page);
@@ -101,14 +98,7 @@ public class BackendUserGradeController extends BaseController {
         }
         paginationResponse.setContent(content);
 
-        List<ParamDto> catchTypes = new ArrayList<>();
-        for (UserGradeCatchTypeEnum catchTypeEnum : catchTypeList) {
-             ParamDto catchType = new ParamDto();
-             catchType.setKey(catchTypeEnum.getKey());
-             catchType.setName(catchTypeEnum.getValue());
-             catchType.setValue(catchTypeEnum.getKey());
-             catchTypes.add(catchType);
-        }
+        List<ParamDto> catchTypes = UserGradeCatchTypeEnum.getUserGradeCatchTypeList();
 
         Map<String, Object> result = new HashMap<>();
         result.put("paginationResponse", paginationResponse);
@@ -129,9 +119,6 @@ public class BackendUserGradeController extends BaseController {
     public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
         Integer userGradeId = param.get("userGradeId") == null ? 0 : Integer.parseInt(param.get("userGradeId").toString());
         String status = param.get("status") == null ? StatusEnum.ENABLED.getKey() : param.get("status").toString();
 
@@ -159,9 +146,6 @@ public class BackendUserGradeController extends BaseController {
     public ResponseObject delete(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         MtUserGrade mtUserGrade = userGradeService.queryUserGradeById(0, id, 0);
         if (mtUserGrade == null || !mtUserGrade.getMerchantId().equals(accountInfo.getMerchantId())) {
@@ -187,9 +171,6 @@ public class BackendUserGradeController extends BaseController {
     public ResponseObject saveHandler(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         String grade = param.get("grade") == null ? "0" : param.get("grade").toString();
         String name = CommonUtil.replaceXSS(param.get("name").toString());

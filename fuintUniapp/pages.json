@@ -419,6 +419,12 @@
       "style": {
         "navigationBarTitleText": "预约详情"
       }
+    },
+    {
+      "path": "pages/merchant/order/confirm",
+      "style": {
+        "navigationBarTitleText": "核销订单"
+      }
     }
   ],
   "globalStyle": {

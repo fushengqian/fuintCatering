@@ -1,5 +1,11 @@
 package com.fuint.common.enums;
 
+import com.fuint.common.dto.ParamDto;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * 广告位枚举
  *
@@ -53,5 +59,11 @@ public enum PositionEnum {
             }
         }
         return null;
+    }
+
+    public static List<ParamDto> getPositionList() {
+        return Arrays.stream(PositionEnum.values())
+                .map(status -> new ParamDto(status.getKey(), status.getValue(), status.getValue()))
+                .collect(Collectors.toList());
     }
 }

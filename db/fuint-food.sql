@@ -630,6 +630,9 @@ CREATE TABLE `mt_order` (
   `PAY_STATUS` char(1) DEFAULT '' COMMENT '支付状态',
   `SETTLE_STATUS` char(1) DEFAULT 'A' COMMENT '结算状态',
   `STAFF_ID` int DEFAULT '0' COMMENT '操作员工',
+  `CONFIRM_STATUS` char(1) DEFAULT 'N' COMMENT '核销状态',
+  `CONFIRM_TIME` datetime DEFAULT NULL COMMENT '核销时间',
+  `CONFIRM_REMARK` varchar(500) DEFAULT NULL COMMENT '核销备注',
   `COMMISSION_STATUS` char(1) DEFAULT 'A' COMMENT '分佣提成计算状态',
   `OPERATOR` varchar(30) DEFAULT '' COMMENT '最后操作人',
   PRIMARY KEY (`ID`)

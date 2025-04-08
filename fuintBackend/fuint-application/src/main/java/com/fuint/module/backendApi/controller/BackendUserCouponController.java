@@ -93,9 +93,6 @@ public class BackendUserCouponController extends BaseController {
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         Map<String, Object> param = new HashMap<>();
         param.put("pageNumber", page);
@@ -129,26 +126,10 @@ public class BackendUserCouponController extends BaseController {
         List<MtStore> storeList = storeService.queryStoresByParams(paramsStore);
 
         // 卡券类型列表
-        CouponTypeEnum[] typeListEnum = CouponTypeEnum.values();
-        List<ParamDto> typeList = new ArrayList<>();
-        for (CouponTypeEnum enumItem : typeListEnum) {
-            ParamDto paramDto = new ParamDto();
-            paramDto.setKey(enumItem.getKey());
-            paramDto.setName(enumItem.getValue());
-            paramDto.setValue(enumItem.getKey());
-            typeList.add(paramDto);
-        }
+        List<ParamDto> typeList = CouponTypeEnum.getCouponTypeList();
 
         // 卡券状态列表
-        UserCouponStatusEnum[] statusListEnum = UserCouponStatusEnum.values();
-        List<ParamDto> statusList = new ArrayList<>();
-        for (UserCouponStatusEnum enumItem : statusListEnum) {
-            ParamDto paramDto = new ParamDto();
-            paramDto.setKey(enumItem.getKey());
-            paramDto.setName(enumItem.getValue());
-            paramDto.setValue(enumItem.getKey());
-            statusList.add(paramDto);
-        }
+        List<ParamDto> statusList = UserCouponStatusEnum.getUserCouponStatusList();
 
         Map<String, Object> data = new HashMap<>();
         data.put("paginationResponse", result.getData());
@@ -176,9 +157,6 @@ public class BackendUserCouponController extends BaseController {
         }
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         TAccount account = accountService.getAccountInfoById(accountInfo.getId());
         Integer storeId = account.getStoreId();
@@ -206,9 +184,6 @@ public class BackendUserCouponController extends BaseController {
         String token = request.getHeader("Access-Token");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         // 删除会员的卡券
         couponService.deleteUserCoupon(id, accountInfo.getAccountName());

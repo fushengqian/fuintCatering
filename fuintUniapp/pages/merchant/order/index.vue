@@ -6,10 +6,27 @@
       <!-- tab栏 -->
       <u-tabs :list="tabs" :is-scroll="false" :current="curTab" active-color="#FA2209" :duration="0.2" @change="onChangeTab" />
 
+      <!-- 搜索框 -->
+      <view class="search-wrapper">
+        <view class="search-input">
+          <view class="search-input-wrapper">
+            <view class="left">
+              <text class="search-icon iconfont icon-sousuo"></text>
+            </view>
+            <view class="right">
+              <input v-model="keyword" class="input" placeholder="请输入订单号 / 手机号" type="text"></input>
+            </view>
+          </view>
+        </view>
+        <view class="search-button">
+          <button class="button" @click="doSearchOrder" type="warn"> 搜索 </button>
+        </view>
+      </view>
+
       <!-- 订单列表 -->
       <view class="order-list">
         <view class="order-item" v-for="(item, index) in list.content" :key="index">
-          <view class="item-top" @click="handleTargetDetail(item.id)">
+          <view class="item-top">
             <view class="item-top-left">
               <text class="order-type">{{ item.typeName }}</text>
             </view>
@@ -18,7 +35,7 @@
             </view>
           </view>
           <!-- 商品列表 -->
-          <view class="goods-list" v-if="item.goods" @click="handleTargetDetail(item.id)">
+          <view class="goods-list" v-if="item.goods">
             <view class="goods-item" v-for="(goods, idx) in item.goods" :key="idx">
               <!-- 商品图片 -->
               <view class="goods-image">
@@ -46,12 +63,12 @@
             </view>
           </view>
           <!-- 备注信息 -->
-          <view v-if="item.remark" class="remark" @click="handleTargetDetail(item.id)">
+          <view v-if="item.remark" class="remark">
               <text>备注：</text>
               <text>{{ item.remark ? item.remark : '--'}}</text>
           </view>
           <!-- 订单合计 -->
-          <view class="order-total" @click="handleTargetDetail(item.id)">
+          <view class="order-total">
             <text>总金额</text>
             <text class="unit">￥</text>
             <text class="money">{{ item.amount }}</text>
@@ -62,7 +79,7 @@
                 <text class="time">{{ item.createTime }}</text>
             </view>
             <view class="btn-group">
-                <view class="btn-item" @click="handleTargetDetail(item.id)">详情</view>
+                <view class="btn-item" v-if="getTabValue() == 'todo'" @click="handleConfirm(item.id)">核销</view>
             </view>
           </view>
         </view>
@@ -100,6 +117,12 @@
   }, {
     name: `已支付`,
     value: 'paid'
+  },{
+    name: `待核销`,
+    value: 'todo'
+  }, {
+    name: `已核销`,
+    value: 'confirm'
   }, {
     name: `已取消`,
     value: 'cancel'
@@ -147,7 +170,8 @@
         canReset: false,
         // 支付方式弹窗
         showPayPopup: false,
-        statusText: "payStatus"
+        statusText: "payStatus",
+        keyword: ""
       }
     },
 
@@ -173,7 +197,6 @@
       initCurTab(options) {
         const app = this
         if (options.dataType) {
-            console.log("options == ", options);
             const index = app.tabs.findIndex(item => item.value == options.dataType)
             app.curTab = index > -1 ? index : 0
         }
@@ -200,7 +223,7 @@
       getOrderList(pageNo = 1) {
         const app = this
         return new Promise((resolve, reject) => {
-          OrderApi.list({ dataType: app.getTabValue(), page: pageNo }, { load: false })
+          OrderApi.list({ dataType: app.getTabValue(), keyword: app.keyword, page: pageNo }, { load: false })
             .then(result => {
               // 合并新数据
               const newList = result.data;
@@ -219,12 +242,20 @@
       getTabValue() {
         return this.tabs[this.curTab].value
       },
+      
+      // 搜索提交
+      doSearchOrder() {
+        this.curId = 'all';
+        // 刷新列表数据
+        this.onRefreshList();
+      },
 
       // 切换标签项
       onChangeTab(index) {
         const app = this
         // 设置当前选中的标签
         app.curTab = index
+        app.keyword = ""
         // 刷新订单列表
         app.onRefreshList()
       },
@@ -237,9 +268,9 @@
         }, 120)
       },
 
-      // 跳转到订单详情页
-      handleTargetDetail(orderId) {
-        this.$navTo('pages/order/detail', { orderId })
+      // 跳转到核销
+      handleConfirm(orderId) {
+        this.$navTo('pages/merchant/order/confirm', { orderId })
       }
     }
 
@@ -247,6 +278,66 @@
 </script>
 
 <style lang="scss" scoped>
+    .search-wrapper {
+      display: flex;
+      height: 80rpx;
+      margin-top: 10rpx;
+      padding: 0rpx 10rpx;
+    }
+    
+    // 搜索输入框
+    .search-input {
+      width: 80%;
+      background: #fff;
+      border-radius: 50rpx 0 0 50rpx;
+      box-sizing: border-box;
+      overflow: hidden;
+      border: solid 1px #cccccc;
+      line-height: 80rpx;
+      .search-input-wrapper {
+        display: flex;
+        .left {
+          display: flex;
+          width: 60rpx;
+          justify-content: center;
+          align-items: center;
+          .search-icon {
+            display: block;
+            color: #666666;
+            font-size: 30rpx;
+            font-weight: bold;
+          }
+        }
+    
+        .right {
+          flex: 1;
+    
+          input {
+            font-size: 28rpx;
+            height: 80rpx;
+            line-height: 80rpx;
+            .input-placeholder {
+              color: #aba9a9;
+            }
+          }
+    
+        }
+      }
+    }
+    
+    // 搜索按钮
+    .search-button {
+      width: 20%;
+      box-sizing: border-box;
+    
+      .button {
+        line-height: 78rpx;
+        height: 78rpx;
+        font-size: 28rpx;
+        border-radius: 0 20px 20px 0;
+        background: $fuint-theme;
+      }
+    }
   // 项目内容
   .order-item {
     margin: 10rpx auto 10rpx auto;

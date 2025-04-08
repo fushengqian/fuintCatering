@@ -24,7 +24,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,15 +112,7 @@ public class BackendBannerController extends BaseController {
         String imagePath = settingService.getUploadBasePath();
 
         // 展示位置列表
-        PositionEnum[] positionListEnum = PositionEnum.values();
-        List<ParamDto> positionList = new ArrayList<>();
-        for (PositionEnum enumItem : positionListEnum) {
-            ParamDto paramDto = new ParamDto();
-            paramDto.setKey(enumItem.getKey());
-            paramDto.setName(enumItem.getValue());
-            paramDto.setValue(enumItem.getKey());
-            positionList.add(paramDto);
-        }
+        List<ParamDto> positionList = PositionEnum.getPositionList();
 
         Map<String, Object> result = new HashMap<>();
         result.put("dataList", paginationResponse);

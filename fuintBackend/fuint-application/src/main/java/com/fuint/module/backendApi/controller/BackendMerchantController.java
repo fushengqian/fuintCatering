@@ -22,7 +22,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +51,7 @@ public class BackendMerchantController extends BaseController {
     /**
      * 分页查询商户列表
      *
-     * @param  request  HttpServletRequest对象
+     * @param request HttpServletRequest对象
      * @return 商户列表
      */
     @ApiOperation(value = "分页查询商户列表")
@@ -69,9 +68,6 @@ public class BackendMerchantController extends BaseController {
         String status = request.getParameter("status");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             merchantId = accountInfo.getMerchantId().toString();
         }
@@ -96,15 +92,7 @@ public class BackendMerchantController extends BaseController {
         String imagePath = settingService.getUploadBasePath();
 
         // 商户类型列表
-        MerchantTypeEnum[] typeListEnum = MerchantTypeEnum.values();
-        List<ParamDto> typeList = new ArrayList<>();
-        for (MerchantTypeEnum enumItem : typeListEnum) {
-             ParamDto paramDto = new ParamDto();
-             paramDto.setKey(enumItem.getKey());
-             paramDto.setName(enumItem.getValue());
-             paramDto.setValue(enumItem.getKey());
-             typeList.add(paramDto);
-        }
+        List<ParamDto> typeList = MerchantTypeEnum.getMerchantTypeList();
 
         Map<String, Object> result = new HashMap<>();
         result.put("dataList", paginationResponse);
@@ -156,9 +144,6 @@ public class BackendMerchantController extends BaseController {
         Integer merchantId = params.get("merchantId") == null ? 0 : Integer.parseInt(params.get("merchantId").toString());
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             merchantId = accountInfo.getMerchantId();
         }
@@ -182,9 +167,6 @@ public class BackendMerchantController extends BaseController {
     public ResponseObject saveHandler(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         Integer merchantId = StringUtil.isEmpty(params.get("id").toString()) ? Integer.parseInt("0") : Integer.parseInt(params.get("id").toString());
         String name = CommonUtil.replaceXSS(params.get("name").toString());
@@ -246,24 +228,21 @@ public class BackendMerchantController extends BaseController {
     /**
      * 获取商户详情
      *
-     * @param id
+     * @param merchantId
      * @return
      */
     @ApiOperation(value = "获取商户详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('merchant:index')")
-    public ResponseObject getMerchantInfo(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
+    public ResponseObject getMerchantInfo(HttpServletRequest request, @PathVariable("id") Integer merchantId) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            id = accountInfo.getMerchantId();
+            merchantId = accountInfo.getMerchantId();
         }
 
-        MtMerchant merchantInfo = merchantService.queryMerchantById(id);;
+        MtMerchant merchantInfo = merchantService.queryMerchantById(merchantId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("merchantInfo", merchantInfo);

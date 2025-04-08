@@ -25,7 +25,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,9 +81,6 @@ public class BackendConfirmLogController extends BaseController {
         String couponId = request.getParameter("couponId") == null ? "" : request.getParameter("couponId");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         PaginationRequest paginationRequest = new PaginationRequest();
         paginationRequest.setCurrentPage(page);
@@ -122,15 +118,7 @@ public class BackendConfirmLogController extends BaseController {
         PaginationResponse<ConfirmLogDto> paginationResponse = confirmLogService.queryConfirmLogListByPagination(paginationRequest);
 
         // 卡券类型列表
-        CouponTypeEnum[] typeListEnum = CouponTypeEnum.values();
-        List<ParamDto> typeList = new ArrayList<>();
-        for (CouponTypeEnum enumItem : typeListEnum) {
-            ParamDto paramDto = new ParamDto();
-            paramDto.setKey(enumItem.getKey());
-            paramDto.setName(enumItem.getValue());
-            paramDto.setValue(enumItem.getKey());
-            typeList.add(paramDto);
-        }
+        List<ParamDto> typeList = CouponTypeEnum.getCouponTypeList();
 
         Map<String, Object> result = new HashMap<>();
         result.put("paginationResponse", paginationResponse);
@@ -154,9 +142,6 @@ public class BackendConfirmLogController extends BaseController {
         String userCouponId = (request.getParameter("userCouponId") == null || StringUtil.isEmpty(request.getParameter("userCouponId"))) ? "0" : request.getParameter("userCouponId");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         couponService.rollbackUserCoupon(id, Integer.parseInt(userCouponId), accountInfo.getAccountName());
         return getSuccessResult(true);

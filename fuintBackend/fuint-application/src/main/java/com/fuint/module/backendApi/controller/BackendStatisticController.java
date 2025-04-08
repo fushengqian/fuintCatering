@@ -75,9 +75,6 @@ public class BackendStatisticController extends BaseController {
         Date endTime = StringUtil.isNotEmpty(endTimeStr) ? DateUtil.parseDate(endTimeStr) : null;
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         Integer merchantId = accountInfo.getMerchantId();
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
@@ -149,9 +146,6 @@ public class BackendStatisticController extends BaseController {
         Date endTime = StringUtil.isNotEmpty(endTimeStr) ? DateUtil.parseDate(endTimeStr) : null;
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         Integer merchantId = accountInfo.getMerchantId();
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
@@ -179,9 +173,6 @@ public class BackendStatisticController extends BaseController {
     public ResponseObject totalMember(HttpServletRequest request) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         Integer merchantId = accountInfo.getMerchantId();
         Integer storeId = accountInfo.getStoreId();
