@@ -7,7 +7,7 @@
             </view>
             <view class="item">
                 <image class="icon" src="/static/nav/send.png" @click="goUrl('express')"></image>
-                <view class="title">外卖到家</view>
+                <view class="title">配送到家</view>
             </view>
         </view>
     </view>
@@ -23,6 +23,7 @@ export default {
     },
     methods: {
         goUrl(orderMode) {
+            uni.setStorageSync('orderMode', orderMode);
             this.$navTo('pages/category/index', { orderMode });
         }
     }

@@ -75,6 +75,11 @@ export default {
       animationData3: {}
     };
   },
+  watch: {
+      defaultSwitch(value) {
+        this.changeSwitch(value);
+      }
+  },
   created () {
     this.initAnimation = uni.createAnimation({
       duration: 500,

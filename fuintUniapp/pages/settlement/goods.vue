@@ -1,7 +1,7 @@
 <template>
   <view class="container p-bottom">
     <view class="flow-mode">
-        <selectSwitch :switchList="orderModeList" checked_bj_color="#113a28" @change="switchMode"/> 
+        <selectSwitch :switchList="orderModeList" :defaultSwitch="orderMode" checked_bj_color="#113a28" @change="switchMode"/> 
     </view>
     <!-- 快递配送：配送地址 -->
     <view @click="onSelectAddress" v-if="orderMode == false" class="flow-delivery">
@@ -348,6 +348,9 @@
         app.getDefaultAddress();
         // 获取店铺信息
         app.getStoreInfo();
+        if (uni.getStorageSync('orderMode')) {
+            app.orderMode = (uni.getStorageSync('orderMode') == 'express') ? false : true;
+        }
     },
 
     methods: {
@@ -446,6 +449,7 @@
       switchMode(mode) {
          const app = this;
          app.orderMode = mode;
+         uni.setStorageSync('orderMode', mode);
          if (mode && !app.storeInfo) {
              app.getStoreInfo();
          }
