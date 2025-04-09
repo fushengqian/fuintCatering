@@ -2060,17 +2060,19 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 if (storeId <= 0 && cart.getStoreId() != null) {
                     storeId = cart.getStoreId();
                 }
+
                 // 购物车商品信息
                 MtGoods mtGoodsInfo = goodsService.queryGoodsById(cart.getGoodsId());
+                if (mtGoodsInfo == null || !mtGoodsInfo.getStatus().equals(StatusEnum.ENABLED.getKey())) {
+                    continue;
+                }
+
                 // 取对应sku的价格
                 if (cart.getSkuId() != null && cart.getSkuId() > 0) {
                     MtGoodsSku mtGoodsSku = mtGoodsSkuMapper.selectById(cart.getSkuId());
                     if (mtGoodsSku != null && mtGoodsSku.getPrice().compareTo(new BigDecimal("0")) > 0) {
                         mtGoodsInfo.setPrice(mtGoodsSku.getPrice());
                     }
-                }
-                if (mtGoodsInfo == null || !mtGoodsInfo.getStatus().equals(StatusEnum.ENABLED.getKey())) {
-                    continue;
                 }
 
                 // 会员支付折扣

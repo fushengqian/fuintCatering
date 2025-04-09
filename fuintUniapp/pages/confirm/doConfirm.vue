@@ -254,6 +254,7 @@
         border-radius: 10rpx;
         width: 98%;
         display: inline-flex;
+        background: #fff;
     }
     .coupon-timer {
           border-radius: 10rpx;

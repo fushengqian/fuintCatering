@@ -4,7 +4,7 @@
       <view class="search-input">
         <view class="search-input-wrapper">
           <view class="right">
-            <input v-model="code" class="input" placeholder="请输入订单核销码..." type="text"></input>
+            <input v-model="code" class="input" placeholder="请输入订单核销码...(在会员端订单详情查看)" type="text"></input>
           </view>
           <view class="scan u-icon-wrap">
              <view class="icon" @click="doScan">
@@ -63,6 +63,7 @@
       doSubmit() {
         const app = this;
         if (!app.code || !app.orderId) {
+            app.$error("请输入核销码！");
             return false;
         }
         app.disabled = true;
@@ -91,7 +92,7 @@
 
   .search-wrapper {
     display: flex;
-    height: 100rpx;
+    height: 110rpx;
     margin-top: 80rpx;
     padding: 0 5rpx;
   }
@@ -100,18 +101,20 @@
   .search-input {
     width: 100%;
     background: #fff;
-    border-radius: 10rpx 0 0 10rpx;
+    border-radius: 10rpx;
     box-sizing: border-box;
     overflow: hidden;
+    border: solid 1rpx #ccc;
     .search-input-wrapper {
       display: flex;
       .right {
         flex: 1;
         input {
           font-size: 30rpx;
-          height: 100rpx;
-          line-height: 100rpx;
+          height: 110rpx;
+          line-height: 110rpx;
           padding-left: 30rpx;
+          background: #fff;
           .input-placeholder {
             color: #aba9a9;
           }
