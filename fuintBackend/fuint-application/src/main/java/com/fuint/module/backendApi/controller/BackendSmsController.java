@@ -66,9 +66,6 @@ public class BackendSmsController extends BaseController {
         String content = request.getParameter("content") == null ? "" : request.getParameter("content");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         PaginationRequest paginationRequest = new PaginationRequest();
         paginationRequest.setCurrentPage(page);
@@ -80,6 +77,12 @@ public class BackendSmsController extends BaseController {
         }
         if (StringUtil.isNotEmpty(content)) {
             searchParams.put("content", content);
+        }
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+            searchParams.put("merchantId", accountInfo.getMerchantId());
+        }
+        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
+            searchParams.put("storeId", accountInfo.getStoreId());
         }
 
         paginationRequest.setSearchParams(searchParams);
