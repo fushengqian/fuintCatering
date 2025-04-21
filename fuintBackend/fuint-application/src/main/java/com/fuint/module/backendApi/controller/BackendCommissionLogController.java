@@ -159,11 +159,12 @@ public class BackendCommissionLogController extends BaseController {
     public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         CommissionLogDto commissionLog = commissionLogService.queryCommissionLogById(id);
+        if (accountInfo.getMerchantId() > 0 && !commissionLog.getMerchantId().equals(accountInfo.getMerchantId())) {
+            return getFailureResult(1004);
+        }
+
         Map<String, Object> result = new HashMap<>();
         result.put("commissionLog", commissionLog);
 
@@ -183,9 +184,6 @@ public class BackendCommissionLogController extends BaseController {
         String token = request.getHeader("Access-Token");
 
         AccountInfo accountDto = TokenUtil.getAccountInfoByToken(token);
-        if (accountDto == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         commissionLogRequest.setOperator(accountDto.getAccountName());
         commissionLogService.updateCommissionLog(commissionLogRequest);
@@ -206,8 +204,10 @@ public class BackendCommissionLogController extends BaseController {
     public ResponseObject delete(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
+
+        CommissionLogDto commissionLog = commissionLogService.queryCommissionLogById(id);
+        if (accountInfo.getMerchantId() > 0 && !commissionLog.getMerchantId().equals(accountInfo.getMerchantId())) {
+            return getFailureResult(1004);
         }
 
         CommissionLogRequest commissionLogRequest = new CommissionLogRequest();
@@ -231,9 +231,6 @@ public class BackendCommissionLogController extends BaseController {
         String token = request.getHeader("Access-Token");
 
         AccountInfo accountDto = TokenUtil.getAccountInfoByToken(token);
-        if (accountDto == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         commissionSettleRequest.setOperator(accountDto.getAccountName());
         if (accountDto.getMerchantId() != null && accountDto.getMerchantId() > 0) {

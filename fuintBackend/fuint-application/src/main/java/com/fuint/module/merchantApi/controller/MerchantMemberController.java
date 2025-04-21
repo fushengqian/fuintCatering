@@ -153,9 +153,6 @@ public class MerchantMemberController extends BaseController {
     public ResponseObject save(HttpServletRequest request, @RequestBody MemberInfoParam memberInfoParam) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         UserInfo userInfo = TokenUtil.getUserInfoByToken(token);
-        if (userInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         MtStaff staffInfo = null;
         MtUser myUserInfo = memberService.queryMemberById(userInfo.getId());
@@ -179,7 +176,7 @@ public class MerchantMemberController extends BaseController {
         mtUser.setUserNo(memberInfoParam.getUserNo());
         MtUser memberInfo;
         if (memberInfoParam.getId() == null) {
-            memberInfo = memberService.addMember(mtUser, null);
+            memberInfo = memberService.addMember(mtUser);
         } else {
             memberInfo = memberService.updateMember(mtUser, false);
         }

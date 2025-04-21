@@ -420,9 +420,6 @@ public class BackendOrderController extends BaseController {
         String payOffLine = param.get("payOffLine") != null ? param.get("payOffLine").toString() : "N";
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         String operator = accountInfo.getAccountName();
 

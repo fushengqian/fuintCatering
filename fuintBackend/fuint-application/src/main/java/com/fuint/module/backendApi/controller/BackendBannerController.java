@@ -215,9 +215,6 @@ public class BackendBannerController extends BaseController {
     public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-        if (accountInfo == null) {
-            return getFailureResult(1001, "请先登录");
-        }
 
         MtBanner bannerInfo = bannerService.queryBannerById(id);
         String imagePath = settingService.getUploadBasePath();
