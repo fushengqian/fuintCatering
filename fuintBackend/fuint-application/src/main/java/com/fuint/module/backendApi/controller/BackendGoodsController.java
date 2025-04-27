@@ -79,10 +79,10 @@ public class BackendGoodsController extends BaseController {
      * @return
      */
     @ApiOperation(value = "分页查询商品列表")
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:index')")
-    public ResponseObject list(HttpServletRequest request, @RequestBody GoodsListParam param) throws BusinessCheckException, IllegalAccessException {
+    public ResponseObject list(HttpServletRequest request, GoodsListParam param) throws BusinessCheckException, IllegalAccessException {
         String token = request.getHeader("Access-Token");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);

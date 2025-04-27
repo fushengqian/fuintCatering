@@ -91,7 +91,7 @@ public class ArticleServiceImpl extends ServiceImpl<MtArticleMapper, MtArticle> 
                     .or()
                     .eq(MtArticle::getStoreId, storeId));
         }
-        lambdaQueryWrapper.orderByAsc(MtArticle::getSort);
+        lambdaQueryWrapper.orderByAsc(MtArticle::getSort, MtArticle::getId);
         List<MtArticle> articleList = mtArticleMapper.selectList(lambdaQueryWrapper);
         List<ArticleDto> dataList = new ArrayList<>();
 
