@@ -13,7 +13,8 @@ public enum SettingTypeEnum {
     ORDER("order", "交易配置"),
     SUB_MESSAGE("sub_message", "订阅消息"),
     PRINTER("printer", "打印设置"),
-    SMS_CONFIG("sms_config", "短信配置");
+    SMS_CONFIG("sms_config", "短信配置"),
+    KUAIDI100("kuaidi100", "快递100配置");
 
     private String key;
 
@@ -53,7 +54,7 @@ public enum SettingTypeEnum {
     // 普通方法，通过Value获取key
     public static String getKey(String v) {
         for (SettingTypeEnum c : SettingTypeEnum.values()) {
-            if (c.getValue() == v) {
+            if (c.getValue().equals(v)) {
                 return c.getKey();
             }
         }
