@@ -6,11 +6,11 @@ import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.common.Constants;
 import com.fuint.common.enums.StatusEnum;
-import com.fuint.common.service.${tableClass}Service;
+import com.fuint.common.service.TableAreaService;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.repository.model.${className};
+import com.fuint.repository.model.MtTableArea;
 import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,32 +22,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * ${moduleName}管理类controller
+ * 桌码区域管理类controller
  *
- * Created by ${author}
+ * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-${moduleName}相关接口")
+@Api(tags="管理端-桌码区域相关接口")
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = "/backendApi/${serviceName}")
-public class Backend${tableClass}Controller extends BaseController {
+@RequestMapping(value = "/backendApi/tableArea")
+public class BackendTableAreaController extends BaseController {
 
     /**
-     * ${moduleName}服务接口
+     * 桌码区域服务接口
      */
-    private ${tableClass}Service ${serviceName}Service;
+    private TableAreaService tableAreaService;
 
     /**
-     * ${moduleName}列表查询
+     * 桌码区域列表查询
      *
      * @param  request HttpServletRequest对象
-     * @return ${moduleName}列表
+     * @return 桌码区域列表
      */
-    @ApiOperation(value = "${moduleName}列表查询")
+    @ApiOperation(value = "桌码区域列表查询")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('${serviceName}:list')")
+    @PreAuthorize("@pms.hasPermission('tableArea:list')")
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
@@ -80,7 +80,7 @@ public class Backend${tableClass}Controller extends BaseController {
             params.put("storeId", storeId);
         }
         paginationRequest.setSearchParams(params);
-        PaginationResponse<${className}> paginationResponse = ${serviceName}Service.query${tableClass}ListByPagination(paginationRequest);
+        PaginationResponse<MtTableArea> paginationResponse = tableAreaService.queryTableAreaListByPagination(paginationRequest);
 
         Map<String, Object> paramsStore = new HashMap<>();
         paramsStore.put("status", StatusEnum.ENABLED.getKey());
@@ -98,14 +98,14 @@ public class Backend${tableClass}Controller extends BaseController {
     }
 
     /**
-     * 更新${moduleName}状态
+     * 更新桌码区域状态
      *
      * @return
      */
-    @ApiOperation(value = "更新${moduleName}状态")
+    @ApiOperation(value = "更新桌码区域状态")
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('${serviceName}:edit')")
+    @PreAuthorize("@pms.hasPermission('tableArea:edit')")
     public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
@@ -113,29 +113,29 @@ public class Backend${tableClass}Controller extends BaseController {
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
 
-        ${className} ${tablePrefix}${tableClass} = ${serviceName}Service.query${tableClass}ById(id);
-        if (${tablePrefix}${tableClass} == null) {
+        MtTableArea mtTableArea = tableAreaService.queryTableAreaById(id);
+        if (mtTableArea == null) {
             return getFailureResult(201);
         }
 
         String operator = accountInfo.getAccountName();
-        ${tablePrefix}${tableClass}.setOperator(operator);
-        ${tablePrefix}${tableClass}.setStatus(status);
-        ${serviceName}Service.update${tableClass}(${tablePrefix}${tableClass});
+        mtTableArea.setOperator(operator);
+        mtTableArea.setStatus(status);
+        tableAreaService.updateTableArea(mtTableArea);
 
         return getSuccessResult(true);
     }
 
     /**
-     * 保存${moduleName}
+     * 保存桌码区域
      *
      * @param request HttpServletRequest对象
      * @return
      */
-    @ApiOperation(value = "保存${moduleName}")
+    @ApiOperation(value = "保存桌码区域")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('${serviceName}:add')")
+    @PreAuthorize("@pms.hasPermission('tableArea:add')")
     public ResponseObject saveHandler(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         String id = params.get("id") == null ? "" : params.get("id").toString();
@@ -144,36 +144,36 @@ public class Backend${tableClass}Controller extends BaseController {
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
 
-        ${className} info = new ${className}();
+        MtTableArea info = new MtTableArea();
         info.setOperator(accountInfo.getAccountName());
         info.setStatus(status);
         info.setStoreId(Integer.parseInt(storeId));
         info.setMerchantId(accountInfo.getMerchantId());
         if (StringUtil.isNotEmpty(id)) {
             info.setId(Integer.parseInt(id));
-            ${serviceName}Service.update${tableClass}(info);
+            tableAreaService.updateTableArea(info);
         } else {
-            ${serviceName}Service.add${tableClass}(info);
+            tableAreaService.addTableArea(info);
         }
 
         return getSuccessResult(true);
     }
 
     /**
-     * 获取${moduleName}详情
+     * 获取桌码区域详情
      *
      * @param id
      * @return
      */
-    @ApiOperation(value = "获取${moduleName}详情")
+    @ApiOperation(value = "获取桌码区域详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('${serviceName}:list')")
+    @PreAuthorize("@pms.hasPermission('tableArea:list')")
     public ResponseObject info(@PathVariable("id") Integer id) throws BusinessCheckException {
-        ${className} ${serviceName}Info = ${serviceName}Service.query${tableClass}ById(id);
+        MtTableArea tableAreaInfo = tableAreaService.queryTableAreaById(id);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("${serviceName}Info", ${serviceName}Info);
+        result.put("tableAreaInfo", tableAreaInfo);
 
         return getSuccessResult(result);
     }

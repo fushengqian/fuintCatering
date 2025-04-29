@@ -11,16 +11,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 桌码实体
+ * 桌码区域实体
  *
  * @Created by FSQ
  * CopyRight https://www.fuint.cn
  */
 @Getter
 @Setter
-@TableName("mt_table")
-@ApiModel(value = "table表对象", description = "table表对象")
-public class MtTable implements Serializable {
+@TableName("mt_table_area")
+@ApiModel(value = "table_area表对象", description = "table_area表对象")
+public class MtTableArea implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,20 +28,14 @@ public class MtTable implements Serializable {
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
 
-    @ApiModelProperty("桌子编码")
-    private String code;
-
-    @ApiModelProperty("区域ID")
-    private Integer areaId;
+    @ApiModelProperty("区域名称")
+    private String name;
 
     @ApiModelProperty("所属商户ID")
     private Integer merchantId;
 
     @ApiModelProperty("所属店铺ID")
     private Integer storeId;
-
-    @ApiModelProperty("人数上限")
-    private Integer maxPeople;
 
     @ApiModelProperty("备注信息")
     private String description;

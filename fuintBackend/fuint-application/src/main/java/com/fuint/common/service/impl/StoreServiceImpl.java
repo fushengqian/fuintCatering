@@ -359,9 +359,19 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
         }
 
         lambdaQueryWrapper.orderByAsc(MtStore::getStatus).orderByDesc(MtStore::getIsDefault);
-        List<MtStore> dataList = mtStoreMapper.selectList(lambdaQueryWrapper);
+        return mtStoreMapper.selectList(lambdaQueryWrapper);
+    }
 
-        return dataList;
+    /**
+     * 获取可用店铺列表
+     *
+     * @param merchantId 商户ID
+     * @param storeId 店铺ID
+     * @return
+     * */
+    @Override
+    public List<MtStore> getActiveStoreList(Integer merchantId, Integer storeId) {
+        return mtStoreMapper.getActiveStoreList(merchantId, storeId);
     }
 
     /**
