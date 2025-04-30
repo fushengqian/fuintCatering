@@ -1,7 +1,7 @@
 package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.fuint.common.dto.TableOverviewDto;
+import com.fuint.common.dto.HangUpDto;
 import com.fuint.common.param.TableParam;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
@@ -45,6 +45,16 @@ public interface TableService extends IService<MtTable> {
     MtTable queryTableById(Integer id) throws BusinessCheckException;
 
     /**
+     * 根据ID获取桌码信息
+     *
+     * @param storeId 店铺ID
+     * @param code 桌码
+     * @throws BusinessCheckException
+     * @return
+     */
+    MtTable queryTableByCode(Integer storeId, String code) throws BusinessCheckException;
+
+    /**
      * 根据ID删除桌码
      *
      * @param  id ID
@@ -72,12 +82,12 @@ public interface TableService extends IService<MtTable> {
     List<MtTable> queryTableListByParams(Map<String, Object> params) throws BusinessCheckException;
 
     /**
-     * 获取桌台概览
+     * 获取桌台列表
      *
-     * @param tableParam 请求参数
+     @ param tableParam 请求参数
      * @throws BusinessCheckException
      * @return
      * */
-    List<TableOverviewDto> getTableOverView(TableParam tableParam) throws BusinessCheckException;
+    List<HangUpDto> getActiveTableList(TableParam tableParam) throws BusinessCheckException;
 
 }

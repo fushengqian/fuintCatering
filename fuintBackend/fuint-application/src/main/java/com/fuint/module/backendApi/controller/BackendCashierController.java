@@ -2,12 +2,10 @@ package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.Constants;
 import com.fuint.common.dto.*;
-import com.fuint.common.enums.OrderModeEnum;
-import com.fuint.common.enums.PlatformTypeEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
+import com.fuint.common.param.TableParam;
 import com.fuint.common.service.*;
-import com.fuint.common.util.DateUtil;
 import com.fuint.common.util.PhoneFormatCheckUtils;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -23,7 +21,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,11 +54,6 @@ public class BackendCashierController extends BaseController {
     private CartService cartService;
 
     /**
-     * 订单服务接口
-     * */
-    private OrderService orderService;
-
-    /**
      * 商品服务接口
      */
     private GoodsService goodsService;
@@ -85,6 +77,11 @@ public class BackendCashierController extends BaseController {
      * 商户接口
      */
     private MerchantService merchantService;
+
+    /**
+     * 桌码服务接口
+     */
+    private TableService tableService;
 
     /**
      * 收银台初始化
@@ -375,40 +372,18 @@ public class BackendCashierController extends BaseController {
     @RequestMapping(value = "/getHangUpList", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject getHangUpList(HttpServletRequest request) throws BusinessCheckException {
+    public ResponseObject getHangUpList(HttpServletRequest request, TableParam tableParam) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
-
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
-        List<HangUpDto> dataList = new ArrayList<>();
-
-        for (int i = 0; i < 20; i++) {
-             String hangNo = "#0" + (i+1);
-             Map<String, Object> param = new HashMap<>();
-             param.put("hangNo", hangNo);
-             param.put("merchantId", accountInfo.getMerchantId());
-             param.put("storeId", accountInfo.getStoreId());
-             List<MtCart> cartList = cartService.queryCartListByParams(param);
-             HangUpDto dto = new HangUpDto();
-             dto.setIsEmpty(true);
-             if (cartList.size() > 0) {
-                 Integer userId = cartList.get(0).getUserId();
-                 String isVisitor = cartList.get(0).getIsVisitor();
-                 Map<String, Object> cartInfo = orderService.calculateCartGoods(accountInfo.getMerchantId(), userId, cartList, 0, false, PlatformTypeEnum.PC.getCode(), OrderModeEnum.ONESELF.getKey());
-                 dto.setNum(Integer.parseInt(cartInfo.get("totalNum").toString()));
-                 dto.setAmount(new BigDecimal(cartInfo.get("totalPrice").toString()));
-                 if (isVisitor.equals(YesOrNoEnum.NO.getKey())) {
-                     MtUser userInfo = memberService.queryMemberById(userId);
-                     dto.setMemberInfo(userInfo);
-                 }
-                 String dateTime = DateUtil.formatDate(cartList.get(0).getUpdateTime(), "yyyy-MM-dd HH:mm:ss");
-                 dto.setDateTime(dateTime);
-                 dto.setIsEmpty(false);
-             }
-             dto.setHangNo(hangNo);
-             dataList.add(dto);
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+            tableParam.setMerchantId(accountInfo.getMerchantId());
+        }
+        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
+            tableParam.setStoreId(accountInfo.getStoreId());
         }
 
-        return getSuccessResult(dataList);
+        List<HangUpDto> tableList = tableService.getActiveTableList(tableParam);
+
+        return getSuccessResult(tableList);
     }
 }

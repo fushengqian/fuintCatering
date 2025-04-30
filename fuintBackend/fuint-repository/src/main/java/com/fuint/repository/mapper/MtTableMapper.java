@@ -2,6 +2,9 @@ package com.fuint.repository.mapper;
 
 import com.fuint.repository.model.MtTable;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 桌码 Mapper 接口
@@ -10,5 +13,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * CopyRight https://www.fuint.cn
  */
 public interface MtTableMapper extends BaseMapper<MtTable> {
+
+    List<MtTable> getActiveTableList(@Param("merchantId") Integer merchantId, @Param("storeId") Integer storeId);
+
+    MtTable queryTableByTableCode(@Param("storeId") Integer storeId, @Param("code") String code);
 
 }

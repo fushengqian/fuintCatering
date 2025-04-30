@@ -3,16 +3,25 @@ package com.fuint.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fuint.common.dto.TableOverviewDto;
+import com.fuint.common.dto.HangUpDto;
+import com.fuint.common.enums.OrderModeEnum;
+import com.fuint.common.enums.PlatformTypeEnum;
+import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.param.TableParam;
+import com.fuint.common.service.CartService;
+import com.fuint.common.service.MemberService;
+import com.fuint.common.service.OrderService;
+import com.fuint.common.util.DateUtil;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
+import com.fuint.repository.model.MtCart;
 import com.fuint.repository.model.MtTable;
 import com.fuint.common.service.TableService;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.repository.mapper.MtTableMapper;
+import com.fuint.repository.model.MtUser;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
@@ -23,6 +32,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -38,6 +49,21 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
     private static final Logger logger = LoggerFactory.getLogger(TableServiceImpl.class);
 
     private MtTableMapper mtTableMapper;
+
+    /**
+     * 购物车服务接口
+     * */
+    private CartService cartService;
+
+    /**
+     * 订单服务接口
+     * */
+    private OrderService orderService;
+
+    /**
+     * 会员服务接口
+     */
+    private MemberService memberService;
 
     /**
      * 分页查询数据列表
@@ -112,6 +138,18 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
     @Override
     public MtTable queryTableById(Integer id) {
         return mtTableMapper.selectById(id);
+    }
+
+    /**
+     * 根据桌码获取桌码信息
+     *
+     * @param storeId 店铺ID
+     * @param code 桌码
+     * @throws BusinessCheckException
+     * @return
+     */
+    public MtTable queryTableByCode(Integer storeId, String code) {
+        return mtTableMapper.queryTableByTableCode(storeId, code);
     }
 
     /**
@@ -204,23 +242,48 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
         }
 
         lambdaQueryWrapper.orderByAsc(MtTable::getSort);
-        List<MtTable> dataList = mtTableMapper.selectList(lambdaQueryWrapper);
-        return dataList;
+        return mtTableMapper.selectList(lambdaQueryWrapper);
     }
 
     /**
-     * 获取桌台概览
+     * 获取桌台列表
      *
-     * @param  tableParam 请求参数
+     * @param tableParam 请求参数
      * @throws BusinessCheckException
      * @return
-     * */
+     */
     @Override
-    public List<TableOverviewDto> getTableOverView(TableParam tableParam) throws BusinessCheckException {
-        if (tableParam.getStoreId() == null || tableParam.getStoreId() <= 0) {
-            throw new BusinessCheckException("店铺ID异常");
+    public List<HangUpDto> getActiveTableList(TableParam tableParam) throws BusinessCheckException {
+        List<MtTable> tableList = mtTableMapper.getActiveTableList(tableParam.getMerchantId(), tableParam.getStoreId());
+
+        List<HangUpDto> dataList = new ArrayList<>();
+        for (MtTable mtTable : tableList) {
+            String hangNo = mtTable.getCode();
+            Map<String, Object> param = new HashMap<>();
+            param.put("hangNo", hangNo);
+            param.put("merchantId", tableParam.getMerchantId());
+            param.put("storeId", tableParam.getStoreId());
+            List<MtCart> cartList = cartService.queryCartListByParams(param);
+            HangUpDto dto = new HangUpDto();
+            dto.setIsEmpty(true);
+            if (cartList.size() > 0) {
+                Integer userId = cartList.get(0).getUserId();
+                String isVisitor = cartList.get(0).getIsVisitor();
+                Map<String, Object> cartInfo = orderService.calculateCartGoods(tableParam.getMerchantId(), userId, cartList, 0, false, PlatformTypeEnum.PC.getCode(), OrderModeEnum.ONESELF.getKey());
+                dto.setNum(Integer.parseInt(cartInfo.get("totalNum").toString()));
+                dto.setAmount(new BigDecimal(cartInfo.get("totalPrice").toString()));
+                if (isVisitor.equals(YesOrNoEnum.NO.getKey())) {
+                    MtUser userInfo = memberService.queryMemberById(userId);
+                    dto.setMemberInfo(userInfo);
+                }
+                String dateTime = DateUtil.formatDate(cartList.get(0).getUpdateTime(), "yyyy-MM-dd HH:mm:ss");
+                dto.setDateTime(dateTime);
+                dto.setIsEmpty(false);
+            }
+            dto.setHangNo(hangNo);
+            dataList.add(dto);
         }
-        List<TableOverviewDto> dataList = new ArrayList<>();
+
         return dataList;
     }
 }

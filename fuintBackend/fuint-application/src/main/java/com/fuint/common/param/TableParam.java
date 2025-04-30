@@ -13,8 +13,14 @@ import java.io.Serializable;
 @Data
 public class TableParam implements Serializable {
 
+    @ApiModelProperty(value="商户ID", name="merchantId")
+    private Integer merchantId;
+
     @ApiModelProperty(value="店铺ID", name="storeId")
     private Integer storeId;
+
+    @ApiModelProperty(value="区域ID", name="areaId")
+    private Integer areaId;
 
     @ApiModelProperty(value="会员手机号", name="mobile")
     private String mobile;

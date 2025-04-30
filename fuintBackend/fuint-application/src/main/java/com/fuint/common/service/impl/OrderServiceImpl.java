@@ -213,6 +213,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         List<String> payType = orderListParam.getPayType();
 
         LambdaQueryWrapper<MtOrder> lambdaQueryWrapper = Wrappers.lambdaQuery();
+        lambdaQueryWrapper.orderByDesc(MtOrder::getId);
         lambdaQueryWrapper.ne(MtOrder::getStatus, OrderStatusEnum.DELETED.getKey());
         lambdaQueryWrapper.ne(MtOrder::getStatus, OrderStatusEnum.DELETED.getKey());
 
@@ -320,7 +321,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             lambdaQueryWrapper.eq(MtOrder::getPayStatus, PayStatusEnum.SUCCESS.getKey());
             lambdaQueryWrapper.eq(MtOrder::getType, OrderTypeEnum.GOODS.getKey());
         }
-        lambdaQueryWrapper.orderByDesc(MtOrder::getId);
         Page<MtOrder> pageHelper = PageHelper.startPage(pageNumber, pageSize);
         List<MtOrder> orderList = mtOrderMapper.selectList(lambdaQueryWrapper);
 
@@ -712,34 +712,12 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         Integer buyNum = param.getBuyNum() == null ? 1 : param.getBuyNum(); // 立即购买商品数量
         String orderMode = StringUtil.isEmpty(param.getOrderMode()) ? OrderModeEnum.ONESELF.getKey() : param.getOrderMode(); // 订单模式(配送or自取)
         Integer orderId = param.getOrderId() == null ? null : param.getOrderId(); // 订单ID
+        String tableCode = param.getTableCode() == null ? "" : param.getTableCode();
         Integer merchantId = merchantService.getMerchantId(merchantNo);
         UserInfo loginInfo = TokenUtil.getUserInfoByToken(token);
         MtUser userInfo = null;
         if (loginInfo != null) {
             userInfo = memberService.queryMemberById(loginInfo.getId());
-        }
-
-        if (tableId > 0) {
-            MtTable mtTable = tableService.queryTableById(tableId);
-            if (mtTable != null && mtTable.getStoreId() > 0) {
-                storeId = mtTable.getStoreId();
-            }
-            MtOrder tableOrder = mtOrderMapper.findByTableId(tableId);
-            if (tableOrder != null) {
-                myOrderId = tableOrder.getId();
-            }
-        }
-
-        MtOrder myOrder = null;
-        BigDecimal myAmount = new BigDecimal(0);
-        BigDecimal myPayAmount = new BigDecimal(0);
-        BigDecimal myPointAmount = new BigDecimal(0);
-        if (myOrderId > 0) {
-            orderId = myOrderId;
-            myOrder = getOrderInfo(orderId);
-            myAmount = myOrder.getAmount();
-            myPayAmount = myOrder.getPayAmount();
-            myPointAmount = myOrder.getPointAmount();
         }
 
         // 后台管理员或店员操作
@@ -750,11 +728,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         if (accountInfo != null) {
             operator = accountInfo.getAccountName();
             staffId = accountInfo.getStaffId() == null ? 0 : accountInfo.getStaffId();
-
             if (param.getStaffId() != null && param.getStaffId() > 0) {
                 staffId = param.getStaffId();
             }
-
             storeId = accountInfo.getStoreId();
             merchantId = accountInfo.getMerchantId();
             if (storeId <= 0) {
@@ -784,6 +760,36 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             if (mtStaff != null) {
                 operator = mtStaff.getRealName();
             }
+        }
+
+        if (tableId > 0 || StringUtil.isNotEmpty(tableCode)) {
+            MtTable mtTable = null;
+            if (tableId > 0) {
+                mtTable = tableService.queryTableById(tableId);
+            } else if (storeId != null && storeId > 0 && StringUtil.isNotEmpty(tableCode)) {
+                mtTable = tableService.queryTableByCode(storeId, tableCode);
+            }
+            if (mtTable != null) {
+                tableId = mtTable.getId();
+                if (mtTable.getStoreId() > 0) {
+                    storeId = mtTable.getStoreId();
+                }
+            }
+            MtOrder tableOrder = mtOrderMapper.findByTableId(tableId);
+            if (tableOrder != null) {
+                myOrderId = tableOrder.getId();
+            }
+        }
+        MtOrder myOrder = null;
+        BigDecimal myAmount = new BigDecimal(0);
+        BigDecimal myPayAmount = new BigDecimal(0);
+        BigDecimal myPointAmount = new BigDecimal(0);
+        if (myOrderId > 0) {
+            orderId = myOrderId;
+            myOrder = getOrderInfo(orderId);
+            myAmount = myOrder.getAmount();
+            myPayAmount = myOrder.getPayAmount();
+            myPointAmount = myOrder.getPointAmount();
         }
 
         MtSetting config = settingService.querySettingByName(merchantId, storeId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.IS_CLOSE.getKey());

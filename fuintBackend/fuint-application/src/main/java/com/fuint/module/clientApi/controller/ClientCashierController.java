@@ -1,11 +1,8 @@
 package com.fuint.module.clientApi.controller;
 
-import com.fuint.common.dto.TableOverviewDto;
 import com.fuint.common.param.MemberInfoParam;
-import com.fuint.common.param.TableParam;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.MerchantService;
-import com.fuint.common.service.TableService;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
@@ -17,7 +14,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,11 +39,6 @@ public class ClientCashierController extends BaseController {
     private MerchantService merchantService;
 
     /**
-     * 桌码服务接口
-     */
-    private TableService tableService;
-
-    /**
      * 获取会员信息
      */
     @ApiOperation(value = "查询会员信息")
@@ -67,20 +58,6 @@ public class ClientCashierController extends BaseController {
         outParams.put("memberInfo", userInfo);
 
         return getSuccessResult(outParams);
-    }
-
-    /**
-     * 获取桌台概览
-     * */
-    @ApiOperation(value = "获取桌台概览")
-    @RequestMapping(value = "/getTables", method = RequestMethod.POST)
-    @CrossOrigin
-    public ResponseObject getTables(HttpServletRequest request,  @RequestBody TableParam tableParam) throws BusinessCheckException {
-        Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
-        tableParam.setStoreId(storeId);
-
-        List<TableOverviewDto> result = tableService.getTableOverView(tableParam);
-        return getSuccessResult(result);
     }
 
 }
