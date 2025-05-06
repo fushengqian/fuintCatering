@@ -120,6 +120,11 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
         mtTable.setStatus(StatusEnum.ENABLED.getKey());
         mtTable.setUpdateTime(new Date());
         mtTable.setCreateTime(new Date());
+        MtTable tableInfo = queryTableByCode(mtTable.getStoreId(), mtTable.getCode());
+        if (tableInfo != null ) {
+            throw new BusinessCheckException("桌码已经存在，新增失败");
+        }
+
         Integer id = mtTableMapper.insert(mtTable);
         if (id > 0) {
             return mtTable;
