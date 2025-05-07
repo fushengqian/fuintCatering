@@ -49,7 +49,7 @@ public class OrderDto implements Serializable {
     private Integer skuId;
 
     @ApiModelProperty("购买数量")
-    private Integer buyNum;
+    private Double buyNum;
 
     @ApiModelProperty("会员ID")
     private Integer userId;

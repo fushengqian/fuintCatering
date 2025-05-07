@@ -25,4 +25,6 @@ public interface MtStoreMapper extends BaseMapper<MtStore> {
 
     List<MtStore> getActiveStoreList(@Param("merchantId") Integer merchantId, @Param("storeId") Integer storeId);
 
+    void deleteStoreByMerchant(@Param("merchantId") Integer merchantId);
+
 }

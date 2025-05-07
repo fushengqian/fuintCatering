@@ -37,4 +37,8 @@
             AND t.STORE_ID = #{storeId}
         </if>
     </select>
+
+    <update id="deleteStoreByMerchant">
+        update mt_store set STATUS = 'D' where MERCHANT_ID = #{merchantId}
+    </update>
 </mapper>

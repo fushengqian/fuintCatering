@@ -65,7 +65,7 @@ public class GoodsDto implements Serializable {
     private BigDecimal linePrice;
 
     @ApiModelProperty("库存")
-    private Integer stock;
+    private Double stock;
 
     @ApiModelProperty("数量")
     private Integer num;
@@ -80,7 +80,7 @@ public class GoodsDto implements Serializable {
     private BigDecimal weight;
 
     @ApiModelProperty("初始销量")
-    private Integer initSale;
+    private Double initSale;
 
     @ApiModelProperty("商品卖点")
     private String salePoint;

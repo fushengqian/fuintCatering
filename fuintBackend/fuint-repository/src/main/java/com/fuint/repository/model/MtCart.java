@@ -53,7 +53,7 @@ public class MtCart implements Serializable {
     private Integer goodsId;
 
     @ApiModelProperty("数量")
-    private Integer num;
+    private Double num;
 
     @ApiModelProperty("创建时间")
     private Date createTime;

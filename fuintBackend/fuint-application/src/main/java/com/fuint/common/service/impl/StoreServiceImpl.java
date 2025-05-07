@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ import java.util.*;
  * CopyRight https://www.fuint.cn
  */
 @Service
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_= {@Lazy})
 public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implements StoreService {
 
     private static final Logger logger = LoggerFactory.getLogger(StoreServiceImpl.class);
@@ -437,5 +438,19 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
            }
        }
        return String.join(",", storeNames);
+    }
+
+    /**
+     * 根据商户ID删除店铺信息
+     *
+     * @param merchantId 商户ID
+     * @return
+     * */
+    @Override
+    public void deleteStoreByMerchant(Integer merchantId) {
+        if (merchantId == null || merchantId <= 0) {
+            return;
+        }
+        mtStoreMapper.deleteStoreByMerchant(merchantId);
     }
 }

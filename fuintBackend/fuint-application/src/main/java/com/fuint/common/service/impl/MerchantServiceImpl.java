@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.service.MerchantService;
+import com.fuint.common.service.StoreService;
 import com.fuint.common.util.CommonUtil;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -23,6 +24,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -36,8 +38,10 @@ import java.util.*;
  * CopyRight https://www.fuint.cn
  */
 @Service
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_= {@Lazy})
 public class MerchantServiceImpl extends ServiceImpl<MtMerchantMapper, MtMerchant> implements MerchantService {
+
+    private static final Logger logger = LoggerFactory.getLogger(MerchantServiceImpl.class);
 
     private MtMerchantMapper mtMerchantMapper;
 
@@ -45,7 +49,10 @@ public class MerchantServiceImpl extends ServiceImpl<MtMerchantMapper, MtMerchan
 
     private MtGoodsMapper mtGoodsMapper;
 
-    private static final Logger logger = LoggerFactory.getLogger(MerchantServiceImpl.class);
+    /**
+     * 店铺服务接口
+     * */
+    private StoreService storeService;
 
     /**
      * 分页查询商户列表
@@ -217,6 +224,9 @@ public class MerchantServiceImpl extends ServiceImpl<MtMerchantMapper, MtMerchan
 
         // 如果是删除，检查是否有商品等数据
         if (status.equals(StatusEnum.DISABLE.getKey())) {
+            // 删除店铺
+            storeService.deleteStoreByMerchant(id);
+
             Map<String, Object> params = new HashMap<>();
             params.put("status", StatusEnum.ENABLED.getKey());
             params.put("merchant_id", id);

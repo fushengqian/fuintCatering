@@ -28,6 +28,7 @@ import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
  * CopyRight https://www.fuint.cn
  */
 @Service
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_= {@Lazy})
 public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implements GoodsService {
 
     private MtGoodsMapper mtGoodsMapper;
@@ -488,13 +489,13 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
             if (goodsSkuList.size() > 0) {
                 goodsInfo.setPrice(goodsSkuList.get(0).getPrice());
                 goodsInfo.setLinePrice(goodsSkuList.get(0).getLinePrice());
-                Integer stock = 0;
+                Double stock = 0.0;
                 for (MtGoodsSku mtGoodsSku : goodsSkuList) {
                      stock = stock + mtGoodsSku.getStock();
                 }
                 goodsInfo.setStock(stock);
             } else {
-                goodsInfo.setStock(0);
+                goodsInfo.setStock(0.0);
             }
         } else {
             goodsInfo.setSkuList(new ArrayList<>());
@@ -579,13 +580,13 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
                     if (goodsSkuList.size() > 0) {
                         mtGoods.setPrice(goodsSkuList.get(0).getPrice());
                         mtGoods.setLinePrice(goodsSkuList.get(0).getLinePrice());
-                        Integer stock = 0;
+                        Double stock = 0.0;
                         for (MtGoodsSku mtGoodsSku : goodsSkuList) {
                              stock = stock + mtGoodsSku.getStock();
                         }
                         mtGoods.setStock(stock);
                     } else {
-                        mtGoods.setStock(0);
+                        mtGoods.setStock(0.0);
                     }
                 }
                 dataList.add(mtGoods);
@@ -651,7 +652,7 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
      * */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean updateInitSale(Integer goodsId, Integer saleNum) {
+    public Boolean updateInitSale(Integer goodsId, Double saleNum) {
         return mtGoodsMapper.updateInitSale(goodsId, saleNum);
     }
 

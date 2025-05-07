@@ -47,7 +47,7 @@ public class MtOrderGoods implements Serializable {
     private BigDecimal discount;
 
     @ApiModelProperty("商品数量")
-    private Integer num;
+    private Double num;
 
     @ApiModelProperty("创建时间")
     private Date createTime;
