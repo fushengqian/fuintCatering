@@ -99,6 +99,28 @@
               </view>
             </view>
           </view>
+          <!-- 易宝支付 - 微信 -->
+          <view class="pay-item dis-flex flex-x-between" @click="payNow('YEEPAY_WECHAT')">
+            <view class="item-left dis-flex flex-y-center">
+              <view class="item-left_icon wechat">
+                <text class="iconfont icon-weixinzhifu"></text>
+              </view>
+              <view class="item-left_text">
+                <text>易宝微信支付</text>
+              </view>
+            </view>
+          </view>
+          <!-- 易宝支付 - 支付宝 -->
+          <view class="pay-item dis-flex flex-x-between" @click="payNow('YEEPAY_ALIPAY')">
+            <view class="item-left dis-flex flex-y-center">
+              <view class="item-left_icon alipay">
+                <text class="iconfont icon-zhifubao"></text>
+              </view>
+              <view class="item-left_text">
+                <text>易宝支付宝支付</text>
+              </view>
+            </view>
+          </view>
           <!-- 余额支付 -->
           <view class="pay-item dis-flex flex-x-between" @click="payNow(PayTypeEnum.BALANCE.value)">
             <view class="item-left dis-flex flex-y-center">
@@ -119,6 +141,7 @@
 
 <script>
   import * as SettlementApi from '@/api/settlement'
+  import * as YeepayApi from '@/api/yeepay'
   import PayTypeEnum from '@/common/enum/order/PayType'
   import { wxPayment } from '@/utils/app'
   
@@ -243,14 +266,34 @@
            .then(() => {
                   app.$navTo(`pages/pay/result`, { amount: parseFloat(result.data.orderInfo.payAmount).toFixed(2), point: parseInt(result.data.orderInfo.usePoint)})
               })
-            .catch(err => 
+            .catch(err =>
                 app.$error('订单未支付'))
             .finally(() => {
                //empty
             })
         }
+        
+        // 易宝支付 - 微信
+        if (result.data.payType == 'YEEPAY_WECHAT') {
+            app.$navTo(`pages/pay/yeepay-qrcode`, {
+              orderId: result.data.orderInfo.orderSn,
+              amount: parseFloat(result.data.orderInfo.payAmount).toFixed(2),
+              point: parseInt(result.data.orderInfo.usePoint),
+              channel: 'WECHAT'
+            })
+        }
+        
+        // 易宝支付 - 支付宝
+        if (result.data.payType == 'YEEPAY_ALIPAY') {
+            app.$navTo(`pages/pay/yeepay-qrcode`, {
+              orderId: result.data.orderInfo.orderSn,
+              amount: parseFloat(result.data.orderInfo.payAmount).toFixed(2),
+              point: parseInt(result.data.orderInfo.usePoint),
+              channel: 'ALIPAY'
+            })
+        }
           
-          // 余额支付
+        // 余额支付
         if (result.data.payType == PayTypeEnum.BALANCE.value) {
             if (result.data.orderInfo.payStatus == 'B') {
                 app.$navTo(`pages/pay/result`, { amount: parseFloat(result.data.orderInfo.payAmount).toFixed(2), point: parseInt(result.data.orderInfo.usePoint)})
@@ -355,7 +398,11 @@
            &.wechat {
              color: #00c800;
            }
-   
+           
+           &.alipay {
+             color: #1677ff;
+           }
+
            &.balance {
              color: $fuint-theme;
            }

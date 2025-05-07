@@ -6,6 +6,7 @@ import com.fuint.application.config.YopClientConfig;
 import com.fuint.common.dto.YeepayNotificationResult;
 import com.fuint.common.dto.YeepayOrderQueryResponse;
 import com.fuint.common.dto.YeepayPaymentResponse;
+import com.fuint.common.service.OrderService;
 import com.fuint.common.service.YeepayService;
 import com.fuint.repository.mapper.MtYeepayNotificationLogMapper;
 import com.fuint.repository.model.MtOrder;
@@ -120,6 +121,21 @@ public class YeepayServiceImpl implements YeepayService {
             queryResponse.setPayWay("SCAN_CODE");
             queryResponse.setPayChannel("WECHAT");
             
+            // 调用OrderService更新订单状态
+            try {
+                String yeepayStatus = queryResponse.getStatus();
+                String yeepayTransactionId = queryResponse.getUniqueOrderNo();
+                
+                // 只有在查询成功时才更新订单状态
+                if ("SUCCESS".equals(queryResponse.getCode())) {
+                    boolean updated = orderService.updateOrderStatusFromYeepay(orderId, yeepayStatus, yeepayTransactionId);
+                    logger.info("查询订单后更新状态结果：{}，订单号：{}，易宝支付状态：{}", updated, orderId, yeepayStatus);
+                }
+            } catch (Exception e) {
+                // 记录异常，但不影响查询结果返回
+                logger.error("查询订单后更新订单状态异常: {}", e.getMessage(), e);
+            }
+            
             return queryResponse;
         } catch (Exception e) {
             // 记录异常
@@ -140,6 +156,9 @@ public class YeepayServiceImpl implements YeepayService {
      * @return 处理结果
      * @throws Exception 处理异常
      */
+    @Autowired
+    private OrderService orderService;
+
     @Override
     public YeepayNotificationResult processNotification(String notificationData) throws Exception {
         // 构建响应对象
@@ -200,14 +219,20 @@ public class YeepayServiceImpl implements YeepayService {
             notificationLog.setUpdateTime(new Date());
             yeepayNotificationLogMapper.insert(notificationLog);
             
-            // 6. 根据通知状态更新订单状态（实际项目中需要实现）
-            // updateOrderStatus(orderId, status, uniqueOrderNo, payAmount);
+            // 6. 调用OrderService更新订单状态
+            boolean updated = orderService.updateOrderStatusFromYeepay(orderId, status, uniqueOrderNo);
             
-            // 设置处理成功
-            result.setSuccess(true);
-            result.setProcessed(false);
-            result.setMessage("通知处理成功");
-            logger.info("易宝支付通知处理成功，订单号：{}，易宝交易ID：{}，状态：{}", orderId, uniqueOrderNo, status);
+            // 设置处理结果
+            result.setSuccess(updated);
+            if (updated) {
+                result.setProcessed(false);
+                result.setMessage("通知处理成功");
+                logger.info("易宝支付通知处理成功，订单号：{}，易宝交易ID：{}，状态：{}", orderId, uniqueOrderNo, status);
+            } else {
+                result.setProcessed(false);
+                result.setMessage("订单状态更新失败");
+                logger.warn("易宝支付通知处理失败，订单状态更新失败，订单号：{}，易宝交易ID：{}，状态：{}", orderId, uniqueOrderNo, status);
+            }
             
             return result;
         } catch (Exception e) {
