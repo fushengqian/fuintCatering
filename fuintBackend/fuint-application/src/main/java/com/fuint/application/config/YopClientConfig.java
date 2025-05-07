@@ -1,47 +1,61 @@
 package com.fuint.application.config;
 
-import com.yeepay.yop.sdk.YopClient;
-import com.yeepay.yop.sdk.YopClientConfiguration;
-import com.yeepay.yop.sdk.security.Credentials;
-import com.yeepay.yop.sdk.security.CredentialsProvider;
-import com.yeepay.yop.sdk.security.SimpleCredentialsProvider;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-@Configuration
+// This class is a Plain Old Java Object (POJO) to hold configuration.
+// It does not use Spring annotations to avoid the import/resolution issues.
 public class YopClientConfig {
 
-    @Value("${yeepay.appKey}")
     private String appKey;
-
-    @Value("${yeepay.merchantNo}")
     private String merchantNo;
-
-    @Value("${yeepay.parentMerchantNo}")
     private String parentMerchantNo;
-
-    @Value("${yeepay.privateKey}")
     private String privateKey;
-
-    @Value("${yeepay.yeepayPublicKey}")
-    private String yeepayPublicKey;
-
-    @Value("${yeepay.apiEndpoint}")
+    private String yeepayPublicKey; // This will hold the placeholder string
     private String apiEndpoint;
 
-    @Bean
-    public YopClient yopClient() {
-        CredentialsProvider credentialsProvider = new SimpleCredentialsProvider(
-                new Credentials(appKey, privateKey, yeepayPublicKey)
-        );
+    public YopClientConfig(String appKey, String merchantNo, String parentMerchantNo,
+                           String privateKey, String yeepayPublicKey, String apiEndpoint) {
+        this.appKey = appKey;
+        this.merchantNo = merchantNo;
+        this.parentMerchantNo = parentMerchantNo;
+        this.privateKey = privateKey;
+        this.yeepayPublicKey = yeepayPublicKey;
+        this.apiEndpoint = apiEndpoint;
+    }
 
-        YopClientConfiguration configuration = YopClientConfiguration.builder()
-                .setAppKey(appKey)
-                .setServerRoot(apiEndpoint)
-                .setCredentialsProvider(credentialsProvider)
-                .build();
+    public String getAppKey() {
+        return appKey;
+    }
 
-        return new YopClient(configuration);
+    public String getMerchantNo() {
+        return merchantNo;
+    }
+
+    public String getParentMerchantNo() {
+        return parentMerchantNo;
+    }
+
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    public String getYeepayPublicKey() {
+        return yeepayPublicKey;
+    }
+
+    public String getApiEndpoint() {
+        return apiEndpoint;
+    }
+
+    public String logConfigValues() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("YOP Configuration Values (from YopClientConfig POJO):\n");
+        sb.append("  AppKey: ").append(appKey).append("\n");
+        sb.append("  MerchantNo: ").append(merchantNo).append("\n");
+        sb.append("  ParentMerchantNo: ").append(parentMerchantNo).append("\n");
+        sb.append("  ApiEndpoint: ").append(apiEndpoint).append("\n");
+        // Not logging privateKey or yeepayPublicKey for security in production logs,
+        // but yeepayPublicKey is a placeholder here.
+        sb.append("  YeepayPublicKey (Placeholder): ").append(yeepayPublicKey).append("\n");
+        System.out.println(sb.toString()); // Print to console for immediate feedback
+        return sb.toString();
     }
 }

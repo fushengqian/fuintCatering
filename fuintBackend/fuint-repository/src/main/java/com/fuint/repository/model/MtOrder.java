@@ -131,4 +131,13 @@ public class MtOrder implements Serializable {
     @ApiModelProperty("分佣提成用户ID")
     private Integer commissionUserId;
 
+    @ApiModelProperty("易宝支付的唯一订单号")
+    private String yeepayTransactionId;
+
+    @ApiModelProperty("易宝支付状态，如'PENDING'、'SUCCESS'、'FAIL'")
+    private String yeepayStatus;
+
+    @ApiModelProperty("支付网关信息，值为'YEEPAY'")
+    private String paymentGateway;
+
 }
