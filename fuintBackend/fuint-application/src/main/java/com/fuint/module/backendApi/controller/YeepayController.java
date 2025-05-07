@@ -1,6 +1,7 @@
 package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.dto.UserOrderDto;
+import com.fuint.common.dto.YeepayNotificationResult;
 import com.fuint.common.dto.YeepayPaymentResponse;
 import com.fuint.common.service.OrderService;
 import com.fuint.common.service.YeepayService;
@@ -144,67 +145,50 @@ public class YeepayController extends BaseController {
         
         try {
             // 获取请求体内容
-            StringBuilder requestBody = new StringBuilder();
-            String line;
-            try {
-                BufferedReader reader = request.getReader();
-                while ((line = reader.readLine()) != null) {
-                    requestBody.append(line);
-                }
-            } catch (IOException e) {
-                logger.error("读取易宝支付通知请求体异常：{}", e.getMessage(), e);
-                requestBody.append("读取请求体异常：").append(e.getMessage());
-            }
+            String notificationData = getRequestBody(request);
             
-            // 获取请求头信息
-            Map<String, String> headers = new HashMap<>();
-            Enumeration<String> headerNames = request.getHeaderNames();
-            while (headerNames.hasMoreElements()) {
-                String headerName = headerNames.nextElement();
-                headers.put(headerName, request.getHeader(headerName));
-            }
-            
-            // 记录关键请求头信息
-            StringBuilder headerInfo = new StringBuilder();
-            headerInfo.append("Content-Type: ").append(headers.getOrDefault("content-type", "未知")).append("; ");
-            headerInfo.append("User-Agent: ").append(headers.getOrDefault("user-agent", "未知")).append("; ");
-            
-            // 提取可能的订单ID
-            String orderId = "";
-            String notificationData = requestBody.toString();
-            if (notificationData.contains("orderId=")) {
-                String[] params = notificationData.split("&");
-                for (String param : params) {
-                    if (param.startsWith("orderId=")) {
-                        orderId = param.substring("orderId=".length());
-                        break;
-                    }
-                }
-            }
-            
-            // 记录通知日志
-            MtYeepayNotificationLog notificationLog = new MtYeepayNotificationLog();
-            notificationLog.setOrderId(orderId);
-            notificationLog.setNotificationData(notificationData);
-            notificationLog.setProcessStatus("RECEIVED");
-            notificationLog.setCreateTime(new Date());
-            notificationLog.setUpdateTime(new Date());
-            
-            // 保存通知日志
-            yeepayNotificationLogMapper.insert(notificationLog);
-            
-            // 记录日志
-            logger.info("易宝支付通知内容，订单ID：{}，请求头：{}，请求体：{}",
-                    orderId, headerInfo.toString(),
+            // 记录通知信息
+            logger.info("接收到易宝支付通知：{}",
                     notificationData.length() > 500 ? notificationData.substring(0, 500) + "..." : notificationData);
             
-            // 返回成功响应
+            // 调用YeepayService处理通知
+            YeepayNotificationResult result = yeepayService.processNotification(notificationData);
+            
+            // 记录处理结果
+            if (result.isSuccess()) {
+                if (result.isProcessed()) {
+                    logger.info("易宝支付通知已处理过，订单号：{}，状态：{}", result.getOrderId(), result.getStatus());
+                } else {
+                    logger.info("易宝支付通知处理成功，订单号：{}，状态：{}", result.getOrderId(), result.getStatus());
+                }
+            } else {
+                logger.warn("易宝支付通知处理失败，消息：{}", result.getMessage());
+            }
+            
+            // 无论处理成功与否，都返回成功响应，避免易宝支付平台重复发送通知
             return "success";
         } catch (Exception e) {
-            logger.error("处理易宝支付通知异常：{}", e.getMessage(), e);
-            
-            // 即使处理异常，也返回成功响应，避免易宝支付平台重复发送通知
+            logger.error("处理易宝支付通知异常", e);
+            // 发生异常也返回成功响应，避免易宝支付平台重复发送通知
             return "success";
         }
+    }
+    
+    /**
+     * 获取请求体内容
+     *
+     * @param request HTTP请求
+     * @return 请求体内容
+     * @throws IOException IO异常
+     */
+    private String getRequestBody(HttpServletRequest request) throws IOException {
+        StringBuilder requestBody = new StringBuilder();
+        String line;
+        try (BufferedReader reader = request.getReader()) {
+            while ((line = reader.readLine()) != null) {
+                requestBody.append(line);
+            }
+        }
+        return requestBody.toString();
     }
 }
