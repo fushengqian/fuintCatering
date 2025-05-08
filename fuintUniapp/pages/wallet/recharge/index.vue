@@ -29,10 +29,13 @@
         <input type="digit" placeholder="请输入充值金额" v-model="inputValue" @input="onChangeMoney" />
       </view>
       <!-- 确认按钮 -->
-      <view class="recharge-submit btn-submit">
+      <view class="recharge-submit btn-submit" v-if="setting.isOpen">
         <form @submit="onSubmit">
           <button class="button" formType="submit" :disabled="disabled">立即充值</button>
         </form>
+      </view>
+      <view class="recharge-submit btn-submit" v-if="!setting.isOpen">
+        <button class="button disabled" formType="submit" :disabled="true">当前未开启充值</button>
       </view>
     </view>
     <!-- 充值描述 -->
@@ -121,7 +124,9 @@
           BalanceApi.setting()
             .then(result => {
               app.setting = result.data
-              console.log("app.setting = ", app.setting)
+              if (!app.setting.isOpen) {
+                  app.disabled = true;
+              }
               resolve(app.setting)
             })
         })
@@ -275,8 +280,8 @@
     }
 
     .button[disabled] {
-      background: #ff6335;
-      border-color: #ff6335;
+      background: #ccc;
+      border-color: #6666;
       color: white;
     }
   }

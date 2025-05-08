@@ -688,7 +688,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> doSettle(HttpServletRequest request, SettlementParam param) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
-        Integer myOrderId = request.getHeader("orderId") == null ? 0 : Integer.parseInt(request.getHeader("orderId")); // 继续点单的订单ID
         Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
         Integer tableId = request.getHeader("tableId") == null ? 0 : Integer.parseInt(request.getHeader("tableId"));
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
@@ -761,7 +760,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 operator = mtStaff.getRealName();
             }
         }
-
+        // 继续点单的订单ID
+        Integer myOrderId = 0;
         if (tableId > 0 || StringUtil.isNotEmpty(tableCode)) {
             MtTable mtTable = null;
             if (tableId > 0) {
@@ -1092,7 +1092,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             if (payType.equals(PayTypeEnum.CASH.getKey()) && StringUtil.isNotEmpty(operator)) {
                 // 收银台现金支付，更新为已支付
                 setOrderPayed(orderInfo.getId(), null);
-            } else  if (payType.equals(PayTypeEnum.STORE.getKey())) {
+            } else  if (payType.equals(PayTypeEnum.STORE.getKey()) || tableId > 0) {
                 // 门店支付，不做任何操作
             } else if (payType.equals(PayTypeEnum.BALANCE.getKey())) {
                 // 余额支付

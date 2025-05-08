@@ -293,7 +293,7 @@ public class BackendCashierController extends BaseController {
             }
         }
 
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+        if (userInfo != null && accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             if (!accountInfo.getMerchantId().equals(userInfo.getMerchantId())) {
                 return getFailureResult(1004);
             }
