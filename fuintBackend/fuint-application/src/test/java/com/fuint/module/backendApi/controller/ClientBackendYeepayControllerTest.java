@@ -1,6 +1,5 @@
 package com.fuint.module.backendApi.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.fuint.common.dto.UserOrderDto;
 import com.fuint.common.dto.YeepayNotificationResult;
 import com.fuint.common.dto.YeepayPaymentResponse;
@@ -17,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -25,9 +23,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -35,10 +33,10 @@ import static org.mockito.Mockito.*;
  * YeepayController单元测试
  */
 @ExtendWith(MockitoExtension.class)
-public class YeepayControllerTest {
+public class ClientBackendYeepayControllerTest {
 
     @InjectMocks
-    private YeepayController yeepayController;
+    private BackendYeepayController backendYeepayController;
 
     @Mock
     private YeepayService yeepayService;
@@ -51,7 +49,7 @@ public class YeepayControllerTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(yeepayController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(backendYeepayController).build();
     }
 
     @Test
@@ -81,7 +79,7 @@ public class YeepayControllerTest {
         when(yeepayService.initiatePayment(any(MtOrder.class))).thenReturn(paymentResult);
 
         // 执行测试
-        ResponseObject response = yeepayController.initiatePayment(requestBody);
+        ResponseObject response = backendYeepayController.initiatePayment(requestBody);
 
         // 验证结果
         assertNotNull(response);
@@ -111,7 +109,7 @@ public class YeepayControllerTest {
         when(orderService.getOrderById(eq(Integer.parseInt(orderId)))).thenReturn(null);
 
         // 执行测试
-        ResponseObject response = yeepayController.initiatePayment(requestBody);
+        ResponseObject response = backendYeepayController.initiatePayment(requestBody);
 
         // 验证结果
         assertNotNull(response);
@@ -149,7 +147,7 @@ public class YeepayControllerTest {
         when(yeepayService.processNotification(anyString())).thenReturn(notificationResult);
         
         // 执行测试
-        String result = yeepayController.paymentNotify(request);
+        String result = backendYeepayController.paymentNotify(request);
         
         // 验证结果
         assertEquals("success", result);
@@ -180,7 +178,7 @@ public class YeepayControllerTest {
         when(yeepayService.processNotification(anyString())).thenReturn(notificationResult);
         
         // 执行测试
-        String result = yeepayController.paymentNotify(request);
+        String result = backendYeepayController.paymentNotify(request);
         
         // 验证结果
         assertEquals("success", result);
@@ -205,7 +203,7 @@ public class YeepayControllerTest {
         when(yeepayService.processNotification(anyString())).thenThrow(new RuntimeException("处理通知时发生异常"));
         
         // 执行测试
-        String result = yeepayController.paymentNotify(request);
+        String result = backendYeepayController.paymentNotify(request);
         
         // 验证结果
         assertEquals("success", result);
