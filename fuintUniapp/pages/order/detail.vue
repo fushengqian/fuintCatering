@@ -168,7 +168,7 @@
           <text>-￥{{ order.pointAmount.toFixed(2) }}</text>
         </view>
       </view>
-      <view class="info-item">
+      <view class="info-item" v-if="order.payStatus == 'B'">
         <view class="item-lable">支付方式</view>
         <view class="item-content">
           <text>{{ PayTypeEnum.getNameByValue(order.payType) }}</text>

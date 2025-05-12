@@ -59,11 +59,12 @@
         options: {},
         // 正在加载
         isLoading: true,
-        userInfo: { avatar: '', name: '', sex: 0, birthday: '', hasPassword: '' },
+        userInfo: { avatar: '', name: '', mobile: '', sex: 1, birthday: '', hasPassword: '' },
         openCardPara: null,
         code: "",
         nickname: "",
-        avatar: ""
+        avatar: "/static/default-avatar.png",
+        mobile: ""
       }
     },
 
@@ -119,8 +120,16 @@
        */
       save() {
           const app = this
+          if (!app.nickname) {
+              app.$error('昵称不能为空！');
+              return false;
+          }
+          if (!app.mobile) {
+              app.$error('手机号不能为空！');
+              return false;
+          }
           app.isLoading = true
-          MemberApi.save({"name": app.nickname, "avatar": app.avatar, "sex": app.userInfo.sex, "birthday": app.userInfo.birthday})
+          MemberApi.save({"name": app.nickname, "avatar": app.avatar, "mobile": app.mobile, "sex": app.userInfo.sex, "birthday": app.userInfo.birthday})
             .then(result => {
               app.userInfo = result.data
               app.isLoading = false

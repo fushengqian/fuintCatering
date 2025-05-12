@@ -136,6 +136,12 @@
             </view>
             <view class="item-name">商户管理</view>
           </view>
+          <view v-else class="service-item disabled" @click="handleBeMerchant()">
+              <view class="item-icon">
+                <text class="iconfont icon-dianpu"></text>
+              </view>
+              <view class="item-name">商户管理</view>
+          </view>
         </block>
       </view>
     </view>
@@ -428,6 +434,10 @@
       // 跳转到服务页面
       handleService({ url }) {
           this.$navTo(url)
+      },
+      // 成为商家
+      handleBeMerchant() {
+          this.$error('请联系管理员添加您的员工身份信息！');
       }
     },
 
@@ -693,7 +703,14 @@
           text-align: center;
           margin-right: 10rpx;
         }
-
+      }
+      .disabled {
+         .item-icon {
+           color: #cccccc;
+         }
+         .item-name {
+           color: #cccccc;
+         }
       }
     }
   }

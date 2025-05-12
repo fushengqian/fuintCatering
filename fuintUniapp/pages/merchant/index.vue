@@ -431,7 +431,8 @@
     .asset-left-item {
       text-align: center;
       color: #666;
-      padding: 0 72rpx;
+      padding: 4px 72rpx;
+      width: 33.33%;
 
       .item-value {
         font-size: 36rpx;
