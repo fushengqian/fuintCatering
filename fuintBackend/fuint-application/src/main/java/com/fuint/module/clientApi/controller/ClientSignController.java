@@ -159,6 +159,8 @@ public class ClientSignController extends BaseController {
             return getFailureResult(201, "微信公众号授权失败");
         }
 
+        logger.info("公众号授权登录, userInfo:{}，param:{}", userInfo, param);
+
         String userAgent = request.getHeader("user-agent");
         String token = TokenUtil.generateToken(userAgent, mtUser.getId());
         UserInfo userLoginInfo = new UserInfo();

@@ -7,7 +7,6 @@ import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtCouponGroup;
 import org.springframework.web.multipart.MultipartFile;
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 
 /**
@@ -90,13 +89,5 @@ public interface CouponGroupService extends IService<MtCouponGroup> {
      * @param operator 操作者
      * */
     String importSendCoupon(MultipartFile file, String operator, String filePath) throws BusinessCheckException;
-
-    /**
-     * 保存文件
-     *
-     * @param file excel文件
-     * @param request 操作者
-     * */
-     String saveExcelFile(MultipartFile file, HttpServletRequest request) throws Exception;
 
 }

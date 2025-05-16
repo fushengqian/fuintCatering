@@ -3,6 +3,7 @@ package com.fuint.module.backendApi.controller;
 import com.aliyun.oss.OSS;
 import com.fuint.common.dto.AccountInfo;
 import com.fuint.common.service.SettingService;
+import com.fuint.common.service.UploadService;
 import com.fuint.common.util.AliyunOssUtil;
 import com.fuint.common.util.CommonUtil;
 import com.fuint.common.util.DateUtil;
@@ -53,6 +54,11 @@ public class BackendFileController extends BaseController {
      * 系统设置服务接口
      * */
     private SettingService settingService;
+
+    /**
+     * 上传文件服务接口
+     * */
+    private UploadService uploadService;
 
     /**
      * 后台上传文件
@@ -110,11 +116,9 @@ public class BackendFileController extends BaseController {
             return getFailureResult(201, "上传的文件不能大于" + maxSize + "MB");
         }
 
-        String fileType = file.getContentType();
-
         // 保存文件
         try {
-            String fileName = saveFile(file);
+            String fileName = uploadService.saveUploadFile(request, file);
             String baseImage = settingService.getUploadBasePath();
             String filePath = baseImage + fileName;
             String url = filePath;

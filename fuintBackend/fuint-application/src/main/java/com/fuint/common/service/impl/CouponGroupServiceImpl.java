@@ -9,7 +9,6 @@ import com.fuint.common.dto.ReqSendLogDto;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.service.*;
 import com.fuint.common.util.CommonUtil;
-import com.fuint.common.util.DateUtil;
 import com.fuint.common.util.XlsUtil;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -31,10 +30,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.lang.String;
@@ -498,38 +494,6 @@ public class CouponGroupServiceImpl extends ServiceImpl<MtCouponGroupMapper, MtC
             throw new BusinessCheckException(e.getMessage());
         }
         return uuid;
-    }
-
-    /**
-     * 保存文件
-     *
-     * @param file excel文件
-     * @param request
-     * */
-    public String saveExcelFile(MultipartFile file, HttpServletRequest request) throws Exception {
-        String fileName = file.getOriginalFilename();
-
-        String imageName = fileName.substring(fileName.lastIndexOf("."));
-        String pathRoot = env.getProperty("images.root");
-        if (pathRoot == null || StringUtil.isEmpty(pathRoot)) {
-            pathRoot = ResourceUtils.getURL("classpath:").getPath();
-        }
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-
-        String filePath = "/static/uploadFiles/"+ DateUtil.formatDate(new Date(), "yyyyMMdd")+"/";
-        String path = filePath + uuid + imageName;
-
-        try {
-            File tempFile = new File(pathRoot + path);
-            if (!tempFile.getParentFile().exists()) {
-                tempFile.getParentFile().mkdirs();
-            }
-            CommonUtil.saveMultipartFile(file, pathRoot + path);
-        } catch (Exception e) {
-            log.error("保存Excel文件出错", e.getMessage());
-        }
-
-        return path;
     }
 
 }

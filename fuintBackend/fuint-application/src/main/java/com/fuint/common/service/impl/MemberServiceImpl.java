@@ -25,12 +25,16 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
@@ -44,6 +48,8 @@ import java.util.*;
 @Service
 @AllArgsConstructor(onConstructor_= {@Lazy})
 public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> implements MemberService {
+
+    private static final Logger logger = LoggerFactory.getLogger(MemberServiceImpl.class);
 
     private MtUserMapper mtUserMapper;
 
@@ -993,5 +999,32 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
     @Override
     public List<Integer> getUserIdList(Integer merchantId, Integer storeId) {
         return mtUserMapper.getUserIdList(merchantId, storeId);
+    }
+
+    /**
+     * 导入会员
+     *
+     * @param file excel文件
+     * @param accountInfo 操作者
+     * @return
+     * */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @OperationServiceLog(description = "导入会员列表")
+    public Boolean importMember(MultipartFile file, AccountInfo accountInfo, String filePath) throws BusinessCheckException {
+        String originalFileName = file.getOriginalFilename();
+        boolean isExcel2003 = XlsUtil.isExcel2003(originalFileName);
+        boolean isExcel2007 = XlsUtil.isExcel2007(originalFileName);
+
+        if (!isExcel2003 && !isExcel2007) {
+            logger.error("importMember->uploadFile：{}", "文件类型不正确");
+            throw new BusinessCheckException("文件类型不正确");
+        }
+
+        if (accountInfo == null || accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
+            throw new BusinessCheckException("没有操作权限");
+        }
+
+        return true;
     }
 }
