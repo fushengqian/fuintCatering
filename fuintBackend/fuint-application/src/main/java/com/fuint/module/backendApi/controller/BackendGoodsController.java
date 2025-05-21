@@ -9,6 +9,7 @@ import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.param.GoodsListParam;
 import com.fuint.common.service.*;
 import com.fuint.common.util.CommonUtil;
+import com.fuint.common.util.ExcelUtil;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
@@ -22,10 +23,17 @@ import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -41,6 +49,8 @@ import java.util.*;
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/goods/goods")
 public class BackendGoodsController extends BaseController {
+
+    private static final Logger logger = LoggerFactory.getLogger(BackendGoodsController.class);
 
     private MtGoodsSpecMapper mtGoodsSpecMapper;
 
@@ -70,6 +80,11 @@ public class BackendGoodsController extends BaseController {
      * 系统设置服务接口
      * */
     private SettingService settingService;
+
+    /**
+     * 上传文件服务接口
+     * */
+    private UploadService uploadService;
 
     /**
      * 分页查询商品列表
@@ -161,6 +176,8 @@ public class BackendGoodsController extends BaseController {
 
         String operator = accountInfo.getAccountName();
         goodsService.deleteGoods(goodsId, operator);
+        logger.info("删除商品, goodsId = {},account = {}", goodsId, accountInfo.getAccountName());
+
         return getSuccessResult(true);
     }
 
@@ -176,11 +193,11 @@ public class BackendGoodsController extends BaseController {
     public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
-        Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
+        Integer goodsId = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
 
-        MtGoods mtGoods = goodsService.queryGoodsById(id);
+        MtGoods mtGoods = goodsService.queryGoodsById(goodsId);
         if (mtGoods == null) {
             return getFailureResult(201, "该商品不存在");
         }
@@ -195,9 +212,10 @@ public class BackendGoodsController extends BaseController {
 
         MtGoods goodsInfo = new MtGoods();
         goodsInfo.setOperator(operator);
-        goodsInfo.setId(id);
+        goodsInfo.setId(goodsId);
         goodsInfo.setStatus(status);
         goodsService.saveGoods(goodsInfo, null);
+        logger.info("更新商品状态, goodsId = {},account = {}", goodsId, accountInfo.getAccountName());
 
         return getSuccessResult(true);
     }
@@ -542,6 +560,7 @@ public class BackendGoodsController extends BaseController {
         mtGoods.setOperator(accountInfo.getAccountName());
 
         MtGoods goodsInfo = goodsService.saveGoods(mtGoods, storeIds);
+        logger.info("保存商品信息, goodsId = {},account = {}", goodsInfo.getId(), accountInfo.getAccountName());
 
         Map<String, Object> result = new HashMap();
         result.put("goodsInfo", goodsInfo);
@@ -775,6 +794,40 @@ public class BackendGoodsController extends BaseController {
         Map<String, Object> result = new HashMap();
         result.put("paginationResponse", paginationResponse);
         result.put("imagePath", imagePath);
+
+        return getSuccessResult(result);
+    }
+
+    /**
+     * 下载商品导入模板
+     *
+     * @return
+     */
+    @ApiOperation(value = "下载商品导入模板")
+    @RequestMapping(value = "/downloadTemplate", method = RequestMethod.GET)
+    @CrossOrigin
+    public void downloadTemplate(HttpServletResponse response) throws IOException {
+        ExcelUtil.downLoadTemplate(response, "GoodsTemplate.xlsx");
+    }
+
+    /**
+     * 上传商品导入文件
+     *
+     * @param request
+     * @throws
+     */
+    @ApiOperation(value = "上传商品导入文件")
+    @RequestMapping(value = "/uploadGoodsFile", method = RequestMethod.POST)
+    @CrossOrigin
+    public ResponseObject uploadGoodsFile(HttpServletRequest request) throws Exception {
+        String token = request.getHeader("Access-Token");
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+
+        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+        MultipartFile file = multipartRequest.getFile("file");
+
+        String filePath = uploadService.saveUploadFile(request, file);
+        Boolean result = goodsService.importGoods(file, accountInfo, filePath);
 
         return getSuccessResult(result);
     }

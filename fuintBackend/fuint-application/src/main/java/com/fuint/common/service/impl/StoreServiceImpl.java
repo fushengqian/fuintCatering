@@ -394,6 +394,9 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
         List<StoreDistanceBean> distanceList = mtStoreMapper.queryByDistance(merchantId, keyword, latitude, longitude);
         Map<String, Object> param = new HashMap<>();
         param.put("status", StatusEnum.ENABLED.getKey());
+        if (merchantId != null && merchantId > 0) {
+            param.put("merchant_id", merchantId);
+        }
         List<MtStore> storeList = mtStoreMapper.selectByMap(param);
 
         if (distanceList != null) {
@@ -438,6 +441,31 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
            }
        }
        return String.join(",", storeNames);
+    }
+
+    /**
+     * 获取店铺名称
+     *
+     * @param merchantId 商户ID
+     * @param storeNames 店铺名称
+     * @return
+     * */
+    @Override
+    public String getStoreIds(Integer merchantId, String storeNames) {
+        if (StringUtil.isEmpty(storeNames)) {
+            return "";
+        }
+        String[] names = storeNames.split(",");
+        List<String> storeIds = new ArrayList<>();
+        if (names.length > 0) {
+            for (int i = 0; i < names.length; i++) {
+                MtStore mtStore = mtStoreMapper.queryStoreByName(names[i]);
+                if (mtStore != null) {
+                    storeIds.add(mtStore.getId().toString());
+                }
+            }
+        }
+        return String.join(",", storeIds);
     }
 
     /**

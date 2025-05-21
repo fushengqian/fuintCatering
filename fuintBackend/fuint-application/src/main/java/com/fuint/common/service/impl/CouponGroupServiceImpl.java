@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
  * CopyRight https://www.fuint.cn
  */
 @Service
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_= {@Lazy})
 public class CouponGroupServiceImpl extends ServiceImpl<MtCouponGroupMapper, MtCouponGroup> implements CouponGroupService {
 
     private static final Logger log = LoggerFactory.getLogger(CouponGroupServiceImpl.class);
@@ -61,11 +61,6 @@ public class CouponGroupServiceImpl extends ServiceImpl<MtCouponGroupMapper, MtC
     private CouponService couponService;
 
     /**
-     * 会员卡券服务接口
-     * */
-    private UserCouponService userCouponService;
-
-    /**
      * 会员服务接口
      * */
     private MemberService memberService;
@@ -79,11 +74,6 @@ public class CouponGroupServiceImpl extends ServiceImpl<MtCouponGroupMapper, MtC
      * 短信发送服务接口
      * */
     private SendSmsService sendSmsService;
-
-    /**
-     * 系统环境变量
-     * */
-    private Environment env;
 
     /**
      * 分页查询卡券分组列表
@@ -290,7 +280,7 @@ public class CouponGroupServiceImpl extends ServiceImpl<MtCouponGroupMapper, MtC
 
         List<List<String>> content = new ArrayList<>();
         try {
-            content = XlsUtil.readExcelContent(file.getInputStream(), isExcel2003, 1, null, null, null);
+            content = XlsUtil.readExcelContent(file.getInputStream(), isExcel2003, 0,1, null, null, null);
         } catch (IOException e) {
             log.error("CouponGroupServiceImpl->parseExcelContent{}", e);
             throw new BusinessCheckException("导入失败"+e.getMessage());

@@ -81,4 +81,12 @@ public interface UserGradeService extends IService<MtUserGrade> {
      * @return
      * */
     List<MtUserGrade> getPayUserGradeList(Integer merchantId, MtUser userInfo) throws BusinessCheckException;
+
+    /**
+     * 获取商户会员等级列表
+     *
+     * @param  merchantId
+     * @return
+     * */
+    List<MtUserGrade> getMerchantGradeList(Integer merchantId);
 }

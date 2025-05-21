@@ -258,7 +258,33 @@ public class CateServiceImpl extends ServiceImpl<MtGoodsCateMapper, MtGoodsCate>
                     .eq(MtGoodsCate::getStoreId, storeId));
         }
         lambdaQueryWrapper.orderByAsc(MtGoodsCate::getSort);
-        List<MtGoodsCate> dataList = cateMapper.selectList(lambdaQueryWrapper);
-        return dataList;
+        return cateMapper.selectList(lambdaQueryWrapper);
+    }
+
+    /**
+     * 获取分类ID
+     *
+     * @param merchantId 商户ID
+     * @param storeId 店铺ID
+     * @param name 分类名称
+     * @return
+     * */
+    @Override
+    public Integer getGoodsCateId(Integer merchantId, Integer storeId, String name) {
+        Integer cate = 0;
+        Map<String, Object> param = new HashMap<>();
+        param.put("status", StatusEnum.ENABLED.getKey());
+        param.put("name", name);
+        if (storeId != null && storeId > 0) {
+            param.put("storeId", storeId);
+        }
+        if (merchantId != null && merchantId > 0) {
+            param.put("merchantId", merchantId);
+        }
+        List<MtGoodsCate> cateList = queryCateListByParams(param);
+        if (cateList != null && cateList.size() > 0) {
+            cate = cateList.get(0).getId();
+        }
+        return cate;
     }
 }
