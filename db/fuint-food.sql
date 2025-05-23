@@ -135,16 +135,17 @@ CREATE TABLE `mt_cart` (
   `USER_ID` int NOT NULL DEFAULT '0' COMMENT '会员ID',
   `MERCHANT_ID` int DEFAULT '0' COMMENT '商户ID',
   `STORE_ID` int DEFAULT '0' COMMENT '店铺ID',
+  `TABLE_ID` int DEFAULT '0' COMMENT '桌码ID',
   `IS_VISITOR` char(1) DEFAULT 'N' COMMENT '是否游客',
   `HANG_NO` varchar(10) DEFAULT '' COMMENT '挂单号',
   `SKU_ID` int DEFAULT '0' COMMENT 'skuID',
   `GOODS_ID` int DEFAULT '0' COMMENT '商品ID',
-  `NUM` int DEFAULT '1' COMMENT '数量',
+  `NUM` double(10,2) DEFAULT '1.00' COMMENT '数量',
   `CREATE_TIME` datetime DEFAULT NULL COMMENT '创建时间',
   `UPDATE_TIME` datetime DEFAULT NULL COMMENT '更新时间',
   `STATUS` char(1) DEFAULT 'A' COMMENT '状态',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2783 DEFAULT CHARSET=utf8 COMMENT='购物车';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='购物车';
 
 /*Table structure for table `mt_commission_cash` */
 
@@ -442,7 +443,7 @@ DROP TABLE IF EXISTS `mt_goods`;
 
 CREATE TABLE `mt_goods` (
   `ID` int NOT NULL AUTO_INCREMENT COMMENT '自增ID',
-  `TYPE` varchar(30) DEFAULT 'product' COMMENT '商品类别',
+  `TYPE` varchar(30) DEFAULT 'goods' COMMENT '商品类别',
   `MERCHANT_ID` int DEFAULT '0' COMMENT '所属商户ID',
   `STORE_ID` int DEFAULT '0' COMMENT '所属店铺ID',
   `NAME` varchar(100) DEFAULT '' COMMENT '商品名称',
@@ -453,11 +454,12 @@ CREATE TABLE `mt_goods` (
   `IMAGES` varchar(1000) DEFAULT '' COMMENT '图片地址',
   `PRICE` decimal(10,2) unsigned DEFAULT '0.00' COMMENT '价格',
   `LINE_PRICE` decimal(10,2) unsigned DEFAULT '0.00' COMMENT '划线价格',
-  `STOCK` int unsigned DEFAULT '0' COMMENT '库存',
+  `COST_PRICE` decimal(10,2) DEFAULT '0.00' COMMENT '成本价格',
+  `STOCK` double(10,2) unsigned DEFAULT '0.00' COMMENT '库存',
   `WEIGHT` decimal(10,2) DEFAULT '0.00' COMMENT '重量',
   `COUPON_IDS` varchar(500) DEFAULT '' COMMENT '关联卡券ID',
   `SERVICE_TIME` int DEFAULT '0' COMMENT '服务时长，单位：分钟',
-  `INIT_SALE` int DEFAULT '0' COMMENT '初始销量',
+  `INIT_SALE` double(10,2) DEFAULT '0.00' COMMENT '初始销量',
   `SALE_POINT` varchar(100) DEFAULT '' COMMENT '商品卖点',
   `CAN_USE_POINT` char(1) DEFAULT 'N' COMMENT '可否使用积分抵扣',
   `IS_MEMBER_DISCOUNT` char(1) DEFAULT 'Y' COMMENT '会员是否有折扣',
@@ -468,7 +470,7 @@ CREATE TABLE `mt_goods` (
   `OPERATOR` varchar(30) DEFAULT NULL COMMENT '最后操作人',
   `STATUS` char(1) DEFAULT 'A' COMMENT 'A：正常；D：删除',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=486 DEFAULT CHARSET=utf8 COMMENT='商品表';
+) ENGINE=InnoDB AUTO_INCREMENT=570 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED COMMENT='商品表';
 
 /*Table structure for table `mt_goods_cate` */
 
@@ -499,13 +501,14 @@ CREATE TABLE `mt_goods_sku` (
   `LOGO` varchar(255) DEFAULT '' COMMENT '图片',
   `GOODS_ID` int NOT NULL DEFAULT '0' COMMENT '商品ID',
   `SPEC_IDS` varchar(100) NOT NULL DEFAULT '' COMMENT '规格ID',
-  `STOCK` int NOT NULL DEFAULT '0' COMMENT '库存',
+  `STOCK` double(10,2) NOT NULL DEFAULT '0.00' COMMENT '库存',
   `PRICE` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '价格',
   `LINE_PRICE` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '划线价格',
+  `COST_PRICE` decimal(10,2) DEFAULT '0.00' COMMENT '成本价格',
   `WEIGHT` decimal(10,2) DEFAULT '0.00' COMMENT '重量',
   `STATUS` char(1) NOT NULL DEFAULT 'A' COMMENT '状态',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=865 DEFAULT CHARSET=utf8 COMMENT='商品SKU表';
+) ENGINE=InnoDB AUTO_INCREMENT=1006 DEFAULT CHARSET=utf8 COMMENT='商品SKU表';
 
 /*Table structure for table `mt_goods_spec` */
 
@@ -668,12 +671,12 @@ CREATE TABLE `mt_order_goods` (
   `SKU_ID` int DEFAULT '0' COMMENT 'skuID',
   `PRICE` decimal(10,2) DEFAULT '0.00' COMMENT '价格',
   `DISCOUNT` decimal(10,2) DEFAULT '0.00' COMMENT '优惠价',
-  `NUM` int NOT NULL DEFAULT '0' COMMENT '商品数量',
+  `NUM` double(10,2) NOT NULL DEFAULT '0.00' COMMENT '商品数量',
   `CREATE_TIME` datetime DEFAULT NULL COMMENT '创建时间',
   `UPDATE_TIME` datetime DEFAULT NULL COMMENT '更新时间',
   `STATUS` char(1) DEFAULT 'A' COMMENT 'A：正常；D：删除',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1929 DEFAULT CHARSET=utf8 COMMENT='订单商品表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='订单商品表';
 
 /*Table structure for table `mt_point` */
 
@@ -937,6 +940,59 @@ CREATE TABLE `mt_store` (
   `OPERATOR` varchar(30) DEFAULT '' COMMENT '最后操作人',
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='店铺表';
+
+/*Data for the table `mt_store_goods` */
+CREATE TABLE `mt_store_goods` (
+  `ID` int NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `MERCHANT_ID` int unsigned NOT NULL DEFAULT '0' COMMENT '所属商户',
+  `STORE_ID` int NOT NULL DEFAULT '0' COMMENT '所属店铺',
+  `GOODS_ID` int NOT NULL DEFAULT '0' COMMENT '商品ID',
+  `CREATE_TIME` datetime DEFAULT NULL COMMENT '创建时间',
+  `UPDATE_TIME` datetime DEFAULT NULL COMMENT '更新时间',
+  `STATUS` char(1) DEFAULT 'A' COMMENT '状态，A：有效/启用；D：无效',
+  `OPERATOR` varchar(30) DEFAULT '' COMMENT '最后操作人',
+  PRIMARY KEY (`ID`),
+  KEY `INDEX_STORE_ID` (`STORE_ID`),
+  KEY `INDEX_GOODS_ID` (`GOODS_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED COMMENT='店铺商品表';
+
+/*Table structure for table `mt_table` */
+
+DROP TABLE IF EXISTS `mt_table`;
+
+CREATE TABLE `mt_table` (
+  `ID` int NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `CODE` varchar(32) NOT NULL DEFAULT '' COMMENT '桌子编码',
+  `AREA_ID` int DEFAULT '0' COMMENT '区域ID',
+  `MERCHANT_ID` int NOT NULL DEFAULT '0' COMMENT '所属商户ID',
+  `STORE_ID` int NOT NULL DEFAULT '0' COMMENT '所属店铺ID',
+  `MAX_PEOPLE` int DEFAULT '0' COMMENT '人数上限',
+  `DESCRIPTION` text COMMENT '备注信息',
+  `CREATE_TIME` datetime DEFAULT NULL COMMENT '创建时间',
+  `UPDATE_TIME` datetime DEFAULT NULL COMMENT '更新时间',
+  `OPERATOR` varchar(30) DEFAULT NULL COMMENT '最后操作人',
+  `SORT` int DEFAULT '0' COMMENT '排序',
+  `STATUS` char(1) DEFAULT 'A' COMMENT 'A：正常；D：删除',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='桌码表';
+
+/*Table structure for table `mt_table_area` */
+
+DROP TABLE IF EXISTS `mt_table_area`;
+
+CREATE TABLE `mt_table_area` (
+  `ID` int NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `NAME` varchar(50) NOT NULL DEFAULT '' COMMENT '区域名称',
+  `MERCHANT_ID` int NOT NULL DEFAULT '0' COMMENT '所属商户ID',
+  `STORE_ID` int NOT NULL DEFAULT '0' COMMENT '所属店铺ID',
+  `DESCRIPTION` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '备注信息',
+  `CREATE_TIME` datetime DEFAULT NULL COMMENT '创建时间',
+  `UPDATE_TIME` datetime DEFAULT NULL COMMENT '更新时间',
+  `OPERATOR` varchar(30) DEFAULT NULL COMMENT '最后操作人',
+  `SORT` int DEFAULT '0' COMMENT '排序',
+  `STATUS` char(1) DEFAULT 'A' COMMENT 'A：正常；D：删除',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='桌码区域表';
 
 /*Table structure for table `mt_user` */
 
