@@ -73,6 +73,7 @@ public class ClientGoodsController extends BaseController {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
         Integer tableId = request.getHeader("tableId") == null ? 0 : Integer.parseInt(request.getHeader("tableId"));
+        String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
 
         Map<String, Object> param = new HashMap<>();
         param.put("status", StatusEnum.ENABLED.getKey());
@@ -90,7 +91,7 @@ public class ClientGoodsController extends BaseController {
             param.put("storeId", storeId);
         }
         List<MtGoodsCate> cateList = cateService.queryCateListByParams(param);
-        Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, "", 0, 1, 500);
+        Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, "", platform, 0, 1, 500);
         List<MtGoods> goodsList = (ArrayList)goodsData.get("goodsList");
         String baseImage = settingService.getUploadBasePath();
         if (goodsList.size() > 0) {
@@ -126,7 +127,8 @@ public class ClientGoodsController extends BaseController {
     @CrossOrigin
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
         Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
-        Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, "", 0,1, 200);
+        String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
+        Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, "", platform,0,1, 200);
         return getSuccessResult(goodsData.get("goodsList"));
     }
 
@@ -139,6 +141,7 @@ public class ClientGoodsController extends BaseController {
     public ResponseObject search(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
         Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
+        String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
         Integer page = params.get("page") == null ? 1 : Integer.parseInt(params.get("page").toString());
         Integer pageSize = params.get("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(params.get("pageSize").toString());
         String name = params.get("name") == null ? "" : params.get("name").toString();
@@ -171,6 +174,9 @@ public class ClientGoodsController extends BaseController {
         }
         if (StringUtil.isNotEmpty(sortPrice)) {
             searchParams.put("sortPrice", sortPrice);
+        }
+        if (StringUtil.isNotEmpty(platform)) {
+            searchParams.put("platform", platform);
         }
 
         paginationRequest.setSearchParams(searchParams);

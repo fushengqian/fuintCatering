@@ -2,6 +2,7 @@ package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.Constants;
 import com.fuint.common.dto.*;
+import com.fuint.common.enums.PlatformTypeEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.param.TableParam;
@@ -134,12 +135,10 @@ public class BackendCashierController extends BaseController {
         List<MtGoodsCate> cateList = cateService.queryCateListByParams(param);
 
         param.put("status", StatusEnum.ENABLED.getKey());
-        Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, "", cateId, page, pageSize);
-
-        String imagePath = settingService.getUploadBasePath();
+        Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, "", PlatformTypeEnum.PC.getCode(), cateId, page, pageSize);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("imagePath", imagePath);
+        result.put("imagePath", settingService.getUploadBasePath());
         result.put("storeInfo", storeInfo);
         result.put("memberInfo", memberInfo);
         result.put("accountInfo", accountDto);
@@ -180,7 +179,7 @@ public class BackendCashierController extends BaseController {
             }
         }
 
-        Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, keyword, 0, 1, 100);
+        Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, keyword, PlatformTypeEnum.PC.getCode(), 0, 1, 100);
         return getSuccessResult(goodsData.get("goodsList"));
     }
 

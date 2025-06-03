@@ -93,14 +93,15 @@ public interface GoodsService {
     /**
      * 获取店铺的商品列表
      *
-     * @param storeId
-     * @param keyword
-     * @param cateId
-     * @param page
-     * @param pageSize
+     * @param storeId 店铺ID
+     * @param keyword 关键字
+     * @param platform 平台
+     * @param cateId 分类ID
+     * @param page 当前页码
+     * @param pageSize 每页数量
      * @return
      * */
-    Map<String, Object> getStoreGoodsList(Integer storeId, String keyword, Integer cateId, Integer page, Integer pageSize) throws BusinessCheckException;
+    Map<String, Object> getStoreGoodsList(Integer storeId, String keyword, String platform, Integer cateId, Integer page, Integer pageSize) throws BusinessCheckException;
 
     /**
      * 根据skuId获取规格列表
