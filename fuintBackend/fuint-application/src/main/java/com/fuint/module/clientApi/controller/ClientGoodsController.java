@@ -75,8 +75,6 @@ public class ClientGoodsController extends BaseController {
         Integer tableId = request.getHeader("tableId") == null ? 0 : Integer.parseInt(request.getHeader("tableId"));
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
 
-        Map<String, Object> param = new HashMap<>();
-        param.put("status", StatusEnum.ENABLED.getKey());
         Integer merchantId = merchantService.getMerchantId(merchantNo);
         if (tableId > 0) {
             MtTable mtTable = tableService.queryTableById(tableId);
@@ -84,13 +82,7 @@ public class ClientGoodsController extends BaseController {
                 storeId = mtTable.getStoreId();
             }
         }
-        if (merchantId > 0) {
-            param.put("merchantId", merchantId);
-        }
-        if (storeId > 0) {
-            param.put("storeId", storeId);
-        }
-        List<MtGoodsCate> cateList = cateService.queryCateListByParams(param);
+        List<MtGoodsCate> cateList = cateService.getCateList(merchantId, storeId, null, StatusEnum.ENABLED.getKey());
         Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, "", platform, 0, 1, 500);
         List<MtGoods> goodsList = (ArrayList)goodsData.get("goodsList");
         String baseImage = settingService.getUploadBasePath();
