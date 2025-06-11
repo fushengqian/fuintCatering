@@ -368,11 +368,12 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
      *
      * @param merchantId 商户ID
      * @param storeId 店铺ID
+     * @param name 店铺名称
      * @return
      * */
     @Override
-    public List<MtStore> getActiveStoreList(Integer merchantId, Integer storeId) {
-        return mtStoreMapper.getActiveStoreList(merchantId, storeId);
+    public List<MtStore> getActiveStoreList(Integer merchantId, Integer storeId, String name) {
+        return mtStoreMapper.getActiveStoreList(merchantId, storeId, name);
     }
 
     /**

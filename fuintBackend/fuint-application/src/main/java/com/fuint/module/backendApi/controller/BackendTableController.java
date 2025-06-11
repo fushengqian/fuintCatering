@@ -96,7 +96,7 @@ public class BackendTableController extends BaseController {
         paginationRequest.setSearchParams(params);
         PaginationResponse<MtTable> paginationResponse = tableService.queryTableListByPagination(paginationRequest);
 
-        List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId());
+        List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
 
         Map<String, Object> result = new HashMap<>();
         result.put("imagePath", settingService.getUploadBasePath());

@@ -36,6 +36,9 @@
         <if test="storeId != null and storeId != ''">
             AND t.ID = #{storeId}
         </if>
+        <if test="name != null and name != ''">
+            AND t.name LIKE concat('%',#{name},'%')
+        </if>
     </select>
 
     <update id="deleteStoreByMerchant">

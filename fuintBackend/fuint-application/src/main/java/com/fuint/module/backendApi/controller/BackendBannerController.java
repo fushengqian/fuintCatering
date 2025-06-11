@@ -99,24 +99,14 @@ public class BackendBannerController extends BaseController {
         paginationRequest.setSearchParams(params);
         PaginationResponse<MtBanner> paginationResponse = bannerService.queryBannerListByPagination(paginationRequest);
 
-        Map<String, Object> paramsStore = new HashMap<>();
-        paramsStore.put("status", StatusEnum.ENABLED.getKey());
-        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
-            paramsStore.put("storeId", accountInfo.getStoreId().toString());
-        }
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            paramsStore.put("merchantId", accountInfo.getMerchantId());
-        }
-
-        List<MtStore> storeList = storeService.queryStoresByParams(paramsStore);
-        String imagePath = settingService.getUploadBasePath();
+        List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
 
         // 展示位置列表
         List<ParamDto> positionList = PositionEnum.getPositionList();
 
         Map<String, Object> result = new HashMap<>();
         result.put("dataList", paginationResponse);
-        result.put("imagePath", imagePath);
+        result.put("imagePath", settingService.getUploadBasePath());
         result.put("storeList", storeList);
         result.put("positionList", positionList);
 

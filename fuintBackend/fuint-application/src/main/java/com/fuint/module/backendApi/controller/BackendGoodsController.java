@@ -123,15 +123,7 @@ public class BackendGoodsController extends BaseController {
         // 商品类型列表
         List<ParamDto> typeList = GoodsTypeEnum.getGoodsTypeList();
 
-        Map<String, Object> paramsStore = new HashMap<>();
-        paramsStore.put("status", StatusEnum.ENABLED.getKey());
-        if (storeId != null && storeId > 0) {
-            paramsStore.put("storeId", storeId.toString());
-        }
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            paramsStore.put("merchantId", accountInfo.getMerchantId());
-        }
-        List<MtStore> storeList = storeService.queryStoresByParams(paramsStore);
+        List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), storeId, null);
         List<MtGoodsCate> cateList = cateService.getCateList(accountInfo.getMerchantId(), storeId, null, StatusEnum.ENABLED.getKey());
 
         Map<String, Object> result = new HashMap<>();
@@ -301,15 +293,8 @@ public class BackendGoodsController extends BaseController {
         String imagePath = settingService.getUploadBasePath();
         result.put("imagePath", imagePath);
 
-        Map<String, Object> paramsStore = new HashMap<>();
-        paramsStore.put("status", StatusEnum.ENABLED.getKey());
-        if (storeId != null && storeId > 0) {
-            paramsStore.put("storeId", storeId.toString());
-        }
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            paramsStore.put("merchantId", accountInfo.getMerchantId());
-        }
-        List<MtStore> storeList = storeService.queryStoresByParams(paramsStore);
+        // 店铺列表
+        List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), storeId, null);
 
         // 商品类型列表
         List<ParamDto> typeList = GoodsTypeEnum.getGoodsTypeList();

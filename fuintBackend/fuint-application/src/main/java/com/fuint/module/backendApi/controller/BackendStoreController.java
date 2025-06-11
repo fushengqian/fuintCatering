@@ -122,32 +122,20 @@ public class BackendStoreController extends BaseController {
     @CrossOrigin
     public ResponseObject search(HttpServletRequest request) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
-        String merchantId = request.getParameter("merchantId") == null ? "" : request.getParameter("merchantId");
-        String storeId = request.getParameter("id") == null ? "" : request.getParameter("id");
+        Integer merchantId = request.getParameter("merchantId") == null ? 0 : Integer.parseInt(request.getParameter("merchantId"));
+        Integer storeId = request.getParameter("id") == null ? 0 : Integer.parseInt(request.getParameter("id"));
         String storeName = request.getParameter("name") == null ? "" : request.getParameter("name");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
 
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
-            storeId = accountInfo.getStoreId().toString();
+            storeId = accountInfo.getStoreId();
         }
 
-        Map<String, Object> paramsStore = new HashMap<>();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            merchantId = accountInfo.getMerchantId().toString();
+            merchantId = accountInfo.getMerchantId();
         }
-        if (StringUtil.isNotEmpty(merchantId)) {
-            paramsStore.put("merchantId", merchantId);
-        }
-        if (StringUtil.isNotEmpty(storeId)) {
-            paramsStore.put("storeId", storeId);
-        }
-        if (StringUtil.isNotEmpty(storeName)) {
-            paramsStore.put("name", storeName);
-        }
-
-        paramsStore.put("status", StatusEnum.ENABLED.getKey());
-        List<MtStore> storeList = storeService.queryStoresByParams(paramsStore);
+        List<MtStore> storeList = storeService.getActiveStoreList(merchantId, storeId, storeName);
         Map<String, Object> result = new HashMap<>();
         result.put("storeList", storeList);
 

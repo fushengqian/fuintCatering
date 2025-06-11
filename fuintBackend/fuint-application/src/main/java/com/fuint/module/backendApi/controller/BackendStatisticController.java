@@ -3,7 +3,6 @@ package com.fuint.module.backendApi.controller;
 import com.fuint.common.dto.AccountInfo;
 import com.fuint.common.dto.GoodsTopDto;
 import com.fuint.common.dto.MemberTopDto;
-import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.StatisticParam;
 import com.fuint.common.service.GoodsService;
 import com.fuint.common.service.MemberService;
@@ -103,15 +102,7 @@ public class BackendStatisticController extends BaseController {
         Integer totalPayUserCount = orderService.getPayUserCount(merchantId, storeId);
 
         // 店铺列表
-        Map<String, Object> params = new HashMap<>();
-        params.put("status", StatusEnum.ENABLED.getKey());
-        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
-            params.put("storeId", accountInfo.getStoreId().toString());
-        }
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            params.put("merchantId", accountInfo.getMerchantId());
-        }
-        List<MtStore> storeList = storeService.queryStoresByParams(params);
+        List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
 
         Map<String, Object> result = new HashMap<>();
 

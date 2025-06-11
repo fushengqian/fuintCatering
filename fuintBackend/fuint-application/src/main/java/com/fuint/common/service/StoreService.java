@@ -91,9 +91,10 @@ public interface StoreService extends IService<MtStore> {
      *
      * @param merchantId 商户ID
      * @param storeId 店铺ID
+     * @param name 店铺名称
      * @return
      * */
-    List<MtStore> getActiveStoreList(Integer merchantId, Integer storeId) throws BusinessCheckException;
+    List<MtStore> getActiveStoreList(Integer merchantId, Integer storeId, String name) throws BusinessCheckException;
 
     /**
      * 根据距离远近查找店铺

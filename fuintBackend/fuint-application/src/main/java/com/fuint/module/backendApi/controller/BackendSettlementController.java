@@ -102,7 +102,7 @@ public class BackendSettlementController extends BaseController {
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             params.put("merchantId", accountInfo.getMerchantId());
         }
-        List<MtStore> storeList = storeService.queryStoresByParams(params);
+        List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
         List<MtMerchant> merchantList = merchantService.queryMerchantByParams(params);
 
         PaginationRequest paginationRequest = new PaginationRequest();

@@ -81,7 +81,7 @@ public class ClientPointsController extends BaseController {
     @ApiOperation(value = "转赠积分")
     @RequestMapping(value = "/doGive", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject doGive(HttpServletRequest request, @RequestBody Map<String, Object> param) {
+    public ResponseObject doGive(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
 
         if (StringUtil.isEmpty(token)) {
@@ -98,14 +98,10 @@ public class ClientPointsController extends BaseController {
         String remark = param.get("remark") == null ? "" : param.get("remark").toString();
         Integer amount = param.get("amount") == null ? 0 : Integer.parseInt(param.get("amount").toString());
 
-        try {
-            boolean result = pointService.doGift(mtUser.getId(), mobile, amount, remark);
-            if (result) {
-                return getSuccessResult(true);
-            } else {
-                return getFailureResult(3008);
-            }
-        } catch (BusinessCheckException e) {
+        boolean result = pointService.doGift(mtUser.getId(), mobile, amount, remark);
+        if (result) {
+            return getSuccessResult(true);
+        } else {
             return getFailureResult(3008);
         }
     }

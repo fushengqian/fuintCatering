@@ -10,7 +10,6 @@ import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.common.Constants;
-import com.fuint.common.enums.StatusEnum;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -107,15 +106,8 @@ public class BackendCommissionCashController extends BaseController {
         paginationRequest.setSearchParams(params);
         PaginationResponse<CommissionCashDto> paginationResponse = commissionCashService.queryCommissionCashByPagination(paginationRequest);
 
-        Map<String, Object> paramsStore = new HashMap<>();
-        paramsStore.put("status", StatusEnum.ENABLED.getKey());
-        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
-            paramsStore.put("storeId", accountInfo.getStoreId().toString());
-        }
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            paramsStore.put("merchantId", accountInfo.getMerchantId());
-        }
-        List<MtStore> storeList = storeService.queryStoresByParams(paramsStore);
+        // 店铺列表
+        List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
 
         // 状态列表
         List<ParamDto> statusList = CommissionCashStatusEnum.getCommissionCashStatusList();

@@ -139,16 +139,6 @@ public class BackendCouponController extends BaseController {
         List<MtCoupon> dataList = paginationResponse.getContent();
         List<MtCouponGroup> groupList = new ArrayList<>();
 
-        Map<String, Object> paramsStore = new HashMap<>();
-        paramsStore.put("status", StatusEnum.ENABLED.getKey());
-        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
-            paramsStore.put("storeId", accountInfo.getStoreId().toString());
-        }
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            paramsStore.put("merchantId", accountInfo.getMerchantId());
-        }
-        List<MtStore> storeList = storeService.queryStoresByParams(paramsStore);
-
         if (dataList.size() > 0) {
             for (MtCoupon coupon : dataList) {
                 MtCouponGroup groupInfo = mtCouponGroupMapper.selectById(coupon.getGroupId());
@@ -186,6 +176,9 @@ public class BackendCouponController extends BaseController {
 
         // 卡券使用专项列表
         List<ParamDto> couponUseForList = CouponUseForEnum.getCouponUseForList();
+
+        // 店铺列表
+        List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
 
         // 会员等级列表
         Map<String, Object> param = new HashMap<>();
