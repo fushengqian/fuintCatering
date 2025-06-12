@@ -80,7 +80,7 @@ public class PrinterUtil {
         ObjectRestResponse<String> result = JSON.parseObject(resp, new TypeReference<ObjectRestResponse<String>>(){});
 
         if (result == null || result.getCode() != 0) {
-            logger.error("云打印机打印失败，原因：", result.getMsg());
+            logger.error("云打印小票订单失败，原因：", result.getMsg());
         }
 
         return result;
@@ -96,7 +96,13 @@ public class PrinterUtil {
         String url = BASE_URL + "/xprinter/printLabel";
         String jsonRequest = JSON.toJSONString(restRequest);
         String resp = HttpClientUtil.doPostJSON(url, jsonRequest);
-        return JSON.parseObject(resp, new TypeReference<ObjectRestResponse<String>>(){});
+        ObjectRestResponse<String> result =  JSON.parseObject(resp, new TypeReference<ObjectRestResponse<String>>(){});
+
+        if (result == null || result.getCode() != 0) {
+            logger.error("云打印标签订单失败，原因：", result.getMsg());
+        }
+
+        return result;
     }
 
     /**

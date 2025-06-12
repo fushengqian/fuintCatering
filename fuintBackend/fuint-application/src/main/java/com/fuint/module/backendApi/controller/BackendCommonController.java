@@ -2,11 +2,11 @@ package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.dto.AccountInfo;
 import com.fuint.common.enums.QrCodeEnum;
+import com.fuint.common.param.QrParam;
 import com.fuint.common.service.*;
 import com.fuint.common.util.Base64Util;
 import com.fuint.common.util.QRCodeUtil;
 import com.fuint.common.util.TokenUtil;
-import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtCoupon;
@@ -15,8 +15,6 @@ import com.fuint.repository.model.MtTable;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
@@ -35,8 +33,6 @@ import java.util.Map;
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/common")
 public class BackendCommonController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(BackendCommonController.class);
 
     private Environment env;
 
@@ -73,12 +69,11 @@ public class BackendCommonController extends BaseController {
     @ApiOperation(value = "生成二维码")
     @RequestMapping(value = "/createQrCode", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject createQrCode(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        String type = params.get("type") != null ? params.get("type").toString() : "";
-        Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
+    public ResponseObject createQrCode(HttpServletRequest request, @RequestBody QrParam qrParam) throws Exception {
+        String type = qrParam.getType() != null ? qrParam.getType() : "";
+        Integer id = qrParam.getId() == null ? 0 : qrParam.getId();
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         Integer merchantId = accountInfo.getMerchantId();
         String page = QrCodeEnum.STORE.getPage() + "?" + QrCodeEnum.STORE.getKey() + "Id=" + id;
         if (type.equals(QrCodeEnum.TABLE.getKey())) {
@@ -104,15 +99,11 @@ public class BackendCommonController extends BaseController {
             }
         }
         String h5QrCode = "";
-        try {
-            String h5Page = env.getProperty("website.url") + "#" + page;
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            QRCodeUtil.createQrCode(out, h5Page, 800, 800, "png", "");
-            h5QrCode = new String(Base64Util.baseEncode(out.toByteArray()), "UTF-8");
-            h5QrCode = "data:image/jpg;base64," + h5QrCode;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
+        String h5Page = env.getProperty("website.url") + "#" + page;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        QRCodeUtil.createQrCode(out, h5Page, 800, 800, "png", "");
+        h5QrCode = new String(Base64Util.baseEncode(out.toByteArray()), "UTF-8");
+        h5QrCode = "data:image/jpg;base64," + h5QrCode;
 
         String imagePath = settingService.getUploadBasePath();
         String minAppQrCode = weixinService.createQrCode(merchantId, type, id, page, 320);
@@ -123,5 +114,23 @@ public class BackendCommonController extends BaseController {
         result.put("h5QrCode", h5QrCode);
 
         return getSuccessResult(result);
+    }
+
+    /**
+     * 生成条形码
+     *
+     * @return
+     */
+    @ApiOperation(value = "生成条形码")
+    @RequestMapping(value = "/createBarCode", method = RequestMethod.POST)
+    @CrossOrigin
+    public ResponseObject createBarCode(@RequestBody QrParam qrParam) throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        QRCodeUtil.createBarCode(out, qrParam.getContent(), 800, 800);
+
+        String barcode = new String(Base64Util.baseEncode(out.toByteArray()), "UTF-8");
+        barcode = "data:image/jpg;base64," + barcode;
+
+        return getSuccessResult(barcode);
     }
 }

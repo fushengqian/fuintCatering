@@ -806,4 +806,18 @@ public class BackendGoodsController extends BaseController {
 
         return getSuccessResult(result);
     }
+
+    /**
+     * 获取商品条码
+     *
+     * @param goodsId
+     * @return
+     */
+    @ApiOperation(value = "获取商品条码")
+    @RequestMapping(value = "/getBarCodeList/{id}", method = RequestMethod.GET)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('goods:goods:index')")
+    public ResponseObject getBarCodeList(@PathVariable("id") Integer goodsId) throws BusinessCheckException {
+        return getSuccessResult(true);
+    }
 }
