@@ -189,7 +189,7 @@ public class ClientSignController extends BaseController {
         String password = param.get("password").toString();
         String captchaCode = param.get("captchaCode") == null ? "" : param.get("captchaCode").toString();
         String uuid = param.get("uuid") == null ? "" : param.get("uuid").toString();
-        Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
+        Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
         String userAgent = request.getHeader("user-agent") == null ? "" : request.getHeader("user-agent");
 
         if (StringUtil.isEmpty(account)) {

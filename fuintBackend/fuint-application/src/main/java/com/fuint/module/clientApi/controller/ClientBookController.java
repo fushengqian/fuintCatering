@@ -83,7 +83,7 @@ public class ClientBookController extends BaseController {
     @CrossOrigin
     public ResponseObject list(HttpServletRequest request,  @RequestBody BookListParam param) throws BusinessCheckException, InvocationTargetException, IllegalAccessException {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
-        Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
+        Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
         String name = param.getName();
         Integer cateId = param.getCateId();
         Integer page = param.getPage() == null ? Constants.PAGE_NUMBER : param.getPage();
@@ -150,7 +150,7 @@ public class ClientBookController extends BaseController {
     @CrossOrigin
     public ResponseObject cateList(HttpServletRequest request) throws BusinessCheckException {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
-        Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
+        Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
 
         Map<String, Object> param = new HashMap<>();
         param.put("status", StatusEnum.ENABLED.getKey());
@@ -187,7 +187,7 @@ public class ClientBookController extends BaseController {
     @CrossOrigin
     public ResponseObject submit(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException, ParseException {
         String token = request.getHeader("Access-Token");
-        Integer storeId = request.getHeader("storeId") == null ? 0 : Integer.parseInt(request.getHeader("storeId"));
+        Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
         String bookId = param.get("bookId") == null ? "" : param.get("bookId").toString();
         String remark = param.get("remark") == null ? "" : param.get("remark").toString();
         String mobile = param.get("mobile") == null ? "" : param.get("mobile").toString();
