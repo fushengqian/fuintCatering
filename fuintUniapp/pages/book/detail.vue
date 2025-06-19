@@ -7,8 +7,8 @@
                 ｜请选择预约日期
             </view>
                 <view v-if="dateArr && dateArr.length > 0" class="list-v">
-                    <view @click="dateClick(index)" v-for="(item, index) in dateArr" :key="index" :class="[dateIndex==index?'activeItem':'item-v']">
-                        <view>{{item.week}}</view>
+                    <view @click="dateClick(index)" v-for="(item, index) in dateArr" :key="index" v-if="item.enable" :class="[dateIndex==index?'activeItem':'item-v']">
+                        <view>{{ item.week }}</view>
                         <view>{{ item.date }}</view>
                     </view>
                 </view>

@@ -135,7 +135,7 @@ public class ClientBookController extends BaseController {
     public ResponseObject detail(@RequestBody BookDetailParam param) throws BusinessCheckException, InvocationTargetException, IllegalAccessException, ParseException {
         Integer bookId = param.getBookId() == null ? 0 : param.getBookId();
 
-        BookDto bookInfo = bookService.getBookById(bookId);
+        BookDto bookInfo = bookService.getBookById(bookId, true);
         Map<String, Object> result = new HashMap<>();
         result.put("bookInfo", bookInfo);
 
@@ -171,10 +171,10 @@ public class ClientBookController extends BaseController {
     /**
      * 是否可预约
      */
-    @ApiOperation(value="获取预约项目详情", notes="根据ID获取预约项目详情")
+    @ApiOperation(value="获取预约项目是否可预约", notes="根据ID获取预约项目是否可预约")
     @RequestMapping(value = "/bookable", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject bookable(@RequestBody BookableParam param) throws BusinessCheckException {
+    public ResponseObject bookable(@RequestBody BookableParam param) throws BusinessCheckException, ParseException {
         List<String> result = bookService.isBookable(param);
         return getSuccessResult(result);
     }
@@ -201,7 +201,7 @@ public class ClientBookController extends BaseController {
         }
 
         MtUser mtUser = memberService.queryMemberById(loginInfo.getId());
-        BookDto bookInfo = bookService.getBookById(Integer.parseInt(bookId));
+        BookDto bookInfo = bookService.getBookById(Integer.parseInt(bookId), true);
         if (bookInfo == null) {
             return getFailureResult(2001);
         }

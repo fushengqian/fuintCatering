@@ -40,7 +40,7 @@ import java.util.*;
 @AllArgsConstructor
 public class CateServiceImpl extends ServiceImpl<MtGoodsCateMapper, MtGoodsCate> implements CateService {
 
-    private static final Logger log = LoggerFactory.getLogger(CateServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(CateServiceImpl.class);
 
     private MtGoodsMapper mtGoodsMapper;
 
@@ -195,7 +195,7 @@ public class CateServiceImpl extends ServiceImpl<MtGoodsCateMapper, MtGoodsCate>
     public MtGoodsCate updateCate(MtGoodsCate reqDto) throws BusinessCheckException {
         MtGoodsCate mtCate = queryCateById(reqDto.getId());
         if (null == mtCate) {
-            log.error("该分类状态异常");
+            logger.error("该分类状态异常");
             throw new BusinessCheckException("该分类状态异常");
         }
         mtCate.setId(reqDto.getId());
