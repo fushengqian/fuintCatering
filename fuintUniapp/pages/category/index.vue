@@ -8,14 +8,14 @@
 
     <view class="cate-content dis-flex" v-if="list.length > 0">
       <!-- 左侧 分类 -->
-      <scroll-view class="cate-left f-28" :scroll-y="true" :style="{ height: `${scrollHeight}px` }">
-          <view v-for="(item, index) in list" :key="index">
-              <text class="cart-badge" v-if="item.total">{{ item.total }}</text>
-              <view class="type-nav" :class="{ selected: curIndex == index }" @click="handleSelectNav(index)">
-                  <image class="logo" lazy-load :lazy-load-margin="0" v-if="item.logo" :src="item.logo"></image>
-                  <view class="name">{{ item.name }}</view>
-              </view>
-          </view>
+      <scroll-view class="cate-left f-28" scroll-y :show-scrollbar="false" :enhanced="true" :style="{ height: `${scrollHeight}px` }">
+        <view v-for="(item, index) in list" :key="index">
+            <text class="cart-badge" v-if="item.total">{{ item.total }}</text>
+            <view class="type-nav" :class="{ selected: curIndex == index }" @click="handleSelectNav(index)">
+                <image class="logo" lazy-load :lazy-load-margin="0" :src="item.logo ? item.logo : '/static/empty-02.png'"></image>
+                <view class="name">{{ item.name }}</view>
+            </view>
+        </view>
       </scroll-view>
 
       <!-- 右侧 商品 -->
@@ -335,11 +335,13 @@
   .cate-wrapper {
     padding: 0 20rpx 20rpx 20rpx;
     box-sizing: border-box;
+    overflow: hidden;
   }
 
   /* 分类内容 */
   .cate-content {
     width: 100%;
+    overflow: hidden;
   }
 
   .cate-left {
@@ -350,6 +352,12 @@
     height: 100%;
     background: #f8f8f8;
     margin-bottom: 120rpx;
+    overflow: hidden;
+    &::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
     .cart-badge {
       position: absolute;
       right: 1rpx;
