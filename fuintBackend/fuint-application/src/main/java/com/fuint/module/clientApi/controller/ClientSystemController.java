@@ -151,12 +151,19 @@ public class ClientSystemController extends BaseController {
             storeInfo = null;
         }
 
+        // 桌码信息
+        MtTable tableInfo = null;
+        if (StringUtil.isNotEmpty(tableId)) {
+            tableInfo = tableService.queryTableById(Integer.parseInt(tableId));
+        }
+
         // 支付方式列表
         List<ParamDto> payTypeList = settingService.getPayTypeList(merchantId, storeInfo.getId(), platform);
 
         Map<String, Object> result = new HashMap<>();
         result.put("storeInfo", storeInfo);
         result.put("payTypeList", payTypeList);
+        result.put("tableInfo", tableInfo);
 
         return getSuccessResult(result);
     }

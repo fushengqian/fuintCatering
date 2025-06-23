@@ -1,7 +1,7 @@
 <template>
   <view class="container">
     <!--店铺切换-->
-    <Location v-if="storeInfo" :storeInfo="storeInfo"/>
+    <Location v-if="storeInfo" :storeInfo="storeInfo" :tableInfo="tableInfo"/>
     
     <!-- 搜索框 -->
     <Search tips="请输入搜索关键字..." @event="$navTo('pages/search/index')" />
@@ -115,7 +115,8 @@
         showSkuPopup: false,
         skuMode: 1,
         goods: {},
-        storeInfo: null
+        storeInfo: null,
+        tableInfo: null
       }
     },
 
@@ -204,7 +205,8 @@
          const app = this
          settingApi.systemConfig()
            .then(result => {
-               app.storeInfo = result.data.storeInfo
+               app.storeInfo = result.data.storeInfo;
+               app.tableInfo = result.data.tableInfo;
            })
        },
       

@@ -7,7 +7,10 @@
             <text class="store">
                <text class="name">{{ storeInfo.name }}</text>
                <text class="switch">[切换店铺]</text>
-               <text class="address"><text class="location-icon iconfont icon-dingwei"></text>{{ storeInfo.address }}</text>
+               <text class="address" v-if="storeInfo.address"><text class="location-icon iconfont icon-dingwei"></text>{{ storeInfo.address }}</text>
+            </text>
+            <text class="table" v-if="tableInfo">
+                <text class="code">桌码 : {{ tableInfo.code ? tableInfo.code : '-' }}</text>
             </text>
           </view>
         </view>
@@ -24,7 +27,8 @@
      */
     props: {
       itemStyle: Object,
-      storeInfo: Object
+      storeInfo: Object,
+      tableInfo: Object
     },
 
     /**
@@ -78,6 +82,8 @@
   }
   
   .store {
+      height: 120rpx;
+      float: left;
       .name {
           font-size: 32rpx;
           font-weight: bold;
@@ -102,6 +108,15 @@
             font-weight: bold;
           }
       }
+  }
+  .table {
+      height: 100rpx;
+      line-height: 100rpx;
+      float: right;
+      margin-right: 10rpx;
+      display: block;
+      color: #ffffff;
+      font-size: 20rpx;
   }
 }
   
