@@ -10,13 +10,13 @@ import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.service.BalanceService;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.SettingService;
-import com.fuint.common.util.CommonUtil;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
+import com.fuint.module.backendApi.request.RechargeRequest;
 import com.fuint.repository.model.MtBalance;
 import com.fuint.repository.model.MtSetting;
 import com.fuint.repository.model.MtUser;
@@ -125,40 +125,34 @@ public class BackendBalanceController extends BaseController {
     @RequestMapping(value = "/doRecharge", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('balance:modify')")
-    public ResponseObject doRecharge(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject doRecharge(HttpServletRequest request, @RequestBody RechargeRequest rechargeParam) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
-        String amount = param.get("amount") == null ? "0" : param.get("amount").toString();
-        String remark = param.get("remark") == null ? "后台充值" : param.get("remark").toString();
-        Integer userId = param.get("userId") == null ? 0 : Integer.parseInt(param.get("userId").toString());
-        Integer type = param.get("type") == null ? 1 : Integer.parseInt(param.get("type").toString());// 1 增加，2 扣减
+        BigDecimal amount = rechargeParam.getAmount();
+        String remark = rechargeParam.getRemark();
+        Integer userId = rechargeParam.getUserId();
+        Integer type = rechargeParam.getType();// 1 增加，2 扣减
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
-        if (!CommonUtil.isNumeric(amount)) {
-            return getFailureResult(201, "充值金额必须是数字");
-        }
         if (userId < 1) {
             return getFailureResult(201, "充值会员信息不能为空");
         }
 
-        String operator = accountInfo.getAccountName();
         MtBalance mtBalance = new MtBalance();
-
         MtUser userInfo = memberService.queryMemberById(userId);
 
         // 扣减余额
         if (type == 2) {
-            if (userInfo.getBalance().compareTo(new BigDecimal(amount)) < 0) {
+            if (userInfo.getBalance().compareTo(amount) < 0) {
                 return getFailureResult(201, "操作失败，会员余额不足");
             }
-            mtBalance.setAmount(new BigDecimal(amount).subtract(new BigDecimal(amount).multiply(new BigDecimal("2"))));
+            mtBalance.setAmount(amount.subtract(amount.multiply(new BigDecimal("2"))));
         } else {
-            mtBalance.setAmount(new BigDecimal(amount));
+            mtBalance.setAmount(amount);
         }
         mtBalance.setMerchantId(accountInfo.getMerchantId());
         mtBalance.setDescription(remark);
         mtBalance.setUserId(userId);
-        mtBalance.setOperator(operator);
+        mtBalance.setOperator(accountInfo.getAccountName());
         mtBalance.setOrderSn("");
 
         balanceService.addBalance(mtBalance, true);
@@ -183,7 +177,6 @@ public class BackendBalanceController extends BaseController {
         String object = param.get("object") == null ? "" : param.get("object").toString();
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
         balanceService.distribute(accountInfo, object, userIds, amount, remark);
         return getSuccessResult(true);
     }
@@ -259,7 +252,7 @@ public class BackendBalanceController extends BaseController {
             return getFailureResult(201, "充值规则设置不能为空");
         }
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
-            return return getFailureResult(5002);
+            return getFailureResult(5002);
         }
 
         String rechargeRule = "";

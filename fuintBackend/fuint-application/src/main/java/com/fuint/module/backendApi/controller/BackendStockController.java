@@ -151,9 +151,7 @@ public class BackendStockController extends BaseController {
             return getFailureResult(201, "该数据不存在");
         }
 
-        String operator = accountInfo.getAccountName();
-        stockService.delete(id, operator);
-
+        stockService.delete(id, accountInfo.getAccountName());
         return getSuccessResult(true);
     }
 
@@ -188,8 +186,7 @@ public class BackendStockController extends BaseController {
         mtStock.setStatus(status);
         mtStock.setStoreId(storeId);
         mtStock.setType(type);
-        String operator = accountDto.getAccountName();
-        mtStock.setOperator(operator);
+        mtStock.setOperator(accountDto.getAccountName());
         stockService.addStock(mtStock, goodsList);
 
         return getSuccessResult(true);

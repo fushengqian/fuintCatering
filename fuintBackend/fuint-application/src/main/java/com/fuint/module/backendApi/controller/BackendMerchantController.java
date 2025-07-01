@@ -147,10 +147,7 @@ public class BackendMerchantController extends BaseController {
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             merchantId = accountInfo.getMerchantId();
         }
-
-        String operator = accountInfo.getAccountName();
-        merchantService.updateStatus(merchantId, operator, status);
-
+        merchantService.updateStatus(merchantId, accountInfo.getAccountName(), status);
         return getSuccessResult(true);
     }
 
@@ -218,9 +215,7 @@ public class BackendMerchantController extends BaseController {
             merchantInfo.setId(merchantId);
         }
 
-        String operator = accountInfo.getAccountName();
-        merchantInfo.setOperator(operator);
-
+        merchantInfo.setOperator(accountInfo.getAccountName());
         merchantService.saveMerchant(merchantInfo);
         return getSuccessResult(true);
     }
@@ -241,12 +236,9 @@ public class BackendMerchantController extends BaseController {
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             merchantId = accountInfo.getMerchantId();
         }
-
         MtMerchant merchantInfo = merchantService.queryMerchantById(merchantId);
-
         Map<String, Object> result = new HashMap<>();
         result.put("merchantInfo", merchantInfo);
-
         return getSuccessResult(result);
     }
 }

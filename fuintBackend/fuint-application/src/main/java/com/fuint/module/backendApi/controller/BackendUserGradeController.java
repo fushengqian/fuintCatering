@@ -152,9 +152,7 @@ public class BackendUserGradeController extends BaseController {
             return getFailureResult(201, "您没有删除权限");
         }
 
-        String operator = accountInfo.getAccountName();
-        userGradeService.deleteUserGrade(id, operator);
-
+        userGradeService.deleteUserGrade(id, accountInfo.getAccountName());
         return getSuccessResult(true);
     }
 

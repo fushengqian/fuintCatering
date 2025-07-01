@@ -186,10 +186,8 @@ public class BackendPointController extends BaseController {
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
-            return return getFailureResult(5002);
+            return getFailureResult(5002);
         }
-
-        String operator = accountInfo.getAccountName();
 
         PointSettingEnum[] settingList = PointSettingEnum.values();
         for (PointSettingEnum setting : settingList) {
@@ -211,7 +209,7 @@ public class BackendPointController extends BaseController {
 
             info.setDescription(setting.getValue());
             info.setStatus(status);
-            info.setOperator(operator);
+            info.setOperator(accountInfo.getAccountName());
             info.setUpdateTime(new Date());
 
             settingService.saveSetting(info);

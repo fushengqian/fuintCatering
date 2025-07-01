@@ -121,15 +121,12 @@ public class BackendBookCateController extends BaseController {
         Integer cateId = params.get("cateId") == null ? 0 : Integer.parseInt(params.get("cateId").toString());
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
         MtBookCate mtBookCate = bookCateService.getBookCateById(cateId);
         if (mtBookCate == null) {
             return getFailureResult(201);
         }
 
-        String operator = accountInfo.getAccountName();
-
-        mtBookCate.setOperator(operator);
+        mtBookCate.setOperator(accountInfo.getAccountName());
         mtBookCate.setStatus(status);
         bookCateService.updateBookCate(mtBookCate);
 

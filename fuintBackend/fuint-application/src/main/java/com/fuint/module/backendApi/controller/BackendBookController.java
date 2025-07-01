@@ -151,11 +151,9 @@ public class BackendBookController extends BaseController {
             return getFailureResult(201);
         }
 
-        String operator = accountInfo.getAccountName();
         MtBook mtBook = new MtBook();
         BeanUtils.copyProperties(bookDto, mtBook);
-
-        mtBook.setOperator(operator);
+        mtBook.setOperator(accountInfo.getAccountName());
         mtBook.setStatus(status);
         bookService.updateBook(mtBook);
 

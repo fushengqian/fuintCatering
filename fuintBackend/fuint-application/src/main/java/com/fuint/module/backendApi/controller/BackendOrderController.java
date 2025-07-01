@@ -346,10 +346,7 @@ public class BackendOrderController extends BaseController {
     public ResponseObject delete(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
-        String operator = accountInfo.getAccountName();
-        orderService.deleteOrder(id, operator);
-
+        orderService.deleteOrder(id, accountInfo.getAccountName());
         return getSuccessResult(true);
     }
 
@@ -412,9 +409,6 @@ public class BackendOrderController extends BaseController {
         String payOffLine = param.get("payOffLine") != null ? param.get("payOffLine").toString() : "N";
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
-        String operator = accountInfo.getAccountName();
-
         OrderSettingEnum[] settingList = OrderSettingEnum.values();
         for (OrderSettingEnum setting : settingList) {
             MtSetting info = new MtSetting();
@@ -434,7 +428,7 @@ public class BackendOrderController extends BaseController {
             info.setStoreId(accountInfo.getStoreId());
             info.setDescription(setting.getValue());
             info.setStatus(StatusEnum.ENABLED.getKey());
-            info.setOperator(operator);
+            info.setOperator(accountInfo.getAccountName());
             info.setUpdateTime(new Date());
 
             settingService.saveSetting(info);

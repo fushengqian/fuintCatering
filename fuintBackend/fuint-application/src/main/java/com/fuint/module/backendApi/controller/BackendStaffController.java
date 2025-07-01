@@ -139,7 +139,7 @@ public class BackendStaffController extends BaseController {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
-            return return getFailureResult(5002);
+            return getFailureResult(5002);
         }
 
         MtStaff mtStaff = new MtStaff();

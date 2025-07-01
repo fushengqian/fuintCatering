@@ -157,8 +157,7 @@ public class BackendGoodsController extends BaseController {
             }
         }
 
-        String operator = accountInfo.getAccountName();
-        goodsService.deleteGoods(goodsId, operator);
+        goodsService.deleteGoods(goodsId, accountInfo.getAccountName());
         logger.info("删除商品, goodsId = {},account = {}", goodsId, accountInfo.getAccountName());
 
         return getSuccessResult(true);
@@ -179,7 +178,6 @@ public class BackendGoodsController extends BaseController {
         Integer goodsId = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
         MtGoods mtGoods = goodsService.queryGoodsById(goodsId);
         if (mtGoods == null) {
             return getFailureResult(201, "该商品不存在");
@@ -191,10 +189,8 @@ public class BackendGoodsController extends BaseController {
             }
         }
 
-        String operator = accountInfo.getAccountName();
-
         MtGoods goodsInfo = new MtGoods();
-        goodsInfo.setOperator(operator);
+        goodsInfo.setOperator(accountInfo.getAccountName());
         goodsInfo.setId(goodsId);
         goodsInfo.setStatus(status);
         goodsService.saveGoods(goodsInfo, null);

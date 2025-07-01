@@ -158,9 +158,7 @@ public class BackendStoreController extends BaseController {
         Integer storeId = params.get("storeId") == null ? 0 : Integer.parseInt(params.get("storeId").toString());
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
-        String operator = accountInfo.getAccountName();
-        storeService.updateStatus(storeId, operator, status);
+        storeService.updateStatus(storeId, accountInfo.getAccountName(), status);
 
         return getSuccessResult(true);
     }
@@ -262,8 +260,7 @@ public class BackendStoreController extends BaseController {
             storeInfo.setId(Integer.parseInt(storeId));
         }
 
-        String operator = accountInfo.getAccountName();
-        storeInfo.setOperator(operator);
+        storeInfo.setOperator(accountInfo.getAccountName());
         storeService.saveStore(storeInfo);
 
         return getSuccessResult(true);

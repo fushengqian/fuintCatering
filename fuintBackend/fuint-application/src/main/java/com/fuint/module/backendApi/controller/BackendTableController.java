@@ -127,8 +127,7 @@ public class BackendTableController extends BaseController {
             return getFailureResult(201);
         }
 
-        String operator = accountInfo.getAccountName();
-        mtTable.setOperator(operator);
+        mtTable.setOperator(accountInfo.getAccountName());
         mtTable.setStatus(status);
         tableService.updateTable(mtTable);
 

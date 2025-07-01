@@ -162,9 +162,7 @@ public class BackendBookItemController extends BaseController {
             return getFailureResult(201);
         }
 
-        String operator = accountInfo.getAccountName();
-
-        mtBookItem.setOperator(operator);
+        mtBookItem.setOperator(accountInfo.getAccountName());
         mtBookItem.setStatus(status);
         bookItemService.updateBookItem(mtBookItem);
 

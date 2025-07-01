@@ -118,8 +118,7 @@ public class BackendTableAreaController extends BaseController {
             return getFailureResult(201);
         }
 
-        String operator = accountInfo.getAccountName();
-        mtTableArea.setOperator(operator);
+        mtTableArea.setOperator(accountInfo.getAccountName());
         mtTableArea.setStatus(status);
         tableAreaService.updateTableArea(mtTableArea);
 

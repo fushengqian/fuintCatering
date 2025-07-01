@@ -134,10 +134,8 @@ public class BackendBannerController extends BaseController {
             return getFailureResult(201);
         }
 
-        String operator = accountInfo.getAccountName();
-
         BannerDto bannerDto = new BannerDto();
-        bannerDto.setOperator(operator);
+        bannerDto.setOperator(accountInfo.getAccountName());
         bannerDto.setId(id);
         bannerDto.setStatus(status);
         bannerService.updateBanner(bannerDto);

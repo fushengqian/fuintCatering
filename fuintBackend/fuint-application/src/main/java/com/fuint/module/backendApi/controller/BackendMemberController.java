@@ -230,10 +230,7 @@ public class BackendMemberController extends BaseController {
     public ResponseObject delete(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
-        String operator = accountInfo.getAccountName();
-        memberService.deleteMember(id, operator);
-
+        memberService.deleteMember(id, accountInfo.getAccountName());
         return getSuccessResult(true);
     }
 

@@ -156,38 +156,37 @@ public class BackendOpenGiftController extends BaseController {
             return getFailureResult(201, "会员等级不能为空");
         }
 
-        MtOpenGift reqDto = new MtOpenGift();
+        MtOpenGift mtOpenGift = new MtOpenGift();
         if (StringUtil.isNotEmpty(couponId)) {
-            reqDto.setCouponId(Integer.parseInt(couponId));
+            mtOpenGift.setCouponId(Integer.parseInt(couponId));
         } else {
-            reqDto.setCouponId(0);
+            mtOpenGift.setCouponId(0);
         }
         if (StringUtil.isNotEmpty(couponNum)) {
-            reqDto.setCouponNum(Integer.parseInt(couponNum));
+            mtOpenGift.setCouponNum(Integer.parseInt(couponNum));
         } else {
-            reqDto.setCouponNum(0);
+            mtOpenGift.setCouponNum(0);
         }
         if (StringUtil.isNotEmpty(gradeId)) {
-            reqDto.setGradeId(Integer.parseInt(gradeId));
+            mtOpenGift.setGradeId(Integer.parseInt(gradeId));
         } else {
-            reqDto.setGradeId(0);
+            mtOpenGift.setGradeId(0);
         }
         if (StringUtil.isNotEmpty(point)) {
-            reqDto.setPoint(Integer.parseInt(point));
+            mtOpenGift.setPoint(Integer.parseInt(point));
         } else {
-            reqDto.setPoint(0);
+            mtOpenGift.setPoint(0);
         }
-        reqDto.setMerchantId(accountInfo.getMerchantId());
-        reqDto.setStoreId(0);
-        reqDto.setStatus(status);
-        String operator = accountInfo.getAccountName();
-        reqDto.setOperator(operator);
+        mtOpenGift.setMerchantId(accountInfo.getMerchantId());
+        mtOpenGift.setStoreId(0);
+        mtOpenGift.setStatus(status);
+        mtOpenGift.setOperator(accountInfo.getAccountName());
 
         if (StringUtil.isNotEmpty(id)) {
-            reqDto.setId(Integer.parseInt(id));
-            openGiftService.updateOpenGift(reqDto);
+            mtOpenGift.setId(Integer.parseInt(id));
+            openGiftService.updateOpenGift(mtOpenGift);
         } else {
-            openGiftService.addOpenGift(reqDto);
+            openGiftService.addOpenGift(mtOpenGift);
         }
 
         return getSuccessResult(true);
@@ -232,10 +231,7 @@ public class BackendOpenGiftController extends BaseController {
     public ResponseObject delete(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
-        String operator = accountInfo.getAccountName();
-        openGiftService.deleteOpenGift(id, operator);
-
+        openGiftService.deleteOpenGift(id, accountInfo.getAccountName());
         return getSuccessResult(true);
     }
 }

@@ -156,7 +156,7 @@ public class BackendSmsController extends BaseController {
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
-            return return getFailureResult(5002);
+            return getFailureResult(5002);
         }
 
         SmsSettingEnum[] settingList = SmsSettingEnum.values();
