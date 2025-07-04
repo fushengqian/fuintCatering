@@ -370,6 +370,7 @@ public class BackendOrderController extends BaseController {
         String isClose = "";
         String deliveryMinAmount = "";
         String payOffLine = "N";
+        String payFirst = "Y";
 
         for (MtSetting setting : settingList) {
             if (setting.getName().equals(OrderSettingEnum.DELIVERY_FEE.getKey())) {
@@ -379,14 +380,17 @@ public class BackendOrderController extends BaseController {
             } else if (setting.getName().equals(OrderSettingEnum.DELIVERY_MIN_AMOUNT.getKey())) {
                 deliveryMinAmount = setting.getValue();
             } else if (setting.getName().equals(OrderSettingEnum.PAY_OFF_LINE.getKey())) {
-            payOffLine = setting.getValue();
-        }
+                payOffLine = setting.getValue();
+            } else if (setting.getName().equals(OrderSettingEnum.PAY_FIRST.getKey())) {
+                payFirst = setting.getValue();
+            }
         }
 
         result.put("deliveryFee", deliveryFee);
         result.put("isClose", isClose);
         result.put("deliveryMinAmount", deliveryMinAmount);
         result.put("payOffLine", payOffLine);
+        result.put("payFirst", payFirst);
 
         return getSuccessResult(result);
     }
@@ -407,6 +411,7 @@ public class BackendOrderController extends BaseController {
         String isClose = param.get("isClose") != null ? param.get("isClose").toString() : YesOrNoEnum.FALSE.getKey();
         String deliveryMinAmount = param.get("deliveryMinAmount") != null ? param.get("deliveryMinAmount").toString() : "0";
         String payOffLine = param.get("payOffLine") != null ? param.get("payOffLine").toString() : "N";
+        String payFirst = param.get("payFirst") != null ? param.get("payFirst").toString() : "Y";
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
         OrderSettingEnum[] settingList = OrderSettingEnum.values();
@@ -421,8 +426,10 @@ public class BackendOrderController extends BaseController {
                 info.setValue(isClose);
             } else if (setting.getKey().equals(OrderSettingEnum.DELIVERY_MIN_AMOUNT.getKey())) {
                 info.setValue(deliveryMinAmount);
-            }  else if (setting.getKey().equals(OrderSettingEnum.PAY_OFF_LINE.getKey())) {
+            } else if (setting.getKey().equals(OrderSettingEnum.PAY_OFF_LINE.getKey())) {
                 info.setValue(payOffLine);
+            } else if (setting.getKey().equals(OrderSettingEnum.PAY_FIRST.getKey())) {
+                info.setValue(payFirst);
             }
             info.setMerchantId(accountInfo.getMerchantId());
             info.setStoreId(accountInfo.getStoreId());

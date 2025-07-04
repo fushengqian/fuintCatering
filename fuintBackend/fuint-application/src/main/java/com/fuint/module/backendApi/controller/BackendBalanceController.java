@@ -170,13 +170,12 @@ public class BackendBalanceController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('balance:distribute')")
     public ResponseObject distribute(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String amount = param.get("amount") == null ? "0" : param.get("amount").toString();
         String remark = param.get("remark") == null ? "后台充值" : param.get("remark").toString();
         String userIds = param.get("userIds") == null ? "" : param.get("userIds").toString();
         String object = param.get("object") == null ? "" : param.get("object").toString();
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         balanceService.distribute(accountInfo, object, userIds, amount, remark);
         return getSuccessResult(true);
     }

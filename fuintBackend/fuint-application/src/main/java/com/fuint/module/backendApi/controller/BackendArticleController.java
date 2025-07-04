@@ -201,11 +201,8 @@ public class BackendArticleController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('content:article:index')")
     public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         MtArticle articleInfo = articleService.queryArticleById(id);
-        String imagePath = settingService.getUploadBasePath();
 
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             if (!articleInfo.getMerchantId().equals(accountInfo.getMerchantId())) {
@@ -215,7 +212,7 @@ public class BackendArticleController extends BaseController {
 
         Map<String, Object> result = new HashMap<>();
         result.put("articleInfo", articleInfo);
-        result.put("imagePath", imagePath);
+        result.put("imagePath", settingService.getUploadBasePath());
 
         return getSuccessResult(result);
     }

@@ -60,7 +60,6 @@ public class BackendMerchantController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('merchant:index')")
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
 
@@ -68,7 +67,7 @@ public class BackendMerchantController extends BaseController {
         String merchantName = request.getParameter("name");
         String status = request.getParameter("status");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             merchantId = accountInfo.getMerchantId().toString();
         }
@@ -90,14 +89,12 @@ public class BackendMerchantController extends BaseController {
         paginationRequest.setSearchParams(params);
         PaginationResponse<MtMerchant> paginationResponse = merchantService.queryMerchantListByPagination(paginationRequest);
 
-        String imagePath = settingService.getUploadBasePath();
-
         // 商户类型列表
         List<ParamDto> typeList = MerchantTypeEnum.getMerchantTypeList();
 
         Map<String, Object> result = new HashMap<>();
         result.put("dataList", paginationResponse);
-        result.put("imagePath", imagePath);
+        result.put("imagePath", settingService.getUploadBasePath());
         result.put("typeList", typeList);
 
         return getSuccessResult(result);
@@ -140,11 +137,9 @@ public class BackendMerchantController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('merchant:index')")
     public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer merchantId = params.get("merchantId") == null ? 0 : Integer.parseInt(params.get("merchantId").toString());
-
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             merchantId = accountInfo.getMerchantId();
         }
@@ -163,14 +158,13 @@ public class BackendMerchantController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('merchant:index')")
     public ResponseObject saveHandler(HttpServletRequest request, @RequestBody MerchantSubmitRequest merchantInfo) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         Integer merchantId = accountInfo.getMerchantId();
 
         MtMerchant mtMerchant = new MtMerchant();
         BeanUtils.copyProperties(merchantInfo, mtMerchant);
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            mtMerchant.setId(accountInfo.getMerchantId());
+        if (merchantId != null && merchantId > 0) {
+            mtMerchant.setId(merchantId);
         }
 
         if (StringUtil.isEmpty(mtMerchant.getName())) {
@@ -182,7 +176,7 @@ public class BackendMerchantController extends BaseController {
             }
         }
 
-        if (mtMerchant.getId() == null && accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+        if (mtMerchant.getId() == null && merchantId != null && merchantId > 0) {
             return getFailureResult(201, "抱歉，您没有添加商户的权限");
         }
 
@@ -203,8 +197,7 @@ public class BackendMerchantController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('merchant:index')")
     public ResponseObject getMerchantInfo(HttpServletRequest request, @PathVariable("id") Integer merchantId) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             merchantId = accountInfo.getMerchantId();
         }
