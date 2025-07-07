@@ -11,7 +11,8 @@ public enum OrderSettingEnum {
     DELIVERY_MIN_AMOUNT("deliveryMinAmount", "订单起送金额"),
     IS_CLOSE("isClose", "关闭交易功能"),
     PAY_OFF_LINE("payOffLine", "开启前台支付功能"),
-    PAY_FIRST("payFirst", "门店支付模式");
+    PAY_FIRST("payFirst", "门店支付模式"),
+    DELIVERY_RANGE("deliveryRange", "配送范围");
 
     private String key;
 

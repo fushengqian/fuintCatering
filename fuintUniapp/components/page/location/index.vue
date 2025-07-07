@@ -6,7 +6,7 @@
           <view class="location-input">
             <text class="store">
                <text class="name">{{ storeInfo.name }}</text>
-               <text class="switch">[切换店铺]</text>
+               <text class="switch" v-if="storeInfo.single == 'N'">[切换店铺]</text>
                <text class="address" v-if="storeInfo.address"><text class="location-icon iconfont icon-dingwei"></text>{{ storeInfo.address }}</text>
             </text>
             <text class="table" v-if="tableInfo">

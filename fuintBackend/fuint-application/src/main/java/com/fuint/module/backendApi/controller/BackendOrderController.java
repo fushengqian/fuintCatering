@@ -371,6 +371,7 @@ public class BackendOrderController extends BaseController {
         String deliveryMinAmount = "";
         String payOffLine = "N";
         String payFirst = "Y";
+        String deliveryRange = "0";
 
         for (MtSetting setting : settingList) {
             if (setting.getName().equals(OrderSettingEnum.DELIVERY_FEE.getKey())) {
@@ -383,6 +384,8 @@ public class BackendOrderController extends BaseController {
                 payOffLine = setting.getValue();
             } else if (setting.getName().equals(OrderSettingEnum.PAY_FIRST.getKey())) {
                 payFirst = setting.getValue();
+            } else if (setting.getName().equals(OrderSettingEnum.DELIVERY_RANGE.getKey())) {
+                deliveryRange = setting.getValue();
             }
         }
 
@@ -391,17 +394,18 @@ public class BackendOrderController extends BaseController {
         result.put("deliveryMinAmount", deliveryMinAmount);
         result.put("payOffLine", payOffLine);
         result.put("payFirst", payFirst);
+        result.put("deliveryRange", deliveryRange);
 
         return getSuccessResult(result);
     }
 
     /**
-     * 保存订单设置
+     * 保存交易设置
      *
      * @param request HttpServletRequest对象
      * @return
      */
-    @ApiOperation(value = "保存订单设置")
+    @ApiOperation(value = "保存交易设置")
     @RequestMapping(value = "/saveSetting", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('order:setting')")
@@ -412,6 +416,7 @@ public class BackendOrderController extends BaseController {
         String deliveryMinAmount = param.get("deliveryMinAmount") != null ? param.get("deliveryMinAmount").toString() : "0";
         String payOffLine = param.get("payOffLine") != null ? param.get("payOffLine").toString() : "N";
         String payFirst = param.get("payFirst") != null ? param.get("payFirst").toString() : "Y";
+        String deliveryRange = param.get("deliveryRange") != null ? param.get("deliveryRange").toString() : "";
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
         OrderSettingEnum[] settingList = OrderSettingEnum.values();
@@ -419,7 +424,6 @@ public class BackendOrderController extends BaseController {
             MtSetting info = new MtSetting();
             info.setType(SettingTypeEnum.ORDER.getKey());
             info.setName(setting.getKey());
-
             if (setting.getKey().equals(OrderSettingEnum.DELIVERY_FEE.getKey())) {
                 info.setValue(deliveryFee);
             } else if (setting.getKey().equals(OrderSettingEnum.IS_CLOSE.getKey())) {
@@ -430,6 +434,8 @@ public class BackendOrderController extends BaseController {
                 info.setValue(payOffLine);
             } else if (setting.getKey().equals(OrderSettingEnum.PAY_FIRST.getKey())) {
                 info.setValue(payFirst);
+            } else if (setting.getKey().equals(OrderSettingEnum.DELIVERY_RANGE.getKey())) {
+                info.setValue(deliveryRange);
             }
             info.setMerchantId(accountInfo.getMerchantId());
             info.setStoreId(accountInfo.getStoreId());
@@ -437,7 +443,6 @@ public class BackendOrderController extends BaseController {
             info.setStatus(StatusEnum.ENABLED.getKey());
             info.setOperator(accountInfo.getAccountName());
             info.setUpdateTime(new Date());
-
             settingService.saveSetting(info);
         }
 
