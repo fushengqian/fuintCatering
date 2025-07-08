@@ -24,7 +24,7 @@ public interface AddressService extends IService<MtAddress> {
     MtAddress saveAddress(MtAddress mtAddress) throws BusinessCheckException;
 
     /**
-     * 根据ID获取Banner信息
+     * 根据ID获取地址信息
      *
      * @param  id 地址ID
      * @throws BusinessCheckException
@@ -39,4 +39,14 @@ public interface AddressService extends IService<MtAddress> {
      * @return
      * */
     List<MtAddress> queryListByParams(Map<String, Object> params) throws BusinessCheckException;
+
+    /**
+     * 获取会员默认地址
+     *
+     * @param  userId 会员ID
+     * @throws BusinessCheckException
+     * @return
+     */
+    MtAddress getDefaultAddress(Integer userId) throws BusinessCheckException;
+
 }

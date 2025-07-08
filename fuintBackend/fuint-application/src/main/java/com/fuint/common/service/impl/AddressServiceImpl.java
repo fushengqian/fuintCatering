@@ -116,4 +116,25 @@ public class AddressServiceImpl extends ServiceImpl<MtAddressMapper, MtAddress> 
 
         return mtAddressMapper.selectByMap(param);
     }
+
+    /**
+     * 获取会员默认地址
+     *
+     * @param  userId 会员ID
+     * @throws BusinessCheckException
+     * @return
+     */
+    @Override
+    public MtAddress getDefaultAddress(Integer userId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("isDefault", YesOrNoEnum.YES.getKey());
+        params.put("status", StatusEnum.ENABLED.getKey());
+        List<MtAddress> addressList = queryListByParams(params);
+        MtAddress mtAddress = null;
+        if (addressList.size() > 0) {
+            mtAddress = addressList.get(0);
+        }
+        return mtAddress;
+    }
 }

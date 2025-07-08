@@ -650,14 +650,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
             // 需要配送的订单，生成配送地址
             if (orderDto.getOrderMode().equals(OrderModeEnum.EXPRESS.getKey())) {
-                Map<String, Object> params = new HashMap<>();
-                params.put("userId", orderDto.getUserId().toString());
-                params.put("isDefault", YesOrNoEnum.YES.getKey());
-                List<MtAddress> addressList = addressService.queryListByParams(params);
-                MtAddress mtAddress;
-                if (addressList.size() > 0) {
-                    mtAddress = addressList.get(0);
-                } else {
+                MtAddress mtAddress = addressService.getDefaultAddress(orderInfo.getUserId());
+                if (mtAddress == null) {
                     throw new BusinessCheckException("配送地址出错了，请重新选择配送地址");
                 }
                 MtOrderAddress orderAddress = new MtOrderAddress();
