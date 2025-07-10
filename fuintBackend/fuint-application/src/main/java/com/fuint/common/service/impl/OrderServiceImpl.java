@@ -1118,13 +1118,25 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         ResponseObject paymentInfo = null;
         String errorMessage = "";
 
+        // 是否支持先用餐后支付
+        Boolean payFirst = true;
+        if (tableId > 0) {
+            MtSetting paySetting = settingService.querySettingByName(merchantId, orderInfo.getStoreId(), SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.PAY_FIRST.getKey());
+            if (paySetting == null) {
+                paySetting = settingService.querySettingByName(merchantId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.PAY_FIRST.getKey());
+            }
+            if (paySetting != null && paySetting.getValue().equals(YesOrNoEnum.NO.getKey())) {
+                payFirst = false;
+            }
+        }
+
         // 应付金额大于0才提交微信支付
         if (realPayAmount.compareTo(new BigDecimal("0")) > 0) {
             if (payType.equals(PayTypeEnum.CASH.getKey()) && StringUtil.isNotEmpty(operator)) {
                 // 收银台现金支付，更新为已支付
                 setOrderPayed(orderInfo.getId(), null);
-            } else  if (payType.equals(PayTypeEnum.STORE.getKey()) || tableId > 0) {
-                // 门店支付，不做任何操作
+            } else  if (payType.equals(PayTypeEnum.STORE.getKey()) || !payFirst) {
+                // 门店支付或先用餐后支付，就不做任何操作
             } else if (payType.equals(PayTypeEnum.BALANCE.getKey())) {
                 // 余额支付
                 MtBalance balance = new MtBalance();

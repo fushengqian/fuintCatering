@@ -511,7 +511,7 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
     public Map<String, Object> getLatAndLngByAddress(String addr) {
         String key = env.getProperty("amap.key");
         Map<String, Object> map = new HashMap<>();
-        if (StringUtil.isEmpty(key)) {
+        if (StringUtil.isEmpty(key) || key.length() < 10) {
             map.put("lat", "");
             map.put("lng", "");
             return map;
@@ -566,7 +566,7 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
      * */
      public Double getDistance(String origin, String destination) {
         String key = env.getProperty("amap.key");
-        if (StringUtil.isEmpty(key)) {
+        if (StringUtil.isEmpty(key) || key.length() < 10) {
             return 0d;
         }
         String url = "https://restapi.amap.com/v3/direction/walking?origin="+origin+"&destination="+destination+"&key="+key;
@@ -575,7 +575,7 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
             return 0d;
         }
         JSONObject resultJson = JSON.parseObject(response);
-         if (resultJson != null && "1".equals(resultJson.getString("status"))) {
+        if (resultJson != null && "1".equals(resultJson.getString("status"))) {
              JSONObject route = resultJson.getJSONObject("route");
              if (route != null) {
                  JSONArray paths = route.getJSONArray("paths");
@@ -587,8 +587,7 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
                      }
                  }
              }
-
-         }
+        }
         return 0d;
      }
 }

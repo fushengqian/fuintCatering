@@ -3,6 +3,8 @@ package com.fuint.module.clientApi.controller;
 import com.fuint.common.dto.ParamDto;
 import com.fuint.common.dto.StoreInfo;
 import com.fuint.common.dto.UserInfo;
+import com.fuint.common.enums.OrderSettingEnum;
+import com.fuint.common.enums.SettingTypeEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.service.*;
@@ -10,10 +12,7 @@ import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
-import com.fuint.repository.model.MtMerchant;
-import com.fuint.repository.model.MtStore;
-import com.fuint.repository.model.MtTable;
-import com.fuint.repository.model.MtUser;
+import com.fuint.repository.model.*;
 import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -170,10 +169,18 @@ public class ClientSystemController extends BaseController {
         // 支付方式列表
         List<ParamDto> payTypeList = settingService.getPayTypeList(merchantId, (storeInfo == null) ? 0 : storeInfo.getId(), platform);
 
+        // 支付模式：Y先用餐后支付；N先支付后用餐
+        MtSetting paySetting = settingService.querySettingByName(merchantId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.PAY_FIRST.getKey());
+        String payFirst = YesOrNoEnum.YES.getKey();
+        if (paySetting != null) {
+            payFirst = paySetting.getValue();
+        }
+
         Map<String, Object> result = new HashMap<>();
         result.put("storeInfo", storeInfo);
         result.put("payTypeList", payTypeList);
         result.put("tableInfo", tableInfo);
+        result.put("payFirst", payFirst);
 
         return getSuccessResult(result);
     }

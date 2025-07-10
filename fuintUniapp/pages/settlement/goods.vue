@@ -477,6 +477,7 @@
                         }
                    }
                }
+               uni.setStorageSync("payFirst", result.data.payFirst ? result.data.payFirst : 'Y');
           })
       },
       
@@ -576,7 +577,8 @@
         }
         
         const tableId = uni.getStorageSync("tableId") ? uni.getStorageSync("tableId") : 0;
-        if (tableId > 0) {
+        const payFirst = uni.getStorageSync("payFirst") ? uni.getStorageSync("payFirst") : 'Y';
+        if (tableId > 0 && payFirst == 'N') {
             app.navToOrderResult(result.data.orderInfo.id, '订单提交成功');
             return false;
         }
