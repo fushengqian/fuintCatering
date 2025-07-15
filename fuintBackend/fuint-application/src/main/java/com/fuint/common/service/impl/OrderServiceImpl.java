@@ -387,12 +387,20 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         mtOrder.setCouponId(orderDto.getCouponId());
         mtOrder.setParam(orderDto.getParam());
         mtOrder.setRemark(orderDto.getRemark());
-        mtOrder.setStatus(OrderStatusEnum.CREATED.getKey());
+        if (orderDto.getStatus() != null) {
+            mtOrder.setStatus(orderDto.getStatus());
+        } else {
+            mtOrder.setStatus(OrderStatusEnum.CREATED.getKey());
+        }
         mtOrder.setType(orderDto.getType());
         mtOrder.setAmount(orderDto.getAmount());
         mtOrder.setPayAmount(orderDto.getPayAmount());
         mtOrder.setDiscount(orderDto.getDiscount());
-        mtOrder.setPayStatus(PayStatusEnum.WAIT.getKey());
+        if (orderDto.getPayStatus() != null) {
+            mtOrder.setPayStatus(orderDto.getPayStatus());
+        } else {
+            mtOrder.setPayStatus(PayStatusEnum.WAIT.getKey());
+        }
         mtOrder.setPlatform(orderDto.getPlatform());
         mtOrder.setPointAmount(orderDto.getPointAmount());
         mtOrder.setUsePoint(orderDto.getUsePoint());
@@ -559,7 +567,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         }
 
         // 扣减积分
-        if (orderDto.getUsePoint() > 0) {
+        if (orderDto.getUsePoint() != null && orderDto.getUsePoint() > 0) {
             try {
                 MtPoint reqPointDto = new MtPoint();
                 reqPointDto.setUserId(orderDto.getUserId());
@@ -791,6 +799,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 operator = mtStaff.getRealName();
             }
         }
+
         // 继续点单的订单ID
         Integer myOrderId = 0;
         if (tableId > 0 || StringUtil.isNotEmpty(tableCode)) {
@@ -811,11 +820,24 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 myOrderId = tableOrder.getId();
             }
         }
+
+        // 是否支持先用餐后支付
+        Boolean payFirst = true;
+        if (tableId > 0) {
+            MtSetting paySetting = settingService.querySettingByName(merchantId, storeId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.PAY_FIRST.getKey());
+            if (paySetting == null) {
+                paySetting = settingService.querySettingByName(merchantId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.PAY_FIRST.getKey());
+            }
+            if (paySetting != null && paySetting.getValue().equals(YesOrNoEnum.NO.getKey())) {
+                payFirst = false;
+            }
+        }
+
         MtOrder myOrder = null;
         BigDecimal myAmount = new BigDecimal(0);
         BigDecimal myPayAmount = new BigDecimal(0);
         BigDecimal myPointAmount = new BigDecimal(0);
-        if (myOrderId > 0) {
+        if (myOrderId > 0 && !payFirst) {
             orderId = myOrderId;
             myOrder = getOrderInfo(orderId);
             myAmount = myOrder.getAmount();
@@ -1004,7 +1026,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         }
 
         // 继续点单，合并订单金额等信息
-        if (myOrder != null) {
+        if (myOrder != null && !payFirst) {
             orderInfo.setAmount(orderInfo.getAmount().add(myAmount));
             orderInfo.setPayAmount(orderInfo.getPayAmount().add(myPayAmount));
             orderInfo.setPointAmount(orderInfo.getPointAmount().add(myPointAmount));
@@ -1118,18 +1140,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         ResponseObject paymentInfo = null;
         String errorMessage = "";
 
-        // 是否支持先用餐后支付
-        Boolean payFirst = true;
-        if (tableId > 0) {
-            MtSetting paySetting = settingService.querySettingByName(merchantId, orderInfo.getStoreId(), SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.PAY_FIRST.getKey());
-            if (paySetting == null) {
-                paySetting = settingService.querySettingByName(merchantId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.PAY_FIRST.getKey());
-            }
-            if (paySetting != null && paySetting.getValue().equals(YesOrNoEnum.NO.getKey())) {
-                payFirst = false;
-            }
-        }
-
         // 应付金额大于0才提交微信支付
         if (realPayAmount.compareTo(new BigDecimal("0")) > 0) {
             if (payType.equals(PayTypeEnum.CASH.getKey()) && StringUtil.isNotEmpty(operator)) {
@@ -1144,6 +1154,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 balance.setOrderSn(orderInfo.getOrderSn());
                 balance.setUserId(userInfo.getId());
                 balance.setMerchantId(userInfo.getMerchantId());
+                balance.setStoreId(orderInfo.getStoreId());
                 BigDecimal balanceAmount = realPayAmount.subtract(realPayAmount).subtract(realPayAmount);
                 balance.setAmount(balanceAmount);
                 boolean isPay = balanceService.addBalance(balance, true);
@@ -1757,35 +1768,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             userOrderDto.setPayTime(DateUtil.formatDate(orderInfo.getPayTime(), "yyyy.MM.dd HH:mm"));
         }
 
-        if (userOrderDto.getType().equals(OrderTypeEnum.PRESTORE.getKey())) {
-            userOrderDto.setTypeName(OrderTypeEnum.PRESTORE.getValue());
-        } else if(userOrderDto.getType().equals(OrderTypeEnum.PAYMENT.getKey())) {
-            userOrderDto.setTypeName(OrderTypeEnum.PAYMENT.getValue());
-        } else if(userOrderDto.getType().equals(OrderTypeEnum.GOODS.getKey())) {
-            userOrderDto.setTypeName(OrderTypeEnum.GOODS.getValue());
-        } else if(userOrderDto.getType().equals(OrderTypeEnum.MEMBER.getKey())) {
-            userOrderDto.setTypeName(OrderTypeEnum.MEMBER.getValue());
-        } else if(userOrderDto.getType().equals(OrderTypeEnum.RECHARGE.getKey())) {
-            userOrderDto.setTypeName(OrderTypeEnum.RECHARGE.getValue());
-        }
-
-        if (userOrderDto.getStatus().equals(OrderStatusEnum.CREATED.getKey())) {
-            userOrderDto.setStatusText(OrderStatusEnum.CREATED.getValue());
-        } else if(userOrderDto.getStatus().equals(OrderStatusEnum.CANCEL.getKey())) {
-            userOrderDto.setStatusText(OrderStatusEnum.CANCEL.getValue());
-        } else if(userOrderDto.getStatus().equals(OrderStatusEnum.PAID.getKey())) {
-            userOrderDto.setStatusText(OrderStatusEnum.PAID.getValue());
-        } else if(userOrderDto.getStatus().equals(OrderStatusEnum.DELIVERY.getKey())) {
-            userOrderDto.setStatusText(OrderStatusEnum.DELIVERY.getValue());
-        } else if(userOrderDto.getStatus().equals(OrderStatusEnum.DELIVERED.getKey())) {
-            userOrderDto.setStatusText(OrderStatusEnum.DELIVERED.getValue());
-        } else if(userOrderDto.getStatus().equals(OrderStatusEnum.RECEIVED.getKey())) {
-            userOrderDto.setStatusText(OrderStatusEnum.RECEIVED.getValue());
-        } else if(userOrderDto.getStatus().equals(OrderStatusEnum.DELETED.getKey())) {
-            userOrderDto.setStatusText(OrderStatusEnum.DELETED.getValue());
-        } else if(userOrderDto.getStatus().equals(OrderStatusEnum.REFUND.getKey())) {
-            userOrderDto.setStatusText(OrderStatusEnum.REFUND.getValue());
-        }
+        userOrderDto.setTypeName(OrderTypeEnum.getValue(userOrderDto.getType()));
+        userOrderDto.setStatusText(OrderStatusEnum.getValue(userOrderDto.getStatus()));
 
         // 订单所属店铺
         MtStore storeInfo = storeService.queryStoreById(orderInfo.getStoreId());

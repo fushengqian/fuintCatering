@@ -150,10 +150,10 @@ public class BackendBalanceController extends BaseController {
             mtBalance.setAmount(amount);
         }
         mtBalance.setMerchantId(accountInfo.getMerchantId());
+        mtBalance.setStoreId(accountInfo.getStoreId());
         mtBalance.setDescription(remark);
         mtBalance.setUserId(userId);
         mtBalance.setOperator(accountInfo.getAccountName());
-        mtBalance.setOrderSn("");
 
         balanceService.addBalance(mtBalance, true);
         return getSuccessResult(true);
