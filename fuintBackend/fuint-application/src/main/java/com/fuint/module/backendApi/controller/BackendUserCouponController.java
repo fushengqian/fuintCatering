@@ -77,10 +77,6 @@ public class BackendUserCouponController extends BaseController {
 
     /**
      * 查询会员卡券列表
-     *
-     * @param request
-     * @return
-     * @throws BusinessCheckException
      */
     @ApiOperation(value = "查询会员卡券列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -164,9 +160,6 @@ public class BackendUserCouponController extends BaseController {
 
     /**
      * 删除会员卡券
-     *
-     * @param request
-     * @return
      */
     @ApiOperation(value = "删除会员卡券")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
@@ -207,8 +200,6 @@ public class BackendUserCouponController extends BaseController {
 
     /**
      * 导出会员卡券
-     *
-     * @return
      */
     @ApiOperation(value = "导出会员卡券")
     @RequestMapping(value = "/exportList", method = RequestMethod.GET)
@@ -288,6 +279,5 @@ public class BackendUserCouponController extends BaseController {
         ExcelUtil.setResponseHeader(response, fileName, wb);
 
         logger.info("导出会员卡券成功：token = ", token);
-        return;
     }
 }

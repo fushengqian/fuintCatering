@@ -63,8 +63,6 @@ public class BackendCommonController extends BaseController {
 
     /**
      * 生成二维码
-     *
-     * @return
      */
     @ApiOperation(value = "生成二维码")
     @RequestMapping(value = "/createQrCode", method = RequestMethod.POST)
@@ -118,8 +116,6 @@ public class BackendCommonController extends BaseController {
 
     /**
      * 生成条形码
-     *
-     * @return
      */
     @ApiOperation(value = "生成条形码")
     @RequestMapping(value = "/createBarCode", method = RequestMethod.POST)

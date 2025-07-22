@@ -57,9 +57,6 @@ public class BackendStoreController extends BaseController {
 
     /**
      * 获取店铺列表
-     *
-     * @param request HttpServletRequest对象
-     * @return 店铺列表
      */
     @ApiOperation(value = "获取店铺列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -144,9 +141,6 @@ public class BackendStoreController extends BaseController {
 
     /**
      * 更新店铺状态
-     *
-     * @param request
-     * @return
      */
     @ApiOperation(value = "更新店铺状态")
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
@@ -165,9 +159,6 @@ public class BackendStoreController extends BaseController {
 
     /**
      * 保存店铺
-     *
-     * @param request HttpServletRequest对象
-     * @return
      */
     @ApiOperation(value = "保存店铺")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
@@ -213,9 +204,6 @@ public class BackendStoreController extends BaseController {
 
     /**
      * 获取店铺详情
-     *
-     * @param id
-     * @return
      */
     @ApiOperation(value = "获取店铺详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)

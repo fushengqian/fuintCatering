@@ -42,8 +42,6 @@ public class ClientStoreController extends BaseController {
 
     /**
      * 获取店铺列表（根据距离排序）
-     *
-     * @param request Request对象
      */
     @ApiOperation(value = "获取店铺列表（根据距离排序）")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
@@ -64,8 +62,6 @@ public class ClientStoreController extends BaseController {
 
     /**
      * 获取店铺详情
-     *
-     * @param request Request对象
      */
     @ApiOperation(value = "获取店铺详情")
     @RequestMapping(value = "/detail", method = RequestMethod.GET)

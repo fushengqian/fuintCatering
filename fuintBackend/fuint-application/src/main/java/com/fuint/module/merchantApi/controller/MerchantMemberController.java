@@ -51,9 +51,6 @@ public class MerchantMemberController extends BaseController {
 
     /**
      * 会员列表查询
-     *
-     * @param request HttpServletRequest对象
-     * @return 会员列表
      */
     @ApiOperation(value = "查询会员列表")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
@@ -115,9 +112,6 @@ public class MerchantMemberController extends BaseController {
 
     /**
      * 会员详情
-     *
-     * @param request
-     * @return
      */
     @ApiOperation(value = "查询会员详情")
     @RequestMapping(value = "/info", method = RequestMethod.POST)
@@ -176,6 +170,7 @@ public class MerchantMemberController extends BaseController {
         mtUser.setUserNo(memberInfoParam.getUserNo());
         MtUser memberInfo;
         if (memberInfoParam.getId() == null) {
+            mtUser.setDescription("商户登记添加");
             memberInfo = memberService.addMember(mtUser);
         } else {
             memberInfo = memberService.updateMember(mtUser, false);

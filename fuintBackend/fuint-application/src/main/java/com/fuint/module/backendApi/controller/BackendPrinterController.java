@@ -63,9 +63,6 @@ public class BackendPrinterController extends BaseController {
 
     /**
      * 打印机列表查询
-     *
-     * @param  request HttpServletRequest对象
-     * @return 打印机列表
      */
     @ApiOperation(value = "打印机列表查询")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -120,8 +117,6 @@ public class BackendPrinterController extends BaseController {
 
     /**
      * 更新打印机状态
-     *
-     * @return
      */
     @ApiOperation(value = "更新打印机状态")
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
@@ -148,9 +143,6 @@ public class BackendPrinterController extends BaseController {
 
     /**
      * 保存打印机
-     *
-     * @param request HttpServletRequest对象
-     * @return
      */
     @ApiOperation(value = "保存打印机")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
@@ -193,9 +185,6 @@ public class BackendPrinterController extends BaseController {
 
     /**
      * 获取打印机详情
-     *
-     * @param id
-     * @return
      */
     @ApiOperation(value = "获取打印机详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
@@ -219,9 +208,6 @@ public class BackendPrinterController extends BaseController {
 
     /**
      * 获取打印设置
-     *
-     * @param request
-     * @return
      */
     @ApiOperation(value = "获取打印设置")
     @RequestMapping(value = "/setting", method = RequestMethod.GET)
@@ -258,9 +244,6 @@ public class BackendPrinterController extends BaseController {
 
     /**
      * 保存打印设置
-     *
-     * @param request HttpServletRequest对象
-     * @return
      */
     @ApiOperation(value = "保存打印设置")
     @RequestMapping(value = "/saveSetting", method = RequestMethod.POST)
@@ -299,9 +282,6 @@ public class BackendPrinterController extends BaseController {
 
     /**
      * 打印订单
-     *
-     * @param orderId
-     * @return
      */
     @ApiOperation(value = "打印订单")
     @RequestMapping(value = "/doPrint/{orderId}", method = RequestMethod.GET)

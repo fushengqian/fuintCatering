@@ -39,8 +39,6 @@ public class ClientPointsController extends BaseController {
 
     /**
      * 查询我的积分明细
-     *
-     * @param request Request对象
      */
     @ApiOperation(value = "查询我的积分明细")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -67,8 +65,6 @@ public class ClientPointsController extends BaseController {
 
     /**
      * 转赠积分
-     *
-     * @param param Request对象
      */
     @ApiOperation(value = "转赠积分")
     @RequestMapping(value = "/doGive", method = RequestMethod.POST)

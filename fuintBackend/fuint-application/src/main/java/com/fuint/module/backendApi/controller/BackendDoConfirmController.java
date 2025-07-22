@@ -67,9 +67,6 @@ public class BackendDoConfirmController extends BaseController {
 
     /**
      * 核销详情
-     *
-     * @param param 详情参数
-     * @return
      */
     @ApiOperation(value = "核销详情")
     @RequestMapping(value = "/info", method = RequestMethod.POST)
@@ -133,15 +130,12 @@ public class BackendDoConfirmController extends BaseController {
 
     /**
      * 确认核销
-     *
-     * @param request HttpServletRequest对象
-     * @return
      */
     @ApiOperation(value = "确认核销")
     @RequestMapping(value = "/doConfirm", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:confirm:index')")
-    public ResponseObject doConfirm(HttpServletRequest request, @RequestBody Map<String, Object> param) {
+    public ResponseObject doConfirm(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
         String token = request.getHeader("Access-Token");
         String userCouponId = param.get("userCouponId") == null ? "" : param.get("userCouponId").toString();
         String amount = (param.get("amount") == null || StringUtil.isEmpty(param.get("amount").toString())) ? "0" : param.get("amount").toString();
@@ -161,12 +155,7 @@ public class BackendDoConfirmController extends BaseController {
             return getFailureResult(201, "储值卡核销金额不能为空");
         }
 
-        try {
-            couponService.useCoupon(Integer.parseInt(userCouponId), accountInfo.getId(), storeId, 0, new BigDecimal(amount), remark);
-        } catch (BusinessCheckException e) {
-            return getFailureResult(201, "核销失败：" + e.getMessage());
-        }
-
+        couponService.useCoupon(Integer.parseInt(userCouponId), accountInfo.getId(), storeId, 0, new BigDecimal(amount), remark);
         return getSuccessResult(true);
     }
 }

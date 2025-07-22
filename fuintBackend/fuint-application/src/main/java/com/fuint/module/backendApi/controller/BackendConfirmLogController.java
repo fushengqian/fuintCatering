@@ -63,9 +63,6 @@ public class BackendConfirmLogController extends BaseController {
 
     /**
      * 获取会员卡券核销记录列表
-     *
-     * @param request HttpServletRequest对象
-     * @return
      */
     @ApiOperation(value = "获取会员卡券核销记录列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -129,9 +126,6 @@ public class BackendConfirmLogController extends BaseController {
 
     /**
      * 撤销已使用的卡券
-     *
-     * @param request
-     * @return
      */
     @ApiOperation(value = "撤销已使用的卡券")
     @RequestMapping(value = "/rollbackUserCoupon/{id}", method = RequestMethod.GET)

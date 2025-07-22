@@ -51,9 +51,6 @@ public class BackendMerchantController extends BaseController {
 
     /**
      * 分页查询商户列表
-     *
-     * @param request HttpServletRequest对象
-     * @return 商户列表
      */
     @ApiOperation(value = "分页查询商户列表")
     @RequestMapping(value = "/list")
@@ -128,9 +125,6 @@ public class BackendMerchantController extends BaseController {
 
     /**
      * 更新商户状态
-     *
-     * @param request
-     * @return
      */
     @ApiOperation(value = "更新商户状态")
     @RequestMapping(value = "/updateStatus")
@@ -149,9 +143,6 @@ public class BackendMerchantController extends BaseController {
 
     /**
      * 保存商户信息
-     *
-     * @param request HttpServletRequest对象
-     * @return
      */
     @ApiOperation(value = "保存商户信息")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
@@ -188,9 +179,6 @@ public class BackendMerchantController extends BaseController {
 
     /**
      * 获取商户详情
-     *
-     * @param merchantId
-     * @return
      */
     @ApiOperation(value = "获取商户详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)

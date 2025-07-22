@@ -66,9 +66,6 @@ public class BackendAccountController extends BaseController {
 
     /**
      * 账户信息列表
-     *
-     * @param  request HttpServletRequest对象
-     * @return 账户信息列表
      */
     @ApiOperation(value = "账户信息列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -128,10 +125,6 @@ public class BackendAccountController extends BaseController {
 
     /**
      * 获取账户详情
-     *
-     * @param  request
-     * @param  userId 账号ID
-     * @return 账户详情
      */
     @ApiOperation(value = "获取账户详情")
     @RequestMapping(value = "/info/{userId}", method = RequestMethod.GET)
@@ -204,9 +197,6 @@ public class BackendAccountController extends BaseController {
 
     /**
      * 新增账户
-     *
-     * @return 新增账户
-     * @throws BusinessCheckException
      */
     @ApiOperation(value = "新增账户")
     @RequestMapping(value = "/doCreate", method = RequestMethod.POST)
@@ -268,9 +258,6 @@ public class BackendAccountController extends BaseController {
 
     /**
      * 修改账户信息
-     *
-     * @return
-     * @throws BusinessCheckException
      */
     @ApiOperation(value = "修改账户信息")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
@@ -337,11 +324,6 @@ public class BackendAccountController extends BaseController {
 
     /**
      * 删除账户信息
-     *
-     * @param request HttpServletRequest对象
-     * @param userIds  账户ID（逗号隔开）
-     * @return
-     * @throws BusinessCheckException
      */
     @ApiOperation(value = "删除账户信息")
     @RequestMapping(value = "/delete/{userIds}", method = RequestMethod.GET)
@@ -376,8 +358,6 @@ public class BackendAccountController extends BaseController {
 
     /**
      * 更新账户状态
-     *
-     * @return
      */
     @ApiOperation(value = "更新账户状态")
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
@@ -406,8 +386,6 @@ public class BackendAccountController extends BaseController {
 
     /**
      * 修改账户密码
-     *
-     * @return
      */
     @ApiOperation(value = "修改账户密码")
     @RequestMapping(value = "/resetPwd", method = RequestMethod.POST)

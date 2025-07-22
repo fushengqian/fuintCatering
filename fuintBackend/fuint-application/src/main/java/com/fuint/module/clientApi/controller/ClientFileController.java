@@ -54,10 +54,7 @@ public class ClientFileController extends BaseController {
     private SettingService settingService;
 
     /**
-     * 上传文件
-     *
-     * @param request
-     * @throws IOException
+     * C端上传文件
      */
     @ApiOperation(value = "上传文件")
     @RequestMapping(value = "/upload", method = RequestMethod.POST)

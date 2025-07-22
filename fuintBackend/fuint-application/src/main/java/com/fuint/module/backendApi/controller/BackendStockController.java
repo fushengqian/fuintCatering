@@ -62,10 +62,6 @@ public class BackendStockController extends BaseController {
 
     /**
      * 获取库存管理记录列表
-     *
-     * @param request
-     * @return
-     * @throws BusinessCheckException
      */
     @ApiOperation(value = "获取库存管理记录列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -133,8 +129,6 @@ public class BackendStockController extends BaseController {
 
     /**
      * 删除库存管理记录状态
-     *
-     * @return
      */
     @ApiOperation(value = "删除库存管理记录状态")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
@@ -157,9 +151,6 @@ public class BackendStockController extends BaseController {
 
     /**
      * 保存库存管理记录
-     *
-     * @param request HttpServletRequest对象
-     * @return
      */
     @ApiOperation(value = "保存库存管理记录")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
@@ -194,9 +185,6 @@ public class BackendStockController extends BaseController {
 
     /**
      * 获取库存管理记录详情
-     *
-     * @param id 记录ID
-     * @return
      */
     @ApiOperation(value = "获取库存管理记录详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)

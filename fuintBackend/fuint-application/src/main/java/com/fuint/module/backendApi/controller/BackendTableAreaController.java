@@ -40,9 +40,6 @@ public class BackendTableAreaController extends BaseController {
 
     /**
      * 桌码区域列表查询
-     *
-     * @param  request HttpServletRequest对象
-     * @return 桌码区域列表
      */
     @ApiOperation(value = "桌码区域列表查询")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -99,8 +96,6 @@ public class BackendTableAreaController extends BaseController {
 
     /**
      * 更新桌码区域状态
-     *
-     * @return
      */
     @ApiOperation(value = "更新桌码区域状态")
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
@@ -127,9 +122,6 @@ public class BackendTableAreaController extends BaseController {
 
     /**
      * 保存桌码区域
-     *
-     * @param request HttpServletRequest对象
-     * @return
      */
     @ApiOperation(value = "保存桌码区域")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
@@ -160,9 +152,6 @@ public class BackendTableAreaController extends BaseController {
 
     /**
      * 获取桌码区域详情
-     *
-     * @param id
-     * @return
      */
     @ApiOperation(value = "获取桌码区域详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)

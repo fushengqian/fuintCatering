@@ -58,9 +58,6 @@ public class BackendCommissionLogController extends BaseController {
 
     /**
      * 分销提成记录列表查询
-     *
-     * @param request HttpServletRequest对象
-     * @return 分销提成记录
      */
     @ApiOperation(value = "分销提成记录查询")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -140,9 +137,6 @@ public class BackendCommissionLogController extends BaseController {
 
     /**
      * 获取分销提成记录详情
-     *
-     * @param  id
-     * @return
      */
     @ApiOperation(value = "获取分销提成记录详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
@@ -165,9 +159,6 @@ public class BackendCommissionLogController extends BaseController {
 
     /**
      * 修改分销提成记录
-     *
-     * @param request HttpServletRequest对象
-     * @return
      */
     @ApiOperation(value = "修改分销提成记录")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
@@ -185,9 +176,6 @@ public class BackendCommissionLogController extends BaseController {
 
     /**
      * 作废分销提成记录
-     *
-     * @param  id
-     * @return
      */
     @ApiOperation(value = "作废分销提成记录")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
@@ -212,9 +200,6 @@ public class BackendCommissionLogController extends BaseController {
 
     /**
      * 分销提成结算
-     *
-     * @param request HttpServletRequest对象
-     * @return
      */
     @ApiOperation(value = "分销提成结算")
     @RequestMapping(value = "/doSettle", method = RequestMethod.POST)
