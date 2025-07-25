@@ -256,4 +256,15 @@ public interface OrderService extends IService<MtOrder> {
      * @return
      * */
     MtOrder doRecharge(HttpServletRequest request, RechargeParam rechargeParam) throws BusinessCheckException;
+
+    /**
+     * 根据易宝支付通知更新订单状态
+     *
+     * @param orderId 商户订单号
+     * @param yeepayStatus 易宝支付状态
+     * @param yeepayTransactionId 易宝交易ID
+     * @return 更新结果
+     * @throws BusinessCheckException 业务检查异常
+     */
+    boolean updateOrderStatusFromYeepay(String orderId, String yeepayStatus, String yeepayTransactionId) throws BusinessCheckException;
 }
