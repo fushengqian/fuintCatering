@@ -115,11 +115,11 @@
   import * as OrderApi from '@/api/order'
   import { checkLogin } from '@/utils/app'
 
-  // 订单操作
+  // 待办操作
   const orderNavbar = [
-       { id: 'confirm', name: '核销订单', icon: 'dingdan', count: 1, url:'pages/merchant/order/index?dataType=todo' },
-       { id: 'refund', name: '售后审核', icon: 'daifukuan', count: 1, url:'pages/merchant/refund/index?dataType=todo' },
-       { id: 'book', name: '预约确认', icon: 'daishouhuo', count: 3, url:'pages/merchant/book/index??dataType=todo' },
+    { id: 'confirm', name: '核销订单', icon: 'dingdan', count: 1, url:'pages/merchant/order/index?dataType=todo' },
+    { id: 'refund', name: '售后审核', icon: 'daifukuan', count: 1, url:'pages/merchant/refund/index?dataType=todo' },
+    { id: 'book', name: '预约管理', icon: 'daishouhuo', count: 3, url:'pages/merchant/book/index??dataType=todo' },
   ]
 
   /**
@@ -130,7 +130,6 @@
     { id: 'addMember', name: '会员登记', icon: 'add', type: 'link', url: 'pages/merchant/member/add' },
     { id: 'memberSearch', name: '会员查找', icon: 'tuandui', type: 'link', url: 'pages/merchant/member/index' },
     { id: 'coupon', name: '卡券管理', icon: 'youhuiquan', type: 'link', url: 'pages/merchant/coupon' },
-    { id: 'activity', name: '营销活动', icon: 'lingquan', type: 'link', url: 'pages/merchant/activity' },
     { id: 'order', name: '订单管理', icon: 'dingdan', type: 'link', url: 'pages/merchant/order/index' },
     { id: 'report', name: '报表数据', icon: 'zhibozhong', type: 'link', url: 'pages/merchant/data/index' },
     { id: 'refund', name: '售后订单', icon: 'shouhou', type: 'link', url: 'pages/merchant/refund/index' },
@@ -285,8 +284,9 @@
 
       // 跳转到服务页面
       handleService({ url }) {
+        console.log(url)
         this.$navTo(url)
-      },
+      }
     },
 
     /**
@@ -420,6 +420,7 @@
 
       .item-name {
         margin-top: 10rpx;
+        background: red;
       }
 
       .item-name text {
@@ -433,7 +434,6 @@
       color: #666;
       padding: 4px 72rpx;
       width: 33.33%;
-
       .item-value {
         font-size: 36rpx;
         color: #f03c3c;

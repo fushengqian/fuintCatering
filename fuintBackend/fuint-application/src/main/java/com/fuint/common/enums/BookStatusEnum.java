@@ -1,7 +1,6 @@
 package com.fuint.common.enums;
 
 import com.fuint.common.dto.ParamDto;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,8 +44,20 @@ public enum BookStatusEnum {
         this.value = value;
     }
 
-    public static List<ParamDto> getBookStatusList() {
+    public static String getValue(String key) {
+        final BookStatusEnum[] values = BookStatusEnum.values();
+        for (BookStatusEnum value : values) {
+            if (key.equals(value.getKey())) {
+                return value.getValue();
+            }
+        }
+        return null;
+    }
+
+    public static List<ParamDto> getBookStatusList(String... excludedKeys) {
+        List<String> excludedKeySet = Arrays.asList(excludedKeys);
         return Arrays.stream(BookStatusEnum.values())
+                .filter(status -> !excludedKeySet.contains(status.getKey()))
                 .map(status -> new ParamDto(status.getKey(), status.getValue(), status.getValue()))
                 .collect(Collectors.toList());
     }

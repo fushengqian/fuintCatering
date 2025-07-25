@@ -116,7 +116,7 @@ public class BackendBookItemController extends BaseController {
         List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
 
         // 预约状态列表
-        List<ParamDto> bookStatusList = BookStatusEnum.getBookStatusList();
+        List<ParamDto> bookStatusList = BookStatusEnum.getBookStatusList(BookStatusEnum.DELETE.getKey());
 
         Map<String, Object> param = new HashMap<>();
         param.put("status", StatusEnum.ENABLED.getKey());

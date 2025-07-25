@@ -24,12 +24,15 @@
               <text>{{ item.bookName }}</text>
             </view>
             <view class="book-content">
-                <view class="contacts">姓名：{{ item.contact }}</view>
-                <view class="time">时间：{{ item.serviceDate }} {{ item.serviceTime }}</view>
+                <view class="item">姓名：{{ item.contact }}</view>
+                <view class="item">时间：{{ item.serviceDate }} {{ item.serviceTime }}</view>
+                <view class="item">状态：{{ item.statusName }}</view>
             </view>
             <view class="book-item-footer m-top10">
               <text class="book-views f-24 col-8">{{ item.createTime | timeFormat('yyyy-mm-dd hh:MM') }}</text>
+              <view class="btn btn-operate" v-if="item.status == 'A'" @click="onConfirm(item.id, 'B')">确认</view>
               <view class="btn btn-operate" v-if="item.status == 'A'" @click="onCancel(item.id)">取消</view>
+              <view class="btn btn-operate" v-if="item.status == 'B'" @click="onConfirm(item.id, 'E')">完成</view>
               <view class="btn btn-view" @click="onView(item.id)">详情</view>
             </view>
           </view>
@@ -42,10 +45,10 @@
 <script>
   import MescrollBody from '@/components/mescroll-uni/mescroll-body.vue'
   import MescrollMixin from '@/components/mescroll-uni/mescroll-mixins'
-  import * as BookApi from '@/api/book'
+  import * as BookApi from '@/api/merchant/book'
   import { getEmptyPaginateObj, getMoreListData } from '@/utils/app'
 
-  const pageSize = 15
+  const pageSize = 20
 
   export default {
     components: {
@@ -83,7 +86,6 @@
     },
 
     methods: {
-
       /**
        * 上拉加载的回调 (页面初始化时也会执行一次)
        * 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10
@@ -92,7 +94,7 @@
       upCallback(page) {
         const app = this;
         // 设置列表数据
-        app.getMyBookList(page.num)
+        app.getBookList(page.num)
           .then(list => {
             const curPageLen = list.content.length;
             const totalSize = list.content.totalElements;
@@ -105,10 +107,10 @@
        * 获取预约列表
        * @param {Number} pageNo 页码
        */
-      getMyBookList(pageNo = 1) {
+      getBookList(pageNo = 1) {
         const app = this;
         return new Promise((resolve, reject) => {
-          BookApi.myBookList({ status: app.curId, page: pageNo }, { load: false })
+          BookApi.bookList({ status: app.curId, page: pageNo }, { load: false })
             .then(result => {
               // 合并新数据
               const newList = result.data;
@@ -131,26 +133,50 @@
       },
       
       // 取消预约
-      onCancel(myBookId) {
+      onCancel(bookId) {
          const app = this;
          uni.showModal({
            title: "提示",
            content: "您确定要取消该预约吗?",
            success({ confirm }) {
-             confirm && app.doCancel(myBookId)
+             confirm && app.doCancel(bookId)
            }
          });
       },
       
       // 确认取消预约
-      doCancel(myBookId) {
+      doCancel(bookId) {
         const app = this;
-        BookApi.cancel(myBookId)
+        BookApi.cancel(bookId)
           .then(result => {
-            app.$success("取消成功！")
-            setTimeout(() => {
-                app.getMyBookList(1);
-            }, 1500)
+              app.$success("取消成功！")
+              setTimeout(() => {
+                  app.getBookList(1);
+              }, 1500)
+          })
+      },
+      
+      // 确认预约
+      onConfirm(bookId, action) {
+         const app = this;
+         uni.showModal({
+           title: "提示",
+           content: "您确认操作该预约状态吗?",
+           success({ confirm }) {
+             confirm && app.doConfirm(bookId, action)
+           }
+         });
+      },
+      
+      // 确认预约
+      doConfirm(bookId, action) {
+        const app = this;
+        BookApi.confirm(bookId, action)
+          .then(result => {
+              app.$success("操作成功！")
+              setTimeout(() => {
+                  app.getBookList(1);
+              }, 1500)
           })
       },
 
@@ -165,6 +191,7 @@
 
 <style lang="scss" scoped>
   /* 顶部选项卡 */
+
   .container {
     min-height: 100vh;
     background: #333;
@@ -191,7 +218,7 @@
     height: 87rpx;
     line-height: 88rpx;
     box-sizing: border-box;
-
+    
     .value {
       height: 100%;
     }
@@ -211,11 +238,11 @@
   }
 
   .book-item {
-    margin: 0rpx 10rpx 20rpx 10rpx;
+    margin: 0rpx 20rpx 20rpx 20rpx;
     padding: 30rpx;
     background: #fff;
-    border-radius: 20rpx;
-    min-height: 280rpx;
+    min-height: 330rpx;
+    border-radius: 10rpx;
     border: solid 1rpx #f5f5f5;
     &:last-child {
       margin-bottom: 0;
@@ -229,7 +256,7 @@
     }
     .book-content {
         margin: 30rpx 0rpx 30rpx 0rpx;
-        .contacts {
+        .item {
             margin-bottom: 20rpx;
         }
     }

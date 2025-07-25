@@ -1,6 +1,7 @@
 package com.fuint.module.merchantApi.controller;
 
 import com.fuint.common.dto.UserInfo;
+import com.fuint.common.enums.BookStatusEnum;
 import com.fuint.common.service.BookItemService;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.StaffService;
@@ -10,6 +11,7 @@ import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
+import com.fuint.module.merchantApi.request.BookConfirmParam;
 import com.fuint.module.merchantApi.request.BookDetailParam;
 import com.fuint.module.merchantApi.request.BookListRequest;
 import com.fuint.repository.model.MtBookItem;
@@ -68,7 +70,9 @@ public class MerchantBookController extends BaseController {
             return getFailureResult(1004);
         } else {
             params.put("merchantId", staffInfo.getMerchantId());
-            params.put("storeId", staffInfo.getStoreId());
+            if (staffInfo.getStoreId() > 0) {
+                params.put("storeId", staffInfo.getStoreId());
+            }
         }
         if (StringUtil.isNotEmpty(requestParams.getStatus())) {
             params.put("status", requestParams.getStatus());
@@ -79,8 +83,17 @@ public class MerchantBookController extends BaseController {
         paginationRequest.setPageSize(requestParams.getPageSize());
         paginationRequest.setSearchParams(params);
 
-        PaginationResponse bookList = bookItemService.queryBookItemListByPagination(paginationRequest);
-        return getSuccessResult(bookList);
+        PaginationResponse paginationResponse = bookItemService.queryBookItemListByPagination(paginationRequest);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("content", paginationResponse.getContent());
+        result.put("pageSize", paginationResponse.getPageSize());
+        result.put("pageNumber", paginationResponse.getCurrentPage());
+        result.put("totalRow", paginationResponse.getTotalElements());
+        result.put("totalPage", paginationResponse.getTotalPages());
+        result.put("statusList", BookStatusEnum.getBookStatusList(BookStatusEnum.DELETE.getKey()));
+
+        return getSuccessResult(result);
     }
 
     /**
@@ -144,7 +157,7 @@ public class MerchantBookController extends BaseController {
     @ApiOperation(value = "确定预约")
     @RequestMapping(value = "/confirm", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject confirm(HttpServletRequest request, @RequestBody BookDetailParam param) throws BusinessCheckException {
+    public ResponseObject confirm(HttpServletRequest request, @RequestBody BookConfirmParam param) throws BusinessCheckException {
         UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
 
         Integer bookId = param.getBookId();
@@ -158,7 +171,8 @@ public class MerchantBookController extends BaseController {
         if (staffInfo == null || (staffInfo.getStoreId() != null && staffInfo.getStoreId() > 0 && !staffInfo.getStoreId().equals(bookItem.getStoreId()))) {
             return getFailureResult(1004);
         }
-
+        bookItem.setStatus(param.getStatus() == null ? BookStatusEnum.CONFIRM.getKey() : param.getStatus());
+        bookItem.setOperator(staffInfo.getRealName());
         bookItemService.updateBookItem(bookItem);
         return getSuccessResult(true);
     }
