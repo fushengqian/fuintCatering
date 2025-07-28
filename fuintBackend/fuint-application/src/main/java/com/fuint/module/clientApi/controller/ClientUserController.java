@@ -309,7 +309,7 @@ public class ClientUserController extends BaseController {
             mtUser.setPassword(password);
             modifyPassword = true;
         }
-        if (sex.equals(1) || sex.equals(0) || sex.equals(2)) {
+        if (sex != null && (sex == 0 || sex == 1 || sex == 2)) {
             mtUser.setSex(sex);
         }
         if (StringUtil.isNotEmpty(birthday)) {
