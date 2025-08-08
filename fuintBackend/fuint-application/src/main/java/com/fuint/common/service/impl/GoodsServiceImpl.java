@@ -181,6 +181,33 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
         } else {
             lambdaQueryWrapper.orderByAsc(MtGoods::getSort, MtGoods::getId);
         }
+        lambdaQueryWrapper.select(
+                MtGoods::getId,
+                MtGoods::getGoodsNo,
+                MtGoods::getMerchantId,
+                MtGoods::getStoreId,
+                MtGoods::getName,
+                MtGoods::getCanUsePoint,
+                MtGoods::getCateId,
+                MtGoods::getCostPrice,
+                MtGoods::getCouponIds,
+                MtGoods::getCreateTime,
+                MtGoods::getUpdateTime,
+                MtGoods::getInitSale,
+                MtGoods::getIsMemberDiscount,
+                MtGoods::getIsSingleSpec,
+                MtGoods::getPlatform,
+                MtGoods::getPrice,
+                MtGoods::getLinePrice,
+                MtGoods::getImages,
+                MtGoods::getLogo,
+                MtGoods::getCostPrice,
+                MtGoods::getSort,
+                MtGoods::getStatus,
+                MtGoods::getStock,
+                MtGoods::getType,
+                MtGoods::getOperator,
+                MtGoods::getWeight);
         Page<MtGoods> pageHelper = PageHelper.startPage(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
         List<MtGoods> goodsList = mtGoodsMapper.selectList(lambdaQueryWrapper);
         List<GoodsDto> dataList = new ArrayList<>();
@@ -210,7 +237,7 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
             item.setPrice(mtGoods.getPrice());
             item.setLinePrice(mtGoods.getLinePrice());
             item.setSalePoint(mtGoods.getSalePoint());
-            item.setDescription(mtGoods.getDescription());
+            item.setSort(mtGoods.getSort());
             item.setCreateTime(mtGoods.getCreateTime());
             item.setUpdateTime(mtGoods.getUpdateTime());
             item.setStatus(mtGoods.getStatus());
@@ -663,11 +690,13 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
         String specIdArr[] = specIds.split("-");
         for (String specId : specIdArr) {
             MtGoodsSpec mtGoodsSpec = mtGoodsSpecMapper.selectById(Integer.parseInt(specId));
-            GoodsSpecValueDto dto = new GoodsSpecValueDto();
-            dto.setSpecValueId(mtGoodsSpec.getId());
-            dto.setSpecName(mtGoodsSpec.getName());
-            dto.setSpecValue(mtGoodsSpec.getValue());
-            result.add(dto);
+            if (mtGoodsSpec != null) {
+                GoodsSpecValueDto dto = new GoodsSpecValueDto();
+                dto.setSpecValueId(mtGoodsSpec.getId());
+                dto.setSpecName(mtGoodsSpec.getName());
+                dto.setSpecValue(mtGoodsSpec.getValue());
+                result.add(dto);
+            }
         }
 
         return result;

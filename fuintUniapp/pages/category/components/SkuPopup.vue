@@ -112,15 +112,18 @@
       getSpecValueName(valueId, specId) {
         const app = this
         const { goods: { specList } } = app
-        const res = specList[specId].valueList.find(specValue => {
-          return specValue.specValueId == valueId
-        })
-        
-        if (res) {
-            return res.specValue
-        } else {
-            return ""
+        if (specList[specId] && specList[specId].valueList) {
+            const res = specList[specId].valueList.find(specValue => {
+              return specValue.specValueId == valueId
+            })
+            
+            if (res) {
+                return res.specValue
+            } else {
+                return ""
+            }
         }
+        return ""
       },
 
       // 整理规格数据
@@ -131,9 +134,11 @@
         if (specList) {
             specList.forEach(group => {
               const children = []
-              group.valueList.forEach(specValue => {
-                children.push({ name: specValue.specValue })
-              })
+              if (group && group.valueList) {
+                  group.valueList.forEach(specValue => {
+                    children.push({ name: specValue.specValue })
+                  })
+              }
               specData.push({
                 name: group.name,
                 list: children

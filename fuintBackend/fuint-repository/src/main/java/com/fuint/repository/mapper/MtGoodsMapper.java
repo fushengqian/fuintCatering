@@ -5,12 +5,11 @@ import com.fuint.repository.bean.GoodsTopBean;
 import com.fuint.repository.model.MtGoods;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
-
 import java.util.Date;
 import java.util.List;
 
 /**
- *  商品 Mapper 接口
+ * 商品 Mapper 接口
  *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
