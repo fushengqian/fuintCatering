@@ -2,6 +2,7 @@ package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.Constants;
 import com.fuint.common.dto.AccountInfo;
+import com.fuint.common.dto.MerchantDto;
 import com.fuint.common.dto.ParamDto;
 import com.fuint.common.enums.MerchantTypeEnum;
 import com.fuint.common.enums.StatusEnum;
@@ -84,7 +85,7 @@ public class BackendMerchantController extends BaseController {
             params.put("status", status);
         }
         paginationRequest.setSearchParams(params);
-        PaginationResponse<MtMerchant> paginationResponse = merchantService.queryMerchantListByPagination(paginationRequest);
+        PaginationResponse<MerchantDto> paginationResponse = merchantService.queryMerchantListByPagination(paginationRequest);
 
         // 商户类型列表
         List<ParamDto> typeList = MerchantTypeEnum.getMerchantTypeList();
