@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fuint.repository.mapper.MtYeepayNotificationLogMapper">
+    
+    <!-- 根据订单ID查询通知日志 -->
+    <select id="findByOrderId" resultType="com.fuint.repository.model.MtYeepayNotificationLog">
+        select * from mt_yeepay_notification_log where ORDER_ID = #{orderId} order by CREATE_TIME desc
+    </select>
+    
+    <!-- 根据处理状态查询通知日志 -->
+    <select id="findByProcessStatus" resultType="com.fuint.repository.model.MtYeepayNotificationLog">
+        select * from mt_yeepay_notification_log where PROCESS_STATUS = #{processStatus} order by CREATE_TIME desc
+    </select>
+    
+</mapper>
