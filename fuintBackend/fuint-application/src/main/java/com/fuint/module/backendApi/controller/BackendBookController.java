@@ -69,7 +69,6 @@ public class BackendBookController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
         String name = request.getParameter("name");
@@ -77,12 +76,8 @@ public class BackendBookController extends BaseController {
         String status = request.getParameter("status");
         String searchStoreId = request.getParameter("storeId");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         Integer storeId = accountInfo.getStoreId();
-
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
 
         Map<String, Object> params = new HashMap<>();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
@@ -103,8 +98,7 @@ public class BackendBookController extends BaseController {
         if (storeId != null && storeId > 0) {
             params.put("storeId", storeId);
         }
-        paginationRequest.setSearchParams(params);
-        PaginationResponse<BookDto> paginationResponse = bookService.queryBookListByPagination(paginationRequest);
+        PaginationResponse<BookDto> paginationResponse = bookService.queryBookListByPagination(new PaginationRequest(page, pageSize, params));
 
         Map<String, Object> param = new HashMap<>();
         param.put("status", StatusEnum.ENABLED.getKey());
@@ -135,12 +129,10 @@ public class BackendBookController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
     public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException, ParseException {
-        String token = request.getHeader("Access-Token");
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         BookDto bookDto = bookService.getBookById(id, false);
         if (bookDto == null) {
             return getFailureResult(201);
@@ -163,7 +155,6 @@ public class BackendBookController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
     public ResponseObject saveHandler(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String id = params.get("id") == null ? "" : params.get("id").toString();
         String cateId = params.get("cateId") == null ? "0" : params.get("cateId").toString();
         String name = params.get("name") == null ? "" : params.get("name").toString();
@@ -175,7 +166,7 @@ public class BackendBookController extends BaseController {
         String dates = params.get("dates") == null ? "" : params.get("dates").toString();
         List<LinkedHashMap> times = params.get("times") == null ? new ArrayList<>() : (List) params.get("times");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() < 1) {
             throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
         }
@@ -231,11 +222,9 @@ public class BackendBookController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
     public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException, ParseException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         BookDto bookDto = bookService.getBookById(id, false);
-
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             if (!bookDto.getMerchantId().equals(accountInfo.getMerchantId())) {
                 return getFailureResult(1004);

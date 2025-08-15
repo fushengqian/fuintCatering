@@ -149,9 +149,8 @@ public class TActionLogAop {
             if (module.length() > 255) {
                 module = module.substring(0, 255);
             }
-            String token = request.getHeader("Access-Token");
-            if (StringUtils.isNotEmpty(token)) {
-                AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+            if (StringUtils.isNotEmpty(request.getHeader("Access-Token"))) {
+                AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
                 if (accountInfo != null) {
                     userName = accountInfo.getAccountName();
                     merchantId = accountInfo.getMerchantId() == null ? 0 : accountInfo.getMerchantId();

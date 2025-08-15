@@ -61,19 +61,14 @@ public class BackendArticleController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('content:article:index')")
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
         String title = request.getParameter("title");
         String status = request.getParameter("status");
         String searchStoreId = request.getParameter("storeId");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         Integer storeId = accountInfo.getStoreId();
-
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
 
         Map<String, Object> params = new HashMap<>();
         if (StringUtil.isNotEmpty(title)) {
@@ -91,9 +86,8 @@ public class BackendArticleController extends BaseController {
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             params.put("merchantId", accountInfo.getMerchantId());
         }
-        paginationRequest.setSearchParams(params);
-        PaginationResponse<ArticleDto> paginationResponse = articleService.queryArticleListByPagination(paginationRequest);
 
+        PaginationResponse<ArticleDto> paginationResponse = articleService.queryArticleListByPagination(new PaginationRequest(page, pageSize, params));
         List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
 
         Map<String, Object> result = new HashMap<>();
@@ -112,11 +106,10 @@ public class BackendArticleController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('content:article:edit')")
     public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         MtArticle mtArticle = articleService.queryArticleById(id);
         if (mtArticle == null) {
@@ -140,7 +133,6 @@ public class BackendArticleController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('content:article:add')")
     public ResponseObject saveHandler(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String id = params.get("id") == null ? "" : params.get("id").toString();
         String title = params.get("title") == null ? "" : params.get("title").toString();
         String description = params.get("description") == null ? "" : params.get("description").toString();
@@ -151,7 +143,7 @@ public class BackendArticleController extends BaseController {
         String sort = params.get("sort") == null ? "0" : params.get("sort").toString();
         String brief = params.get("brief") == null ? "" : params.get("brief").toString();
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         ArticleDto articleDto = new ArticleDto();
         articleDto.setTitle(title);

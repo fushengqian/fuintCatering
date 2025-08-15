@@ -89,10 +89,6 @@ public class ClientBookController extends BaseController {
         Integer page = param.getPage() == null ? Constants.PAGE_NUMBER : param.getPage();
         Integer pageSize = param.getPageSize() == null ? Constants.PAGE_SIZE : param.getPageSize();
 
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
-
         Map<String, Object> params = new HashMap<>();
         params.put("status", StatusEnum.ENABLED.getKey());
         if (StringUtil.isNotEmpty(name)) {
@@ -113,8 +109,7 @@ public class ClientBookController extends BaseController {
         if (cateId != null && cateId > 0) {
             params.put("cateId", cateId);
         }
-        paginationRequest.setSearchParams(params);
-        PaginationResponse<BookDto> paginationResponse = bookService.queryBookListByPagination(paginationRequest);
+        PaginationResponse<BookDto> paginationResponse = bookService.queryBookListByPagination(new PaginationRequest(page, pageSize, params));
 
         Map<String, Object> result = new HashMap();
         result.put("content", paginationResponse.getContent());
@@ -186,7 +181,6 @@ public class ClientBookController extends BaseController {
     @RequestMapping(value = "/submit", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject submit(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException, ParseException {
-        String token = request.getHeader("Access-Token");
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
         String bookId = param.get("bookId") == null ? "" : param.get("bookId").toString();
         String remark = param.get("remark") == null ? "" : param.get("remark").toString();
@@ -195,10 +189,7 @@ public class ClientBookController extends BaseController {
         String date = param.get("date") == null ? "" : param.get("date").toString();
         String time = param.get("time") == null ? "" : param.get("time").toString();
 
-        UserInfo loginInfo = TokenUtil.getUserInfoByToken(token);
-        if (null == loginInfo) {
-            return getFailureResult(1001);
-        }
+        UserInfo loginInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
 
         MtUser mtUser = memberService.queryMemberById(loginInfo.getId());
         BookDto bookInfo = bookService.getBookById(Integer.parseInt(bookId), true);
@@ -229,7 +220,6 @@ public class ClientBookController extends BaseController {
     @RequestMapping(value = "/myBook", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject myBook(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
@@ -241,7 +231,7 @@ public class ClientBookController extends BaseController {
             param.put("merchantId", merchantId);
         }
 
-        UserInfo loginInfo = TokenUtil.getUserInfoByToken(token);
+        UserInfo loginInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         if (null == loginInfo) {
             return getFailureResult(1001);
         }
@@ -250,11 +240,7 @@ public class ClientBookController extends BaseController {
             param.put("status", status);
         }
 
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
-        paginationRequest.setSearchParams(param);
-        PaginationResponse<BookItemDto> paginationResponse = bookItemService.queryBookItemListByPagination(paginationRequest);
+        PaginationResponse<BookItemDto> paginationResponse = bookItemService.queryBookItemListByPagination(new PaginationRequest(page, pageSize, param));
 
         Map<String, Object> result = new HashMap<>();
         result.put("content", paginationResponse.getContent());
@@ -274,14 +260,9 @@ public class ClientBookController extends BaseController {
     @RequestMapping(value = "/cancel", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject cancel(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String bookId = request.getParameter("bookId");
         String remark = request.getParameter("remark") == null ? "会员取消" : request.getParameter("remark");
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
-
-        if (mtUser == null) {
-            return getFailureResult(1001, "用户未登录");
-        }
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
 
         if (StringUtil.isEmpty(bookId)) {
             return getFailureResult(2000, "订单不能为空");

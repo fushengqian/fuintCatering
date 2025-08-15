@@ -53,7 +53,6 @@ public class BackendStaffController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('staff:list')")
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
         String mobile = request.getParameter("mobile");
@@ -62,14 +61,11 @@ public class BackendStaffController extends BaseController {
         String storeId = request.getParameter("storeId");
         String category = request.getParameter("category");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
             storeId = accountInfo.getStoreId().toString();
         }
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
 
         Map<String, Object> params = new HashMap<>();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
@@ -90,8 +86,7 @@ public class BackendStaffController extends BaseController {
         if (StringUtil.isNotEmpty(category)) {
             params.put("category", category);
         }
-        paginationRequest.setSearchParams(params);
-        PaginationResponse<MtStaff> paginationResponse = staffService.queryStaffListByPagination(paginationRequest);
+        PaginationResponse<MtStaff> paginationResponse = staffService.queryStaffListByPagination(new PaginationRequest(page, pageSize, params));
 
         // 员工类别列表
         List<ParamDto> categoryList = StaffCategoryEnum.getStaffCategoryList();
@@ -111,11 +106,10 @@ public class BackendStaffController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('staff:list')")
     public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         staffService.updateAuditedStatus(id, status, accountInfo.getAccountName());
         return getSuccessResult(true);
@@ -129,8 +123,7 @@ public class BackendStaffController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('staff:list')")
     public ResponseObject saveHandler(HttpServletRequest request, @RequestBody StaffParam staffParam) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
             return getFailureResult(5002);
         }
@@ -195,9 +188,7 @@ public class BackendStaffController extends BaseController {
     @RequestMapping(value = "/storeStaffList/{storeId}", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject storeStaffList(HttpServletRequest request, @PathVariable("storeId") Integer storeId) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         Map<String, Object> params = new HashMap<>();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
@@ -226,10 +217,7 @@ public class BackendStaffController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('staff:list')")
     public ResponseObject deleteStaff(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         staffService.updateAuditedStatus(id, StatusEnum.DISABLE.getKey(), accountInfo.getAccountName());
         return getSuccessResult(true);
     }

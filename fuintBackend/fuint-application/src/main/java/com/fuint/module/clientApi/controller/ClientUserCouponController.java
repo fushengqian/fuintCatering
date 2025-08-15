@@ -85,7 +85,6 @@ public class ClientUserCouponController extends BaseController {
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject detail(HttpServletRequest request, @RequestParam Map<String, Object> param) throws BusinessCheckException, InvocationTargetException, IllegalAccessException {
-        String token = request.getHeader("Access-Token");
         Integer userCouponId = param.get("userCouponId") == null ? 0 : Integer.parseInt(param.get("userCouponId").toString());
         String userCouponCode = param.get("userCouponCode") == null ? "" : param.get("userCouponCode").toString();
 
@@ -97,15 +96,7 @@ public class ClientUserCouponController extends BaseController {
             return getFailureResult(1004);
         }
 
-        if (StringUtil.isEmpty(token)) {
-            return getFailureResult(1001);
-        }
-
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
-        if (null == mtUser) {
-            return getFailureResult(1001);
-        }
-
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         MtUser loginInfo = memberService.queryMemberById(mtUser.getId());
         MtUserCoupon userCoupon;
         if (userCouponId > 0) {

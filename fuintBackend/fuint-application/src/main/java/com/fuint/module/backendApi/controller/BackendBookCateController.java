@@ -60,19 +60,14 @@ public class BackendBookCateController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
         String name = request.getParameter("name");
         String status = request.getParameter("status");
         String searchStoreId = request.getParameter("storeId");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         Integer storeId = accountInfo.getStoreId();
-
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
 
         Map<String, Object> params = new HashMap<>();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
@@ -90,8 +85,7 @@ public class BackendBookCateController extends BaseController {
         if (storeId != null && storeId > 0) {
             params.put("storeId", storeId);
         }
-        paginationRequest.setSearchParams(params);
-        PaginationResponse<MtBookCate> paginationResponse = bookCateService.queryBookCateListByPagination(paginationRequest);
+        PaginationResponse<MtBookCate> paginationResponse = bookCateService.queryBookCateListByPagination(new PaginationRequest(page, pageSize, params));
 
         List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
 
@@ -111,11 +105,10 @@ public class BackendBookCateController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
     public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer cateId = params.get("cateId") == null ? 0 : Integer.parseInt(params.get("cateId").toString());
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         MtBookCate mtBookCate = bookCateService.getBookCateById(cateId);
         if (mtBookCate == null) {
             return getFailureResult(201);
@@ -136,7 +129,6 @@ public class BackendBookCateController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
     public ResponseObject saveHandler(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String id = params.get("id") == null ? "" : params.get("id").toString();
         String name = params.get("name") == null ? "" : params.get("name").toString();
         String description = params.get("description") == null ? "" : params.get("description").toString();
@@ -145,7 +137,7 @@ public class BackendBookCateController extends BaseController {
         String storeId = (params.get("storeId") == null || StringUtil.isEmpty(params.get("storeId").toString())) ? "0" : params.get("storeId").toString();
         String sort = (params.get("sort") == null || StringUtil.isEmpty(params.get("sort").toString())) ? "0" : params.get("sort").toString();
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() < 1) {
             throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
@@ -179,12 +171,9 @@ public class BackendBookCateController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
     public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         MtBookCate bookCateInfo = bookCateService.getBookCateById(id);
-        String imagePath = settingService.getUploadBasePath();
-
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             if (!bookCateInfo.getMerchantId().equals(accountInfo.getMerchantId())) {
                 return getFailureResult(1004);
@@ -193,7 +182,7 @@ public class BackendBookCateController extends BaseController {
 
         Map<String, Object> result = new HashMap<>();
         result.put("bookCateInfo", bookCateInfo);
-        result.put("imagePath", imagePath);
+        result.put("imagePath", settingService.getUploadBasePath());
 
         return getSuccessResult(result);
     }

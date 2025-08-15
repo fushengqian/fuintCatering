@@ -63,7 +63,6 @@ public class BackendStatisticController extends BaseController {
     @RequestMapping(value = "/main", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject main(HttpServletRequest request, @RequestBody StatisticParam param) throws BusinessCheckException, ParseException {
-        String token = request.getHeader("Access-Token");
         String startTimeStr = param.getStartTime();
         String endTimeStr = param.getEndTime();
         Integer storeId = param.getStoreId();
@@ -71,7 +70,7 @@ public class BackendStatisticController extends BaseController {
         Date startTime = StringUtil.isNotEmpty(startTimeStr) ? DateUtil.parseDate(startTimeStr) : null;
         Date endTime = StringUtil.isNotEmpty(endTimeStr) ? DateUtil.parseDate(endTimeStr) : null;
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         Integer merchantId = accountInfo.getMerchantId();
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {

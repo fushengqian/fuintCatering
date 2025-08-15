@@ -159,13 +159,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> doPay(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
         String isWechat = request.getHeader("isWechat") == null ? "" : request.getHeader("isWechat");
         String payType = request.getParameter("payType") == null ? PayTypeEnum.JSAPI.getKey() : request.getParameter("payType");
         String cashierPayAmount = request.getParameter("cashierPayAmount") == null ? "" : request.getParameter("cashierPayAmount"); // 收银台实付金额
         String cashierDiscountAmount = request.getParameter("cashierDiscountAmount") == null ? "" : request.getParameter("cashierDiscountAmount"); // 收银台优惠金额
-        UserInfo loginInfo = TokenUtil.getUserInfoByToken(token);
+        UserInfo loginInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         String orderId = request.getParameter("orderId");
         String userId = request.getParameter("userId");
         String authCode = request.getParameter("authCode");
@@ -190,7 +189,7 @@ public class PaymentServiceImpl implements PaymentService {
         orderInfo = orderService.updateOrder(orderInfo);
 
         // 收银员操作
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (loginInfo == null && accountInfo != null) {
             // 游客订单绑定到会员
             if (orderInfo.getIsVisitor().equals(YesOrNoEnum.YES.getKey()) && StringUtil.isNotEmpty(userId)) {

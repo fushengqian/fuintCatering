@@ -133,7 +133,6 @@ public class ClientGoodsController extends BaseController {
     @CrossOrigin
     public ResponseObject search(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
-        String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
         Integer page = params.get("page") == null ? 1 : Integer.parseInt(params.get("page").toString());
         Integer pageSize = params.get("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(params.get("pageSize").toString());
@@ -141,10 +140,6 @@ public class ClientGoodsController extends BaseController {
         Integer cateId = params.get("cateId") == null ? 0 : Integer.parseInt(params.get("cateId").toString());
         String sortType = params.get("sortType") == null ? "all" : params.get("sortType").toString();
         String sortPrice = params.get("sortPrice") == null ? "0" : params.get("sortPrice").toString();
-
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
 
         Map<String, Object> searchParams = new HashMap<>();
         searchParams.put("status", StatusEnum.ENABLED.getKey());
@@ -158,7 +153,7 @@ public class ClientGoodsController extends BaseController {
         if (StringUtil.isNotEmpty(name)) {
             searchParams.put("name", name);
         }
-        Integer merchantId = merchantService.getMerchantId(merchantNo);
+        Integer merchantId = merchantService.getMerchantId(request.getHeader("merchantNo"));
         if (merchantId > 0 ) {
             searchParams.put("merchantId", merchantId);
         }
@@ -172,9 +167,7 @@ public class ClientGoodsController extends BaseController {
             searchParams.put("platform", platform);
         }
 
-        paginationRequest.setSearchParams(searchParams);
-        PaginationResponse<GoodsDto> paginationResponse = goodsService.queryGoodsListByPagination(paginationRequest);
-
+        PaginationResponse<GoodsDto> paginationResponse = goodsService.queryGoodsListByPagination(new PaginationRequest(page, pageSize, searchParams));
         return getSuccessResult(paginationResponse);
     }
 

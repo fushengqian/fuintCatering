@@ -67,7 +67,6 @@ public class BackendRefundController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('refund:index')")
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String orderSn = request.getParameter("orderSn");
         String mobile = request.getParameter("mobile");
         String userId = request.getParameter("userId");
@@ -77,14 +76,10 @@ public class BackendRefundController extends BaseController {
         String startTime = request.getParameter("startTime") == null ? "" : request.getParameter("startTime");
         String endTime = request.getParameter("endTime") == null ? "" : request.getParameter("endTime");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         TAccount account = accountService.getAccountInfoById(accountInfo.getId());
         Integer storeId = account.getStoreId() == null ? 0 : account.getStoreId();
-
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
 
         Map<String, Object> params = new HashMap<>();
         if (account.getMerchantId() != null && account.getMerchantId() > 0) {
@@ -121,8 +116,7 @@ public class BackendRefundController extends BaseController {
         if (StringUtil.isNotEmpty(endTime)) {
             params.put("endTime", endTime);
         }
-        paginationRequest.setSearchParams(params);
-        PaginationResponse<RefundDto> paginationResponse = refundService.getRefundListByPagination(paginationRequest);
+        PaginationResponse<RefundDto> paginationResponse = refundService.getRefundListByPagination(new PaginationRequest(page, pageSize, params));
 
         // 售后状态列表
         List<ParamDto> statusList = RefundStatusEnum.getRefundStatusList();
@@ -146,8 +140,7 @@ public class BackendRefundController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('refund:index')")
     public ResponseObject info(HttpServletRequest request, @PathVariable("refundId") Integer refundId) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         UserOrderDto orderInfo = null;
         RefundDto refundInfo = refundService.getRefundById(refundId);
@@ -176,12 +169,11 @@ public class BackendRefundController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('refund:edit')")
     public ResponseObject save(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer refundId = param.get("refundId") == null ? 0 : Integer.parseInt(param.get("refundId").toString());
         String status = param.get("status") == null ? "" : param.get("status").toString();
         String remark = param.get("remark") == null ? "" : param.get("remark").toString();
         String rejectReason = param.get("rejectReason") == null ? "" : param.get("rejectReason").toString();
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (status.equals(RefundStatusEnum.REJECT.getKey())) {
             RefundDto dto = new RefundDto();
             dto.setId(refundId);
@@ -213,11 +205,10 @@ public class BackendRefundController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('refund:edit')")
     public ResponseObject doRefund(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer orderId = param.get("orderId") == null ? 0 : Integer.parseInt(param.get("orderId").toString());
         String remark = param.get("remark") == null ? "" : param.get("remark").toString();
         String refundAmount = param.get("refundAmount") == null ? "" : param.get("refundAmount").toString();
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (orderId <= 0 || StringUtil.isEmpty(refundAmount)) {
             return getFailureResult(201, "参数有误，发起退款失败");
         }

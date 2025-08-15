@@ -64,15 +64,13 @@ public class BackendSettlementController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('settlement:index')")
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
         String mobile = request.getParameter("mobile") == null ? "" : request.getParameter("mobile");
         String userId = request.getParameter("userId") == null ? "" : request.getParameter("userId");
         String status = request.getParameter("status") == null ? StatusEnum.ENABLED.getKey() : request.getParameter("status");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         Map<String, Object> searchParams = new HashMap<>();
         if (StringUtil.isNotEmpty(mobile)) {
             searchParams.put("mobile", mobile);
@@ -102,12 +100,7 @@ public class BackendSettlementController extends BaseController {
         List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
         List<MtMerchant> merchantList = merchantService.queryMerchantByParams(params);
 
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
-        paginationRequest.setSearchParams(searchParams);
-
-        PaginationResponse<MtSettlement> paginationResponse = settlementService.querySettlementListByPagination(paginationRequest);
+        PaginationResponse<MtSettlement> paginationResponse = settlementService.querySettlementListByPagination(new PaginationRequest(page, pageSize, params));
 
         // 结算状态
         List<ParamDto> statusList = SettleStatusEnum.getSettleStatusList();

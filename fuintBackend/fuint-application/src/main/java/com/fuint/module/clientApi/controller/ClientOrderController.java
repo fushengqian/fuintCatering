@@ -53,13 +53,9 @@ public class ClientOrderController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject list(HttpServletRequest request, @RequestBody OrderListParam orderListParam) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer tableId = StringUtil.isEmpty(request.getHeader("tableId")) ? 0 : Integer.parseInt(request.getHeader("tableId"));
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(token);
+        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
 
-        if (userInfo == null) {
-            return getFailureResult(1001, "用户未登录");
-        }
         orderListParam.setUserId(userInfo.getId());
         if (tableId > 0) {
             MtTable mtTable = tableService.queryTableById(tableId);
@@ -81,19 +77,20 @@ public class ClientOrderController extends BaseController {
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject detail(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(token);
-
+        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         if (userInfo == null) {
             return getFailureResult(1001, "用户未登录");
         }
-
         String orderId = request.getParameter("orderId");
         if (StringUtil.isEmpty(orderId)) {
-            return getFailureResult(2000, "订单不能为空");
+            return getFailureResult(201, "订单不能为空");
         }
 
         UserOrderDto orderInfo = orderService.getMyOrderById(Integer.parseInt(orderId));
+        if (!orderInfo.getUserId().equals(userInfo.getId())) {
+            return getFailureResult(201, "订单信息有误");
+        }
+
         return getSuccessResult(orderInfo);
     }
 
@@ -104,21 +101,15 @@ public class ClientOrderController extends BaseController {
     @RequestMapping(value = "/cancel", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject cancel(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
-
-        if (mtUser == null) {
-            return getFailureResult(1001, "用户未登录");
-        }
-
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         String orderId = request.getParameter("orderId");
         if (StringUtil.isEmpty(orderId)) {
-            return getFailureResult(2000, "订单不能为空");
+            return getFailureResult(201, "订单不能为空");
         }
 
         UserOrderDto order = orderService.getOrderById(Integer.parseInt(orderId));
         if (!order.getUserId().equals(mtUser.getId())) {
-            return getFailureResult(2000, "订单信息有误");
+            return getFailureResult(201, "订单信息有误");
         }
 
         MtOrder orderInfo = orderService.cancelOrder(order.getId(), "会员取消");
@@ -133,21 +124,16 @@ public class ClientOrderController extends BaseController {
     @RequestMapping(value = "/receipt", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject receipt(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
-
-        if (mtUser == null) {
-            return getFailureResult(1001, "用户未登录");
-        }
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
 
         String orderId = request.getParameter("orderId");
         if (StringUtil.isEmpty(orderId)) {
-            return getFailureResult(2000, "订单不能为空");
+            return getFailureResult(201, "订单不能为空");
         }
 
         UserOrderDto order = orderService.getOrderById(Integer.parseInt(orderId));
         if (!order.getUserId().equals(mtUser.getId())) {
-            return getFailureResult(2000, "订单信息有误");
+            return getFailureResult(201, "订单信息有误");
         }
 
         OrderDto reqDto = new OrderDto();
@@ -165,8 +151,7 @@ public class ClientOrderController extends BaseController {
     @RequestMapping(value = "/todoCounts", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject todoCounts(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(token);
+        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
 
         Map<String, Object> result = new HashMap<>();
 

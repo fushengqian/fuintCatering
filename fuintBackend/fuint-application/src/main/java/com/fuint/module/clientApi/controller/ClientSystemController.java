@@ -69,7 +69,6 @@ public class ClientSystemController extends BaseController {
     @RequestMapping(value = "/config", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject config(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String platform = request.getHeader("platform");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String storeId = request.getHeader("storeId") == null ? "" : request.getHeader("storeId");
@@ -77,7 +76,7 @@ public class ClientSystemController extends BaseController {
         String longitude = request.getHeader("longitude") == null ? "" : request.getHeader("longitude");
         String tableId =  request.getHeader("tableId") == null ? "" : request.getHeader("tableId");
 
-        UserInfo loginInfo = TokenUtil.getUserInfoByToken(token);
+        UserInfo loginInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         Integer merchantId = merchantService.getMerchantId(merchantNo);
 
         // 默认店铺，取会员之前选择的店铺

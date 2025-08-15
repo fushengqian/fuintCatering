@@ -726,7 +726,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> doSettle(HttpServletRequest request, SettlementParam param) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
         Integer tableId = StringUtil.isEmpty(request.getHeader("tableId")) ? 0 : Integer.parseInt(request.getHeader("tableId"));
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
@@ -752,7 +751,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         Integer orderId = param.getOrderId() == null ? null : param.getOrderId(); // 订单ID
         String tableCode = param.getTableCode() == null ? "" : param.getTableCode();
         Integer merchantId = merchantService.getMerchantId(merchantNo);
-        UserInfo loginInfo = TokenUtil.getUserInfoByToken(token);
+        UserInfo loginInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         MtUser userInfo = null;
         if (loginInfo != null) {
             userInfo = memberService.queryMemberById(loginInfo.getId());
@@ -762,7 +761,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         String operator = null;
         Integer staffId = 0;
         String isVisitor = YesOrNoEnum.NO.getKey();
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (accountInfo != null) {
             operator = accountInfo.getAccountName();
             staffId = accountInfo.getStaffId() == null ? 0 : accountInfo.getStaffId();
@@ -786,7 +785,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         }
 
         if (userInfo == null) {
-            MtUser user = memberService.getCurrentUserInfo(request, userId, token);
+            MtUser user = memberService.getCurrentUserInfo(request, userId, request.getHeader("Access-Token"));
             if (user != null) {
                 userInfo = memberService.queryMemberById(user.getId());
             }
@@ -851,7 +850,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         }
 
         // 收银台通过手机号自动注册会员信息
-        if ((userInfo == null || StringUtil.isEmpty(token))) {
+        if ((userInfo == null || StringUtil.isEmpty(request.getHeader("Access-Token")))) {
             String mobile = param.getMobile() == null ? "" : param.getMobile();
             if (StringUtil.isNotEmpty(operator) && StringUtil.isNotEmpty(mobile)) {
                 userInfo = memberService.queryMemberByMobile(merchantId, mobile);

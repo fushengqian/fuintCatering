@@ -69,7 +69,6 @@ public class BackendPrinterController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('printer:index')")
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
         String name = request.getParameter("name");
@@ -77,12 +76,8 @@ public class BackendPrinterController extends BaseController {
         String status = request.getParameter("status");
         String searchStoreId = request.getParameter("storeId");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         Integer storeId = accountInfo.getStoreId();
-
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
 
         Map<String, Object> params = new HashMap<>();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
@@ -103,8 +98,7 @@ public class BackendPrinterController extends BaseController {
         if (storeId != null && storeId > 0) {
             params.put("storeId", storeId);
         }
-        paginationRequest.setSearchParams(params);
-        PaginationResponse<MtPrinter> paginationResponse = printerService.queryPrinterListByPagination(paginationRequest);
+        PaginationResponse<MtPrinter> paginationResponse = printerService.queryPrinterListByPagination(new PaginationRequest(page, pageSize, params));
 
         List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
 
@@ -123,11 +117,10 @@ public class BackendPrinterController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('printer:index')")
     public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         MtPrinter mtPrinter = printerService.queryPrinterById(id);
         if (mtPrinter == null) {
@@ -149,7 +142,6 @@ public class BackendPrinterController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('printer:index')")
     public ResponseObject saveHandler(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String id = params.get("id") == null ? "" : params.get("id").toString();
         String status = params.get("status") == null ? "" : params.get("status").toString();
         String storeId = params.get("storeId") == null ? "0" : params.get("storeId").toString();
@@ -160,7 +152,7 @@ public class BackendPrinterController extends BaseController {
         String beforePay = params.get("beforePay") == null ? YesOrNoEnum.YES.getKey() : params.get("beforePay").toString();
         String afterPay = params.get("afterPay") == null ? YesOrNoEnum.NO.getKey() : params.get("afterPay").toString();
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         MtPrinter mtPrinter = new MtPrinter();
         mtPrinter.setOperator(accountInfo.getAccountName());
@@ -191,8 +183,7 @@ public class BackendPrinterController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('printer:index')")
     public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         MtPrinter printerInfo = printerService.queryPrinterById(id);
 
@@ -214,8 +205,7 @@ public class BackendPrinterController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('printer:setting')")
     public ResponseObject setting(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         List<MtSetting> settingList = settingService.getSettingList(accountInfo.getMerchantId(), SettingTypeEnum.PRINTER.getKey());
 
@@ -250,12 +240,11 @@ public class BackendPrinterController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('printer:setting')")
     public ResponseObject saveSetting(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String userName = param.get("userName") != null ? param.get("userName").toString() : null;
         String userKey = param.get("userKey") != null ? param.get("userKey").toString() : null;
         String enable = param.get("enable") != null ? param.get("enable").toString() : null;
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         PrinterSettingEnum[] settingList = PrinterSettingEnum.values();
         for (PrinterSettingEnum setting : settingList) {
@@ -288,8 +277,7 @@ public class BackendPrinterController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('order:index')")
     public ResponseObject doPrint(HttpServletRequest request, @PathVariable("orderId") Integer orderId) throws Exception {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         UserOrderDto orderInfo = orderService.getOrderById(orderId);
         if (orderInfo == null) {

@@ -64,7 +64,6 @@ public class BackendCommissionLogController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:log:index')")
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
         String target = request.getParameter("target");
@@ -76,12 +75,8 @@ public class BackendCommissionLogController extends BaseController {
         String startTime = request.getParameter("startTime") == null ? "" : request.getParameter("startTime");
         String endTime = request.getParameter("endTime") == null ? "" : request.getParameter("endTime");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         Integer storeId = accountInfo.getStoreId();
-
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
 
         Map<String, Object> params = new HashMap<>();
         if (StringUtil.isNotEmpty(target)) {
@@ -114,8 +109,7 @@ public class BackendCommissionLogController extends BaseController {
         if (StringUtil.isNotEmpty(uuid)) {
             params.put("uuid", uuid);
         }
-        paginationRequest.setSearchParams(params);
-        PaginationResponse<CommissionLogDto> paginationResponse = commissionLogService.queryCommissionLogByPagination(paginationRequest);
+        PaginationResponse<CommissionLogDto> paginationResponse = commissionLogService.queryCommissionLogByPagination(new PaginationRequest(page, pageSize, params));
 
         // 店铺列表
         List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
@@ -143,8 +137,7 @@ public class BackendCommissionLogController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:log:index')")
     public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         CommissionLogDto commissionLog = commissionLogService.queryCommissionLogById(id);
         if (accountInfo.getMerchantId() > 0 && !commissionLog.getMerchantId().equals(accountInfo.getMerchantId())) {
@@ -164,9 +157,7 @@ public class BackendCommissionLogController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:log:index')")
     public ResponseObject save(HttpServletRequest request, @RequestBody CommissionLogRequest commissionLogRequest) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-
-        AccountInfo accountDto = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountDto = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         commissionLogRequest.setOperator(accountDto.getAccountName());
         commissionLogService.updateCommissionLog(commissionLogRequest);
@@ -182,8 +173,7 @@ public class BackendCommissionLogController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:log:index')")
     public ResponseObject delete(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         CommissionLogDto commissionLog = commissionLogService.queryCommissionLogById(id);
         if (accountInfo.getMerchantId() > 0 && !commissionLog.getMerchantId().equals(accountInfo.getMerchantId())) {
@@ -205,10 +195,7 @@ public class BackendCommissionLogController extends BaseController {
     @RequestMapping(value = "/doSettle", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:log:index')")
     public ResponseObject doSettle(HttpServletRequest request, @RequestBody CommissionSettleRequest commissionSettleRequest) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-
-        AccountInfo accountDto = TokenUtil.getAccountInfoByToken(token);
-
+        AccountInfo accountDto = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         commissionSettleRequest.setOperator(accountDto.getAccountName());
         if (accountDto.getMerchantId() != null && accountDto.getMerchantId() > 0) {
             commissionSettleRequest.setMerchantId(accountDto.getMerchantId());

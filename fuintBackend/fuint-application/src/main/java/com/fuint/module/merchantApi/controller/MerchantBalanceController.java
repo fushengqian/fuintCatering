@@ -59,14 +59,8 @@ public class MerchantBalanceController extends BaseController {
     @RequestMapping(value = "/doRecharge", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject doRecharge(HttpServletRequest request, @RequestBody RechargeParam rechargeParam) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
-        Integer merchantId = merchantService.getMerchantId(merchantNo);
-        if (StringUtil.isEmpty(token)) {
-            return getFailureResult(1001);
-        }
-
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(token);
+        Integer merchantId = merchantService.getMerchantId(request.getHeader("merchantNo"));
+        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         if (null == userInfo) {
             return getFailureResult(1001);
         }

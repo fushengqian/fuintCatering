@@ -75,19 +75,13 @@ public class BackendCouponGroupController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:group:index')")
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? 1 : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
         String name = request.getParameter("name") == null ? "" : request.getParameter("name");
         String id = request.getParameter("id") == null ? "" : request.getParameter("id");
         String status = request.getParameter("status") == null ? StatusEnum.ENABLED.getKey() : request.getParameter("status");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
-
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         Map<String, Object> searchParams = new HashMap<>();
         if (StringUtil.isNotEmpty(name)) {
             searchParams.put("name", name);
@@ -105,8 +99,7 @@ public class BackendCouponGroupController extends BaseController {
             searchParams.put("storeId", accountInfo.getStoreId());
         }
 
-        paginationRequest.setSearchParams(searchParams);
-        PaginationResponse<MtCouponGroup> paginationResponse = couponGroupService.queryCouponGroupListByPagination(paginationRequest);
+        PaginationResponse<MtCouponGroup> paginationResponse = couponGroupService.queryCouponGroupListByPagination(new PaginationRequest(page, pageSize, searchParams));
 
         // 计算券种类、总价值
         if (paginationResponse.getContent().size() > 0) {
@@ -278,12 +271,7 @@ public class BackendCouponGroupController extends BaseController {
     @RequestMapping(value = "/quickSearch", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject quickSearch(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(Constants.PAGE_NUMBER);
-        paginationRequest.setPageSize(Constants.ALL_ROWS);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         Map<String, Object> param = new HashMap<>();
         param.put("status", StatusEnum.ENABLED.getKey());
@@ -293,8 +281,7 @@ public class BackendCouponGroupController extends BaseController {
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
             param.put("storeId", accountInfo.getStoreId());
         }
-        paginationRequest.setSearchParams(param);
-        PaginationResponse<MtCouponGroup> paginationResponse = couponGroupService.queryCouponGroupListByPagination(paginationRequest);
+        PaginationResponse<MtCouponGroup> paginationResponse = couponGroupService.queryCouponGroupListByPagination(new PaginationRequest(Constants.PAGE_NUMBER, Constants.ALL_ROWS, param));
 
         List<MtCouponGroup> groupList = paginationResponse.getContent();
 

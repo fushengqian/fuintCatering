@@ -29,15 +29,11 @@ public class ClientHelpController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         if (null == mtUser) {
             return getFailureResult(1001);
         }
-
         ArrayList<String> data = new ArrayList<>();
-
         return getSuccessResult(data);
     }
 }

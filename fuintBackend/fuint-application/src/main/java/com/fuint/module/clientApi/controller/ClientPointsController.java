@@ -44,22 +44,15 @@ public class ClientPointsController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
 
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         Map<String, Object> param = new HashMap<>();
-
         param.put("userId", mtUser.getId());
         param.put("status", StatusEnum.ENABLED.getKey());
 
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setSearchParams(param);
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
-        PaginationResponse<PointDto> paginationResponse = pointService.queryPointListByPagination(paginationRequest);
-
+        PaginationResponse<PointDto> paginationResponse = pointService.queryPointListByPagination(new PaginationRequest(page, pageSize, param));
         return getSuccessResult(paginationResponse);
     }
 
@@ -70,8 +63,7 @@ public class ClientPointsController extends BaseController {
     @RequestMapping(value = "/doGive", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject doGive(HttpServletRequest request, @RequestBody GivePointParam param) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
 
         String mobile = param.getMobile();
         Integer amount = param.getAmount();

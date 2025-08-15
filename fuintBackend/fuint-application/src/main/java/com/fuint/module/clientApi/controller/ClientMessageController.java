@@ -54,13 +54,11 @@ public class ClientMessageController extends BaseController {
     @RequestMapping(value = "/getOne", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject getOne(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-
-        if (StringUtil.isEmpty(token)) {
+        if (StringUtil.isEmpty(request.getHeader("Access-Token"))) {
             return getSuccessResult(false);
         }
 
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         if (null == mtUser) {
             return getSuccessResult(false);
         }
@@ -85,8 +83,7 @@ public class ClientMessageController extends BaseController {
     @RequestMapping(value = "/readed", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject readed(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
 
         Integer msgId =  request.getParameter("msgId") == null ? 0 :Integer.parseInt(request.getParameter("msgId"));
 

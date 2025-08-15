@@ -71,20 +71,7 @@ public class ClientShareController extends BaseController {
         Integer page = param.getPage() == null ? Constants.PAGE_NUMBER : param.getPage();
         Integer pageSize = param.getPageSize() == null ? Constants.PAGE_SIZE : param.getPageSize();
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
-
-        String token = request.getHeader("Access-Token");
-        if (StringUtil.isEmpty(token)) {
-            return getFailureResult(1001);
-        }
-
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(token);
-        if (userInfo == null) {
-            return getFailureResult(1001);
-        }
-
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
+        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
 
         Map<String, Object> params = new HashMap<>();
         params.put("status", StatusEnum.ENABLED.getKey());
@@ -92,8 +79,8 @@ public class ClientShareController extends BaseController {
         if (StringUtil.isNotEmpty(merchantNo)) {
             params.put("merchantNo", merchantNo);
         }
-        paginationRequest.setSearchParams(params);
-        PaginationResponse<CommissionRelationDto> paginationResponse = commissionRelationService.queryRelationByPagination(paginationRequest);
+
+        PaginationResponse<CommissionRelationDto> paginationResponse = commissionRelationService.queryRelationByPagination(new PaginationRequest(page, pageSize, params));
 
         Map<String, Object> outParams = new HashMap();
         String url = env.getProperty("website.url");
@@ -110,9 +97,8 @@ public class ClientShareController extends BaseController {
     @RequestMapping(value = "/getMiniAppLink", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject getMiniAppLink(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         if (null == mtUser) {
             return getFailureResult(1001);
         }

@@ -55,17 +55,12 @@ public class BackendSmsController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
         String mobile = request.getParameter("mobile") == null ? "" : request.getParameter("mobile");
         String content = request.getParameter("content") == null ? "" : request.getParameter("content");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
-        PaginationRequest paginationRequest = new PaginationRequest();
-        paginationRequest.setCurrentPage(page);
-        paginationRequest.setPageSize(pageSize);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         Map<String, Object> searchParams = new HashMap<>();
         if (StringUtil.isNotEmpty(mobile)) {
@@ -81,8 +76,7 @@ public class BackendSmsController extends BaseController {
             searchParams.put("storeId", accountInfo.getStoreId());
         }
 
-        paginationRequest.setSearchParams(searchParams);
-        PaginationResponse<MtSmsSendedLog> paginationResponse = sendSmsService.querySmsListByPagination(paginationRequest);
+        PaginationResponse<MtSmsSendedLog> paginationResponse = sendSmsService.querySmsListByPagination(new PaginationRequest(page, pageSize, searchParams));
 
         Map<String, Object> result = new HashMap<>();
         result.put("paginationResponse", paginationResponse);
@@ -98,8 +92,7 @@ public class BackendSmsController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('smsTemplate:edit')")
     public ResponseObject setting(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         List<MtSetting> settingList = settingService.getSettingList(accountInfo.getMerchantId(), SettingTypeEnum.SMS_CONFIG.getKey());
 
@@ -138,13 +131,12 @@ public class BackendSmsController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('smsTemplate:edit')")
     public ResponseObject saveSetting(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String isClose = param.get("isClose") != null ? param.get("isClose").toString() : null;
         String accessKeyId = param.get("accessKeyId") != null ? param.get("accessKeyId").toString() : null;
         String accessKeySecret = param.get("accessKeySecret") != null ? param.get("accessKeySecret").toString() : null;
         String signName = param.get("signName") != null ? param.get("signName").toString() : null;
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
             return getFailureResult(5002);
         }

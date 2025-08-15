@@ -1,8 +1,6 @@
 package com.fuint.module.clientApi.controller;
 
 import com.fuint.common.dto.RegionDto;
-import com.fuint.common.dto.UserInfo;
-import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.mapper.MtRegionMapper;
@@ -11,7 +9,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,13 +34,7 @@ public class ClientRegionController extends BaseController {
     @ApiOperation(value = "获取地区树状结构")
     @RequestMapping(value = "/tree", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject tree(HttpServletRequest request) {
-        String token = request.getHeader("Access-Token");
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(token);
-        if (userInfo == null) {
-            return getFailureResult(1001, "用户未登录");
-        }
-
+    public ResponseObject tree() {
         Map<String, Object> params = new HashMap<>();
         List<MtRegion> regionList = mtRegionMapper.selectByMap(params);
 

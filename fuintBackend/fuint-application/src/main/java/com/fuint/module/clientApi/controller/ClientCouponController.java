@@ -73,15 +73,13 @@ public class ClientCouponController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject list(HttpServletRequest request, @RequestBody CouponListParam params) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         if (null != mtUser) {
             params.setUserId(mtUser.getId());
         }
 
         Map<String, Object> outParams = new HashMap();
-        Integer merchantId = merchantService.getMerchantId(merchantNo);
+        Integer merchantId = merchantService.getMerchantId(request.getHeader("merchantNo"));
         params.setMerchantId(merchantId);
         ResponseObject couponData = couponService.findCouponList(params);
         outParams.put("coupon", couponData.getData());
@@ -97,9 +95,7 @@ public class ClientCouponController extends BaseController {
     @RequestMapping(value = "/receive", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject receive(HttpServletRequest request, @RequestBody CouponReceiveParam couponReceiveParam) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
-
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         if (null != mtUser) {
             couponReceiveParam.setUserId(mtUser.getId());
         } else {
@@ -122,9 +118,7 @@ public class ClientCouponController extends BaseController {
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject detail(HttpServletRequest request, @RequestBody CouponInfoParam params) throws BusinessCheckException, InvocationTargetException, IllegalAccessException {
-        String token = request.getHeader("Access-Token");
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(token);
-
+        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         Integer couponId = params.getCouponId() == null ? 0 : params.getCouponId();
         String userCouponCode = params.getUserCouponCode() == null ? "" : params.getUserCouponCode();
 
