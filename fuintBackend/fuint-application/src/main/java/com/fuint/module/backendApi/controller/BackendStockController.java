@@ -51,11 +51,6 @@ public class BackendStockController extends BaseController {
     private SettingService settingService;
 
     /**
-     * 后台账户服务接口
-     */
-    private AccountService accountService;
-
-    /**
      * 店铺服务接口
      */
     private StoreService storeService;

@@ -69,11 +69,6 @@ public class BackendCouponController extends BaseController {
     private MemberService memberService;
 
     /**
-     * 后台账户服务接口
-     * */
-    private AccountService accountService;
-
-    /**
      * 系统配置服务接口
      * */
     private SettingService settingService;
@@ -230,12 +225,11 @@ public class BackendCouponController extends BaseController {
             return getFailureResult(201, "卡券名称已存在，请修改");
         }
 
-        TAccount account = accountService.getAccountInfoById(accountInfo.getId());
-        if (account.getStoreId() != null && account.getStoreId() > 0) {
-            reqCouponDto.setStoreId(account.getStoreId());
+        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
+            reqCouponDto.setStoreId(accountInfo.getStoreId());
         }
-        if (account.getMerchantId() != null && account.getMerchantId() > 0) {
-            reqCouponDto.setMerchantId(account.getMerchantId());
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+            reqCouponDto.setMerchantId(accountInfo.getMerchantId());
         }
         couponService.saveCoupon(reqCouponDto);
         return getSuccessResult(true);

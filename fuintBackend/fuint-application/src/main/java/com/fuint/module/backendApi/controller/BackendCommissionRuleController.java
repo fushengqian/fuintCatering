@@ -6,7 +6,6 @@ import com.fuint.common.dto.ParamDto;
 import com.fuint.common.enums.CommissionTypeEnum;
 import com.fuint.common.param.CommissionRuleParam;
 import com.fuint.common.service.CommissionRuleService;
-import com.fuint.common.service.StoreService;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
@@ -43,11 +42,6 @@ public class BackendCommissionRuleController extends BaseController {
      * 分销提成规则服务接口
      */
     private CommissionRuleService commissionRuleService;
-
-    /**
-     * 店铺服务接口
-     */
-    private StoreService storeService;
 
     /**
      * 规则列表查询
@@ -132,8 +126,6 @@ public class BackendCommissionRuleController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:rule:index')")
     public ResponseObject saveHandler(HttpServletRequest request, @RequestBody CommissionRuleParam params) throws BusinessCheckException {
-        String id = params.getId() == null ? "" : params.getId().toString();
-
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             params.setMerchantId(accountInfo.getMerchantId());
@@ -141,7 +133,7 @@ public class BackendCommissionRuleController extends BaseController {
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
             params.setStoreId(accountInfo.getStoreId());
         }
-        if (StringUtil.isNotEmpty(id)) {
+        if (params.getId() != null && params.getId() > 0) {
             commissionRuleService.updateCommissionRule(params);
         } else {
             commissionRuleService.addCommissionRule(params);

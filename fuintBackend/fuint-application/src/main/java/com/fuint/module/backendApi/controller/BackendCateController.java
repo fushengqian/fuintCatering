@@ -17,7 +17,6 @@ import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtGoodsCate;
 import com.fuint.repository.model.MtStore;
-import com.fuint.repository.model.TAccount;
 import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -51,11 +50,6 @@ public class BackendCateController extends BaseController {
      * 配置服务接口
      * */
     private SettingService settingService;
-
-    /**
-     * 后台账户服务接口
-     */
-    private AccountService accountService;
 
     /**
      * 店铺服务接口
@@ -151,7 +145,6 @@ public class BackendCateController extends BaseController {
         Integer storeId = (params.get("storeId") == null || StringUtil.isEmpty(params.get("storeId").toString())) ? 0 : Integer.parseInt(params.get("storeId").toString());
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-
         Integer myStoreId = accountInfo.getStoreId();
         if (myStoreId > 0) {
             storeId = myStoreId;

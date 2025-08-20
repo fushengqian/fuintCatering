@@ -55,11 +55,6 @@ public class BackendMemberController extends BaseController {
     private SettingService settingService;
 
     /**
-     * 后台账户服务接口
-     */
-    private AccountService accountService;
-
-    /**
      * 店铺服务接口
      */
     private StoreService storeService;
@@ -359,7 +354,9 @@ public class BackendMemberController extends BaseController {
         String wxMemberCard = param.get("wxMemberCard") != null ? param.get("wxMemberCard").toString() : null;
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-
+        if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
+            throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
+        }
         UserSettingEnum[] settingList = UserSettingEnum.values();
         for (UserSettingEnum setting : settingList) {
             MtSetting mtSetting = new MtSetting();

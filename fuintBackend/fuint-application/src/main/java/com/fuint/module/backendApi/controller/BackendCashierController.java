@@ -40,11 +40,6 @@ import java.util.Map;
 public class BackendCashierController extends BaseController {
 
     /**
-     * 后台账户服务接口
-     */
-    private AccountService accountService;
-
-    /**
      * 商品类别服务接口
      */
     private CateService cateService;
@@ -96,9 +91,7 @@ public class BackendCashierController extends BaseController {
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
         Integer cateId = request.getParameter("cateId") == null ? 0 : Integer.parseInt(request.getParameter("cateId"));
 
-        AccountInfo accountDto = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-
-        TAccount accountInfo = accountService.getAccountInfoById(accountDto.getId());
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         Integer storeId = (accountInfo.getStoreId() == null || accountInfo.getStoreId() < 1) ? 0 : accountInfo.getStoreId();
         MtStore storeInfo = null;
         if (storeId == null || storeId < 1) {
@@ -124,7 +117,7 @@ public class BackendCashierController extends BaseController {
         result.put("imagePath", settingService.getUploadBasePath());
         result.put("storeInfo", storeInfo);
         result.put("memberInfo", memberInfo);
-        result.put("accountInfo", accountDto);
+        result.put("accountInfo", accountInfo);
         result.put("goodsList", goodsData.get("goodsList"));
         result.put("totalGoods", goodsData.get("total"));
         result.put("cateList", cateList);
@@ -190,21 +183,21 @@ public class BackendCashierController extends BaseController {
 
             for (int i = 0; i < specNameArr.size(); i++) {
                 GoodsSpecItemDto item = new GoodsSpecItemDto();
-                List<GoodsSpecChildDto> child = new ArrayList<>();
+                List<GoodsSpecChildDto> childList = new ArrayList<>();
                 Integer specId = specIdArr.get(i) == null ? (i + 1) : specIdArr.get(i);
                 String name = specNameArr.get(i);
                 for (MtGoodsSpec mtGoodsSpec : goodsInfo.getSpecList()) {
                     if (mtGoodsSpec.getName().equals(name)) {
-                        GoodsSpecChildDto e = new GoodsSpecChildDto();
-                        e.setId(mtGoodsSpec.getId());
-                        e.setName(mtGoodsSpec.getValue());
-                        e.setChecked(true);
-                        child.add(e);
+                        GoodsSpecChildDto child = new GoodsSpecChildDto();
+                        child.setId(mtGoodsSpec.getId());
+                        child.setName(mtGoodsSpec.getValue());
+                        child.setChecked(true);
+                        childList.add(child);
                     }
                 }
                 item.setId(specId);
                 item.setName(name);
-                item.setChild(child);
+                item.setChild(childList);
                 specArr.add(item);
             }
 
@@ -345,9 +338,7 @@ public class BackendCashierController extends BaseController {
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
             tableParam.setStoreId(accountInfo.getStoreId());
         }
-
         List<HangUpDto> tableList = tableService.getActiveTableList(tableParam);
-
         return getSuccessResult(tableList);
     }
 }

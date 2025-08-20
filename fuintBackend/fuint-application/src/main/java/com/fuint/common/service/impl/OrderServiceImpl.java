@@ -885,6 +885,10 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
         }
 
+        if (merchantId == null || merchantId <= 0) {
+            throw new BusinessCheckException("系统异常，商户ID不能为空");
+        }
+
         // 生成订单数据
         OrderDto orderDto = new OrderDto();
         orderDto.setId(orderId);

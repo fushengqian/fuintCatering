@@ -66,11 +66,6 @@ public class BackendUserCouponController extends BaseController {
     private StoreService storeService;
 
     /**
-     * 后台用户接口
-     * */
-    private AccountService accountService;
-
-    /**
      * 卡券发放记录接口
      * */
     private SendLogService sendLogService;
@@ -141,9 +136,7 @@ public class BackendUserCouponController extends BaseController {
         }
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-
-        TAccount account = accountService.getAccountInfoById(accountInfo.getId());
-        Integer storeId = account.getStoreId();
+        Integer storeId = accountInfo.getStoreId();
 
         BigDecimal confirmAmount = mtUserCoupon.getAmount();
         if (mtUserCoupon.getType().equals(CouponTypeEnum.PRESTORE.getKey())) {

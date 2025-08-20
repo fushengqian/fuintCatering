@@ -5,7 +5,6 @@ import com.fuint.common.dto.ParamDto;
 import com.fuint.common.dto.UserCouponDto;
 import com.fuint.common.enums.CouponExpireTypeEnum;
 import com.fuint.common.enums.CouponTypeEnum;
-import com.fuint.common.service.AccountService;
 import com.fuint.common.service.ConfirmLogService;
 import com.fuint.common.service.CouponService;
 import com.fuint.common.service.MemberService;
@@ -18,7 +17,6 @@ import com.fuint.repository.mapper.MtUserCouponMapper;
 import com.fuint.repository.model.MtCoupon;
 import com.fuint.repository.model.MtUser;
 import com.fuint.repository.model.MtUserCoupon;
-import com.fuint.repository.model.TAccount;
 import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,11 +52,6 @@ public class BackendDoConfirmController extends BaseController {
      * 卡券服务接口
      */
     private CouponService couponService;
-
-    /**
-     * 账户服务接口
-     */
-    private AccountService accountService;
 
     /**
      * 核销记录服务接口
@@ -136,20 +129,16 @@ public class BackendDoConfirmController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:confirm:index')")
     public ResponseObject doConfirm(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String userCouponId = param.get("userCouponId") == null ? "" : param.get("userCouponId").toString();
         String amount = (param.get("amount") == null || StringUtil.isEmpty(param.get("amount").toString())) ? "0" : param.get("amount").toString();
         String remark = (param.get("remark") == null || StringUtil.isEmpty(param.get("remark").toString())) ? "后台核销" : param.get("remark").toString();
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (StringUtil.isEmpty(userCouponId)) {
             return getFailureResult(201, "系统参数有误");
         }
 
-        TAccount account = accountService.getAccountInfoById(accountInfo.getId());
-        Integer storeId = account.getStoreId() == null ? 0 : account.getStoreId();
-
+        Integer storeId = accountInfo.getStoreId() == null ? 0 : accountInfo.getStoreId();
         MtUserCoupon mtUserCoupon = mtUserCouponMapper.selectById(Integer.parseInt(userCouponId));
         if (mtUserCoupon.getType().equals(CouponTypeEnum.PRESTORE.getKey()) && StringUtil.isEmpty(amount)) {
             return getFailureResult(201, "储值卡核销金额不能为空");

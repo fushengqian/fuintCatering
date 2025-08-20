@@ -222,7 +222,9 @@ public class BackendBalanceController extends BaseController {
         List<LinkedHashMap> rechargeItems = (List) param.get("rechargeItem");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-
+        if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
+            throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
+        }
         if (rechargeItems.size() < 0) {
             return getFailureResult(201, "充值规则设置不能为空");
         }

@@ -14,7 +14,6 @@ import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtSetting;
 import com.fuint.repository.model.MtStore;
 import com.fuint.repository.model.MtUser;
-import com.fuint.repository.model.TAccount;
 import com.fuint.common.util.DateUtil;
 import com.fuint.utils.StringUtil;
 import com.fuint.utils.TimeUtils;
@@ -56,11 +55,6 @@ public class BackendOrderController extends BaseController {
     private OrderService orderService;
 
     /**
-     * 后台账户服务接口
-     */
-    private AccountService accountService;
-
-    /**
      * 会员服务接口
      * */
     private MemberService memberService;
@@ -89,11 +83,10 @@ public class BackendOrderController extends BaseController {
     @PreAuthorize("@pms.hasPermission('order:index')")
     public ResponseObject list(HttpServletRequest request, @RequestBody OrderListParam orderListParam) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-        TAccount account = accountService.getAccountInfoById(accountInfo.getId());
-        if (account.getMerchantId() != null && account.getMerchantId() > 0) {
-            orderListParam.setMerchantId(account.getMerchantId());
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+            orderListParam.setMerchantId(accountInfo.getMerchantId());
         }
-        Integer storeId = account.getStoreId() == null ? 0 : account.getStoreId();
+        Integer storeId = accountInfo.getStoreId() == null ? 0 : accountInfo.getStoreId();
         if (storeId > 0) {
             orderListParam.setStoreId(storeId);
         }
@@ -304,9 +297,8 @@ public class BackendOrderController extends BaseController {
             return getSuccessResult(result);
         }
 
-        TAccount account = accountService.getAccountInfoById(accountInfo.getId());
-        Integer storeId = account.getStoreId() == null ? 0 : account.getStoreId();
-        Integer staffId = account.getStaffId();
+        Integer storeId = accountInfo.getStoreId() == null ? 0 : accountInfo.getStoreId();
+        Integer staffId = accountInfo.getStaffId();
         if (storeId > 0) {
             orderListParam.setStoreId(storeId);
         }
@@ -441,7 +433,7 @@ public class BackendOrderController extends BaseController {
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         OrderListParam params = new OrderListParam();
-        params.setPage(1);
+        params.setPage(Constants.PAGE_NUMBER);
         params.setPageSize(Constants.MAX_ROWS);
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             params.setMerchantId(accountInfo.getMerchantId());

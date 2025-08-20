@@ -4,7 +4,6 @@ import com.fuint.common.Constants;
 import com.fuint.common.dto.*;
 import com.fuint.common.enums.RefundStatusEnum;
 import com.fuint.common.enums.RefundTypeEnum;
-import com.fuint.common.service.AccountService;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.OrderService;
 import com.fuint.common.service.RefundService;
@@ -15,7 +14,6 @@ import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtUser;
-import com.fuint.repository.model.TAccount;
 import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -50,11 +48,6 @@ public class BackendRefundController extends BaseController {
     private OrderService orderService;
 
     /**
-     * 后台账户服务接口
-     */
-    private AccountService accountService;
-
-    /**
      * 会员接口服务
      * */
     private MemberService memberService;
@@ -77,13 +70,11 @@ public class BackendRefundController extends BaseController {
         String endTime = request.getParameter("endTime") == null ? "" : request.getParameter("endTime");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-
-        TAccount account = accountService.getAccountInfoById(accountInfo.getId());
-        Integer storeId = account.getStoreId() == null ? 0 : account.getStoreId();
+        Integer storeId = accountInfo.getStoreId() == null ? 0 : accountInfo.getStoreId();
 
         Map<String, Object> params = new HashMap<>();
-        if (account.getMerchantId() != null && account.getMerchantId() > 0) {
-            params.put("merchantId", account.getMerchantId());
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+            params.put("merchantId", accountInfo.getMerchantId());
         }
         if (StringUtil.isNotEmpty(status)) {
             params.put("status", status);
@@ -97,7 +88,7 @@ public class BackendRefundController extends BaseController {
             }
         }
         if (StringUtil.isNotEmpty(mobile)) {
-            MtUser userInfo = memberService.queryMemberByMobile(account.getMerchantId(), mobile);
+            MtUser userInfo = memberService.queryMemberByMobile(accountInfo.getMerchantId(), mobile);
             if (userInfo != null) {
                 userId = userInfo.getId().toString();
             } else {
