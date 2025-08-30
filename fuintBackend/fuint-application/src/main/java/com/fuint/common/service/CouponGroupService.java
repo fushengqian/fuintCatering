@@ -52,7 +52,7 @@ public interface CouponGroupService extends IService<MtCouponGroup> {
     /**
      * 根据分组ID 删除分组信息
      *
-     * @param id       分组ID
+     * @param id 分组ID
      * @param operator 操作人
      * @throws BusinessCheckException
      */
@@ -61,7 +61,7 @@ public interface CouponGroupService extends IService<MtCouponGroup> {
     /**
      * 根据分组ID 获取券种类数量
      *
-     * @param id       分组ID
+     * @param id 分组ID
      * @throws BusinessCheckException
      */
     Integer getCouponNum(Integer id) throws BusinessCheckException;

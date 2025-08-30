@@ -12,6 +12,7 @@ import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.common.Constants;
+import com.fuint.common.enums.StatusEnum;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -157,9 +158,9 @@ public class BackendCommissionLogController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:log:index')")
     public ResponseObject save(HttpServletRequest request, @RequestBody CommissionLogRequest commissionLogRequest) throws BusinessCheckException {
-        AccountInfo accountDto = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
-        commissionLogRequest.setOperator(accountDto.getAccountName());
+        commissionLogRequest.setOperator(accountInfo.getAccountName());
         commissionLogService.updateCommissionLog(commissionLogRequest);
 
         return getSuccessResult(true);
@@ -195,13 +196,14 @@ public class BackendCommissionLogController extends BaseController {
     @RequestMapping(value = "/doSettle", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:log:index')")
     public ResponseObject doSettle(HttpServletRequest request, @RequestBody CommissionSettleRequest commissionSettleRequest) throws BusinessCheckException {
-        AccountInfo accountDto = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-        commissionSettleRequest.setOperator(accountDto.getAccountName());
-        if (accountDto.getMerchantId() != null && accountDto.getMerchantId() > 0) {
-            commissionSettleRequest.setMerchantId(accountDto.getMerchantId());
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+
+        commissionSettleRequest.setOperator(accountInfo.getAccountName());
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+            commissionSettleRequest.setMerchantId(accountInfo.getMerchantId());
         }
-        if (accountDto.getStoreId() != null && accountDto.getStoreId() > 0) {
-            commissionSettleRequest.setStoreId(accountDto.getStoreId());
+        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
+            commissionSettleRequest.setStoreId(accountInfo.getStoreId());
         }
         String settleNo = commissionCashService.settleCommission(commissionSettleRequest);
         return getSuccessResult(settleNo);

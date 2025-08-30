@@ -85,8 +85,12 @@ public class ClientOrderController extends BaseController {
         if (StringUtil.isEmpty(orderId)) {
             return getFailureResult(201, "订单不能为空");
         }
-
-        UserOrderDto orderInfo = orderService.getMyOrderById(Integer.parseInt(orderId));
+        UserOrderDto orderInfo;
+        if (orderId.length() >= 12) {
+            orderInfo = orderService.getOrderByOrderSn(orderId);
+        } else {
+            orderInfo = orderService.getMyOrderById(Integer.parseInt(orderId));
+        }
         if (!orderInfo.getUserId().equals(userInfo.getId())) {
             return getFailureResult(201, "订单信息有误");
         }
@@ -106,7 +110,12 @@ public class ClientOrderController extends BaseController {
         if (StringUtil.isEmpty(orderId)) {
             return getFailureResult(201, "订单不能为空");
         }
-
+        if (orderId.length() >= 12) {
+            MtOrder mtOrder = orderService.getOrderInfoByOrderSn(orderId);
+            if (mtOrder != null) {
+                orderId = mtOrder.getId().toString();
+            }
+        }
         UserOrderDto order = orderService.getOrderById(Integer.parseInt(orderId));
         if (!order.getUserId().equals(mtUser.getId())) {
             return getFailureResult(201, "订单信息有误");

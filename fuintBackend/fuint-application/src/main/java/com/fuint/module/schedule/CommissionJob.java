@@ -49,7 +49,7 @@ public class CommissionJob {
     /**
      * 一次最多处理订单数量
      **/
-    private int MAX_ROWS = 50;
+    private int MAX_ROWS = 10;
 
     /**
      * 订单完成后n天可产生佣金
@@ -66,7 +66,7 @@ public class CommissionJob {
              param.put("PAY_STATUS", PayStatusEnum.SUCCESS.getKey());
 
              Calendar calendar = Calendar.getInstance();
-             calendar.add(Calendar.DATE, OVER_DAY);
+             calendar.add(Calendar.DATE, -OVER_DAY);
              Date dateTime = calendar.getTime();
              String endTime = DateUtil.formatDate(dateTime, "yyyy-MM-dd HH:mm:ss");
 
@@ -74,7 +74,7 @@ public class CommissionJob {
              if (dataList.size() > 0) {
                 int dealNum = 0;
                 for (MtOrder mtOrder : dataList) {
-                     // 计算订单佣金
+                     // 计算订单佣金，生成分佣记录
                      if (dealNum <= MAX_ROWS) {
                          commissionLogService.calculateCommission(mtOrder.getId());
                          dealNum++;

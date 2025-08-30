@@ -80,7 +80,6 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
     public PaginationResponse<CommissionCashDto> queryCommissionCashByPagination(PaginationRequest paginationRequest) throws BusinessCheckException {
         Page<MtCommissionCash> pageHelper = PageHelper.startPage(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
         LambdaQueryWrapper<MtCommissionCash> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        lambdaQueryWrapper.ne(MtCommissionCash::getStatus, StatusEnum.DISABLE.getKey());
         String status = paginationRequest.getSearchParams().get("status") == null ? "" : paginationRequest.getSearchParams().get("status").toString();
         if (StringUtils.isNotBlank(status)) {
             lambdaQueryWrapper.eq(MtCommissionCash::getStatus, status);
@@ -212,7 +211,7 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
                      staffIds.add(CommissionTargetEnum.STAFF.getKey() + mtCommissionLog.getStaffId());
                  } else if (mtCommissionLog.getUserId() != null && mtCommissionLog.getUserId() > 0 && !userIds.contains(CommissionTargetEnum.MEMBER.getKey() + mtCommissionLog.getUserId())){
                      userIds.add(CommissionTargetEnum.MEMBER.getKey() + mtCommissionLog.getUserId());
-                }
+                 }
             }
         }
         staffIds.addAll(userIds);
