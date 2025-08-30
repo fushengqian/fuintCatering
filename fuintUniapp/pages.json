@@ -313,6 +313,12 @@
       }
     },
     {
+      "path": "pages/pay/yeepay-qrcode",
+      "style": {
+        "navigationBarTitleText": "扫码支付"
+      }
+    },
+    {
       "path": "pages/merchant/index",
       "style": {
         "navigationBarTitleText": "商家管理"
