@@ -155,7 +155,7 @@ public class BackendUserCouponController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:userCoupon:delete')")
     public ResponseObject delete(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getParameter("token"));
 
         // 删除会员的卡券
         couponService.deleteUserCoupon(id, accountInfo.getAccountName());
@@ -195,7 +195,7 @@ public class BackendUserCouponController extends BaseController {
         String status = request.getParameter("status") == null ? "" : request.getParameter("status");
         String userCouponId = request.getParameter("id") == null ? "" : request.getParameter("id");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getParameter("token"));
         if (accountInfo == null) {
             logger.error("导出会员卡券失败：登录信息失效");
             return;

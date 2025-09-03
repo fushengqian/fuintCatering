@@ -169,17 +169,17 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
         if (StringUtil.isNotEmpty(sortType)) {
             if (sortType.equals("price")) {
                 if (sortPrice.equals("0")) {
-                    lambdaQueryWrapper.orderByDesc(MtGoods::getPrice);
+                    lambdaQueryWrapper.orderByDesc(MtGoods::getPrice).orderByAsc(MtGoods::getId);
                 } else {
-                    lambdaQueryWrapper.orderByAsc(MtGoods::getPrice);
+                    lambdaQueryWrapper.orderByAsc(MtGoods::getPrice).orderByAsc(MtGoods::getId);
                 }
             } else if (sortType.equals("sales")) {
-                lambdaQueryWrapper.orderByDesc(MtGoods::getInitSale);
+                lambdaQueryWrapper.orderByDesc(MtGoods::getInitSale).orderByAsc(MtGoods::getId);
             } else {
-                lambdaQueryWrapper.orderByAsc(MtGoods::getSort, MtGoods::getId);
+                lambdaQueryWrapper.orderByAsc(MtGoods::getSort).orderByAsc(MtGoods::getId);
             }
         } else {
-            lambdaQueryWrapper.orderByAsc(MtGoods::getSort, MtGoods::getId);
+            lambdaQueryWrapper.orderByAsc(MtGoods::getSort).orderByAsc(MtGoods::getId);
         }
         lambdaQueryWrapper.select(
                 MtGoods::getId,

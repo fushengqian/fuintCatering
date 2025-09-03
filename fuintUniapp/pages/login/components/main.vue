@@ -182,7 +182,7 @@
         const app = this
         LoginApi.captcha()
           .then(result => {
-            app.captcha = result.data.captcha;
+            app.captcha = result.data.code;
             app.captchaUuid = result.data.uuid;
             app.captchaCode = "";
         })

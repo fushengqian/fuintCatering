@@ -39,6 +39,7 @@
         <if test="name != null and name != ''">
             AND t.name LIKE concat('%',#{name},'%')
         </if>
+        ORDER BY t.IS_DEFAULT desc
     </select>
 
     <update id="deleteStoreByMerchant">

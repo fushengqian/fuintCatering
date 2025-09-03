@@ -430,7 +430,7 @@ public class BackendOrderController extends BaseController {
         String startTime = request.getParameter("startTime") == null ? "" : request.getParameter("startTime");
         String endTime = request.getParameter("endTime") == null ? "" : request.getParameter("endTime");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getParameter("token"));
 
         OrderListParam params = new OrderListParam();
         params.setPage(Constants.PAGE_NUMBER);

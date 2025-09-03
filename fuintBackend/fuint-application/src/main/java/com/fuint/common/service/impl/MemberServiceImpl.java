@@ -362,14 +362,16 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
             mtUser.setName(userNo);
         }
         // 默认会员等级
-        if (mtUser.getGradeId() == null) {
+        if (mtUser.getGradeId() == null || mtUser.getGradeId() <= 0) {
             MtUserGrade grade = userGradeService.getInitUserGrade(mtUser.getMerchantId());
             if (grade != null) {
                 mtUser.setGradeId(grade.getId());
             }
         }
         mtUser.setUserNo(userNo);
-        mtUser.setBalance(new BigDecimal(0));
+        if (mtUser.getBalance() == null) {
+            mtUser.setBalance(new BigDecimal(0));
+        }
         if (mtUser.getPoint() == null || mtUser.getPoint() < 1) {
             mtUser.setPoint(0);
         }
@@ -383,10 +385,13 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         mtUser.setUpdateTime(time);
         mtUser.setStartTime(mtUser.getStartTime());
         mtUser.setEndTime(mtUser.getEndTime());
-        if (mtUser.getStoreId() != null) {
+        if (mtUser.getStoreId() != null && mtUser.getStoreId() > 0) {
             mtUser.setStoreId(mtUser.getStoreId());
         } else {
-            mtUser.setStoreId(0);
+            List<MtStore> stores = storeService.getActiveStoreList(mtUser.getMerchantId(), 0, null);
+            if (stores != null && stores.size() > 0) {
+                mtUser.setStoreId(stores.get(0).getId());
+            }
         }
         if (mtUser.getIsStaff() == null) {
             mtUser.setIsStaff(YesOrNoEnum.NO.getKey());
