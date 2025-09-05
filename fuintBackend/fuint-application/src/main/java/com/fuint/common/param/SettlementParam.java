@@ -78,4 +78,7 @@ public class SettlementParam implements Serializable {
     @ApiModelProperty(value="桌码", name="tableCode")
     private String tableCode;
 
+    @ApiModelProperty(value="就餐人数", name="peopleNum")
+    private Integer peopleNum;
+
 }

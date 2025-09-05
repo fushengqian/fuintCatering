@@ -270,6 +270,7 @@ public class CommissionLogServiceImpl extends ServiceImpl<MtCommissionLogMapper,
             // 订单更新为已结算
             if (mtOrder != null) {
                 mtOrder.setCommissionStatus(CommissionStatusEnum.SETTLED.getKey());
+                mtOrder.setStatus(OrderStatusEnum.COMPLETE.getKey());
                 orderService.updateOrder(mtOrder);
             }
         } else {

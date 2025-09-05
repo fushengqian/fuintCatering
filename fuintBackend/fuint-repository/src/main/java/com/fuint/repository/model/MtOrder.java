@@ -56,6 +56,9 @@ public class MtOrder implements Serializable {
     @ApiModelProperty("所属桌码ID")
     private Integer tableId;
 
+    @ApiModelProperty("就餐人数")
+    private Integer peopleNum;
+
     @ApiModelProperty("用户ID")
     private Integer userId;
 

@@ -19,6 +19,7 @@ import com.fuint.repository.mapper.MtBalanceMapper;
 import com.fuint.repository.mapper.MtUserMapper;
 import com.fuint.repository.model.MtBalance;
 import com.fuint.repository.model.MtBanner;
+import com.fuint.repository.model.MtOrder;
 import com.fuint.repository.model.MtUser;
 import com.fuint.utils.StringUtil;
 import com.github.pagehelper.Page;
@@ -199,14 +200,18 @@ public class BalanceServiceImpl extends ServiceImpl<MtBalanceMapper, MtBalance> 
             orderDto.setPlatform(PlatformTypeEnum.PC.getCode());
             orderDto.setOrderMode(OrderModeEnum.ONESELF.getKey());
             orderDto.setAmount(mtBalance.getAmount());
+            orderDto.setPayAmount(mtBalance.getAmount());
             orderDto.setPayType(PayTypeEnum.CASH.getKey());
             orderDto.setStatus(OrderStatusEnum.COMPLETE.getKey());
-            orderDto.setPayStatus(PayStatusEnum.SUCCESS.getKey());
+            orderDto.setPayStatus(PayStatusEnum.WAIT.getKey());
             orderDto.setOperator(mtBalance.getOperator());
             orderDto.setUsePoint(0);
-            orderService.saveOrder(orderDto);
+            MtOrder mtOrder = orderService.saveOrder(orderDto);
+            if (mtOrder != null) {
+                orderService.setOrderPayed(mtOrder.getId(), null);
+            }
         }
-
+        mtUser = mtUserMapper.selectById(mtBalance.getUserId());
         try {
             List<String> mobileList = new ArrayList<>();
             mobileList.add(mtUser.getMobile());
@@ -223,8 +228,7 @@ public class BalanceServiceImpl extends ServiceImpl<MtBalanceMapper, MtBalance> 
         }
 
         // 发送小程序订阅消息
-        Date nowTime = new Date();
-        Date sendTime = new Date(nowTime.getTime() + 60000);
+        Date sendTime = new Date(new Date().getTime() + 60000);
         Map<String, Object> params = new HashMap<>();
         String dateTime = DateUtil.formatDate(Calendar.getInstance().getTime(), "yyyy-MM-dd HH:mm");
         params.put("amount", mtBalance.getAmount());

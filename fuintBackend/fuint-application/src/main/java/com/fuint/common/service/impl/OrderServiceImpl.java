@@ -194,15 +194,15 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         String userId = orderListParam.getUserId() == null ? "" : orderListParam.getUserId().toString();
         Integer merchantId = orderListParam.getMerchantId() == null ? 0 : orderListParam.getMerchantId();
         Integer storeId = orderListParam.getStoreId() == null ? 0 : orderListParam.getStoreId();
-        String status =  orderListParam.getStatus() == null ? "": orderListParam.getStatus();
-        String payStatus =  orderListParam.getPayStatus() == null ? "": orderListParam.getPayStatus();
+        String status = orderListParam.getStatus() == null ? "": orderListParam.getStatus();
+        String payStatus = orderListParam.getPayStatus() == null ? "": orderListParam.getPayStatus();
         String settleStatus =  orderListParam.getSettleStatus() == null ? "": orderListParam.getSettleStatus();
-        String dataType =  orderListParam.getDataType() == null ? "": orderListParam.getDataType();
-        String type =  orderListParam.getType() == null ? "": orderListParam.getType();
-        String orderSn =  orderListParam.getOrderSn() == null ? "": orderListParam.getOrderSn();
-        String tableCode =  orderListParam.getTableCode() == null ? "": orderListParam.getTableCode();
-        String mobile =  orderListParam.getMobile() == null ? "": orderListParam.getMobile();
-        String orderMode =  orderListParam.getOrderMode() == null ? "": orderListParam.getOrderMode();
+        String dataType = orderListParam.getDataType() == null ? "": orderListParam.getDataType();
+        String type = orderListParam.getType() == null ? "": orderListParam.getType();
+        String orderSn = orderListParam.getOrderSn() == null ? "": orderListParam.getOrderSn();
+        String tableCode = orderListParam.getTableCode() == null ? "": orderListParam.getTableCode();
+        String mobile = orderListParam.getMobile() == null ? "": orderListParam.getMobile();
+        String orderMode = orderListParam.getOrderMode() == null ? "": orderListParam.getOrderMode();
         String staffId = orderListParam.getStaffId() == null ? "" : orderListParam.getStaffId();
         String couponId = orderListParam.getCouponId() == null ? "" : orderListParam.getCouponId();
         String storeIds = orderListParam.getStoreIds() == null ? "" : orderListParam.getStoreIds();
@@ -413,7 +413,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         mtOrder.setDeliveryFee(orderDto.getDeliveryFee() == null ? new BigDecimal(0) : orderDto.getDeliveryFee());
         mtOrder.setSettleStatus(SettleStatusEnum.WAIT.getKey());
         mtOrder.setConfirmStatus(YesOrNoEnum.NO.getKey());
-
+        if (orderDto.getPeopleNum() != null && orderDto.getPeopleNum() > 0) {
+            mtOrder.setPeopleNum(orderDto.getPeopleNum());
+        }
         if (mtOrder.getId() == null || mtOrder.getId() <= 0) {
             mtOrder.setCreateTime(new Date());
         }
@@ -424,7 +426,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         if (mtOrder.getVerifyCode() == null && !orderDto.getPlatform().equals(PlatformTypeEnum.PC.getCode())) {
             mtOrder.setVerifyCode(SeqUtil.getRandomNumber(6));
         }
-
         // 首先生成订单
         if (mtOrder.getId() == null || mtOrder.getId() < 1) {
             mtOrderMapper.insert(mtOrder);
@@ -801,11 +802,11 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         // 继续点单的订单ID
         Integer myOrderId = 0;
-        if (tableId > 0 || StringUtil.isNotEmpty(tableCode)) {
+        if (tableId > 0 || StringUtil.isNotBlank(tableCode)) {
             MtTable mtTable = null;
             if (tableId > 0) {
                 mtTable = tableService.queryTableById(tableId);
-            } else if (storeId != null && storeId > 0 && StringUtil.isNotEmpty(tableCode)) {
+            } else if (storeId != null && storeId > 0 && StringUtil.isNotBlank(tableCode)) {
                 mtTable = tableService.queryTableByCode(storeId, tableCode);
             }
             if (mtTable != null) {
@@ -908,6 +909,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         orderDto.setStaffId(staffId);
         orderDto.setIsVisitor(isVisitor);
         orderDto.setPlatform(platform);
+        orderDto.setPeopleNum(param.getPeopleNum());
 
         MtSetting pointSetting = settingService.querySettingByName(merchantId, SettingTypeEnum.POINT.getKey(), PointSettingEnum.CAN_USE_AS_MONEY.getKey());
         // 使用积分数量
@@ -1464,13 +1466,14 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             mtOrder.setAmount(orderDto.getAmount());
         }
 
-        if (null != orderDto.getVerifyCode() && StringUtil.isNotEmpty(orderDto.getVerifyCode())) {
+        if (StringUtil.isNotBlank(orderDto.getVerifyCode())) {
             if (orderDto.getVerifyCode().equals(mtOrder.getVerifyCode()) || StringUtil.isEmpty(mtOrder.getVerifyCode())) {
                 mtOrder.setStatus(OrderStatusEnum.DELIVERED.getKey());
                 mtOrder.setVerifyCode("");
                 mtOrder.setConfirmStatus(YesOrNoEnum.YES.getKey());
                 mtOrder.setConfirmTime(new Date());
                 mtOrder.setConfirmRemark(orderDto.getConfirmRemark());
+                mtOrder.setStatus(OrderStatusEnum.COMPLETE.getKey());
             } else {
                 throw new BusinessCheckException("核销码错误，请确认！");
             }

@@ -72,6 +72,36 @@
     <!-- 商品SKU弹窗 -->
     <SkuPopup v-if="!isLoading" v-model="showSkuPopup" :skuMode="skuMode" :goods="goods" @addCart="onAddCart"/>
     
+    <!-- 就餐人数对话框 start -->
+    <u-popup v-model="peopleNumShow" mode="bottom" closeable="true" width="90%">
+        <div class="people-container">
+            <div class="popup-header">
+                <h2>就餐人数确认</h2>
+                <p>请选择本次就餐的人数，我们将为您提供更好的服务</p>
+            </div>
+            <div class="people-content">
+                <div class="grid-container">
+                    <div v-for="num in 12" :key="num+1" 
+                         :class="['people-item', { selected: selectedPeopleNum === num+1 }]" 
+                         @click="checkPeopleNum(num+1)">
+                        <div class="people-icon">✓</div>
+                        <div class="people-number">{{ num+1 }}</div>
+                        <div class="people-label">{{ getPeopleLabel(num+1) }}</div>
+                    </div>
+                </div>
+                <div class="custom-input">
+                    <label>其他人数:</label>
+                    <input type="number" min="1" max="99" placeholder="请输入就餐人数">
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-cancel" @click="cancelPeople()">取消</button>
+                    <button class="btn btn-confirm" @click="confirmPeople()">确认选择</button>
+                </div>
+            </div>
+      </div>
+    </u-popup>
+    <!-- 就餐人数对话框 end -->
+    
     <view class="flow-fixed-footer b-f m-top10">
       <view class="dis-flex chackout-box">
         <view class="chackout-left pl-12">
@@ -123,6 +153,8 @@
         // 正在加载中
         isLoading: true,
         showSkuPopup: false,
+        peopleNumShow: true,
+        selectedPeopleNum: 0,
         skuMode: 1,
         goods: {},
         storeInfo: null,
@@ -152,6 +184,13 @@
       const app = this;
       app.getPageData();
       app.onGetStoreInfo();
+      let peopleNum = uni.getStorageSync('peopleNum');
+      console.log("peopleNum ========= ", peopleNum);
+      console.log("tableId ========= ", app.tableId);
+      if (!peopleNum) {
+          app.peopleNumShow = true;
+          console.log("app.peopleNumShow ========= ", app.peopleNumShow);
+      }
       uni.getLocation({
           type: 'gcj02',
           success(res){
@@ -205,12 +244,38 @@
               })
           })
       },
-      
+      getPeopleLabel(num) {
+          const labels = {
+              1: '一人食',
+              2: '双人餐',
+              3: '三人行',
+              4: '家庭餐',
+              5: '朋友小聚',
+              6: '多人聚餐',
+              7: '团体用餐',
+              8: '团体用餐',
+              9: '团体用餐',
+              10: '团体用餐',
+              11: '团体用餐',
+              12: '团体用餐'
+          };
+          return labels[num] || '用餐';
+      },
+      cancelPeople() {
+        this.peopleNumShow = false;
+        uni.setStorageSync('peopleNum', 0);
+      },
+      confirmPeople() {
+        this.peopleNumShow = false;
+        uni.setStorageSync('peopleNum', this.selectedPeopleNum);
+      },
+      checkPeopleNum(peopleNum) {
+        this.selectedPeopleNum = peopleNum;
+      },
       // 计算每个分类的位置信息
       calculateCategoryPositions() {
         const query = uni.createSelectorQuery().in(this);
         this.categoryPositions = [];
-        
         this.list.forEach((item, index) => {
           query.select(`#category-${index}`).boundingClientRect();
         });
@@ -231,8 +296,8 @@
       // 滚动事件处理
       handleScroll(e) {
         if (this.isManualSelect) {
-          this.isManualSelect = false;
-          return;
+            this.isManualSelect = false;
+            return;
         }
         
         // 防抖处理
@@ -352,7 +417,6 @@
         })
       },
     },
-
     onShareAppMessage() {
       const app = this
       return {
@@ -657,4 +721,161 @@
        }
     }
   }
+    .people-container {
+       padding-top: 100rpx;
+    }
+    .popup-header {
+       background: $fuint-theme;
+       color: white;
+       padding: 20rpx;
+       text-align: center;
+    }
+    .popup-header h2 {
+       font-size: 34rpx;
+       font-weight: 600;
+       margin-bottom: 3rpx;
+    }
+    .popup-header p {
+       font-size: 26rpx;
+       opacity: 0.9;
+    }
+    .people-content {
+       padding: 20rpx;
+    }
+    .grid-container {
+       display: grid;
+       grid-template-columns: repeat(4, 1fr);
+       gap: 10rpx;
+       margin-bottom: 10px;
+    }
+    .people-item {
+       position: relative;
+       background: #f8f9fa;
+       border-radius: 0rpx;
+       height: 120rpx;
+       display: flex;
+       flex-direction: column;
+       justify-content: center;
+       align-items: center;
+       cursor: pointer;
+       transition: all 0.3s ease;
+       border: 2rpx solid transparent;
+    }
+    .people-item:hover {
+       transform: translateY(-2px);
+       box-shadow: 0 5rpx 12rpx rgba(0, 0, 0, 0.08);
+       border-color: #ff9f7d;
+    }
+    .people-item.selected {
+       background: linear-gradient(135deg, #ffd9cc 0%, #ffb499 100%);
+       border-color: #ff7e5f;
+       color: #d64c2f;
+    }
+    .people-number {
+       font-size: 18px;
+       font-weight: 700;
+       margin-bottom: 3px;
+    }
+    .people-label {
+       font-size: 11px;
+       color: #6c757d;
+    }
+    .selected .people-label {
+       color: #d64c2f;
+       font-weight: 500;
+    }
+    .people-icon {
+       position: absolute;
+       top: 5rpx;
+       right: 5rpx;
+       width: 26rpx;
+       height: 26rpx;
+       background: #ff7e5f;
+       border-radius: 50%;
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       color: white;
+       font-size: 26rpx;
+       opacity: 0;
+       transition: opacity 0.3s ease;
+    }
+    .selected .people-icon {
+       opacity: 1;
+    }
+    .action-buttons {
+       display: flex;
+       justify-content: space-between;
+       gap: 12rpx;
+    }
+    .btn {
+       flex: 1;
+       padding: 10rpx;
+       border: none;
+       border-radius: 20rpx;
+       font-size: 28rpx;
+       font-weight: 500;
+       cursor: pointer;
+       transition: all 0.3s ease;
+    }
+    .btn-cancel {
+       background: #f8f9fa;
+       color: #6c757d;
+    }
+    .btn-cancel:hover {
+       background: #e9ecef;
+    }
+    .btn-confirm {
+       background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+       color: white;
+       box-shadow: 0 3rpx 8rpx rgba(255, 126, 95, 0.3);
+    }
+    .btn-confirm:hover {
+       transform: translateY(-2px);
+       box-shadow: 0 5rpx 12px rgba(255, 126, 95, 0.4);
+    }
+    .custom-input {
+       display: flex;
+       align-items: center;
+       margin-top: 10rpx;
+       padding: 12rpx;
+       background: #f8f9fa;
+       border-radius: 8px;
+    }
+    .custom-input label {
+       margin-right: 24rpx;
+       font-weight: 500;
+       color: #495057;
+       font-size: 24rpx;
+    }
+    .custom-input input {
+       flex: 1;
+       padding: 10rpx 12rpx;
+       border: 1px solid #dee2e6;
+       border-radius: 6rpx;
+       font-size: 24rpx;
+       outline: none;
+       transition: border-color 0.3s;
+    }
+    .custom-input input:focus {
+       border-color: #ff7e5f;
+       box-shadow: 0 0 0 2rpx rgba(255, 126, 95, 0.2);
+    }
+    @media (max-width: 500rpx) {
+       .grid-container {
+           grid-template-columns: repeat(4, 1fr);
+       }
+       .people-item {
+           height: 120rpx;
+       }
+       .people-number {
+           font-size: 36rpx;
+       }
+       .popup-header {
+           padding: 25rpx;
+       }
+       .people-content {
+           padding: 25rpx;
+       }
+    }
 </style>

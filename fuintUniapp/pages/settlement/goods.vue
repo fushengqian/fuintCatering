@@ -545,9 +545,10 @@
         
         // 按钮禁用
         app.disabled = true;
-        
+        // 就餐人数
+        let peopleNum = uni.getStorageSync('peopleNum');
         // 请求api
-        SettlementApi.submit(0, "", "goods", app.remark, 0, app.usePoint, app.selectCouponId, app.options.cartIds, app.options.goodsId, app.options.skuId, app.options.buyNum, orderMode, payType)
+        SettlementApi.submit(0, "", "goods", app.remark, 0, app.usePoint, app.selectCouponId, app.options.cartIds, app.options.goodsId, app.options.skuId, app.options.buyNum, orderMode, payType, peopleNum)
           .then(result => {
               app.onSubmitCallback(result);
           })
