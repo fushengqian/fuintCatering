@@ -130,6 +130,9 @@ public class UserOrderDto implements Serializable {
     @ApiModelProperty("所属桌码信息")
     private MtTable tableInfo;
 
+    @ApiModelProperty("就餐人数")
+    private Integer peopleNum;
+
     @ApiModelProperty("售后订单")
     private MtRefund refundInfo;
 

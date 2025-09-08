@@ -341,7 +341,7 @@ public class BackendOrderController extends BaseController {
         String payOffLine = "N";
         String payFirst = "Y";
         String deliveryRange = "0";
-
+        String peopleNum = "0";
         for (MtSetting setting : settingList) {
             if (setting.getName().equals(OrderSettingEnum.DELIVERY_FEE.getKey())) {
                 deliveryFee = setting.getValue();
@@ -355,6 +355,8 @@ public class BackendOrderController extends BaseController {
                 payFirst = setting.getValue();
             } else if (setting.getName().equals(OrderSettingEnum.DELIVERY_RANGE.getKey())) {
                 deliveryRange = setting.getValue();
+            } else if (setting.getName().equals(OrderSettingEnum.PEOPLE_NUM.getKey())) {
+                peopleNum = setting.getValue();
             }
         }
 
@@ -364,6 +366,7 @@ public class BackendOrderController extends BaseController {
         result.put("payOffLine", payOffLine);
         result.put("payFirst", payFirst);
         result.put("deliveryRange", deliveryRange);
+        result.put("peopleNum", peopleNum);
 
         return getSuccessResult(result);
     }
@@ -382,6 +385,7 @@ public class BackendOrderController extends BaseController {
         String payOffLine = param.get("payOffLine") != null ? param.get("payOffLine").toString() : "N";
         String payFirst = param.get("payFirst") != null ? param.get("payFirst").toString() : "Y";
         String deliveryRange = param.get("deliveryRange") != null ? param.get("deliveryRange").toString() : "";
+        String peopleNum = param.get("peopleNum") != null ? param.get("peopleNum").toString() : "";
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         OrderSettingEnum[] settingList = OrderSettingEnum.values();
@@ -401,6 +405,8 @@ public class BackendOrderController extends BaseController {
                 info.setValue(payFirst);
             } else if (setting.getKey().equals(OrderSettingEnum.DELIVERY_RANGE.getKey())) {
                 info.setValue(deliveryRange);
+            } else if (setting.getKey().equals(OrderSettingEnum.PEOPLE_NUM.getKey())) {
+                info.setValue(peopleNum);
             }
             info.setMerchantId(accountInfo.getMerchantId());
             info.setStoreId(accountInfo.getStoreId());

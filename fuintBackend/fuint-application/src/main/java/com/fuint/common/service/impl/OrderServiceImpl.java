@@ -1733,6 +1733,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         userOrderDto.setPlatform(orderInfo.getPlatform());
         userOrderDto.setConfirmRemark(orderInfo.getConfirmRemark());
         userOrderDto.setConfirmStatus(orderInfo.getConfirmStatus());
+        userOrderDto.setPeopleNum(orderInfo.getPeopleNum());
         if (orderInfo.getConfirmTime() != null) {
             userOrderDto.setConfirmTime(DateUtil.formatDate(orderInfo.getConfirmTime(), "yyyy.MM.dd HH:mm"));
         }

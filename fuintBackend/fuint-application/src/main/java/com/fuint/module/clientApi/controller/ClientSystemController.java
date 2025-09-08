@@ -173,11 +173,19 @@ public class ClientSystemController extends BaseController {
             payFirst = paySetting.getValue();
         }
 
+        // 显示就餐人数
+        MtSetting peopleNumSetting = settingService.querySettingByName(merchantId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.PEOPLE_NUM.getKey());
+        String peopleNum = YesOrNoEnum.NO.getKey();
+        if (peopleNumSetting != null) {
+            peopleNum = peopleNumSetting.getValue();
+        }
+
         Map<String, Object> result = new HashMap<>();
         result.put("storeInfo", storeInfo);
         result.put("payTypeList", payTypeList);
         result.put("tableInfo", tableInfo);
         result.put("payFirst", payFirst);
+        result.put("peopleNum", peopleNum);
 
         return getSuccessResult(result);
     }

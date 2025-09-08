@@ -73,7 +73,7 @@
     <SkuPopup v-if="!isLoading" v-model="showSkuPopup" :skuMode="skuMode" :goods="goods" @addCart="onAddCart"/>
     
     <!-- 就餐人数对话框 start -->
-    <u-popup v-model="peopleNumShow" mode="bottom" closeable="true" width="90%">
+    <u-popup v-model="peopleNumShow" mode="bottom" width="90%">
         <div class="people-container">
             <div class="popup-header">
                 <h2>就餐人数确认</h2>
@@ -81,12 +81,12 @@
             </div>
             <div class="people-content">
                 <div class="grid-container">
-                    <div v-for="num in 12" :key="num+1" 
-                         :class="['people-item', { selected: selectedPeopleNum === num+1 }]" 
-                         @click="checkPeopleNum(num+1)">
+                    <div v-for="num in peopleArray" :key="num" 
+                         :class="['people-item', { selected: selectedPeopleNum === num }]" 
+                         @click="checkPeopleNum(num)">
                         <div class="people-icon">✓</div>
-                        <div class="people-number">{{ num+1 }}</div>
-                        <div class="people-label">{{ getPeopleLabel(num+1) }}</div>
+                        <div class="people-number">{{ num }}</div>
+                        <div class="people-label">{{ getPeopleLabel(num) }}</div>
                     </div>
                 </div>
                 <div class="custom-input">
@@ -139,6 +139,7 @@
     },
     data() {
       return {
+        peopleArray: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         goodsCart: [],
         totalNum: 0,
         totalPrice: 0.00,
@@ -153,8 +154,8 @@
         // 正在加载中
         isLoading: true,
         showSkuPopup: false,
-        peopleNumShow: true,
-        selectedPeopleNum: 0,
+        peopleNumShow: false,
+        selectedPeopleNum: 2,
         skuMode: 1,
         goods: {},
         storeInfo: null,
@@ -184,13 +185,6 @@
       const app = this;
       app.getPageData();
       app.onGetStoreInfo();
-      let peopleNum = uni.getStorageSync('peopleNum');
-      console.log("peopleNum ========= ", peopleNum);
-      console.log("tableId ========= ", app.tableId);
-      if (!peopleNum) {
-          app.peopleNumShow = true;
-          console.log("app.peopleNumShow ========= ", app.peopleNumShow);
-      }
       uni.getLocation({
           type: 'gcj02',
           success(res){
@@ -339,6 +333,11 @@
            .then(result => {
                app.storeInfo = result.data.storeInfo;
                app.tableInfo = result.data.tableInfo;
+               const showPeopleNum = result.data.peopleNum;
+               let peopleNum = uni.getStorageSync('peopleNum');
+               if (!peopleNum && app.tableId > 0 && showPeopleNum == 'Y') {
+                   app.peopleNumShow = true;
+               }
            })
        },
       
@@ -722,7 +721,8 @@
     }
   }
     .people-container {
-       padding-top: 100rpx;
+       padding-top: 0rpx;
+       padding-bottom: 20rpx;
     }
     .popup-header {
        background: $fuint-theme;
@@ -740,7 +740,7 @@
        opacity: 0.9;
     }
     .people-content {
-       padding: 20rpx;
+       padding: 30rpx 20rpx 20rpx 20rpx;
     }
     .grid-container {
        display: grid;
@@ -821,6 +821,7 @@
     .btn-cancel {
        background: #f8f9fa;
        color: #6c757d;
+       border: 1px solid #dee2e6;
     }
     .btn-cancel:hover {
        background: #e9ecef;
@@ -838,7 +839,7 @@
        display: flex;
        align-items: center;
        margin-top: 10rpx;
-       padding: 12rpx;
+       padding: 16rpx;
        background: #f8f9fa;
        border-radius: 8px;
     }
@@ -846,14 +847,14 @@
        margin-right: 24rpx;
        font-weight: 500;
        color: #495057;
-       font-size: 24rpx;
+       font-size: 28rpx;
     }
     .custom-input input {
        flex: 1;
-       padding: 10rpx 12rpx;
+       padding: 16rpx 20rpx;
        border: 1px solid #dee2e6;
        border-radius: 6rpx;
-       font-size: 24rpx;
+       font-size: 28rpx;
        outline: none;
        transition: border-color 0.3s;
     }
