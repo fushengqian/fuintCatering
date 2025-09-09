@@ -170,5 +170,10 @@
             <artifactId>aliyun-java-sdk-core</artifactId>
             <version>4.4.6</version>
         </dependency>
+        <dependency>
+            <groupId>com.yeepay.yop.sdk</groupId>
+            <artifactId>yop-java-sdk</artifactId>
+            <version>4.4.15</version>
+        </dependency>
     </dependencies>
 </project>

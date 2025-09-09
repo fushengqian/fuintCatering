@@ -2468,4 +2468,95 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         return saveOrder(orderDto);
     }
+
+    /**
+     * 根据易宝支付通知更新订单状态
+     *
+     * @param orderId 商户订单号
+     * @param yeepayStatus 易宝支付状态
+     * @param yeepayTransactionId 易宝交易ID
+     * @return 更新结果
+     * @throws BusinessCheckException 业务检查异常
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @OperationServiceLog(description = "根据易宝支付通知更新订单状态")
+    public boolean updateOrderStatusFromYeepay(String orderId, String yeepayStatus, String yeepayTransactionId) throws BusinessCheckException {
+        logger.info("根据易宝支付通知更新订单状态，订单号：{}，易宝支付状态：{}，易宝交易ID：{}", orderId, yeepayStatus, yeepayTransactionId);
+        
+        // 查询订单信息
+        MtOrder orderInfo = getOrderInfoByOrderSn(orderId);
+        if (orderInfo == null) {
+            logger.error("订单不存在，订单号：{}", orderId);
+            return false;
+        }
+        
+        // 更新易宝支付相关字段
+        orderInfo.setYeepayStatus(yeepayStatus);
+        orderInfo.setYeepayTransactionId(yeepayTransactionId);
+        orderInfo.setPaymentGateway("YEEPAY");
+        orderInfo.setUpdateTime(new Date());
+        
+        // 根据易宝支付状态更新订单状态
+        if ("SUCCESS".equals(yeepayStatus)) {
+            // 如果订单已经是支付成功状态，则不需要再次更新
+            if (orderInfo.getPayStatus().equals(PayStatusEnum.SUCCESS.getKey())) {
+                logger.info("订单已经是支付成功状态，无需更新，订单号：{}", orderId);
+                return true;
+            }
+            
+            // 更新订单状态为已支付
+            orderInfo.setStatus(OrderStatusEnum.PAID.getKey());
+            orderInfo.setPayStatus(PayStatusEnum.SUCCESS.getKey());
+            orderInfo.setPayTime(new Date());
+            
+            // 保存更新后的订单
+            updateOrder(orderInfo);
+            
+            // 处理会员升级订单
+            if (orderInfo.getType().equals(OrderTypeEnum.MEMBER.getKey())) {
+                openGiftService.openGift(orderInfo.getUserId(), Integer.parseInt(orderInfo.getParam()), false);
+            }
+            
+            // 处理购物订单
+            UserOrderDto orderDto = getOrderByOrderSn(orderId);
+            if (orderDto.getType().equals(OrderTypeEnum.GOODS.getKey())) {
+                try {
+                    List<OrderGoodsDto> goodsList = orderDto.getGoods();
+                    if (goodsList != null && goodsList.size() > 0) {
+                        for (OrderGoodsDto goodsDto : goodsList) {
+                            MtGoods mtGoods = goodsService.queryGoodsById(goodsDto.getGoodsId());
+                            if (mtGoods != null) {
+                                // 购买虚拟卡券商品发放处理
+                                if (mtGoods.getType().equals(GoodsTypeEnum.COUPON.getKey()) && mtGoods.getCouponIds() != null && StringUtil.isNotEmpty(mtGoods.getCouponIds())) {
+                                    String couponIds[] = mtGoods.getCouponIds().split(",");
+                                    if (couponIds.length > 0) {
+                                        for (int i = 0; i < couponIds.length; i++) {
+                                            userCouponService.buyCouponItem(orderDto.getId(), Integer.parseInt(couponIds[i]), orderDto.getUserId(), orderDto.getUserInfo().getMobile(), goodsDto.getNum());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("处理购物订单异常", e);
+                }
+            }
+            
+            logger.info("订单状态更新成功，订单号：{}，状态：已支付", orderId);
+            return true;
+        } else if ("FAIL".equals(yeepayStatus)) {
+            // 支付失败，可以根据业务需求更新订单状态
+            // 这里选择不更新订单主状态，只更新易宝支付状态字段
+            updateOrder(orderInfo);
+            logger.info("订单支付失败，订单号：{}", orderId);
+            return true;
+        } else {
+            // 其他状态，只更新易宝支付状态字段
+            updateOrder(orderInfo);
+            logger.info("订单状态更新，订单号：{}，易宝支付状态：{}", orderId, yeepayStatus);
+            return true;
+        }
+    }
 }
