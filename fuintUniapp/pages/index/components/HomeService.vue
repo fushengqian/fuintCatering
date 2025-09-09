@@ -70,13 +70,13 @@ export default {
 
         .title {
             font-size: 36rpx;
-            color: #666;
+            color: #333;
             font-weight: 600;
         }
 
         .content {
             font-size: 28rpx;
-            color: #666;
+            color: #333;
             font-weight: 400;
         }
     }

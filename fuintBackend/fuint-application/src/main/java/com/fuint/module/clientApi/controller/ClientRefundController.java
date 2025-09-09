@@ -52,7 +52,7 @@ public class ClientRefundController extends BaseController {
     @ApiOperation(value = "获取售后订单列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject list(HttpServletRequest request, @RequestParam RefundListRequest param) throws BusinessCheckException {
+    public ResponseObject list(HttpServletRequest request, @ModelAttribute RefundListRequest param) throws BusinessCheckException {
         UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         if (userInfo == null) {
             return getFailureResult(1001, "用户未登录");

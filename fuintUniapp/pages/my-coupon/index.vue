@@ -30,8 +30,9 @@
                               <view class="desc-goods_sales dis-flex">
                                 <text>{{ item.effectiveDate }}</text>
                               </view>
-                              <view v-if="item.amount > 0" class="desc_footer">
-                                <text class="price_x">¥{{ item.amount }}</text>
+                              <view class="desc_footer">
+                                <text v-if="item.type == 'C' || item.type == 'P'" class="price_x">¥{{ item.amount }}</text>
+                                <text v-if="item.type == 'T'" class="price_x">{{ item.amount }}次卡</text>
                               </view>
                           </view>
                     </view>

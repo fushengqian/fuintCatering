@@ -55,15 +55,19 @@ export default {
         position: relative;
 
         .icon {
-            width: 60rpx;
-            height: 60rpx;
+            width: 50rpx;
+            height: 50rpx;
             margin: 28rpx;
+            padding: 20rpx;
+            border-radius: 50rpx;
+            border: #ccc solid 2rpx;
+            background: #f5f5f5;
         }
 
         .title {
-            font-size: 24rpx;
-            color: #666;
-            font-weight: 600;
+            font-size: 28rpx;
+            color: #333;
+            font-weight: 700;
         }
 
         .content {
