@@ -175,7 +175,7 @@ public class BookItemServiceImpl extends ServiceImpl<MtBookItemMapper, MtBookIte
         mtBookItem.setStatus(BookStatusEnum.CREATED.getKey());
         mtBookItem.setUpdateTime(new Date());
         mtBookItem.setCreateTime(new Date());
-        mtBookItem.setVerifyCode(SeqUtil.getRandomNumber(6));
+        mtBookItem.setVerifyCode(SeqUtil.getRandomNumber(4));
         Integer id = mtBookItemMapper.insert(mtBookItem);
         if (id > 0) {
             return mtBookItem;

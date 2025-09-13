@@ -204,7 +204,9 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             // 分割线
             printContent.append(org.apache.commons.lang3.StringUtils.repeat("-", 32)).append("<BR>");
 
-            // 单号桌码
+            // 订单ID、单号、桌码
+            printContent.append("<L>订单ID：").append(orderInfo.getId()).append("</L>");
+            printContent.append("<BR>");
             printContent.append("<L>订单号：").append(orderInfo.getOrderSn()).append("</L>");
             if (orderInfo.getTableInfo() != null && StringUtil.isNotEmpty(orderInfo.getTableInfo().getCode())) {
                 printContent.append("<BR>");

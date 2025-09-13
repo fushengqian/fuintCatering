@@ -481,7 +481,7 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
 
         Page<MtCoupon> pageHelper = PageHelper.startPage(pageNumber, pageSize);
         LambdaQueryWrapper<MtCoupon> lambdaQueryWrapper = Wrappers.lambdaQuery();
-
+        lambdaQueryWrapper.ne(MtCoupon::getStatus, StatusEnum.DISABLE.getKey());
         if (StringUtil.isNotEmpty(status)) {
             lambdaQueryWrapper.eq(MtCoupon::getStatus, status);
         }
@@ -598,7 +598,7 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
 
             // 计次卡卖点
             if (item.getType().equals(CouponTypeEnum.TIMER.getKey()) && StringUtil.isNotEmpty(item.getOutRule())) {
-                sellingPoint = "集满" + item.getOutRule() + "次即可";
+                sellingPoint = "共" + item.getOutRule() + "次次卡";
             }
 
             item.setSellingPoint(sellingPoint);

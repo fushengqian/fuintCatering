@@ -129,7 +129,7 @@
   const service = [
     { id: 'addMember', name: '会员登记', icon: 'add', type: 'link', url: 'pages/merchant/member/add' },
     { id: 'memberSearch', name: '会员查找', icon: 'tuandui', type: 'link', url: 'pages/merchant/member/index' },
-    { id: 'coupon', name: '卡券管理', icon: 'youhuiquan', type: 'link', url: 'pages/merchant/coupon' },
+    { id: 'coupon', name: '卡券管理', icon: 'youhuiquan', type: 'link', url: 'pages/merchant/coupon/list' },
     { id: 'order', name: '订单管理', icon: 'dingdan', type: 'link', url: 'pages/merchant/order/index' },
     { id: 'report', name: '报表数据', icon: 'zhibozhong', type: 'link', url: 'pages/merchant/data/index' },
     { id: 'refund', name: '售后订单', icon: 'shouhou', type: 'link', url: 'pages/merchant/refund/index' },

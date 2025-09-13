@@ -25,7 +25,7 @@
               </block>
               <!-- 已收货-->
               <block>
-                <image v-if="order.status == OrderStatusEnum.RECEIVED.value" class="image" src="/static/order/status/received.png" mode="aspectFit"></image>
+                <image v-if="order.status == OrderStatusEnum.RECEIVED.value || order.status == OrderStatusEnum.COMPLETE.value" class="image" src="/static/order/status/received.png" mode="aspectFit"></image>
               </block>
               <!-- 已取消-->
               <block>
@@ -41,6 +41,7 @@
           <text v-else-if="order.status == OrderStatusEnum.RECEIVED.value">{{OrderStatusEnum.RECEIVED.name}}</text>
           <text v-else-if="order.status == OrderStatusEnum.CANCEL.value">{{OrderStatusEnum.CANCEL.name}}</text>
           <text v-else-if="order.status == OrderStatusEnum.REFUND.value">{{OrderStatusEnum.REFUND.name}}</text>
+          <text v-else-if="order.status == OrderStatusEnum.COMPLETE.value">{{OrderStatusEnum.COMPLETE.name}}</text>
         </view>
         <view class="verify-code" v-if="order.orderMode == 'oneself' && order.type == 'goods' && order.verifyCode && order.payStatus == 'B' && !order.tableInfo && ( !['C', 'H', 'G'].includes(order.status))">
             <view>提取码：</view>

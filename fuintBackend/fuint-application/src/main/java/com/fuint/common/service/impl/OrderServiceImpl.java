@@ -419,12 +419,11 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         if (mtOrder.getId() == null || mtOrder.getId() <= 0) {
             mtOrder.setCreateTime(new Date());
         }
-        // 核销码
         if (orderDto.getPlatform() == null) {
             orderDto.setPlatform("");
         }
         if (mtOrder.getVerifyCode() == null && !orderDto.getPlatform().equals(PlatformTypeEnum.PC.getCode())) {
-            mtOrder.setVerifyCode(SeqUtil.getRandomNumber(6));
+            mtOrder.setVerifyCode(SeqUtil.getRandomNumber(4));
         }
         // 首先生成订单
         if (mtOrder.getId() == null || mtOrder.getId() < 1) {

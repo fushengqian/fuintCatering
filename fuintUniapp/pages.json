@@ -355,9 +355,21 @@
       }
     },
     {
+      "path": "pages/merchant/coupon/list",
+      "style": {
+        "navigationBarTitleText": "卡券管理"
+      }
+    },
+    {
       "path": "pages/merchant/coupon/receive",
       "style": {
         "navigationBarTitleText": "卡券发放"
+      }
+    },
+    {
+      "path": "pages/merchant/coupon/edit",
+      "style": {
+        "navigationBarTitleText": "卡券编辑"
       }
     },
     {
@@ -424,6 +436,18 @@
       "path": "pages/merchant/order/confirm",
       "style": {
         "navigationBarTitleText": "核销订单"
+      }
+    },
+    {
+      "path": "pages/merchant/staff/index",
+      "style": {
+        "navigationBarTitleText": "员工管理"
+      }
+    },
+    {
+      "path": "pages/merchant/staff/add",
+      "style": {
+        "navigationBarTitleText": "新增员工"
       }
     }
   ],
