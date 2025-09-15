@@ -319,6 +319,12 @@
       }
     },
     {
+      "path": "pages/merchant/setting",
+      "style": {
+        "navigationBarTitleText": "商家设置"
+      }
+    },
+    {
       "path": "pages/pay/cashier",
       "style": {
         "navigationBarTitleText": "扫码收款"

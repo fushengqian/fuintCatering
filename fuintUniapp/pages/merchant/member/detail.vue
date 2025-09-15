@@ -34,6 +34,7 @@
       </view>
       <view class="user-no">
         <view class="no" v-if="userInfo.userNo">会员号：{{ userInfo.userNo ? userInfo.userNo : '-'}}</view>
+        <view class="time">{{ userInfo.createTime | timeFormat('yyyy-mm-dd hh:MM') }}</view>
       </view>
     </view>
 
@@ -105,6 +106,7 @@
    * id: 标识; name: 标题名称; icon: 图标; type 类型(link和button); url: 跳转的链接
    */
   const service = [
+    { id: 'order', name: '会员订单', icon: 'dingdan', type: 'link', url: 'pages/merchant/order/index' },
     { id: 'rechange', name: '会员充值', icon: 'qiandai', type: 'link', url: 'pages/merchant/balance/recharge' },
     { id: 'payment', name: '余额扣减', icon: 'shouhou', type: 'link', url: 'pages/pay/cashier' },
     { id: 'myCoupon', name: '卡券发放', icon: 'youhuiquan', type: 'link', url: 'pages/merchant/coupon/receive' },
@@ -395,8 +397,14 @@
         color: #ffffff;
         .no {
             float: left;
+            margin-bottom: 8rpx;
         }
-    }
+        .time {
+            margin-right: 20rpx;
+            color: #f5f5f5;
+            float: right;
+        }
+}
   }
 
   // 我的资产

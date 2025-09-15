@@ -142,7 +142,7 @@
         PayStatusEnum,
         PayTypeEnum,
         ReceiptStatusEnum,
-
+        memberId: '',
         // 当前页面参数
         options: { dataType: 'all' },
         // tab栏数据
@@ -180,7 +180,9 @@
      */
     onLoad(options) {
       // 初始化当前选中的标签
-      this.initCurTab(options)
+      this.initCurTab(options);
+      // 会员ID
+      this.memberId = options.memberId ? options.memberId : 0;
     },
 
     /**
@@ -223,7 +225,7 @@
       getOrderList(pageNo = 1) {
         const app = this
         return new Promise((resolve, reject) => {
-          OrderApi.list({ dataType: app.getTabValue(), keyword: app.keyword, page: pageNo }, { load: false })
+          OrderApi.list({ dataType: app.getTabValue(), keyword: app.keyword, page: pageNo, userId: app.memberId }, { load: false })
             .then(result => {
               // 合并新数据
               const newList = result.data;

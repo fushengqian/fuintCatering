@@ -71,7 +71,7 @@
               <text v-if="!detail.point || detail.point < 1">您已领取</text>
               <text v-if="detail.point && detail.point > 0">您已兑换</text>
             </view>
-            <view v-if="userCouponId && detail.status != 'D'" class="btn-item btn-item-main" @click="remove(userCouponId)">
+            <view v-if="userCouponId && detail.status != 'A'" class="btn-item btn-item-main" @click="remove(userCouponId)">
               <text>删除卡券</text>
             </view>
             <view v-if="detail.status == 'D'" class="btn-item btn-item-main state">
