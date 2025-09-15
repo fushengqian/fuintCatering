@@ -150,7 +150,7 @@ public class BackendAccountController extends BaseController {
         List<MtStore> stores = storeService.getActiveStoreList(accountInfo.getMerchantId(), accountInfo.getStoreId(), null);
         result.put("stores", stores);
 
-        List<MtMerchant> merchants = merchantService.queryMerchantByParams(params);
+        List<MtMerchant> merchants = merchantService.getMyMerchantList(accountInfo.getMerchantId(), accountInfo.getStoreId(), StatusEnum.ENABLED.getKey());
         result.put("merchants", merchants);
 
         AccountDto accountDto = null;

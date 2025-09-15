@@ -4,28 +4,28 @@
       <view class="info-item">
           <view class="contacts avatar-warp">
             <text class="name">头像</text>
-            <image class="avatar" @click="chooseImage()" :src="userInfo.avatar"></image>
+            <image class="avatar" @click="chooseImage()" :src="merchantInfo.logo"></image>
           </view>
       </view>
       <view class="info-item">
         <view class="contacts">
           <text class="name">名称</text>
-          <input class="weui-input value" type="nickname" v-model="userInfo.name" placeholder="请输入商户名称"/>
+          <input class="weui-input value" type="nickname" v-model="merchantInfo.name" placeholder="请输入商户名称"/>
         </view>
       </view>
       <view class="info-item">
         <view class="contacts">
           <text class="name">手机</text>
-          <input class="weui-input value" type="text" v-model="userInfo.mobile" placeholder="请输入手机号"/>
+          <input class="weui-input value" type="text" v-model="merchantInfo.phone" placeholder="请输入手机号"/>
         </view>
       </view>
       <view class="info-item">
         <view class="contacts">
           <text class="name">状态</text>
           <view class="value">
-             <radio-group @change="genderChange">
-                <label class="radio"><radio value="1" color="#00acac" :checked="userInfo.sex == '1' ? true : false"/>营业中</label>
-                <label class="radio second"><radio value="0" color="#00acac" :checked="userInfo.sex == '0' ? true: false"/>已打烊</label>
+             <radio-group @change="statusChange">
+                <label class="radio"><radio value="N" color="#00acac" :checked="merchantInfo.status == 'N' ? true : false"/>营业中</label>
+                <label class="radio second"><radio value="Y" color="#00acac" :checked="merchantInfo.status == 'Y' ? true: false"/>已打烊</label>
              </radio-group>
           </view>
         </view>
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-  import * as MemberApi from '@/api/merchant/member'
+  import * as MerchantApi from '@/api/merchant'
   import * as UploadApi from '@/api/upload'
   import store from '@/store'
   export default {
@@ -51,12 +51,7 @@
         options: {},
         // 正在加载
         isLoading: true,
-        userInfo: { avatar: '', name: '', sex: 0, birthday: '', hasPassword: '' },
-        openCardPara: null,
-        code: "",
-        nickname: "",
-        avatar: "",
-        memberId: 0
+        merchantInfo: { logo: '', name: '', status: 'N', phone: '' }
       }
     },
 
@@ -73,14 +68,14 @@
         const app = this;
         app.showPopup = false;
         return new Promise((resolve, reject) => {
-            MemberApi.detail(app.memberId)
+            MerchantApi.settingInfo()
             .then(result => {
-              if (result.data.userInfo) {
-                  app.userInfo = result.data.userInfo
+              if (result.data.merchantInfo) {
+                  app.merchantInfo = result.data.merchantInfo
               } else {
-                  app.userInfo = { id: 0, name: '', avatar: '', gradeId: 0, mobile: '', balance: 0 }
+                  app.merchantInfo = { id: 0, name: '', phone: '', phone: '', logo: '', status: '' }
               }
-              resolve(app.userInfo);
+              resolve(app.merchantInfo);
             })
             .catch(err => {
               if (err.result && err.result.status == 1001) {
@@ -91,15 +86,8 @@
             })
         })
       },
-      bindDateChange (e) {
-        let that = this;
-        that.userInfo.birthday = e.detail.value;
-      },
-      getnickname(e) {
-          this.nickname = e.detail.value;  
-      }, 
-      genderChange(e) {
-          this.userInfo.sex = e.detail.value;
+      statusChange(e) {
+          this.merchantInfo.status = e.detail.value;
       },
       // 选择图片
       chooseImage() {
@@ -116,8 +104,8 @@
                   UploadApi.image(imageList)
                       .then(files => {
                           if (files && files.length > 0) {
-                              app.userInfo.avatar = files[0].fileName;
-                              app.avatar = files[0].domain + app.userInfo.avatar;
+                              app.merchantInfo.logo = files[0].fileName;
+                              app.logo = files[0].domain + app.merchantInfo.logo;
                           }
                           resolve(files)
                       })
@@ -130,14 +118,14 @@
         });
       },
       /**
-       * 保存会员信息
+       * 保存设置信息
        */
       save() {
           const app = this
           app.isLoading = true
-          MemberApi.save(app.userInfo)
+          MerchantApi.saveSetting(app.merchantInfo)
             .then(result => {
-              app.userInfo = result.data
+              app.merchantInfo = result.data
               app.isLoading = false
               app.$success('保存成功！')
          }).catch(err => {

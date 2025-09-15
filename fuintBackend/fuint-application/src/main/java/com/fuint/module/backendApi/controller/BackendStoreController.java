@@ -86,22 +86,11 @@ public class BackendStoreController extends BaseController {
         }
 
         PaginationResponse<StoreDto> paginationResponse = storeService.queryStoreListByPagination(new PaginationRequest(page, pageSize, params));
-
-        Map<String, Object> param = new HashMap<>();
-        param.put("status", StatusEnum.ENABLED.getKey());
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            param.put("merchantId", accountInfo.getMerchantId());
-        }
-        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
-            param.put("storeId", accountInfo.getStoreId());
-        }
-        List<MtMerchant> merchantList = merchantService.queryMerchantByParams(param);
-        String imagePath = settingService.getUploadBasePath();
-
+        List<MtMerchant> merchantList = merchantService.getMyMerchantList(accountInfo.getMerchantId(), accountInfo.getStoreId(), StatusEnum.ENABLED.getKey());
         Map<String, Object> result = new HashMap<>();
         result.put("paginationResponse", paginationResponse);
         result.put("merchantList", merchantList);
-        result.put("imagePath", imagePath);
+        result.put("imagePath", settingService.getUploadBasePath());
 
         return getSuccessResult(result);
     }

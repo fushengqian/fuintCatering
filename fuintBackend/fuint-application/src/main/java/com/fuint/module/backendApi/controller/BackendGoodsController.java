@@ -252,9 +252,7 @@ public class BackendGoodsController extends BaseController {
 
         List<MtGoodsCate> cateList = cateService.getCateList(accountInfo.getMerchantId(), null, null, StatusEnum.ENABLED.getKey());
         result.put("cateList", cateList);
-
-        String imagePath = settingService.getUploadBasePath();
-        result.put("imagePath", imagePath);
+        result.put("imagePath", settingService.getUploadBasePath());
 
         // 店铺列表
         List<MtStore> storeList = storeService.getActiveStoreList(accountInfo.getMerchantId(), storeId, null);
@@ -710,11 +708,10 @@ public class BackendGoodsController extends BaseController {
             params.put("storeId", accountInfo.getStoreId());
         }
         PaginationResponse<GoodsDto> paginationResponse = goodsService.selectGoodsList(params);
-        String imagePath = settingService.getUploadBasePath();
 
         Map<String, Object> result = new HashMap();
         result.put("paginationResponse", paginationResponse);
-        result.put("imagePath", imagePath);
+        result.put("imagePath", settingService.getUploadBasePath());
 
         return getSuccessResult(result);
     }

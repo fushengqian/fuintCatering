@@ -103,10 +103,9 @@ public class BackendStockController extends BaseController {
             paramsStore.put("merchantId", accountInfo.getMerchantId());
         }
         List<MtStore> storeList = storeService.queryStoresByParams(paramsStore);
-        String imagePath = settingService.getUploadBasePath();
 
         Map<String, Object> result = new HashMap<>();
-        result.put("imagePath", imagePath);
+        result.put("imagePath", settingService.getUploadBasePath());
         result.put("storeList", storeList);
         result.put("paginationResponse", paginationResponse);
 
