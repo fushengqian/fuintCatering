@@ -4,11 +4,17 @@ import request from '@/utils/request'
 const api = {
   staffList: 'merchantApi/staff/staffList',
   saveStaff: 'merchantApi/staff/saveStaff',
+  info: 'merchantApi/staff/info',
 }
 
 // 获取员工列表
 export const getStaffList = (param) => {
   return request.post(api.staffList, param)
+}
+
+// 员工详情
+export function info(id, param) {
+  return request.post(api.info, { id, ...param })
 }
 
 // 保存员工信息

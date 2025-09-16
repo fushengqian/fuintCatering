@@ -2,30 +2,24 @@
   <view class="container">
     <view class="info-list">
       <view class="info-item">
-          <view class="contacts avatar-warp">
-            <text class="name">头像</text>
-            <image class="avatar" @click="chooseImage()" :src="avatar"></image>
-          </view>
-      </view>
-      <view class="info-item">
         <view class="contacts">
           <text class="name">姓名</text>
-          <input class="weui-input value" type="text" v-model="realName" placeholder="请输入姓名"/>
+          <input class="weui-input value" type="text" v-model="staffInfo.realName" placeholder="请输入员工姓名"/>
         </view>
       </view>
       <view class="info-item">
         <view class="contacts">
           <text class="name">手机</text>
-          <input class="weui-input value" type="text" v-model="mobile" placeholder="请输入手机号"/>
+          <input class="weui-input value" type="text" v-model="staffInfo.mobile" placeholder="请输入员工手机号"/>
         </view>
       </view>
       <view class="info-item">
         <view class="contacts">
-          <text class="name">性别</text>
+          <text class="name">状态</text>
           <view class="value">
-             <radio-group @change="genderChange">
-                <label class="radio"><radio value="1" color="#00acac" :checked="userInfo.sex == '1' ? true : false"/>男</label>
-                <label class="radio second"><radio value="0" color="#00acac" :checked="userInfo.sex == '0' ? true: false"/>女</label>
+             <radio-group @change="statusChange">
+                <label class="radio"><radio value="A" color="#00acac" :checked="staffInfo.auditedStatus == 'A' ? true : false"/>启用</label>
+                <label class="radio second"><radio value="N" color="#00acac" :checked="staffInfo.auditedStatus == 'N' ? true: false"/>禁用</label>
              </radio-group>
           </view>
         </view>
@@ -34,7 +28,7 @@
     <!-- 底部操作按钮 -->
     <view class="footer-fixed">
       <view class="btn-wrapper">
-        <view class="btn-item btn-item-main" @click="save()">保存信息</view>
+        <view class="btn-item btn-item-main" @click="save()">新增员工</view>
       </view>
     </view>
   </view>
@@ -51,12 +45,7 @@
         options: {},
         // 正在加载
         isLoading: true,
-        userInfo: { avatar: '', realName: '', mobile: '', sex: '' },
-        openCardPara: null,
-        code: "",
-        realName: "",
-        avatar: "/static/default-avatar.png",
-        mobile: ""
+        staffInfo: { realName: '', mobile: '', auditedStatus: '' },
       }
     },
 
@@ -69,55 +58,27 @@
     },
 
     methods: {
-      genderChange(e) {
-          this.userInfo.sex = e.detail.value;
-      },
-      // 选择图片
-      chooseImage() {
-        const app = this
-        // 选择图片
-        uni.chooseImage({
-          count: 1,
-          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-          success({ tempFiles }) {
-            const imageList = tempFiles;
-            return new Promise((resolve, reject) => {
-              if (imageList.length > 0) {
-                  UploadApi.image(imageList)
-                      .then(files => {
-                          if (files && files.length > 0) {
-                              app.userInfo.avatar = files[0].fileName;
-                              app.avatar = files[0].domain + app.userInfo.avatar;
-                          }
-                          resolve(files)
-                      })
-                      .catch(err => reject(err))
-              } else {
-                resolve()
-              }
-            })
-          }
-        });
+      statusChange(e) {
+          this.staffInfo.auditedStatus = e.detail.value;
       },
       /**
-       * 保存会员信息
+       * 保存员工信息
        */
       save() {
           const app = this
-          if (!app.realName) {
+          if (!app.staffInfo.realName) {
               app.$error('姓名不能为空！');
               return false;
           }
-          if (!app.mobile) {
+          if (!app.staffInfo.mobile) {
               app.$error('手机号不能为空！');
               return false;
           }
           
           app.isLoading = true
-          StaffApi.save({ "name": app.realName, mobile: app.mobile, "avatar": app.avatar, "sex": app.userInfo.sex })
+          StaffApi.save({ "realName": app.staffInfo.realName, mobile: app.staffInfo.mobile, "auditedStatus": app.staffInfo.auditedStatus })
             .then(result => {
-              app.userInfo = result.data
+              app.staffInfo = result.data;
               app.isLoading = false
               app.$success('保存成功！')
          }).catch(err => {

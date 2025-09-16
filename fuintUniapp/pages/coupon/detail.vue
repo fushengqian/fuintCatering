@@ -62,7 +62,7 @@
         </view>
       </view>
     </view>
-    <view class="footer-fixed" v-if="userCouponId || detail.isReceive">
+    <view class="footer-fixed" v-if="detail.isReceive">
       <view class="footer-container">
         <!-- 操作按钮 -->
         <view class="foo-item-btn">

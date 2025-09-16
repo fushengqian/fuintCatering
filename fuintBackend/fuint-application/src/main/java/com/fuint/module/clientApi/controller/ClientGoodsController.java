@@ -89,7 +89,7 @@ public class ClientGoodsController extends BaseController {
              if (StringUtil.isNotEmpty(cate.getLogo())) {
                  dto.setLogo(baseImage + cate.getLogo());
              }
-             Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, "", platform, 0, 1, 500);
+             Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, "", platform, cate.getId(), 1, 100);
              List<MtGoods> goodsList = (ArrayList)goodsData.get("goodsList");
              if (goodsList.size() > 0) {
                  for (MtGoods goods : goodsList) {
@@ -98,9 +98,9 @@ public class ClientGoodsController extends BaseController {
              }
              List<MtGoods> goodsArr = new ArrayList<>();
              for (MtGoods goods : goodsList) {
-                if (goods.getCateId().compareTo(cate.getId()) == 0) {
-                    goodsArr.add(goods);
-                }
+                  if (goods.getCateId().compareTo(cate.getId()) == 0) {
+                      goodsArr.add(goods);
+                  }
              }
              dto.setGoodsList(goodsArr);
              dto.setSort((goodsArr.size() > 0) ? 1 : 0);

@@ -3,8 +3,8 @@ import request from '@/utils/request'
 // api地址
 const api = {
   merchantInfo: 'merchantApi/merchant/info',
-  settingInfo: 'merchantApi/merchant/settingInfo',
-  saveSetting: 'merchantApi/merchant/saveSetting',
+  settingInfo: 'merchantApi/merchantSetting/settingInfo',
+  saveSetting: 'merchantApi/merchantSetting/saveSetting',
 }
 
 // 当前商户信息
@@ -18,8 +18,8 @@ export const info = (param, option) => {
 }
 
 // 商户设置详情
-export function settingInfo(id, param) {
-  return request.post(api.settingInfo, { id, ...param })
+export function settingInfo() {
+  return request.get(api.settingInfo)
 }
 
 // 保存商户设置信息

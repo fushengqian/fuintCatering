@@ -455,6 +455,12 @@
       "style": {
         "navigationBarTitleText": "新增员工"
       }
+    },
+    {
+      "path": "pages/merchant/staff/edit",
+      "style": {
+        "navigationBarTitleText": "编辑员工"
+      }
     }
   ],
   "globalStyle": {
