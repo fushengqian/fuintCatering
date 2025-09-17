@@ -59,7 +59,7 @@ public class MerchantStaffController extends BaseController {
         MtUser mtUser = memberService.queryMemberById(userInfo.getId());
 
         if (mtUser == null || StringUtil.isBlank(mtUser.getMobile())) {
-            return getFailureResult(201, "该账号不是商户");
+            return getFailureResult(201, "您的帐号不是商户，没有操作权限");
         }
 
         MtStaff staff = staffService.queryStaffByMobile(mtUser.getMobile());
@@ -103,7 +103,7 @@ public class MerchantStaffController extends BaseController {
             myInfo = staffService.queryStaffByMobile(mtUser.getMobile());
         }
         if (myInfo == null) {
-            return getFailureResult(201, "该账号不是商户");
+            return getFailureResult(201, "您的帐号不是商户，没有操作权限");
         }
         MtStaff staffInfo = staffService.queryStaffById(params.getId());
         Map<String, Object> result = new HashMap<>();
@@ -121,7 +121,7 @@ public class MerchantStaffController extends BaseController {
         UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         MtUser mtUser = memberService.queryMemberById(userInfo.getId());
         if (mtUser == null || StringUtil.isBlank(mtUser.getMobile())) {
-            return getFailureResult(201, "该账号不是商户");
+            return getFailureResult(201, "您的帐号不是商户，没有操作权限");
         }
 
         MtStaff staff = staffService.queryStaffByMobile(mtUser.getMobile());

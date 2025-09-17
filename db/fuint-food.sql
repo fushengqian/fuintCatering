@@ -610,10 +610,13 @@ CREATE TABLE `mt_order` (
   `TYPE` varchar(30) DEFAULT NULL COMMENT '订单类型',
   `PAY_TYPE` varchar(30) DEFAULT 'JSAPI' COMMENT '支付类型',
   `ORDER_MODE` varchar(30) DEFAULT 'express' COMMENT '订单模式',
+  `PLATFORM` varchar(30) DEFAULT '' COMMENT '平台',
   `ORDER_SN` varchar(32) NOT NULL DEFAULT '' COMMENT '订单号',
   `COUPON_ID` int DEFAULT '0' COMMENT '卡券ID',
   `MERCHANT_ID` int DEFAULT '0' COMMENT '所属商户ID',
   `STORE_ID` int DEFAULT '0' COMMENT '所属店铺ID',
+  `TABLE_ID` int DEFAULT '0' COMMENT '所属桌码ID',
+  `PEOPLE_NUM` int DEFAULT NULL COMMENT '就餐人数',
   `USER_ID` int NOT NULL DEFAULT '0' COMMENT '用户ID',
   `VERIFY_CODE` varchar(10) DEFAULT '' COMMENT '核销验证码',
   `IS_VISITOR` char(1) DEFAULT 'N' COMMENT '是否游客',
@@ -637,9 +640,10 @@ CREATE TABLE `mt_order` (
   `CONFIRM_TIME` datetime DEFAULT NULL COMMENT '核销时间',
   `CONFIRM_REMARK` varchar(500) DEFAULT NULL COMMENT '核销备注',
   `COMMISSION_STATUS` char(1) DEFAULT 'A' COMMENT '分佣提成计算状态',
+  `COMMISSION_USER_ID` int DEFAULT '0' COMMENT '分佣用户ID',
   `OPERATOR` varchar(30) DEFAULT '' COMMENT '最后操作人',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2160 DEFAULT CHARSET=utf8 COMMENT='订单表';
+) ENGINE=InnoDB AUTO_INCREMENT=1741 DEFAULT CHARSET=utf8 COMMENT='订单表';
 
 /*Table structure for table `mt_order_address` */
 

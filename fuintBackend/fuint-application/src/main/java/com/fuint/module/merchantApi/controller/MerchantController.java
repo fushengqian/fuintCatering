@@ -73,7 +73,7 @@ public class MerchantController extends BaseController {
 
         StaffDto staffInfo = staffService.getStaffInfoByMobile(mtUser.getMobile());
         if (null == staffInfo) {
-            return getFailureResult(1002, "该账号不是商户");
+            return getFailureResult(201, "您的帐号不是商户，没有操作权限");
         }
 
         outParams.put("confirmInfo", staffInfo);
