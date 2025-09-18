@@ -119,25 +119,25 @@
         const app = this
         app.isLoading = true
         const tableId = uni.getStorageSync("tableId") ? uni.getStorageSync("tableId") : 0;
-        if (tableId <= 0) {
-            OrderApi.detail(app.orderId)
-              .then(result => {
-                  app.isSuccess = result.data.payStatus === 'B' ? true : false;
-                  if (app.isSuccess) {
-                      app.message = "支付成功！";
-                  }
-                  if (result.data.payType == 'STORE') {
-                      app.isSuccess = true;
-                      app.message = "订单已提交！";
-                  }
-                  app.isLoading = false;
-              })
-        } else {
-            app.isSuccess = true;
-            app.isLoading = false;
-            uni.setStorageSync("tableId", 0);
-            uni.setStorageSync("orderId", 0);
-        }
+        const payFirst = uni.getStorageSync("payFirst") ? uni.getStorageSync("payFirst") : 'Y';
+        OrderApi.detail(app.orderId)
+          .then(result => {
+              app.isSuccess = result.data.payStatus === 'B' ? true : false;
+              if (app.isSuccess) {
+                  app.message = "支付成功！";
+              } else if (result.data.payType == 'STORE') {
+                  app.isSuccess = true;
+                  app.message = "订单已提交！";
+              } else if (payFirst == 'N') {
+                  app.isSuccess = true;
+                  app.message = "订单已提交，先用餐后支付！";
+                  uni.setStorageSync('tableId', 0);
+                  uni.setStorageSync('orderId', 0);
+              } else {
+                  app.isSuccess = false;
+              }
+              app.isLoading = false;
+          })
       }
     }
   }

@@ -820,6 +820,11 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
         }
 
+        // 有未支付的刚下单的扫码单，就合并订单（防止顾客未扫码下单而找不到下单桌码）
+        if (myOrderId <= 0 && userId > 0) {
+            myOrderId = mtOrderMapper.getJustNowTableOrderId(userId, storeId);
+        }
+
         // 是否支持先用餐后支付
         Boolean payFirst = true;
         if (tableId > 0) {

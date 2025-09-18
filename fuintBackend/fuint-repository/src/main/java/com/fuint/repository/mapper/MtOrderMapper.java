@@ -45,4 +45,6 @@ public interface MtOrderMapper extends BaseMapper<MtOrder> {
 
     List<MtOrder> getTobeCommissionOrderList(@Param("dateTime") String dateTime);
 
+    Integer getJustNowTableOrderId(@Param("userId") Integer userId, @Param("storeId") Integer storeId);
+
 }
