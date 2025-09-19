@@ -135,7 +135,9 @@ public class MerchantStaffController extends BaseController {
         }
         BeanUtils.copyProperties(params, mtStaff);
         mtStaff.setMerchantId(staff.getMerchantId());
-        mtStaff.setStoreId(staff.getStoreId());
+        if (staff.getStoreId() != null && staff.getStoreId() > 0) {
+            mtStaff.setStoreId(staff.getStoreId());
+        }
         MtStaff staffInfo = staffService.saveStaff(mtStaff, staff.getRealName());
         return getSuccessResult(staffInfo);
     }

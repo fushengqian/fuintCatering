@@ -821,8 +821,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         }
 
         // 有未支付的刚下单的扫码单，就合并订单（防止顾客未扫码下单而找不到下单桌码）
-        if (myOrderId <= 0 && userId > 0) {
-            myOrderId = mtOrderMapper.getJustNowTableOrderId(userId, storeId);
+        if (myOrderId <= 0 && userInfo != null && !isVisitor.equals(YesOrNoEnum.YES.getKey())) {
+            myOrderId = mtOrderMapper.getJustNowTableOrderId(userInfo.getId(), storeId);
         }
 
         // 是否支持先用餐后支付
@@ -841,7 +841,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         BigDecimal myAmount = new BigDecimal(0);
         BigDecimal myPayAmount = new BigDecimal(0);
         BigDecimal myPointAmount = new BigDecimal(0);
-        if (myOrderId > 0 && !payFirst) {
+        if (myOrderId != null && myOrderId > 0 && !payFirst) {
             orderId = myOrderId;
             myOrder = getOrderInfo(orderId);
             myAmount = myOrder.getAmount();
@@ -851,7 +851,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         MtSetting config = settingService.querySettingByName(merchantId, storeId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.IS_CLOSE.getKey());
         if (config != null && config.getValue().equals(YesOrNoEnum.TRUE.getKey())) {
-            throw new BusinessCheckException("系统已关闭交易功能，请稍后再试！");
+            throw new BusinessCheckException("抱歉，店铺已打烊！");
         }
 
         // 收银台通过手机号自动注册会员信息
