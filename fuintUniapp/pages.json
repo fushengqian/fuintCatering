@@ -124,39 +124,6 @@
       }
     },
     {
-      "path": "pages/coupon/list",
-      "style": {
-        "navigationBarTitleText": "领券中心"
-      }
-    },
-    {
-      "path": "pages/coupon/detail",
-      "style": {
-        "navigationBarTitleText": "优惠券详情"
-      }
-    },
-    {
-      "path": "pages/timer/detail",
-      "style": {
-        "navigationBarTitleText": "计次卡详情",
-        "enablePullDownRefresh": true
-      }
-    },
-    {
-      "path": "pages/prestore/buy",
-      "style": {
-        "navigationBarTitleText": "购买储值卡",
-        "enablePullDownRefresh": true
-      }
-    },
-    {
-      "path": "pages/prestore/detail",
-      "style": {
-        "navigationBarTitleText": "储值卡详情",
-        "enablePullDownRefresh": true
-      }
-    },
-    {
       "path": "pages/confirm/doConfirm",
       "style": {
         "navigationBarTitleText": "核销确认"
@@ -313,75 +280,9 @@
       }
     },
     {
-      "path": "pages/merchant/index",
-      "style": {
-        "navigationBarTitleText": "商家管理"
-      }
-    },
-    {
-      "path": "pages/merchant/setting",
-      "style": {
-        "navigationBarTitleText": "商家设置"
-      }
-    },
-    {
       "path": "pages/pay/cashier",
       "style": {
         "navigationBarTitleText": "扫码收款"
-      }
-    },
-    {
-      "path": "pages/merchant/member/index",
-      "style": {
-        "navigationBarTitleText": "会员列表"
-      }
-    },
-    {
-      "path": "pages/merchant/member/detail",
-      "style": {
-        "navigationBarTitleText": "会员详情"
-      }
-    },
-    {
-      "path": "pages/merchant/member/add",
-      "style": {
-        "navigationBarTitleText": "会员登记"
-      }
-    },
-    {
-      "path": "pages/merchant/member/setting",
-      "style": {
-        "navigationBarTitleText": "会员编辑"
-      }
-    },
-    {
-      "path": "pages/merchant/order/index",
-      "style": {
-        "navigationBarTitleText": "订单列表"
-      }
-    },
-    {
-      "path": "pages/merchant/coupon/list",
-      "style": {
-        "navigationBarTitleText": "卡券管理"
-      }
-    },
-    {
-      "path": "pages/merchant/coupon/receive",
-      "style": {
-        "navigationBarTitleText": "卡券发放"
-      }
-    },
-    {
-      "path": "pages/merchant/coupon/edit",
-      "style": {
-        "navigationBarTitleText": "卡券编辑"
-      }
-    },
-    {
-      "path": "pages/merchant/balance/recharge",
-      "style": {
-        "navigationBarTitleText": "会员充值"
       }
     },
     {
@@ -397,72 +298,199 @@
       }
     },
     {
-      "path": "pages/coupon/receive",
-      "style": {
-        "navigationBarTitleText": "卡券兑换"
-      }
-    },
-    {
       "path": "pages/share/index",
       "style": {
         "navigationBarTitleText": "邀请有礼"
       }
-    },
-    {
-      "path": "pages/book/index",
-      "style": {
-        "navigationBarTitleText": "预约项目"
-      }
-    },
-    {
-      "path": "pages/book/detail",
-      "style": {
-        "navigationBarTitleText": "预约详情"
-      }
-    },
-    {
-      "path": "pages/book/submit",
-      "style": {
-        "navigationBarTitleText": "预约提交"
-      }
-    },
-    {
-      "path": "pages/book/my",
-      "style": {
-        "navigationBarTitleText": "我的预约"
-      }
-    },
-    {
-      "path": "pages/book/bookDetail",
-      "style": {
-        "navigationBarTitleText": "预约详情"
-      }
-    },
-    {
-      "path": "pages/merchant/order/confirm",
-      "style": {
-        "navigationBarTitleText": "核销订单"
-      }
-    },
-    {
-      "path": "pages/merchant/staff/index",
-      "style": {
-        "navigationBarTitleText": "员工管理"
-      }
-    },
-    {
-      "path": "pages/merchant/staff/add",
-      "style": {
-        "navigationBarTitleText": "新增员工"
-      }
-    },
-    {
-      "path": "pages/merchant/staff/edit",
-      "style": {
-        "navigationBarTitleText": "编辑员工"
-      }
     }
   ],
+  // 分包策略
+  "subPackages": [
+        {
+           "root": "subPages",
+           "pages": [
+               {
+                 "path": "book/index",
+                 "style": {
+                   "navigationBarTitleText": "预约项目"
+                 }
+               },
+               {
+                 "path": "book/detail",
+                 "style": {
+                   "navigationBarTitleText": "预约详情"
+                 }
+               },
+               {
+                 "path": "book/submit",
+                 "style": {
+                   "navigationBarTitleText": "预约提交"
+                 }
+               },
+               {
+                 "path": "book/my",
+                 "style": {
+                   "navigationBarTitleText": "我的预约"
+                 }
+               },
+               {
+                 "path": "book/bookDetail",
+                 "style": {
+                   "navigationBarTitleText": "预约详情"
+                 }
+               },
+               {
+                 "path": "coupon/list",
+                 "style": {
+                   "navigationBarTitleText": "领券中心"
+                 }
+               },
+               {
+                 "path": "coupon/detail",
+                 "style": {
+                   "navigationBarTitleText": "优惠券详情"
+                 }
+               },
+               {
+                 "path": "coupon/receive",
+                 "style": {
+                   "navigationBarTitleText": "卡券兑换"
+                 }
+               },
+               {
+                 "path": "timer/detail",
+                 "style": {
+                   "navigationBarTitleText": "计次卡详情",
+                   "enablePullDownRefresh": true
+                 }
+               },
+               {
+                 "path": "prestore/buy",
+                 "style": {
+                   "navigationBarTitleText": "购买储值卡",
+                   "enablePullDownRefresh": true
+                 }
+               },
+               {
+                 "path": "prestore/detail",
+                 "style": {
+                   "navigationBarTitleText": "储值卡详情",
+                   "enablePullDownRefresh": true
+                 }
+               }
+          ]
+        },
+        {
+           "root": "merchantPages",
+           "pages": [
+               {
+                 "path": "index",
+                 "style": {
+                   "navigationBarTitleText": "商家管理"
+                 }
+               },
+               {
+                 "path": "setting",
+                 "style": {
+                   "navigationBarTitleText": "商家设置"
+                 }
+               },
+               {
+                 "path": "member/index",
+                 "style": {
+                   "navigationBarTitleText": "会员列表"
+                 }
+               },
+               {
+                 "path": "member/detail",
+                 "style": {
+                   "navigationBarTitleText": "会员详情"
+                 }
+               },
+               {
+                 "path": "member/add",
+                 "style": {
+                   "navigationBarTitleText": "会员登记"
+                 }
+               },
+               {
+                 "path": "member/setting",
+                 "style": {
+                   "navigationBarTitleText": "会员编辑"
+                 }
+               },
+               {
+                 "path": "order/index",
+                 "style": {
+                   "navigationBarTitleText": "订单列表"
+                 }
+               },
+               {
+                 "path": "balance/recharge",
+                 "style": {
+                   "navigationBarTitleText": "会员充值"
+                 }
+               },
+               {
+                 "path": "coupon/list",
+                 "style": {
+                   "navigationBarTitleText": "卡券管理"
+                 }
+               },
+               {
+                 "path": "coupon/receive",
+                 "style": {
+                   "navigationBarTitleText": "卡券发放"
+                 }
+               },
+               {
+                 "path": "coupon/edit",
+                 "style": {
+                   "navigationBarTitleText": "卡券编辑"
+                 }
+               },
+               {
+                 "path": "book/index",
+                 "style": {
+                   "navigationBarTitleText": "预约管理"
+                 }
+               },
+               {
+                 "path": "order/confirm",
+                 "style": {
+                   "navigationBarTitleText": "核销订单"
+                 }
+               },
+               {
+                 "path": "staff/index",
+                 "style": {
+                   "navigationBarTitleText": "员工管理"
+                 }
+               },
+               {
+                 "path": "staff/add",
+                 "style": {
+                   "navigationBarTitleText": "新增员工"
+                 }
+               },
+               {
+                 "path": "staff/edit",
+                 "style": {
+                   "navigationBarTitleText": "编辑员工"
+                 }
+               }
+        ]
+   }],
+   "preloadRule": {
+     "pages/index/index": {
+        "network": "all",
+        "packages": ["subPages"]
+     },
+     "pages/user/index": {
+        "network": "all",
+        "packages": ["merchantPages"]
+     }
+  },
   "globalStyle": {
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTitleText": "",

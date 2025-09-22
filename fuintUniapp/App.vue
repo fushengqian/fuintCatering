@@ -11,9 +11,12 @@
     /**
      * 初始化完成时触发
      */
-    onLaunch() {
+    onLaunch(options) {
       // 小程序主动更新
       this.updateManager()
+      if (options.query.spm) {
+          uni.setStorageSync('shareId', options.query.spm);
+      }
     },
 
     methods: {

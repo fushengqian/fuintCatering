@@ -90,12 +90,12 @@
        */
       onTargetCoupon(couponId, type, userCouponId) {
           if (type === 'P') {
-              this.$navTo(`pages/prestore/buy`, { couponId })
+              this.$navTo(`subPages/prestore/buy`, { couponId })
           } else {
               if (type === 'C') {
-                    this.$navTo(`pages/coupon/detail`, { couponId: couponId, userCouponId: userCouponId })
+                    this.$navTo(`subPages/coupon/detail`, { couponId: couponId, userCouponId: userCouponId })
               } else if(type === 'T') {
-                  this.$navTo(`pages/timer/detail`, { couponId: couponId, userCouponId: userCouponId })
+                  this.$navTo(`subPages/timer/detail`, { couponId: couponId, userCouponId: userCouponId })
               }
          }
       }

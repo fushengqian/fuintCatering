@@ -70,7 +70,7 @@
         this.$navTo(tabLinks[index])
       },
       onMerchantPage() { 
-        this.$navTo('pages/merchant/index')
+        this.$navTo('merchantPages/index')
       }
     }
   }
