@@ -117,9 +117,9 @@
 
   // 待办操作
   const orderNavbar = [
-    { id: 'confirm', name: '核销订单', icon: 'dingdan', count: 1, url:'pages/merchant/order/index?dataType=todo' },
-    { id: 'refund', name: '售后审核', icon: 'daifukuan', count: 1, url:'pages/merchant/refund/index?dataType=todo' },
-    { id: 'book', name: '预约管理', icon: 'daishouhuo', count: 3, url:'pages/merchant/book/index??dataType=todo' },
+    { id: 'confirm', name: '核销订单', icon: 'dingdan', count: 1, url:'merchantPages/order/index?dataType=todo' },
+    { id: 'refund', name: '售后审核', icon: 'daifukuan', count: 1, url:'merchantPages/refund/index?dataType=todo' },
+    { id: 'book', name: '预约管理', icon: 'daishouhuo', count: 3, url:'merchantPages/book/index??dataType=todo' },
   ]
 
   /**
@@ -127,14 +127,14 @@
    * id: 标识; name: 标题名称; icon: 图标; type 类型(link和button); url: 跳转的链接
    */
   const service = [
-    { id: 'addMember', name: '会员登记', icon: 'add', type: 'link', url: 'pages/merchant/member/add' },
-    { id: 'memberSearch', name: '会员查找', icon: 'tuandui', type: 'link', url: 'pages/merchant/member/index' },
-    { id: 'coupon', name: '卡券管理', icon: 'youhuiquan', type: 'link', url: 'pages/merchant/coupon/list' },
-    { id: 'order', name: '订单管理', icon: 'dingdan', type: 'link', url: 'pages/merchant/order/index' },
-    { id: 'report', name: '报表数据', icon: 'zhibozhong', type: 'link', url: 'pages/merchant/data/index' },
-    { id: 'refund', name: '售后订单', icon: 'shouhou', type: 'link', url: 'pages/merchant/refund/index' },
-    { id: 'setting', name: '商家设置', icon: 'shezhi1', type: 'link', url: 'pages/merchant/setting' },
-    { id: 'staff', name: '员工管理', icon: 'sy-yh', type: 'link', url: 'pages/merchant/staff/index' },
+    { id: 'addMember', name: '会员登记', icon: 'add', type: 'link', url: 'merchantPages/member/add' },
+    { id: 'memberSearch', name: '会员查找', icon: 'tuandui', type: 'link', url: 'merchantPages/member/index' },
+    { id: 'coupon', name: '卡券管理', icon: 'youhuiquan', type: 'link', url: 'merchantPages/coupon/list' },
+    { id: 'order', name: '订单管理', icon: 'dingdan', type: 'link', url: 'merchantPages/order/index' },
+    { id: 'report', name: '报表数据', icon: 'zhibozhong', type: 'link', url: 'merchantPages/data/index' },
+    { id: 'refund', name: '售后订单', icon: 'shouhou', type: 'link', url: 'merchantPages/refund/index' },
+    { id: 'setting', name: '商家设置', icon: 'shezhi1', type: 'link', url: 'merchantPages/setting' },
+    { id: 'staff', name: '员工管理', icon: 'sy-yh', type: 'link', url: 'merchantPages/staff/index' },
   ]
 
   export default {
@@ -269,17 +269,17 @@
 
       // 跳转到订单页
       onTargetOrder(item) {
-        this.$navTo('pages/merchant/order/index', { dataType: item.id })
+        this.$navTo('merchantPages/order/index', { dataType: item.id })
       },
 
       // 跳转到我的积分页面
       onTargetPoints() {
-        this.$navTo('pages/merchant/points/log')
+        this.$navTo('merchantPages/points/log')
       },
       
       // 跳转会员列表
       onTargetMember(dataType) {
-          this.$navTo('pages/merchant/member/index', { dataType: dataType });
+          this.$navTo('merchantPages/member/index', { dataType: dataType });
       },
 
       // 跳转到服务页面

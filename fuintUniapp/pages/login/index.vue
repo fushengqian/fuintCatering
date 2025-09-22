@@ -79,7 +79,7 @@ import * as LoginApi from '@/api/login'
       getMpLogin(code) {
         const app = this
         return new Promise((resolve, reject) => {
-          LoginApi.mpWxLogin({ code : code}, { isPrompt: false })
+          LoginApi.mpWxLogin({ code : code, shareId: (uni.getStorageSync('shareId') ? uni.getStorageSync('shareId') : 0)}, { isPrompt: false })
             .then(result => {
                 console.log("login-info", result);
                 resolve(result)
@@ -111,7 +111,3 @@ import * as LoginApi from '@/api/login'
     }
   }
 </script>
-
-<style lang="scss" scoped>
-  //empty
-</style>

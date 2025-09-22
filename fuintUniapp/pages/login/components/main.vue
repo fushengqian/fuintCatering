@@ -302,7 +302,8 @@
               captchaKey: app.captcha.key,
               captchaCode: app.captchaCode,
               mobile: app.mobile,
-              uuid: app.captchaUuid
+              uuid: app.captchaUuid,
+              shareId: (uni.getStorageSync('shareId') ? uni.getStorageSync('shareId') : 0)
           })
           .then(result => {
             // 显示发送成功
@@ -371,7 +372,8 @@
             password1: app.password1,
             captchaKey: app.captcha.key,
             captchaCode: app.captchaCode,
-            uuid: app.captchaUuid
+            uuid: app.captchaUuid,
+            shareId: (uni.getStorageSync('shareId') ? uni.getStorageSync('shareId') : 0)
           })
           .then(result => {
               // 显示登录信息
@@ -399,7 +401,8 @@
             isParty: app.isParty,
             partyData: app.partyData,
             captchaCode: app.captchaCode,
-            uuid: app.captchaUuid
+            uuid: app.captchaUuid,
+            shareId: (uni.getStorageSync('shareId') ? uni.getStorageSync('shareId') : 0)
           })
           .then(result => {
             // 显示登录信息

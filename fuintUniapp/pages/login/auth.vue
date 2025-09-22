@@ -55,7 +55,7 @@
             }
             
             // 提交到后端
-            store.dispatch('MpWxAuthLogin', { code: app.code })
+            store.dispatch('MpWxAuthLogin', { code: app.code, shareId: (uni.getStorageSync('shareId') ? uni.getStorageSync('shareId') : 0) })
               .then(result => {
                 if (result.code == '200') {
                     // 显示登录成功

@@ -106,12 +106,12 @@
    * id: 标识; name: 标题名称; icon: 图标; type 类型(link和button); url: 跳转的链接
    */
   const service = [
-    { id: 'order', name: '会员订单', icon: 'dingdan', type: 'link', url: 'pages/merchant/order/index' },
-    { id: 'rechange', name: '会员充值', icon: 'qiandai', type: 'link', url: 'pages/merchant/balance/recharge' },
+    { id: 'order', name: '会员订单', icon: 'dingdan', type: 'link', url: 'merchantPages/order/index' },
+    { id: 'rechange', name: '会员充值', icon: 'qiandai', type: 'link', url: 'merchantPages/balance/recharge' },
     { id: 'payment', name: '余额扣减', icon: 'shouhou', type: 'link', url: 'pages/pay/cashier' },
-    { id: 'myCoupon', name: '卡券发放', icon: 'youhuiquan', type: 'link', url: 'pages/merchant/coupon/receive' },
-    { id: 'points', name: '会员积分', icon: 'jifen', type: 'link', url: 'pages/merchant/points/detail' },
-    { id: 'setting', name: '会员信息', icon: 'shezhi1', type: 'link', url: 'pages/merchant/member/setting' },
+    { id: 'myCoupon', name: '卡券发放', icon: 'youhuiquan', type: 'link', url: 'merchantPages/coupon/receive' },
+    { id: 'points', name: '会员积分', icon: 'jifen', type: 'link', url: 'merchantPages/points/detail' },
+    { id: 'setting', name: '会员信息', icon: 'shezhi1', type: 'link', url: 'merchantPages/member/setting' },
   ]
 
   export default {

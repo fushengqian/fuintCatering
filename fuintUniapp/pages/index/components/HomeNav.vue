@@ -14,7 +14,7 @@
                 <view class="title">邀请有礼</view>
             </view>
             <view class="item">
-                <image class="icon" src="/static/nav/coupon.png" @click.stop="goUrl('pages/coupon/list?type=C')"></image>
+                <image class="icon" src="/static/nav/coupon.png" @click.stop="goUrl('subPages/coupon/list?type=C')"></image>
                 <view class="title">领取卡券</view>
             </view>
         </view>

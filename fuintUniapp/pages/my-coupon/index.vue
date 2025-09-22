@@ -145,11 +145,11 @@
             return false;
         }
         if (type === 'C') {
-            app.$navTo(`pages/coupon/detail`, { userCouponId });
+            app.$navTo(`subPages/coupon/detail`, { userCouponId });
         } else if(type === 'T') {
-            app.$navTo(`pages/timer/detail`, { userCouponId });
+            app.$navTo(`subPages/timer/detail`, { userCouponId });
         } else if(type === 'P') {
-            app.$navTo(`pages/prestore/detail`, { userCouponId });
+            app.$navTo(`subPages/prestore/detail`, { userCouponId });
         }
       },
       

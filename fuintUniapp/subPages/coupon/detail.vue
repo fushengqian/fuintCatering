@@ -291,7 +291,7 @@
       const app = this
       return {
          title: config.name + "卡券分享",
-         path: "/pages/coupon/detail?couponId=" + app.couponId + "&" + app.$getShareUrlParams()
+         path: "/subPages/coupon/detail?couponId=" + app.couponId + "&" + app.$getShareUrlParams()
       }
     },
     
@@ -305,7 +305,7 @@
       const { page } = app
       return {
         title: config.name + "卡券分享",
-        path: "/pages/coupon/detail?couponId=" + app.couponId + "&" + app.$getShareUrlParams()
+        path: "/subPages/coupon/detail?couponId=" + app.couponId + "&" + app.$getShareUrlParams()
       }
     }
   }

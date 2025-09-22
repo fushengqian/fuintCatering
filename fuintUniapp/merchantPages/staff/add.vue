@@ -3,19 +3,27 @@
     <view class="info-list">
       <view class="info-item">
         <view class="contacts">
-          <text class="name">姓名</text>
+          <text class="name">所属店铺</text>
+          <picker class="weui-input value" mode="selector" :range="storeList" range-key="name" @change="storeChange">
+            <input type="text" v-model="storeName" disabled="disabled" placeholder="请点击选择店铺"/>
+          </picker>
+        </view>
+      </view>
+      <view class="info-item">
+        <view class="contacts">
+          <text class="name">员工姓名</text>
           <input class="weui-input value" type="text" v-model="staffInfo.realName" placeholder="请输入员工姓名"/>
         </view>
       </view>
       <view class="info-item">
         <view class="contacts">
-          <text class="name">手机</text>
+          <text class="name">员工手机</text>
           <input class="weui-input value" type="text" v-model="staffInfo.mobile" placeholder="请输入员工手机号"/>
         </view>
       </view>
       <view class="info-item">
         <view class="contacts">
-          <text class="name">状态</text>
+          <text class="name">启用状态</text>
           <view class="value">
              <radio-group @change="statusChange">
                 <label class="radio"><radio value="A" color="#00acac" :checked="staffInfo.auditedStatus == 'A' ? true : false"/>启用</label>
@@ -35,31 +43,53 @@
 </template>
 
 <script>
+  import * as settingApi from '@/api/setting'
   import * as StaffApi from '@/api/merchant/staff'
   import * as UploadApi from '@/api/upload'
   import store from '@/store'
   export default {
     data() {
       return {
-        //当前页面参数
-        options: {},
+        // 店铺列表
+        storeList: [],
         // 正在加载
         isLoading: true,
-        staffInfo: { realName: '', mobile: '', auditedStatus: '' },
+        staffInfo: { storeId: 0, realName: '', mobile: '', auditedStatus: '' },
+        storeName: '',
+        storeId: 0
       }
     },
 
     /**
      * 生命周期函数--监听页面加载
      */
-    onLoad(options) {
-      // 当前页面参数
-      this.options = options;
+    onLoad() {
+      this.getStoreList();
     },
 
     methods: {
+     storeChange(e) {
+       const app = this;
+       for (let i = 0; i < app.storeList.length; i++) {
+            if (i == e.detail.value) {
+                app.storeName = app.storeList[i].name;
+                app.storeId = app.storeList[i].id;
+                break;
+            }
+       }
+     },
+     /**
+      * 获取店铺列表
+      * */
+      getStoreList() {
+        const app = this
+        settingApi.storeList()
+          .then(result => {
+             app.storeList = result.data.data;
+          })
+      },
       statusChange(e) {
-          this.staffInfo.auditedStatus = e.detail.value;
+        this.staffInfo.auditedStatus = e.detail.value;
       },
       /**
        * 保存员工信息
@@ -76,11 +106,11 @@
           }
           
           app.isLoading = true
-          StaffApi.save({ "realName": app.staffInfo.realName, mobile: app.staffInfo.mobile, "auditedStatus": app.staffInfo.auditedStatus })
+          StaffApi.save({ "storeId": app.storeId, "realName": app.staffInfo.realName, mobile: app.staffInfo.mobile, "auditedStatus": app.staffInfo.auditedStatus })
             .then(result => {
               app.staffInfo = result.data;
               app.isLoading = false
-              app.$success('保存成功！')
+              app.$success('新增成功！')
          }).catch(err => {
             app.isLoading = false;
          })
@@ -121,16 +151,7 @@
             margin-left: .6rem;
         }
     }
-    .password {
-        text-align: right;
-        float: left;
-        padding-right: 5rpx;
-    }
-    .avatar {
-        width: 120rpx;
-        height: 120rpx;
-        border-radius: 120rpx;
-        border: solid 1px #cccccc;
+    .storeName {
         float: right;
     }
   }

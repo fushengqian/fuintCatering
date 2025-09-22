@@ -60,18 +60,12 @@
     <!--领取码 end-->
     
     <!-- 底部选项卡 -->
-    <view class="footer-fixed">
+    <view class="footer-fixed" v-if="!detail.code && !detail.isReceive">
       <view class="footer-container">
         <view class="foo-item-btn">
           <view class="btn-wrapper">
-            <view v-if="!detail.code && !detail.isReceive" class="btn-item btn-item-main" @click="receive(detail.id)">
+            <view class="btn-item btn-item-main" @click="receive(detail.id)">
               <text>领取次卡</text>
-            </view>
-            <view v-if="userCouponId && detail.status != 'D'" class="btn-item btn-item-main" @click="remove(userCouponId)">
-              <text>删除卡券</text>
-            </view>
-            <view v-if="detail.status == 'D'" class="btn-item btn-item-main state">
-              <text>已删除</text>
             </view>
           </view>
         </view>

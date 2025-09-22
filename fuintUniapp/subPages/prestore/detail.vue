@@ -42,22 +42,6 @@
         <view class="content"><jyf-parser :html="detail.description ? detail.description : '暂无...'"></jyf-parser></view>
     </view>
     
-    <!-- 底部选项卡 -->
-    <view class="footer-fixed">
-      <view class="footer-container">
-        <view class="foo-item-btn">
-          <view class="btn-wrapper">
-            <view v-if="detail.status != 'D'" class="btn-item btn-item-main" @click="remove(userCouponId)">
-              <text>删除卡券</text>
-            </view>
-            <view v-if="detail.status == 'D'" class="btn-item btn-item-main state">
-              <text>已删除</text>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-    
     <!-- 快捷导航 -->
     <shortcut />
     <view class="give-popup">
@@ -120,55 +104,33 @@
       },
       // 确定转赠
       doGive(friendMobile) {
-              const app = this
-              if (friendMobile.length < 11) {
-                 app.$error("请先输入好友手机号码！")
-                 return false
-              } else {
-                  app.$refs.givePopup.close()
-                  const param = {'mobile': friendMobile,
-                                 'couponId': this.userCouponId,
-                                 'message': '转赠一张优惠券给你'}
-                  giveApi.doGive(param)
-                    .then(result => {
-                        if (result.code == '200') {
-                            uni.showModal({
-                              title: '提示信息',
-                              content: '恭喜，转增成功！',
-                              showCancel: false,
-                              success(o) {
-                                if (o.confirm) {
-                                   uni.navigateBack()
-                                }
-                              }
-                            })
-                        } else {
-                          app.$error(result.message)
-                        }
-                  })
-              }
-      },
-      // 删除卡券
-      remove() {
-         const app = this;
-         if (app.isLoading == true) {
-             return false;
-         }
-         uni.showModal({
-           title: "提示",
-           content: "您确定要删除吗?",
-           success({ confirm }) {
-             if (confirm) {
-                 app.isLoading = true;
-                 myCouponApi.remove(app.userCouponId)
-                   .then(result => {
-                      app.getCouponDetail();
-                      app.isLoading = false;
-                   })
-                   .finally(() => app.isLoading = false)
-             }
-           }
-         });
+          const app = this
+          if (friendMobile.length < 11) {
+             app.$error("请先输入好友手机号码！")
+             return false
+          } else {
+              app.$refs.givePopup.close()
+              const param = {'mobile': friendMobile,
+                             'couponId': this.userCouponId,
+                             'message': '转赠一张优惠券给你'}
+              giveApi.doGive(param)
+                .then(result => {
+                    if (result.code == '200') {
+                        uni.showModal({
+                          title: '提示信息',
+                          content: '恭喜，转增成功！',
+                          showCancel: false,
+                          success(o) {
+                            if (o.confirm) {
+                               uni.navigateBack()
+                            }
+                          }
+                        })
+                    } else {
+                      app.$error(result.message)
+                    }
+              })
+          }
       }
     }
   }

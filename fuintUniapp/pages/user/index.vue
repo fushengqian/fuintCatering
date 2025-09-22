@@ -130,7 +130,7 @@
           </view>
         </block>
         <block>
-          <view v-if="isMerchant == true" class="service-item" @click="handleService({'url': 'pages/merchant/index'})">
+          <view v-if="isMerchant == true" class="service-item" @click="handleService({'url': 'merchantPages/index'})">
             <view class="item-icon">
               <text class="iconfont icon-dianpu"></text>
             </view>

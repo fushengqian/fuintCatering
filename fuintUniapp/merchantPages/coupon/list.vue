@@ -1,30 +1,26 @@
 <template>
   <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ native: true }" @down="downCallback"
     :up="upOption" @up="upCallback">
-
-    <!-- 排序标签 -->
-    <view class="store-sort">
-      <view class="sort-item" :class="{ active: sortType === 'all' }" @click="handleSortType('all')">
-        <text>综合</text>
-      </view>
-      <view class="sort-item" :class="{ active: sortType === 'sales' }" @click="handleSortType('sales')">
-        <text>领取数</text>
-      </view>
-      <view class="sort-item sort-item-price" :class="{ active: sortType === 'price' }" @click="handleSortType('price')">
-        <text>面额</text>
-        <view class="price-arrow">
-          <view class="icon up" :class="{ active: sortType === 'price' && !sortPrice }">
-            <text class="iconfont icon-arrow-up"></text>
+    
+    <view class="search-wrapper">
+      <view class="search-input">
+        <view class="search-input-wrapper">
+          <view class="left">
+            <text class="search-icon iconfont icon-sousuo"></text>
           </view>
-          <view class="icon down" :class="{ active: sortType === 'price' && sortPrice }">
-            <text class="iconfont icon-arrow-down"></text> </view>
+          <view class="right">
+            <input v-model="keyword" class="input" placeholder="请输入卡券名称..." type="text"></input>
+          </view>
         </view>
       </view>
+      <view class="search-button">
+        <button class="button" @click="doSearch" type="warn"> 搜索 </button>
+      </view>
     </view>
-
+    
     <!-- 卡券列表 -->
     <view class="goods-list clearfix" :class="['column-1']">
-      <view class="goods-item" v-for="(item, index) in list.content" :key="index" @click="onTargetDetail(item.id, item.type, item.userCouponId)">
+      <view class="goods-item" v-for="(item, index) in list.content" :key="index" @click="onEdit(item.id)">
         <view class="dis-flex">
           <!-- 卡券图片 -->
           <view class="goods-item_left">
@@ -54,22 +50,8 @@
                       </view>
                   </view>
                   <view class="attr-r">
-                      <!--领券按钮-->
-                      <view class="receive" v-if="item.type === 'C' && item.isReceive === false">
-                          <text v-if="!item.point || item.point < 1">立即领取</text>
-                        <text v-if="item.point && item.point > 0">立即兑换</text>
-                      </view>
-                      <view class="receive state" v-if="item.type === 'C' && item.isReceive === true">
-                          <text>已领取</text>
-                      </view>
-                      <view class="receive" v-if="item.type === 'P' && item.isReceive === false">
-                        <text>立即预存</text>
-                      </view>
-                      <view v-if="item.type === 'T' && item.isReceive === false" class="receive">
-                          <text>领取次卡</text>
-                      </view>
-                      <view v-if="item.type === 'T' && item.isReceive === true" class="receive state">
-                          <text>已领取</text>
+                      <view class="receive">
+                        <text>编辑</text>
                       </view>
                   </view>
               </view>
@@ -84,7 +66,7 @@
 <script>
   import MescrollBody from '@/components/mescroll-uni/mescroll-body.vue'
   import MescrollMixin from '@/components/mescroll-uni/mescroll-mixins'
-  import * as couponApi from '@/api/coupon'
+  import * as couponApi from '@/api/merchant/coupon'
   import { getEmptyPaginateObj, getMoreListData } from '@/utils/app'
   import Search from '@/components/search'
   import { CouponTypeEnum } from '@/common/enum/coupon'
@@ -104,9 +86,8 @@
       return {
         // 枚举类
         CouponTypeEnum,
-        sortType: 'all', // 排序类型
-        sortPrice: false, // 价格排序 (true高到低 false低到高)
-        options: {}, // 当前页面参数
+        keyword: '', // 查找关键字
+        type: '', // 卡券类型
         list: getEmptyPaginateObj(), // 卡券列表数据
         // 正在加载
         isLoading: false,
@@ -127,16 +108,9 @@
     /**
      * 生命周期函数--监听页面加载
      */
-    onLoad(options) {
-      // 记录options
-      this.options = options
+    onLoad() {
       // 设置默认列表显示方式
       this.setShowView()
-      // 设置标题
-      let type = options.type
-      uni.setNavigationBarTitle({
-        title: CouponTypeEnum[type].name + "中心"
-      })
     },
 
     methods: {
@@ -156,6 +130,14 @@
           })
           .catch(() => app.mescroll.endErr())
       },
+      
+      /**
+       * 搜索提交
+       */
+      doSearch() {
+        // 刷新列表数据
+        this.mescroll.resetUpScroll();
+      },
 
       // 设置默认列表显示方式
       setShowView() {
@@ -173,20 +155,16 @@
        */
       getCouponList(pageNo = 1) {
         const app = this
-        console.log(app.options)
         const param = {
-          sortType: app.sortType,
-          sortPrice: Number(app.sortPrice),
-          type: app.options.type || "C",
-          needPoint: app.options.needPoint || '0',
-          name: app.options.search || '',
-          pageNumber: pageNo
+          type: app.type,
+          keyword: app.keyword,
+          page: pageNo
         }
         
         return new Promise((resolve, reject) => {
-          couponApi.list(param)
+          couponApi.couponList(param)
             .then(result => {
-              const newList = result.data.coupon
+              const newList = result.data;
               app.list.content = getMoreListData(newList, app.list, pageNo)
               resolve(newList)
             })
@@ -194,62 +172,11 @@
         })
       },
 
-      // 切换排序方式
-      handleSortType(newSortType) {
-        const app = this
-        const newSortPrice = newSortType === 'price' ? !app.sortPrice : true
-        app.sortType = newSortType
-        app.sortPrice = newSortPrice
-        // 刷新列表数据
-        app.list = getEmptyPaginateObj()
-        app.mescroll.resetUpScroll()
-      },
-
-      // 切换列表显示方式
-      handleShowView() {
-        const app = this
-        app.showView = !app.showView
-        uni.setStorageSync(showViewKey, app.showView)
-      },
-
-      // 跳转详情页
-      onTargetDetail(couponId, type, userCouponId) {
-        if (type === 'P') {
-            this.$navTo(`pages/prestore/buy`, { couponId })
-        } else {
-            if (type === 'C') {
-                this.$navTo(`pages/coupon/detail`, { couponId: couponId, userCouponId: userCouponId })
-            } else if(type === 'T'){
-                this.$navTo(`pages/timer/detail`, { couponId: couponId, userCouponId: userCouponId })
-            }
-        }
-      }
-    },
-
-    /**
-     * 设置分享内容
-     */
-    onShareAppMessage() {
-      // 构建分享参数
-      return {
-        title: "全部卡券",
-        path: "/pages/coupon/list?" + this.$getShareUrlParams()
-      }
-    },
-
-    /**
-     * 分享到朋友圈
-     * 本接口为 Beta 版本，暂只在 Android 平台支持，详见分享到朋友圈 (Beta)
-     * https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/share-timeline.html
-     */
-    onShareTimeline() {
-      // 构建分享参数
-      return {
-        title: "全部卡券",
-        path: "/pages/coupon/list?" + this.$getShareUrlParams()
+      // 跳转编辑页
+      onEdit(couponId) {
+        this.$navTo(`merchantPages/coupon/edit`, { couponId })
       }
     }
-
   }
 </script>
 
@@ -280,7 +207,6 @@
   // 排序组件
   .store-sort {
     position: sticky;
-    top: var(--window-top);
     display: flex;
     padding: 20rpx 0;
     font-size: 28rpx;
@@ -318,9 +244,68 @@
           margin-top: -16rpx;
         }
       }
-
     }
-
+  }
+  
+  .search-wrapper {
+    display: flex;
+    height: 80rpx;
+    margin-top: 20rpx;
+    padding: 0rpx 10rpx;
+  }
+  
+  // 搜索输入框
+  .search-input {
+    width: 80%;
+    background: #fff;
+    border-radius: 50rpx 0 0 50rpx;
+    box-sizing: border-box;
+    overflow: hidden;
+    border: solid 1px #cccccc;
+    line-height: 80rpx;
+    .search-input-wrapper {
+      display: flex;
+      .left {
+        display: flex;
+        width: 60rpx;
+        justify-content: center;
+        align-items: center;
+        .search-icon {
+          display: block;
+          color: #666666;
+          font-size: 30rpx;
+          font-weight: bold;
+        }
+      }
+  
+      .right {
+        flex: 1;
+  
+        input {
+          font-size: 28rpx;
+          height: 80rpx;
+          line-height: 80rpx;
+          .input-placeholder {
+            color: #aba9a9;
+          }
+        }
+  
+      }
+    }
+  }
+  
+  // 搜索按钮
+  .search-button {
+    width: 20%;
+    box-sizing: border-box;
+  
+    .button {
+      line-height: 78rpx;
+      height: 78rpx;
+      font-size: 28rpx;
+      border-radius: 0 20px 20px 0;
+      background: $fuint-theme;
+    }
   }
 
   // 卡券列表
@@ -407,21 +392,21 @@
       color: #e49a3d;
     }
     .receive {
-        height: 50rpx;
-        width: 108rpx;
-        padding: 0rpx 10rpx 0rpx 10rpx;
-        line-height: 50rpx;
-        text-align: center;
-        border: 1px solid #f86d48;
-        border-radius: 40rpx;
-        color: #fff;
-        background: linear-gradient(to right, #f9211c, #ff6335);
-        font-size: 22rpx;
-        &.state {
-          border: none;
-          color: #888888;
-          background: #F5F5F5;
-        }
+      height: 50rpx;
+      width: 108rpx;
+      padding: 0rpx 10rpx 0rpx 10rpx;
+      line-height: 50rpx;
+      text-align: center;
+      border: 1px solid #f86d48;
+      border-radius: 40rpx;
+      color: #fff;
+      background: linear-gradient(to right, #f9211c, #ff6335);
+      font-size: 22rpx;
+      &.state {
+        border: none;
+        color: #888888;
+        background: #F5F5F5;
+      }
     }
 
     .desc-goods_sales {
@@ -436,6 +421,7 @@
         margin-right: 16rpx;
         color: #f03c3c;
         font-size: 30rpx;
+        font-weight: bold;
       }
 
       .price_y {

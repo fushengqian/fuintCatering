@@ -1,20 +1,6 @@
 <template>
   <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ native: true }" @down="downCallback"
     :up="upOption" @up="upCallback">
-
-    <!-- 分类列表tab -->
-    <view class="tabs-wrapper">
-      <scroll-view class="scroll-view" scroll-x>
-        <view class="tab-item" :class="{ active: curId ==  0 }" @click="onSwitchTab(0)">
-          <view class="value"><text>全部</text></view>
-        </view>
-        <!-- 分类列表 -->
-        <view class="tab-item" :class="{ active: curId ==  item.id }" @click="onSwitchTab(item.id)"
-          v-for="(item, index) in categoryList" :key="index">
-          <view class="value"><text>{{ item.name }}</text></view>
-        </view>
-      </scroll-view>
-    </view>
     
     <view class="search-wrapper">
       <view class="search-input">
@@ -23,7 +9,7 @@
             <text class="search-icon iconfont icon-sousuo"></text>
           </view>
           <view class="right">
-            <input v-model="keyword" class="input" placeholder="请输入会员手机号 / 会员号" type="text"></input>
+            <input v-model="keyword" class="input" placeholder="请输入员工手机号 / 姓名" type="text"></input>
           </view>
         </view>
       </view>
@@ -32,36 +18,46 @@
       </view>
     </view>
 
-    <!-- 会员列表 -->
-    <view class="member-list" v-if="memberList.content">
-      <view class="member-item" v-for="(item, index) in memberList.content" :key="index" @click="onTargetDetail(item.id)">
+    <!-- 员工列表 -->
+    <view class="staff-list" v-if="staffList.content">
+      <view class="staff-item" v-for="(item, index) in staffList.content" :key="index" @click="onTargetDetail(item.id)">
         <block>
           <view class="left flex-box">
-            <image class="image" :src="item.avatar"></image>
+            <image class="image" src="/static/default-avatar.png"></image>
           </view>
           <view class="right">
             <view class="base">
-              <text class="name">{{ item.name }}</text>
-              <text class="grade">{{ item.gradeName ? item.gradeName : '' }}</text>
-            </view>
-            <view class="amount">
-              <view class="balance">余额：￥{{ item.balance.toFixed(2) }}</view>
-              <view class="point">积分：{{ item.point }}</view>
+              <text class="name">{{ item.realName }}</text>
+              <text class="mobile">{{ item.mobile ? item.mobile : '' }}</text>
+              <view class="store">{{ item.storeInfo ? item.storeInfo.name : '全部店铺' }}</view>
             </view>
             <view class="footer">
-              <text class="member-views f-24 col-8">{{ item.lastLoginTime }}活跃</text>
+              <text class="staff-views f-24 col-8">创建时间：{{ item.createTime | timeFormat('yyyy-mm-dd hh:MM') }}</text>
             </view>
           </view>
         </block>
       </view>
     </view>
+    
+    <view class="footer-fixed">
+      <view class="footer-container">
+        <view class="foo-item-btn">
+          <view class="btn-wrapper">
+            <view class="btn-item btn-item-main" @click="onAddStaff()">
+              <text>新增员工</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
   </mescroll-body>
 </template>
 
 <script>
   import MescrollBody from '@/components/mescroll-uni/mescroll-body.vue'
   import MescrollMixin from '@/components/mescroll-uni/mescroll-mixins'
-  import * as MemberApi from '@/api/merchant/member'
+  import * as StaffApi from '@/api/merchant/staff'
   import { getEmptyPaginateObj, getMoreListData } from '@/utils/app'
 
   const pageSize = 15
@@ -73,12 +69,8 @@
     mixins: [MescrollMixin],
     data() {
       return {
-        // 分类列表
-        categoryList: [{ name : '今日活跃', id: 'todayActive' }, { name : '今日注册', id: 'todayRegister' }],
-        // 会员列表
-        memberList: getEmptyPaginateObj(),
-        // 当前选中的分类id (all则代表全部)
-        curId: 'all',
+        // 员工列表
+        staffList: getEmptyPaginateObj(),
         // 搜索关键字
         keyword: '',
         // 上拉加载配置
@@ -96,16 +88,6 @@
       }
     },
 
-    /**
-     * 生命周期函数--监听页面加载
-     */
-    onLoad(options) {
-      const app = this
-      if (options.dataType) {
-          app.curId = options.dataType
-      }
-    },
-
     methods: {
 
       /**
@@ -116,7 +98,7 @@
       upCallback(page) {
         const app = this
         // 设置列表数据
-        app.getMemberList(page.num)
+        app.getStaffList(page.num)
           .then(list => {
             const curPageLen = list.content.length;
             const totalSize = list.totalElements;
@@ -129,23 +111,22 @@
        * 搜索提交
        */
       doSearch() {
-        this.curId = 'all';
         // 刷新列表数据
         this.mescroll.resetUpScroll();
       },
 
       /**
-       * 获取会员列表
+       * 获取员工列表
        * @param {Number} pageNo 页码
        */
-      getMemberList(pageNo = 1) {
+      getStaffList(pageNo = 1) {
         const app = this;
         return new Promise((resolve, reject) => {
-          MemberApi.list({ dataType: app.curId, keyword: app.keyword, page: pageNo }, { load: false })
+          StaffApi.getStaffList({ keyword: app.keyword, page: pageNo }, { load: false })
             .then(result => {
               // 合并新数据
-              const newList = result.data.paginationResponse;
-              app.memberList.content = getMoreListData(newList, app.memberList, pageNo);
+              const newList = result.data;
+              app.staffList.content = getMoreListData(newList, app.staffList, pageNo);
               resolve(newList);
             })
             .catch(result => reject())
@@ -155,16 +136,19 @@
       // 切换选择的分类
       onSwitchTab(dataType = 'all') {
         const app = this;
-        // 切换当前的分类ID
-        app.curId = dataType;
         app.keyword = '';
         // 刷新列表数据
         app.mescroll.resetUpScroll();
       },
+      
+      // 跳转新增
+      onAddStaff() {
+        this.$navTo('merchantPages/staff/add')
+      },
 
-      // 跳转会员详情页
-      onTargetDetail(memberId) {
-        this.$navTo('pages/merchant/member/detail', { memberId })
+      // 跳转编辑
+      onTargetDetail(staffId) {
+        this.$navTo('merchantPages/staff/edit', { staffId })
       },
       
       // 刷新列表
@@ -248,7 +232,6 @@
   
       .right {
         flex: 1;
-  
         input {
           font-size: 28rpx;
           height: 80rpx;
@@ -257,7 +240,6 @@
             color: #aba9a9;
           }
         }
-  
       }
     }
   }
@@ -275,21 +257,20 @@
       background: $fuint-theme;
     }
   }
-  
 
-  /* 会员列表 */
-  .member-list {
+  /* 员工列表 */
+  .staff-list {
     padding-top: 10rpx;
     line-height: 1;
     background: #f7f7f7;
   }
   
-  .member-item {
+  .staff-item {
     margin-bottom: 10rpx;
     padding: 30rpx;
     background: #fff;
     border: #f5f5f5 solid 1rpx;
-    height: 188rpx;
+    height: 240rpx;
 
     &:last-child {
       margin-bottom: 0;
@@ -309,33 +290,72 @@
         margin-left: 140rpx;
         height: 180rpx;
         .base {
+            margin-top: 10rpx;
             .name {
               font-weight: bold;
               max-height: 80rpx;
               font-size: 30rpx;
               color: #333;
             }
-            .grade {
-                margin-left: 20rpx;
-                float: right;
+            .mobile {
+              margin-left: 20rpx;
+              float: right;
             }
-        }
-        .amount {
-            margin-top: 10rpx;
-            .balance {
-               margin-top: 15rpx;
-            }
-            .point {
-               margin-top: 10rpx;
+            .store {
+              padding-top: 20rpx;
+              color: #aba9a9;
             }
         }
         .footer {
-            margin-top: 20rpx;
-            .member-views {
+            margin-top: 80rpx;
+            .staff-views {
                 float: right;
             }
         }
     }
   }
+    
+    /* 底部操作栏 */
+    .footer-fixed {
+      position: fixed;
+      bottom: var(--window-bottom);
+      left: 0;
+      right: 0;
+      display: flex;
+      height: 180rpx;
+      z-index: 11;
+      box-shadow: 0 -4rpx 40rpx 0 rgba(144, 52, 52, 0.1);
+      background: #fff;
+    }
+    
+    .footer-container {
+      width: 100%;
+      display: flex;
+      margin-bottom: 40rpx;
+    }
+    
+    // 操作按钮
+    .foo-item-btn {
+      flex: 1;
+      .btn-wrapper {
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+      .btn-item {
+        flex: 1;
+        font-size: 28rpx;
+        height: 80rpx;
+        line-height: 80rpx;
+        margin-right: 16rpx;
+        margin-left: 16rpx;
+        text-align: center;
+        color: #fff;
+        border-radius: 40rpx;
+      }
+      .btn-item-main {
+        background: linear-gradient(to right, #f9211c, #ff6335);
+      }
+    }
 
 </style>
