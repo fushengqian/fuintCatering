@@ -55,31 +55,33 @@ public interface MemberService extends IService<MtUser> {
     /**
      * 添加会员
      *
-     * @param  reqUserDto
+     * @param mtUser 用户信息
+     * @param shareId 分享用户ID
      * @throws BusinessCheckException
      * @return
      */
-    MtUser addMember(MtUser reqUserDto) throws BusinessCheckException;
+    MtUser addMember(MtUser mtUser, String shareId) throws BusinessCheckException;
 
     /**
      * 编辑会员
      *
-     * @param  reqUserDto 会员信息
+     * @param  mtUser 会员信息
      * @param  modifyPassword 修改密码
      * @throws BusinessCheckException
      * @return
      */
-    MtUser updateMember(MtUser reqUserDto, boolean modifyPassword) throws BusinessCheckException;
+    MtUser updateMember(MtUser mtUser, boolean modifyPassword) throws BusinessCheckException;
 
     /**
      * 通过手机号添加会员
      *
      * @param  merchantId 商户ID
      * @param  mobile 手机号
+     * @param  shareId 分享用户ID
      * @throws BusinessCheckException
      * @return
      */
-    MtUser addMemberByMobile(Integer merchantId, String mobile) throws BusinessCheckException;
+    MtUser addMemberByMobile(Integer merchantId, String mobile, String shareId) throws BusinessCheckException;
 
     /**
      * 根据会员ID获取会员信息

@@ -861,7 +861,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 userInfo = memberService.queryMemberByMobile(merchantId, mobile);
                 // 自动注册会员
                 if (userInfo == null) {
-                    userInfo = memberService.addMemberByMobile(merchantId, mobile);
+                    userInfo = memberService.addMemberByMobile(merchantId, mobile, null);
                 }
             }
         }

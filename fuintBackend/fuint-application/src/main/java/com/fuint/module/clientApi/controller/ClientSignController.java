@@ -192,6 +192,7 @@ public class ClientSignController extends BaseController {
         String captchaCode = param.get("captchaCode") == null ? "" : param.get("captchaCode").toString();
         String uuid = param.get("uuid") == null ? "" : param.get("uuid").toString();
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
+        String shareId = param.get("shareId") == null ? "0" : param.get("shareId").toString();
         String userAgent = request.getHeader("user-agent") == null ? "" : request.getHeader("user-agent");
 
         if (StringUtil.isEmpty(account)) {
@@ -222,7 +223,7 @@ public class ClientSignController extends BaseController {
         mtUser.setMobile("");
         mtUser.setDescription("会员自行注册新账号");
         mtUser.setIsStaff(YesOrNoEnum.NO.getKey());
-        MtUser userInfo = memberService.addMember(mtUser);
+        MtUser userInfo = memberService.addMember(mtUser, shareId);
 
         if (userInfo != null) {
             String token = TokenUtil.generateToken(userAgent, userInfo.getId());
@@ -268,6 +269,7 @@ public class ClientSignController extends BaseController {
         String password = param.get("password") == null ? "" : param.get("password").toString();
         String captchaCode = param.get("captchaCode") == null ? "" : param.get("captchaCode").toString();
         String uuid = param.get("uuid") == null ? "" : param.get("uuid").toString();
+        String shareId = param.get("shareId") == null ? "0" : param.get("shareId").toString();
         TokenDto dto = new TokenDto();
         MtUser mtUser = null;
         Integer merchantId = merchantService.getMerchantId(merchantNo);
@@ -292,7 +294,7 @@ public class ClientSignController extends BaseController {
             // 2、写入token redis session
             if (mtVerifyCode != null) {
                 if (null == mtUser) {
-                    memberService.addMemberByMobile(merchantId, mobile);
+                    memberService.addMemberByMobile(merchantId, mobile, shareId);
                     mtUser = memberService.queryMemberByMobile(merchantId, mobile);
                 }
 

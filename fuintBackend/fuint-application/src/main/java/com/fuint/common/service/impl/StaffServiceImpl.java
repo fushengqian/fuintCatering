@@ -169,7 +169,7 @@ public class StaffServiceImpl extends ServiceImpl<MtStaffMapper, MtStaff> implem
             userInfo.setMerchantId(mtStaff.getMerchantId());
             userInfo.setIsStaff(YesOrNoEnum.YES.getKey());
             userInfo.setOperator(operator);
-            mtUser = memberService.addMember(userInfo);
+            mtUser = memberService.addMember(userInfo, null);
             if (mtUser != null) {
                 mtStaff.setUserId(mtUser.getId());
             } else {

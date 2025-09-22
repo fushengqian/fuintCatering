@@ -246,7 +246,7 @@ public class BackendMemberController extends BaseController {
             mtUser.setStoreId(myStoreId);
         }
         if (mtUser.getId() == null) {
-            memberService.addMember(mtUser);
+            memberService.addMember(mtUser, null);
         } else {
             memberService.updateMember(mtUser, false);
         }

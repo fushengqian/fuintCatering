@@ -163,7 +163,7 @@ public class MerchantMemberController extends BaseController {
         MtUser memberInfo;
         if (memberInfoParam.getId() == null) {
             mtUser.setDescription("商户登记添加");
-            memberInfo = memberService.addMember(mtUser);
+            memberInfo = memberService.addMember(mtUser, null);
         } else {
             memberInfo = memberService.updateMember(mtUser, false);
         }
