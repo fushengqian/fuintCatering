@@ -1,6 +1,8 @@
 package com.fuint.common.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fuint.common.dto.NavigationDto;
 import com.fuint.common.dto.ParamDto;
 import com.fuint.common.enums.*;
 import com.fuint.framework.annoation.OperationServiceLog;
@@ -196,5 +198,21 @@ public class SettingServiceImpl extends ServiceImpl<MtSettingMapper, MtSetting> 
         }
 
         return payTypeList;
+    }
+
+    /**
+     * 获取导航栏
+     *
+     * @param merchantId 商户ID
+     * @param storeId 店铺ID
+     * @return
+     * */
+    @Override
+    public List<NavigationDto> getNavigation(Integer merchantId, Integer storeId) {
+        MtSetting mtSetting = mtSettingMapper.querySettingByName(merchantId, storeId, SettingTypeEnum.NAVIGATION.getKey(), SettingTypeEnum.NAVIGATION.getKey());
+        if (mtSetting != null && StringUtil.isNotBlank(mtSetting.getValue())) {
+            JSON.parse(mtSetting.getValue());
+        }
+        return new ArrayList<>();
     }
 }

@@ -1,6 +1,7 @@
 package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.fuint.common.dto.NavigationDto;
 import com.fuint.common.dto.ParamDto;
 import com.fuint.repository.model.MtSetting;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -76,6 +77,15 @@ public interface SettingService extends IService<MtSetting> {
      * @param platform 平台
      * @return
      * */
-    List<ParamDto> getPayTypeList(Integer merchantId, Integer storeId, String platform) throws BusinessCheckException;;
+    List<ParamDto> getPayTypeList(Integer merchantId, Integer storeId, String platform) throws BusinessCheckException;
+
+    /**
+     * 获取导航栏
+     *
+     * @param merchantId 商户ID
+     * @param storeId 店铺ID
+     * @return
+     * */
+    List<NavigationDto> getNavigation(Integer merchantId, Integer storeId);
 
 }

@@ -1,9 +1,11 @@
 package com.fuint.module.clientApi.controller;
 
+import com.fuint.common.dto.NavigationDto;
 import com.fuint.common.enums.PositionEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.service.BannerService;
 import com.fuint.common.service.MerchantService;
+import com.fuint.common.service.SettingService;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
@@ -41,6 +43,11 @@ public class ClientPageController extends BaseController {
     private MerchantService merchantService;
 
     /**
+     * 系统设置服务接口
+     * */
+    private SettingService settingService;
+
+    /**
      * 获取页面数据
      */
     @ApiOperation(value = "获取首页页面数据")
@@ -63,10 +70,12 @@ public class ClientPageController extends BaseController {
         List<MtBanner> bannerData = bannerService.queryBannerListByParams(params);
         params.put("position", PositionEnum.M_HOME_ADS.getKey());
         List<MtBanner> adsData = bannerService.queryBannerListByParams(params);
+        List<NavigationDto> navigation = settingService.getNavigation(merchantId, storeId);
 
         Map<String, Object> outParams = new HashMap();
         outParams.put("banner", bannerData);
         outParams.put("ads", adsData);
+        outParams.put("navigation", navigation);
         return getSuccessResult(outParams);
     }
 }
