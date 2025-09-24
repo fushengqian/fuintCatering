@@ -827,7 +827,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         // 是否支持先用餐后支付
         Boolean payFirst = true;
-        if (tableId > 0) {
+        if (tableId > 0 || (myOrderId != null && myOrderId > 0)) {
             MtSetting paySetting = settingService.querySettingByName(merchantId, storeId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.PAY_FIRST.getKey());
             if (paySetting == null) {
                 paySetting = settingService.querySettingByName(merchantId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.PAY_FIRST.getKey());
