@@ -18,7 +18,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
-import java.text.ParseException;
 
 /**
  * 商户卡券接口controller
@@ -67,7 +66,7 @@ public class MerchantCouponController extends BaseController {
         if (staff.getStoreId() != null && staff.getStoreId() > 0) {
             params.setStoreId(staff.getStoreId());
         }
-        params.setStatus("");
+        params.setStatus(null);
         ResponseObject result = couponService.findCouponList(params);
         return getSuccessResult(result.getData());
     }

@@ -1,6 +1,7 @@
 package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fuint.common.dto.NavigationDto;
 import com.fuint.common.dto.ParamDto;
 import com.fuint.repository.model.MtSetting;
@@ -84,8 +85,9 @@ public interface SettingService extends IService<MtSetting> {
      *
      * @param merchantId 商户ID
      * @param storeId 店铺ID
+     * @param status 状态
      * @return
      * */
-    List<NavigationDto> getNavigation(Integer merchantId, Integer storeId);
+    List<NavigationDto> getNavigation(Integer merchantId, Integer storeId, String status) throws JsonProcessingException;
 
 }

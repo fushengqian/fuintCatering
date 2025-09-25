@@ -1,5 +1,6 @@
 package com.fuint.module.clientApi.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fuint.common.dto.NavigationDto;
 import com.fuint.common.enums.PositionEnum;
 import com.fuint.common.enums.StatusEnum;
@@ -53,7 +54,7 @@ public class ClientPageController extends BaseController {
     @ApiOperation(value = "获取首页页面数据")
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject getPageData(HttpServletRequest request, @RequestParam Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject getPageData(HttpServletRequest request, @RequestParam Map<String, Object> param) throws BusinessCheckException, JsonProcessingException {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
 
@@ -70,7 +71,7 @@ public class ClientPageController extends BaseController {
         List<MtBanner> bannerData = bannerService.queryBannerListByParams(params);
         params.put("position", PositionEnum.M_HOME_ADS.getKey());
         List<MtBanner> adsData = bannerService.queryBannerListByParams(params);
-        List<NavigationDto> navigation = settingService.getNavigation(merchantId, storeId);
+        List<NavigationDto> navigation = settingService.getNavigation(merchantId, storeId, StatusEnum.ENABLED.getKey());
 
         Map<String, Object> outParams = new HashMap();
         outParams.put("banner", bannerData);

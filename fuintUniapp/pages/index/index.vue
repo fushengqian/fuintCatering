@@ -11,7 +11,7 @@
           <HomeService v-if="storeInfo" :data="[]"/>
       </block>
       <block>
-          <HomeNav v-if="storeInfo" :ads="[]"/>
+          <HomeNav v-if="storeInfo" :navigation="navigation"/>
       </block>
       <block>
           <HomeAds v-if="storeInfo" :ads="ads"/>
@@ -51,7 +51,8 @@
         storeInfo: null,
         userInfo: {},
         isReflash: false,
-        isLoading: false
+        isLoading: false,
+        navigation: []
       }
     },
 
@@ -102,6 +103,7 @@
             .then(result => {
                  app.banner = result.data.banner;
                  app.ads = result.data.ads;
+                 app.navigation = result.data.navigation;
                  uni.removeStorageSync("reflashHomeData");
                  app.isReflash = false;
             })
