@@ -93,7 +93,6 @@
             }
         },
         "lazyCodeLoading" : "requiredComponents",
-        "lazyCodeLoading" : "requiredComponents",
         "optimization" : {
             "subPackages" : true
         }

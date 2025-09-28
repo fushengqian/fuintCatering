@@ -87,6 +87,7 @@ public class ClientSignController extends BaseController {
     public ResponseObject mpWxLogin(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
         String storeId = request.getHeader("storeId") == null ? "0" : request.getHeader("storeId");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
+        String shareId = param.get("shareId") == null ? "0" : param.get("shareId").toString();
         JSONObject paramsObj = new JSONObject(param);
         logger.info("微信授权登录参数：{}", param);
         Integer merchantId = merchantService.getMerchantId(merchantNo);
@@ -99,6 +100,7 @@ public class ClientSignController extends BaseController {
         String type = userInfo.getString("type");
         String encryptedData = userInfo.getString("encryptedData");
         userInfo.put("phone", "");
+        userInfo.put("shareId", shareId);
         userInfo.put("source", MemberSourceEnum.WECHAT_LOGIN.getKey());
         if (type.equals("phone") && StringUtil.isNotEmpty(encryptedData)) {
             String phone = weixinService.getPhoneNumber(userInfo.get("encryptedData").toString(), loginInfo.get("session_key").toString(), userInfo.get("iv").toString());
