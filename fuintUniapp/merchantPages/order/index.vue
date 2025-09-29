@@ -4,7 +4,7 @@
       :up="upOption" @up="upCallback">
 
       <!-- tab栏 -->
-      <u-tabs :list="tabs" :is-scroll="false" :current="curTab" active-color="#FA2209" :duration="0.2" @change="onChangeTab" />
+      <u-tabs :list="tabs" :is-scroll="true" :current="curTab" active-color="#FA2209" :duration="0.2" @change="onChangeTab" />
 
       <!-- 搜索框 -->
       <view class="search-wrapper">
@@ -123,6 +123,15 @@
   }, {
     name: `已核销`,
     value: 'confirm'
+  }, {
+    name: `待发货`,
+    value: 'unShipped'
+  }, {
+    name: `已发货`,
+    value: 'shipped'
+  },  {
+    name: `已完成`,
+    value: 'completed'
   }, {
     name: `已取消`,
     value: 'cancel'
