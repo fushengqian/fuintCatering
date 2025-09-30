@@ -129,7 +129,10 @@
   }, {
     name: `已发货`,
     value: 'shipped'
-  },  {
+  }, {
+    name: `已收货`,
+    value: 'received'
+  }, {
     name: `已完成`,
     value: 'completed'
   }, {
