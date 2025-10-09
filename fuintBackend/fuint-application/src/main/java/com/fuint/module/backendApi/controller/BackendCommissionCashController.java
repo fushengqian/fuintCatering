@@ -10,7 +10,6 @@ import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.common.Constants;
-import com.fuint.common.enums.StatusEnum;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -141,9 +140,28 @@ public class BackendCommissionCashController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:cash:index')")
     public ResponseObject save(HttpServletRequest request, @RequestBody CommissionCashRequest commissionCashRequest) throws BusinessCheckException {
-        AccountInfo accountDto = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-        commissionCashRequest.setOperator(accountDto.getAccountName());
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        if (!checkOwner(commissionCashRequest.getId(), accountInfo)) {
+            return getFailureResult(1004);
+        }
+        commissionCashRequest.setOperator(accountInfo.getAccountName());
         commissionCashService.updateCommissionCash(commissionCashRequest);
+        return getSuccessResult(true);
+    }
+
+    /**
+     * 支付结算金额到用户余额
+     */
+    @ApiOperation(value = "支付结算金额到用户余额")
+    @RequestMapping(value = "/payToBalance", method = RequestMethod.POST)
+    @PreAuthorize("@pms.hasPermission('commission:cash:index')")
+    public ResponseObject payToBalance(HttpServletRequest request, @RequestBody CommissionCashRequest commissionCashRequest) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        commissionCashRequest.setOperator(accountInfo.getAccountName());
+        if (!checkOwner(commissionCashRequest.getId(), accountInfo)) {
+            return getFailureResult(1004);
+        }
+        commissionCashService.payToBalance(commissionCashRequest);
         return getSuccessResult(true);
     }
 
@@ -154,10 +172,10 @@ public class BackendCommissionCashController extends BaseController {
     @RequestMapping(value = "/confirm", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:cash:index')")
     public ResponseObject confirm(HttpServletRequest request, @RequestBody CommissionSettleConfirmRequest requestParam) throws BusinessCheckException {
-        AccountInfo accountDto = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-        requestParam.setOperator(accountDto.getAccountName());
-        if (accountDto.getMerchantId() != null && accountDto.getMerchantId() > 0) {
-            requestParam.setMerchantId(accountDto.getMerchantId());
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        requestParam.setOperator(accountInfo.getAccountName());
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+            requestParam.setMerchantId(accountInfo.getMerchantId());
         }
         commissionCashService.confirmCommissionCash(requestParam);
         return getSuccessResult(true);
@@ -170,12 +188,28 @@ public class BackendCommissionCashController extends BaseController {
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:cash:index')")
     public ResponseObject cancel(HttpServletRequest request, @RequestBody CommissionSettleConfirmRequest requestParam) throws BusinessCheckException {
-        AccountInfo accountDto = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-        if (accountDto.getMerchantId() != null && accountDto.getMerchantId() > 0) {
-            requestParam.setMerchantId(accountDto.getMerchantId());
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+            requestParam.setMerchantId(accountInfo.getMerchantId());
         }
-        requestParam.setOperator(accountDto.getAccountName());
+        requestParam.setOperator(accountInfo.getAccountName());
         commissionCashService.cancelCommissionCash(requestParam);
         return getSuccessResult(true);
+    }
+
+    private boolean checkOwner(Integer commissionCashId, AccountInfo accountInfo) throws BusinessCheckException {
+        CommissionCashDto commissionCash = commissionCashService.queryCommissionCashById(commissionCashId);
+        if (commissionCash == null || accountInfo == null) {
+            return false;
+        }
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+            if (!accountInfo.getMerchantId().equals(commissionCash.getMerchantId())) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
 }

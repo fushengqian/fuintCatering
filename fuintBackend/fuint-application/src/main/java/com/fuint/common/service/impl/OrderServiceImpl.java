@@ -254,7 +254,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             lambdaQueryWrapper.eq(MtOrder::getStatus, OrderStatusEnum.COMPLETE.getKey());
         }
 
-        if (StringUtil.isNotEmpty(tableCode)) {
+        if (StringUtil.isNotBlank(tableCode)) {
             Map<String, Object> params = new HashMap<>();
             params.put("code", tableCode);
             params.put("status", StatusEnum.ENABLED.getKey());
@@ -265,19 +265,19 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 lambdaQueryWrapper.eq(MtOrder::getTableId, "00");
             }
         }
-        if (StringUtil.isNotEmpty(orderSn)) {
+        if (StringUtil.isNotBlank(orderSn)) {
             lambdaQueryWrapper.eq(MtOrder::getOrderSn, orderSn);
         }
-        if (StringUtil.isNotEmpty(status)) {
+        if (StringUtil.isNotBlank(status)) {
             lambdaQueryWrapper.eq(MtOrder::getStatus, status);
         }
-        if (StringUtil.isNotEmpty(payStatus)) {
+        if (StringUtil.isNotBlank(payStatus)) {
             lambdaQueryWrapper.eq(MtOrder::getPayStatus, payStatus);
         }
-        if (StringUtil.isNotEmpty(settleStatus)) {
+        if (StringUtil.isNotBlank(settleStatus)) {
             lambdaQueryWrapper.eq(MtOrder::getSettleStatus, settleStatus);
         }
-        if (StringUtil.isNotEmpty(keyword)) {
+        if (StringUtil.isNotBlank(keyword)) {
             MtUser userInfo = memberService.queryMemberByMobile(merchantId, keyword);
             if (userInfo != null) {
                 lambdaQueryWrapper.and(wq -> wq
@@ -288,15 +288,13 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 lambdaQueryWrapper.like(MtOrder::getOrderSn, keyword);
             }
         }
-        if (StringUtil.isNotEmpty(mobile)) {
+        if (StringUtil.isNotBlank(mobile)) {
             MtUser userInfo = memberService.queryMemberByMobile(merchantId, mobile);
             if (userInfo != null) {
                 userId = userInfo.getId().toString();
-            } else {
-                userId = "0";
             }
         }
-        if (StringUtil.isNotEmpty(userId) && Integer.parseInt(userId) > 0) {
+        if (StringUtil.isNotBlank(userId) && Integer.parseInt(userId) > 0) {
             lambdaQueryWrapper.eq(MtOrder::getUserId, userId);
         }
         if (merchantId != null && merchantId > 0) {
@@ -440,6 +438,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         }
         if (mtOrder.getVerifyCode() == null && !orderDto.getPlatform().equals(PlatformTypeEnum.PC.getCode())) {
             mtOrder.setVerifyCode(SeqUtil.getRandomNumber(4));
+        } else {
+            mtOrder.setVerifyCode("");
+            mtOrder.setConfirmStatus(YesOrNoEnum.YES.getKey());
         }
         // 首先生成订单
         if (mtOrder.getId() == null || mtOrder.getId() < 1) {
