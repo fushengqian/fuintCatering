@@ -107,7 +107,7 @@
                             let week = app.dateArr[app.dateIndex].week;
                             let data = { bookId: app.bookId, week: week, date : dates[app.dateIndex], time: app.timeArr[app.timeIndex].time };
                             uni.setStorageSync('bookData', data);
-                            app.$navTo('pages/book/submit');
+                            app.$navTo('subPages/book/submit');
                         }
                     }
                 });

@@ -182,7 +182,7 @@
 
       // 跳转详情页
       onView(myBookId) {
-        this.$navTo('pages/book/bookDetail', { myBookId });
+        this.$navTo('subPages/book/bookDetail', { myBookId });
       }
     }
 

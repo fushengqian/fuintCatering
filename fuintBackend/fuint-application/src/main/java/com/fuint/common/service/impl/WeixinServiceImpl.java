@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fuint.common.Constants;
 import com.fuint.common.bean.H5SceneInfo;
 import com.fuint.common.bean.WxPayBean;
+import com.fuint.common.bean.shoppingOrders.*;
 import com.fuint.common.dto.OrderDto;
 import com.fuint.common.dto.UserOrderDto;
 import com.fuint.common.dto.WxCardDto;
@@ -15,8 +16,10 @@ import com.fuint.common.enums.*;
 import com.fuint.common.http.HttpRESTDataClient;
 import com.fuint.common.service.*;
 import com.fuint.common.util.*;
+import com.fuint.common.vo.printer.OrderStatusType;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.ResponseObject;
+import com.fuint.repository.mapper.MtUploadShippingLogMapper;
 import com.fuint.repository.model.*;
 import com.fuint.utils.QRCodeUtil;
 import com.fuint.utils.StringUtil;
@@ -62,6 +65,8 @@ import java.util.*;
 public class WeixinServiceImpl implements WeixinService {
 
     private static final Logger logger = LoggerFactory.getLogger(WeixinServiceImpl.class);
+
+    private MtUploadShippingLogMapper uploadShippingLogMapper;
 
     /**
      * 订单服务接口
@@ -994,6 +999,93 @@ public class WeixinServiceImpl implements WeixinService {
         }
 
         return link;
+    }
+
+    /**
+     * 上传小程序发货信息
+     *
+     * @param orderSn 订单号
+     * @return
+     */
+    @Override
+    public void uploadShippingInfo(String orderSn) throws BusinessCheckException {
+        UserOrderDto orderInfo = orderService.getOrderByOrderSn(orderSn);
+        if (orderInfo == null) {
+            return;
+        }
+        if (orderInfo.getExpressInfo() == null || StringUtil.isEmpty(orderInfo.getExpressInfo().getExpressNo())) {
+            throw new BusinessCheckException("上传发货信息失败，物流信息不能为空！");
+        }
+        if (orderInfo.getUserInfo() == null || StringUtil.isEmpty(orderInfo.getUserInfo().getOpenId())) {
+            throw new BusinessCheckException("上传发货信息失败，会员的openId不能为空！");
+        }
+        // 是否是微信小程序订单 && 微信支付
+        if (orderInfo != null && orderInfo.getPlatform().equals(PlatformTypeEnum.MP_WEIXIN.getCode()) || orderInfo.getPayType().equals(PayTypeEnum.JSAPI.name())) {
+            String url = "https://api.weixin.qq.com/wxa/sec/order/upload_shipping_info?access_token=" + getAccessToken(orderInfo.getMerchantId(), true, true);
+
+            // 获取微信支付配置
+            getApiConfig(orderInfo.getStoreId(), orderInfo.getPlatform());
+            WxPayApiConfig wxPayApiConfig = WxPayApiConfigKit.getWxPayApiConfig();
+
+            // 组织上传参数
+            ShippingInfo shippingInfo = new ShippingInfo();
+
+            // 1、订单参数
+            OrderKeyBean orderKeyBean = new OrderKeyBean();
+            orderKeyBean.setOrderNumberType(1);
+            orderKeyBean.setMchId(wxPayApiConfig.getMchId());
+            orderKeyBean.setOutTradeNo(orderSn);
+            shippingInfo.setOrderKey(orderKeyBean);
+
+            // 2、物流模式，发货方式枚举值：1、实体物流配送采用快递公司进行实体物流配送形式 2、同城配送 3、虚拟商品，虚拟商品，例如话费充值，点卡等，无实体配送形式 4、用户自提
+            shippingInfo.setLogisticsType(1);
+
+            // 3、发货模式，发货模式枚举值：1、UNIFIED_DELIVERY（统一发货）2、SPLIT_DELIVERY（分拆发货） 示例值: UNIFIED_DELIVERY
+            shippingInfo.setDeliveryMode(1);
+
+            // 4、物流信息列表，发货物流单列表，支持统一发货（单个物流单）和分拆发货（多个物流单）两种模式
+            List<ShippingListBean> shippingList = new ArrayList<>();
+            ShippingListBean shippingListBean = new ShippingListBean();
+            shippingListBean.setTrackingNo(orderInfo.getExpressInfo().getExpressNo());
+            shippingListBean.setExpressCompany(orderInfo.getExpressInfo().getExpressCode());
+            ContactBean contact = new ContactBean();
+            contact.setConsignorContact(orderInfo.getStoreInfo().getPhone());
+            contact.setReceiverContact(orderInfo.getAddress().getMobile());
+            shippingListBean.setContact(contact);
+
+            shippingList.add(shippingListBean);
+            shippingInfo.setShippingList(shippingList);
+
+            // 5、支付者信息
+            PayerBean payerBean = new PayerBean();
+            payerBean.setOpenid(orderInfo.getUserInfo().getOpenId());
+            shippingInfo.setPayer(payerBean);
+
+            try {
+                String reqJson = JsonUtil.toJSONString(shippingInfo);
+                String response = HttpRESTDataClient.requestPostBody(url, reqJson);
+                logger.info("微信上传发货信息接口参数：{}，返回：{}", reqJson, response);
+                JSONObject data = (JSONObject) JSONObject.parse(response);
+                MtUploadShippingLog mtUploadShippingLog = new MtUploadShippingLog();
+                mtUploadShippingLog.setMerchantId(orderInfo.getMerchantId());
+                mtUploadShippingLog.setStoreId(orderInfo.getStoreId());
+                mtUploadShippingLog.setOrderId(orderInfo.getId());
+                mtUploadShippingLog.setOrderSn(orderSn);
+                mtUploadShippingLog.setMobile(orderInfo.getAddress().getMobile());
+                Date time = new Date();
+                mtUploadShippingLog.setCreateTime(time);
+                mtUploadShippingLog.setUpdateTime(time);
+                if (data.get("errcode").toString().equals("0")) {
+                    logger.info("微信上传发货信息接口成功，订单号：", orderSn);
+                    mtUploadShippingLog.setStatus(OrderStatusType.Completed.getVal());
+                } else {
+                    mtUploadShippingLog.setStatus(OrderStatusType.Failed.getVal());
+                }
+                uploadShippingLogMapper.insert(mtUploadShippingLog);
+            } catch (Exception e) {
+                logger.error("微信上传发货信息接口失败：", e.getMessage());
+            }
+        }
     }
 
     /**

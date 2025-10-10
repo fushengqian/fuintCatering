@@ -139,7 +139,7 @@
 
       // 跳转预约详情页
       onTargetDetail(bookId) {
-        this.$navTo('pages/book/detail', { bookId });
+        this.$navTo('subPages/book/detail', { bookId });
       }
     },
 
@@ -149,7 +149,7 @@
     onShareAppMessage() {
       return {
         title: '预约项目',
-        path: "/pages/book/index?" + this.$getShareUrlParams()
+        path: "/subPages/book/index?" + this.$getShareUrlParams()
       }
     },
 
@@ -161,7 +161,7 @@
     onShareTimeline() {
       return {
         title: '预约项目',
-        path: "/pages/book/index?" + this.$getShareUrlParams()
+        path: "/subPages/book/index?" + this.$getShareUrlParams()
       }
     }
 
