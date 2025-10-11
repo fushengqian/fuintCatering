@@ -51,7 +51,7 @@ public class OrderCancelJob {
      * */
     private int OVER_TIME = 720;
 
-    @Scheduled(cron = "${orderCancel.job.time}")
+    @Scheduled(cron = "${orderCancel.job.time:0 0/1 * * * ?}")
     @Transactional(rollbackFor = Exception.class)
     public void dealOrder() throws BusinessCheckException {
         String theSwitch = environment.getProperty("orderCancel.job.switch");

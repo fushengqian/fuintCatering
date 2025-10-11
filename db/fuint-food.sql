@@ -998,6 +998,24 @@ CREATE TABLE `mt_table_area` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='桌码区域表';
 
+/*Table structure for table `mt_upload_shipping_log` */
+
+DROP TABLE IF EXISTS `mt_upload_shipping_log`;
+
+CREATE TABLE `mt_upload_shipping_log` (
+  `ID` int NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `MERCHANT_ID` int DEFAULT '0' COMMENT '所属商户ID',
+  `STORE_ID` int DEFAULT '0' COMMENT '所属店铺ID',
+  `ORDER_ID` int DEFAULT '0' COMMENT '订单ID',
+  `ORDER_SN` varchar(100) DEFAULT '' COMMENT '订单号',
+  `MOBILE` varchar(20) DEFAULT '' COMMENT '手机号',
+  `CREATE_TIME` datetime DEFAULT NULL COMMENT '创建时间',
+  `UPDATE_TIME` datetime DEFAULT NULL COMMENT '更新时间',
+  `OPERATOR` varchar(30) DEFAULT NULL COMMENT '最后操作人',
+  `STATUS` char(1) DEFAULT 'A' COMMENT 'A：完成；B：失败',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='微信小程序上传发货信息记录表';
+
 /*Table structure for table `mt_user` */
 
 DROP TABLE IF EXISTS `mt_user`;

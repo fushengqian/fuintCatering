@@ -50,7 +50,7 @@ public class OrderAutoJob {
      * */
     private int RECEIVED_OVER_TIME = 60 * 24 * 10;
 
-    @Scheduled(cron = "${OrderAutoJob.job.time:0 0/5 * * * ?}")
+    @Scheduled(cron = "${OrderAutoJob.job.time:0 0/3 * * * ?}")
     @Transactional(rollbackFor = Exception.class)
     public void dealOrder() throws BusinessCheckException {
         String theSwitch = environment.getProperty("orderAutoJob.job.switch");
