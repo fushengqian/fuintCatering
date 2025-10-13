@@ -147,20 +147,19 @@ public class BackendStockController extends BaseController {
         Integer storeId = (params.get("storeId") == null || StringUtil.isEmpty(params.get("storeId").toString())) ? 0 : Integer.parseInt(params.get("storeId").toString());
         List<LinkedHashMap> goodsList = (List) params.get("goodsList");
 
-        AccountInfo accountDto = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-
-        Integer myStoreId = accountDto.getStoreId();
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        Integer myStoreId = accountInfo.getStoreId();
         if (myStoreId != null && myStoreId > 0) {
             storeId = myStoreId;
         }
 
         MtStock mtStock = new MtStock();
-        mtStock.setMerchantId(accountDto.getMerchantId());
+        mtStock.setMerchantId(accountInfo.getMerchantId());
         mtStock.setDescription(description);
         mtStock.setStatus(status);
         mtStock.setStoreId(storeId);
         mtStock.setType(type);
-        mtStock.setOperator(accountDto.getAccountName());
+        mtStock.setOperator(accountInfo.getAccountName());
         stockService.addStock(mtStock, goodsList);
 
         return getSuccessResult(true);

@@ -208,6 +208,9 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
         if (reqCouponDto.getType() != null) {
             mtCoupon.setType(reqCouponDto.getType());
         }
+        if (reqCouponDto.getContent() != null) {
+            mtCoupon.setContent(reqCouponDto.getContent());
+        }
         if (reqCouponDto.getName() != null) {
             mtCoupon.setName(CommonUtil.replaceXSS(reqCouponDto.getName()));
         }
@@ -403,13 +406,8 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
                     userCoupon.setOperator(reqCouponDto.getOperator());
                     userCoupon.setImage(couponInfo.getImage());
 
-                    // 12位随机数
-                    StringBuffer code = new StringBuffer();
-                    code.append(SeqUtil.getRandomNumber(4));
-                    code.append(SeqUtil.getRandomNumber(4));
-                    code.append(SeqUtil.getRandomNumber(4));
-                    code.append(SeqUtil.getRandomNumber(4));
-                    userCoupon.setCode(code.toString());
+                    // 16位随机数
+                    userCoupon.setCode(SeqUtil.getRandomNumber(16));
 
                     mtUserCouponMapper.insert(userCoupon);
                 }
@@ -731,13 +729,9 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
                     expireTime = c.getTime();
                     userCoupon.setExpireTime(expireTime);
                 }
-                // 12位随机数
-                StringBuffer code = new StringBuffer();
-                code.append(SeqUtil.getRandomNumber(4));
-                code.append(SeqUtil.getRandomNumber(4));
-                code.append(SeqUtil.getRandomNumber(4));
-                code.append(SeqUtil.getRandomNumber(4));
-                userCoupon.setCode(code.toString());
+                // 16位随机数
+                String code = SeqUtil.getRandomNumber(16);
+                userCoupon.setCode(code);
                 userCoupon.setUuid(uuid);
                 mtUserCouponMapper.insert(userCoupon);
             }

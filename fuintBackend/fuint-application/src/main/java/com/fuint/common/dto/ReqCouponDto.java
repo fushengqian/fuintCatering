@@ -1,9 +1,7 @@
 package com.fuint.common.dto;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -13,8 +11,7 @@ import java.math.BigDecimal;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Getter
-@Setter
+@Data
 public class ReqCouponDto implements Serializable {
 
     @ApiModelProperty("卡券ID")
@@ -31,6 +28,9 @@ public class ReqCouponDto implements Serializable {
 
     @ApiModelProperty("类型")
     private String type;
+
+    @ApiModelProperty("内容")
+    private Integer content;
 
     @ApiModelProperty("名称")
     private String name;
