@@ -144,10 +144,9 @@ public class ClientUserCouponController extends BaseController {
             UserCouponDto result = new UserCouponDto();
             result.setName(couponInfo.getName());
             result.setQrCode(qrCode);
-
+            result.setContent(couponInfo.getContent());
             String baseImage = settingService.getUploadBasePath();
             result.setImage(baseImage + couponInfo.getImage());
-
             result.setId(userCouponId);
             result.setDescription(couponInfo.getDescription());
             result.setCouponId(couponInfo.getId());
