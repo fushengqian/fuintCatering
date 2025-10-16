@@ -10,7 +10,8 @@
                   <view class="name">{{ detail.name ? detail.name : '' }}</view>
                 </view>
                 <view v-if="detail.amount > 0" class="item">
-                  <view class="amount">￥<text class="num">{{ detail.amount }}</text></view>
+                  <view v-if="detail.content == '2'" class="amount"><text class="num">{{ (detail.amount / 10).toFixed(2) }}折</text></view>
+                  <view v-if="detail.content != '2'" class="amount">￥<text class="num">{{ detail.amount }}</text></view>
                 </view>
             </view>
         </view>

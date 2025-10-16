@@ -192,11 +192,13 @@
               <scroll-view :scroll-y="true" style="height: 565rpx;">
                 <view class="coupon-item" v-for="(item, index) in couponList" :key="index">
                   <view class="item-wrapper"
+                    v-if="item.status == 'A'"
                     :class="[item.status == 'A' ? 'color-default': 'color-gray']"
                     @click="handleSelectCoupon(index)">
                     <view class="coupon-type">{{ item.type }}</view>
                     <view class="tip dis-flex flex-dir-column flex-x-center">
-                      <text class="money">￥{{ item.amount }}</text>
+                      <text class="money" v-if="item.content != '2'">￥{{ item.amount }}</text>
+                      <text class="money" v-if="item.content == '2'">{{ (item.amount / 10).toFixed(2) }}折</text>
                       <text class="pay-line">{{ item.description }}</text>
                     </view>
                     <view class="split-line"></view>
@@ -551,6 +553,7 @@
         SettlementApi.submit(0, "", "goods", app.remark, 0, app.usePoint, app.selectCouponId, app.options.cartIds, app.options.goodsId, app.options.skuId, app.options.buyNum, orderMode, payType, peopleNum)
           .then(result => {
               app.onSubmitCallback(result);
+              uni.setStorageSync('peopleNum', 0);
           })
           .catch(err => {
             if (err.result) {

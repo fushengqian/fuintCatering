@@ -296,6 +296,7 @@ CREATE TABLE `mt_coupon` (
   `STORE_ID` int DEFAULT '0' COMMENT '店铺ID',
   `GROUP_ID` int NOT NULL DEFAULT '0' COMMENT '券组ID',
   `TYPE` char(1) DEFAULT 'C' COMMENT '券类型，C优惠券；P预存卡；T集次卡',
+  `CONTENT` int DEFAULT '1' COMMENT '内容，如：1表示满减券、2表示折扣券',
   `NAME` varchar(100) NOT NULL DEFAULT '' COMMENT '券名称',
   `IS_GIVE` tinyint(1) DEFAULT '0' COMMENT '是否允许转赠',
   `GRADE_IDS` varchar(100) DEFAULT '' COMMENT '适用会员等级',

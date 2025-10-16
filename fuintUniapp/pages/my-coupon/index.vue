@@ -31,7 +31,11 @@
                                 <text>{{ item.effectiveDate }}</text>
                               </view>
                               <view class="desc_footer">
-                                <text v-if="item.type == 'C' || item.type == 'P'" class="price_x">¥{{ item.amount }}</text>
+                                 <view v-if="item.type == 'C'"> 
+                                    <text v-if="item.content == '1'" class="price_x">¥{{ item.amount }}</text>
+                                    <text v-if="item.content == '2'" class="price_x">{{ (item.amount / 10).toFixed(2) }} 折</text>
+                                 </view>
+                                <text v-if="item.type == 'P'" class="price_x">¥{{ item.amount }}</text>
                                 <text v-if="item.type == 'T'" class="price_x">{{ item.amount }}次卡</text>
                               </view>
                           </view>
