@@ -96,8 +96,8 @@
         <text class="flex-five">使用卡券抵扣：</text>
         <view class="flex-five t-r">
           <view v-if="couponList.length > 0" @click="handleShowPopup()">
-            <text class="col-m" v-if="useCouponInfo">-￥{{ useCouponInfo.amount }}</text>
-            <text class="col-m" v-else>共有卡券{{ couponList.length }}张</text>
+            <text class="col-m" v-if="couponAmount">-￥{{ couponAmount }}</text>
+            <text class="col-m" v-else>可用卡券{{ couponList.length }}张</text>
             <text class="right-arrow iconfont icon-arrow-right"></text>
           </view>
           <text v-else class="">无卡券可用</text>
@@ -310,6 +310,7 @@
         selectCouponId: 0,
         myPoint: 0,
         usePoint: 0,
+        couponAmount: 0,
         usePointAmount: 0.00,
         // 是否使用积分抵扣
         isUsePoints: true,
@@ -385,6 +386,7 @@
               }
               app.usePointAmount = result.data.usePointAmount;
               app.memberDiscount = result.data.memberDiscount ? result.data.memberDiscount : 0;
+              app.couponAmount = result.data.couponAmount ? result.data.couponAmount : 0;
               resolve(result);
             })
             .catch(err => reject(err))
