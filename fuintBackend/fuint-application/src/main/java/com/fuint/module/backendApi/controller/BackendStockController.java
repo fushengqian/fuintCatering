@@ -3,6 +3,7 @@ package com.fuint.module.backendApi.controller;
 import com.fuint.common.Constants;
 import com.fuint.common.dto.AccountInfo;
 import com.fuint.common.dto.GoodsDto;
+import com.fuint.common.dto.StockGoodsDto;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.service.*;
 import com.fuint.common.util.CommonUtil;
@@ -145,7 +146,7 @@ public class BackendStockController extends BaseController {
         String description = params.get("description") == null ? "" : CommonUtil.replaceXSS(params.get("description").toString());
         String status = params.get("status") == null ? StatusEnum.ENABLED.getKey() : params.get("status").toString();
         Integer storeId = (params.get("storeId") == null || StringUtil.isEmpty(params.get("storeId").toString())) ? 0 : Integer.parseInt(params.get("storeId").toString());
-        List<LinkedHashMap> goodsList = (List) params.get("goodsList");
+        List<StockGoodsDto> goodsList = (List) params.get("goodsList");
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         Integer myStoreId = accountInfo.getStoreId();

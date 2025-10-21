@@ -4,11 +4,11 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * 商户表
@@ -16,8 +16,7 @@ import lombok.Setter;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Getter
-@Setter
+@Data
 @TableName("mt_merchant")
 @ApiModel(value = "MtMerchant对象", description = "商户表")
 public class MtMerchant implements Serializable {
@@ -42,6 +41,9 @@ public class MtMerchant implements Serializable {
 
     @ApiModelProperty("微信公众号秘钥")
     private String wxOfficialAppSecret;
+
+    @ApiModelProperty(value="结算比例")
+    private BigDecimal settleRate;
 
     @ApiModelProperty("商户号")
     private String no;

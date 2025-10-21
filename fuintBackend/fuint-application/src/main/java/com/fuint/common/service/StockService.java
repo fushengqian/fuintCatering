@@ -1,13 +1,13 @@
 package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.fuint.common.dto.StockGoodsDto;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtStock;
 import com.fuint.repository.model.MtStockItem;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +34,7 @@ public interface StockService extends IService<MtStock> {
      * @param goodsList
      * @throws BusinessCheckException
      */
-    ResponseObject addStock(MtStock mtStock, List<LinkedHashMap> goodsList) throws BusinessCheckException;
+    ResponseObject addStock(MtStock mtStock, List<StockGoodsDto> goodsList) throws BusinessCheckException;
 
     /**
      * 删除库存管理记录

@@ -12,6 +12,7 @@
           <view class="item-top" @click="handleTargetDetail(item.id)">
             <view class="item-top-left">
               <text class="order-type">{{ item.typeName }}</text>
+              <text class="table-info" v-if="item.tableInfo">桌码：{{ item.tableInfo.code }}</text>
             </view>
             <view class="item-top-right">
               <text :class="item.status">{{ item.statusText }}</text>
@@ -271,6 +272,10 @@
     .order-type {
       font-weight: bold;
       margin-left: 20rpx;
+    }
+    
+    .table-info {
+       margin-left: 50rpx;
     }
 
     .state-text {
