@@ -250,7 +250,7 @@ public class BackendGoodsController extends BaseController {
         result.put("specData", specArr);
         result.put("skuData", skuArr);
 
-        List<MtGoodsCate> cateList = cateService.getCateList(accountInfo.getMerchantId(), null, null, StatusEnum.ENABLED.getKey());
+        List<MtGoodsCate> cateList = cateService.getCateList(accountInfo.getMerchantId(), storeId, null, StatusEnum.ENABLED.getKey());
         result.put("cateList", cateList);
         result.put("imagePath", settingService.getUploadBasePath());
 

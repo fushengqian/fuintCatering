@@ -32,7 +32,10 @@
     </select>
 
     <select id="getActiveStoreList" resultType="com.fuint.repository.model.MtStore">
-        select * from mt_store t where t.MERCHANT_ID = #{merchantId} and t.STATUS = 'A'
+        select * from mt_store t where t.STATUS = 'A'
+        <if test="merchantId != null and merchantId != ''">
+            AND t.MERCHANT_ID = #{merchantId}
+        </if>
         <if test="storeId != null and storeId != ''">
             AND t.ID = #{storeId}
         </if>

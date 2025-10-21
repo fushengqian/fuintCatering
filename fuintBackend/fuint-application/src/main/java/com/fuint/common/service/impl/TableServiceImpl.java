@@ -192,6 +192,10 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
         if (table == null) {
             throw new BusinessCheckException("该桌码状态异常");
         }
+        MtTable tableInfo = queryTableByCode(mtTable.getStoreId(), mtTable.getCode());
+        if (tableInfo != null && !table.getId().equals(tableInfo.getId())) {
+            throw new BusinessCheckException("桌码已经存在，更新失败");
+        }
         if (mtTable.getCode() != null) {
             table.setCode(mtTable.getCode());
         }
