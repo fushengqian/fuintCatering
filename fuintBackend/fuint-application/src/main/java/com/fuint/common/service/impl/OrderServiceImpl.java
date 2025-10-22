@@ -729,8 +729,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 mtOrderAddressMapper.insert(orderAddress);
             }
         }
-
-        return orderInfo;
+        return mtOrderMapper.selectById(mtOrder.getId());
     }
 
     /**
@@ -1124,7 +1123,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                                         updateOrder(orderDto);
                                     }
                                 }
-                            } else if(couponInfo.getType().equals(CouponTypeEnum.PRESTORE.getKey())) {
+                            } else if (couponInfo.getType().equals(CouponTypeEnum.PRESTORE.getKey())) {
                                 // 储值卡，减去余额
                                 BigDecimal useCouponAmount = userCouponInfo.getBalance();
                                 if (orderInfo.getPayAmount().compareTo(userCouponInfo.getBalance()) <= 0) {

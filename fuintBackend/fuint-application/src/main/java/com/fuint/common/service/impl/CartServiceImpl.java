@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.service.CartService;
+import com.fuint.common.service.TableService;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.repository.mapper.MtCartMapper;
@@ -12,8 +13,10 @@ import com.fuint.repository.mapper.MtGoodsSkuMapper;
 import com.fuint.repository.model.MtCart;
 import com.fuint.repository.model.MtGoods;
 import com.fuint.repository.model.MtGoodsSku;
+import com.fuint.repository.model.MtTable;
 import com.fuint.utils.StringUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
@@ -29,7 +32,7 @@ import java.util.Map;
  * CopyRight https://www.fuint.cn
  */
 @Service
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_= {@Lazy})
 public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implements CartService {
 
     private MtCartMapper mtCartMapper;
@@ -37,6 +40,11 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
     private MtGoodsMapper mtGoodsMapper;
 
     private MtGoodsSkuMapper mtGoodsSkuMapper;
+
+    /**
+     * 桌码服务接口
+     */
+    private TableService tableService;
 
     /**
      * 切换购物车给会员
@@ -270,31 +278,31 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
         LambdaQueryWrapper<MtCart> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(MtCart::getStatus, status);
 
-        if (StringUtil.isNotEmpty(userId)) {
+        if (StringUtil.isNotBlank(userId)) {
             lambdaQueryWrapper.eq(MtCart::getUserId, userId);
         }
-        if (StringUtil.isNotEmpty(ids)) {
+        if (StringUtil.isNotBlank(ids)) {
             List<String> idList = Arrays.asList(ids.split(","));
             lambdaQueryWrapper.in(MtCart::getId, idList);
             if (StringUtil.isNotEmpty(hangNo)) {
                 lambdaQueryWrapper.eq(MtCart::getHangNo, hangNo);
             }
-        } else {
+        } else if (StringUtil.isBlank(tableId)) {
             lambdaQueryWrapper.eq(MtCart::getHangNo, hangNo);
         }
-        if (StringUtil.isNotEmpty(goodsId)) {
+        if (StringUtil.isNotBlank(goodsId)) {
             lambdaQueryWrapper.eq(MtCart::getGoodsId, goodsId);
         }
-        if (StringUtil.isNotEmpty(merchantId) && Integer.parseInt(merchantId) > 0) {
+        if (StringUtil.isNotBlank(merchantId) && Integer.parseInt(merchantId) > 0) {
             lambdaQueryWrapper.eq(MtCart::getMerchantId, merchantId);
         }
-        if (StringUtil.isNotEmpty(storeId) && Integer.parseInt(storeId) > 0) {
+        if (StringUtil.isNotBlank(storeId) && Integer.parseInt(storeId) > 0) {
             lambdaQueryWrapper.eq(MtCart::getStoreId, storeId);
         }
-        if (StringUtil.isNotEmpty(tableId) && Integer.parseInt(tableId) > 0) {
+        if (StringUtil.isNotBlank(tableId) && Integer.parseInt(tableId) > 0) {
             lambdaQueryWrapper.eq(MtCart::getTableId, tableId);
         }
-        if (StringUtil.isNotEmpty(skuId)) {
+        if (StringUtil.isNotBlank(skuId)) {
             lambdaQueryWrapper.eq(MtCart::getSkuId, skuId);
         }
 
@@ -314,6 +322,12 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
     @Transactional(rollbackFor = Exception.class)
     public MtCart setHangNo(Integer cartId, String hangNo, String isVisitor) throws BusinessCheckException {
         MtCart mtCart = mtCartMapper.selectById(cartId);
+        if (mtCart.getTableId() == null || mtCart.getTableId() <= 0) {
+            MtTable mtTable = tableService.queryTableByCode(mtCart.getStoreId(), hangNo);
+            if (mtTable != null) {
+                mtCart.setTableId(mtTable.getId());
+            }
+        }
         if (mtCart != null) {
             mtCart.setHangNo(hangNo);
             mtCart.setUpdateTime(new Date());

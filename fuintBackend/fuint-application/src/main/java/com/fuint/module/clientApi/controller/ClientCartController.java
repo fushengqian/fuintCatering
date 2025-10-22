@@ -153,7 +153,12 @@ public class ClientCartController extends BaseController {
         if (storeId <= 0 && mtUser.getStoreId() != null) {
             storeId = mtUser.getStoreId();
         }
-
+        if (StringUtil.isNotBlank(hangNo) && tableId <= 0) {
+            MtTable mtTable = tableService.queryTableByCode(storeId, hangNo);
+            if (mtTable != null && mtTable.getStoreId() > 0) {
+                tableId = mtTable.getId();
+            }
+        }
         MtCart mtCart = new MtCart();
         mtCart.setGoodsId(goodsId);
         mtCart.setUserId(mtUser.getId());
