@@ -103,6 +103,7 @@ public class ClientCartController extends BaseController {
             MtTable mtTable = tableService.queryTableById(tableId);
             if (mtTable != null && mtTable.getStoreId() > 0) {
                 storeId = mtTable.getStoreId();
+                hangNo = mtTable.getCode();
             }
         }
         if (mtUser == null && StringUtil.isNotEmpty(request.getHeader("Access-Token"))) {
