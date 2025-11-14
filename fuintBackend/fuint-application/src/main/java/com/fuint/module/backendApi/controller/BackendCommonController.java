@@ -15,6 +15,8 @@ import com.fuint.repository.model.MtTable;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +35,8 @@ import java.util.Map;
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/common")
 public class BackendCommonController extends BaseController {
+
+    private static final Logger logger = LoggerFactory.getLogger(BackendCommonController.class);
 
     private Environment env;
 
@@ -96,6 +100,7 @@ public class BackendCommonController extends BaseController {
                 merchantId = mtCoupon.getMerchantId();
             }
         }
+
         String h5QrCode = "";
         String h5Page = env.getProperty("website.url") + "#" + page;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -103,9 +108,14 @@ public class BackendCommonController extends BaseController {
         h5QrCode = new String(Base64Util.baseEncode(out.toByteArray()), "UTF-8");
         h5QrCode = "data:image/jpg;base64," + h5QrCode;
 
-        String imagePath = settingService.getUploadBasePath();
-        String minAppQrCode = weixinService.createQrCode(merchantId, type, id, page, 320);
-        minAppQrCode = imagePath + minAppQrCode;
+        String minAppQrCode = "";
+        try {
+            String imagePath = settingService.getUploadBasePath();
+            minAppQrCode = weixinService.createQrCode(merchantId, type, id, page, 320);
+            minAppQrCode = imagePath + minAppQrCode;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
 
         Map<String, Object> result = new HashMap<>();
         result.put("minAppQrCode", minAppQrCode);
