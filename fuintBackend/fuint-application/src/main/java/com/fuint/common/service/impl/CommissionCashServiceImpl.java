@@ -7,6 +7,7 @@ import com.fuint.common.dto.OrderUserDto;
 import com.fuint.common.enums.*;
 import com.fuint.common.service.*;
 import com.fuint.common.util.CommonUtil;
+import com.fuint.common.util.SeqUtil;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
@@ -209,7 +210,7 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
         List<MtCommissionLog> commissionLogList = mtCommissionLogMapper.selectList(lambdaQueryWrapper);
         List<String> staffIds = new ArrayList<>();
         List<String> userIds = new ArrayList<>();
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+        String uuid = SeqUtil.getUUID();
         if (commissionLogList != null && commissionLogList.size() > 0) {
             for (MtCommissionLog mtCommissionLog : commissionLogList) {
                  if (mtCommissionLog.getStaffId() != null && mtCommissionLog.getStaffId() > 0 && !staffIds.contains(CommissionTargetEnum.STAFF.getKey() + mtCommissionLog.getStaffId())) {

@@ -5,8 +5,10 @@ import com.fuint.common.dto.*;
 import com.fuint.common.enums.CouponTypeEnum;
 import com.fuint.common.enums.CouponUseForEnum;
 import com.fuint.common.enums.StatusEnum;
+import com.fuint.common.param.SendCouponParam;
 import com.fuint.common.service.*;
 import com.fuint.common.util.PhoneFormatCheckUtils;
+import com.fuint.common.util.SeqUtil;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
@@ -330,17 +332,16 @@ public class BackendCouponController extends BaseController {
      * 发放卡券
      */
     @ApiOperation(value = "发放卡券")
-    @RequestMapping(value = "/sendCoupon", method = RequestMethod.GET)
+    @RequestMapping(value = "/sendCoupon", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:coupon:index')")
-    public ResponseObject sendCoupon(HttpServletRequest request) throws BusinessCheckException {
-        String mobile = request.getParameter("mobile");
-        String num = request.getParameter("num");
-        String couponId = request.getParameter("couponId");
-        String userIds = request.getParameter("userIds");
-        String object = request.getParameter("object");
+    public ResponseObject sendCoupon(HttpServletRequest request, @RequestBody SendCouponParam param) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-
+        String mobile = param.getMobile();
+        String num = param.getNum();
+        String couponId = param.getCouponId();
+        String userIds = param.getUserIds();
+        String object = param.getObject();
         if (couponId == null) {
             return getFailureResult(201, "系统参数有误");
         }
@@ -354,8 +355,6 @@ public class BackendCouponController extends BaseController {
         if (Integer.parseInt(num) > 100) {
             return getFailureResult(201, "发放数量最多为100");
         }
-        // 导入批次
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         List<Integer> userIdList = new ArrayList<>();
         if (StringUtil.isNotEmpty(mobile)) {
             MtUser mtUser = memberService.queryMemberByMobile(accountInfo.getMerchantId(), mobile);
@@ -377,7 +376,7 @@ public class BackendCouponController extends BaseController {
             return getFailureResult(201, "系统参数有误");
         }
 
-        couponService.batchSendCoupon(Integer.parseInt(couponId), userIdList, Integer.parseInt(num), uuid, accountInfo.getAccountName());
+        couponService.batchSendCoupon(Integer.parseInt(couponId), userIdList, Integer.parseInt(num), SeqUtil.getUUID(), accountInfo.getAccountName());
         return getSuccessResult(true);
     }
 }

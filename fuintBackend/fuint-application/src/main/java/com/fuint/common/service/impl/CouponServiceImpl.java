@@ -358,7 +358,7 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
                 total = mtCoupon.getTotal();
             }
             if (total > 0) {
-                String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+                String uuid = SeqUtil.getUUID();
                 for (int i = 1; i <= total; i++) {
                     MtUserCoupon userCoupon = new MtUserCoupon();
                     userCoupon.setMerchantId(mtCoupon.getMerchantId());
