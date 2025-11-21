@@ -211,6 +211,9 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
         if (mtTable.getStatus() != null) {
             table.setStatus(mtTable.getStatus());
         }
+        if (mtTable.getUseStatus() != null) {
+            table.setUseStatus(mtTable.getUseStatus());
+        }
         if (mtTable.getSort() != null) {
             table.setSort(mtTable.getSort());
         }

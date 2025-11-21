@@ -1,6 +1,7 @@
 package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.dto.AccountInfo;
+import com.fuint.common.enums.TableUseStatusEnum;
 import com.fuint.common.service.SettingService;
 import com.fuint.common.service.StoreService;
 import com.fuint.common.service.TableService;
@@ -137,6 +138,7 @@ public class BackendTableController extends BaseController {
         String code = params.get("code") == null ? "" : params.get("code").toString();
         String description = params.get("description") == null ? "" : params.get("description").toString();
         String maxPeople = params.get("maxPeople") == null ? "0" : params.get("maxPeople").toString();
+        String useStatus = params.get("useStatus") == null ? TableUseStatusEnum.NORMAL.getKey() : params.get("useStatus").toString();
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         MtTable mtTable = new MtTable();
@@ -148,6 +150,7 @@ public class BackendTableController extends BaseController {
         mtTable.setCode(code);
         mtTable.setDescription(description);
         mtTable.setMaxPeople(Integer.parseInt(maxPeople));
+        mtTable.setUseStatus(useStatus);
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() < 1) {
             return getFailureResult(201, "平台方账户无操作权限");
         }

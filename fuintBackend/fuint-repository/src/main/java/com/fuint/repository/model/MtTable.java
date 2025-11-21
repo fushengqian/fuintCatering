@@ -46,6 +46,9 @@ public class MtTable implements Serializable {
     @ApiModelProperty("备注信息")
     private String description;
 
+    @ApiModelProperty("使用状态")
+    private String useStatus;
+
     @ApiModelProperty("创建时间")
     private Date createTime;
 

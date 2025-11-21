@@ -22,6 +22,9 @@ public class TableParam implements Serializable {
     @ApiModelProperty(value="区域ID", name="areaId")
     private Integer areaId;
 
+    @ApiModelProperty(value="使用状态", name="useStatus")
+    private String useStatus;
+
     @ApiModelProperty(value="会员手机号", name="mobile")
     private String mobile;
 
