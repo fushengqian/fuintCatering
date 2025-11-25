@@ -407,16 +407,22 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
         Integer i = mtCommissionCashMapper.updateById(mtCommissionCash);
         if (i > 0 && mtCommissionCash.getUserId() != null) {
             MtUser mtUser = memberService.queryMemberById(mtCommissionCash.getUserId());
+            if (mtCommissionCash.getStaffId() != null && mtCommissionCash.getStaffId() > 0) {
+                MtStaff mtStaff = staffService.queryStaffById(mtCommissionCash.getStaffId());
+                mtUser = memberService.queryMemberByMobile(mtCommissionCash.getMerchantId(), mtStaff.getMobile());
+            }
             if (mtUser != null) {
                 MtBalance mtBalance = new MtBalance();
                 mtBalance.setMerchantId(mtCommissionCash.getMerchantId());
                 mtBalance.setStoreId(mtCommissionCash.getStoreId());
-                mtBalance.setUserId(mtCommissionCash.getUserId());
+                mtBalance.setUserId(mtUser.getId());
                 mtBalance.setAmount(amount);
                 mtBalance.setStatus(StatusEnum.ENABLED.getKey());
                 mtBalance.setMobile(mtUser.getMobile());
                 mtBalance.setDescription("发放分享佣金");
                 balanceService.addBalance(mtBalance, true);
+            }  else {
+                throw new BusinessCheckException("付款失败，未找到会员信息");
             }
         }
     }
