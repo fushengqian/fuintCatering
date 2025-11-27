@@ -138,7 +138,7 @@ public class BackendTableController extends BaseController {
         String code = params.get("code") == null ? "" : params.get("code").toString();
         String description = params.get("description") == null ? "" : params.get("description").toString();
         String maxPeople = params.get("maxPeople") == null ? "0" : params.get("maxPeople").toString();
-        String useStatus = params.get("useStatus") == null ? TableUseStatusEnum.NORMAL.getKey() : params.get("useStatus").toString();
+        String useStatus = params.get("useStatus") == null ? TableUseStatusEnum.AVAILABLE.getKey() : params.get("useStatus").toString();
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         MtTable mtTable = new MtTable();

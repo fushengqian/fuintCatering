@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
  */
 public enum TableUseStatusEnum {
 
-    NORMAL("A", "未开台"),
-    SETTLED("B", "已开台"),
-    CANCEL("C", "就餐中");
+    AVAILABLE("A", "未开台"),
+    TAKEN("B", "已开台"),
+    DURING("C", "就餐中");
 
     private String key;
 
