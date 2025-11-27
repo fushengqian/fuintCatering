@@ -238,13 +238,18 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
         String storeId =  params.get("storeId") == null ? "" : params.get("storeId").toString();
         String merchantId =  params.get("merchantId") == null ? "" : params.get("merchantId").toString();
         String code =  params.get("code") == null ? "" : params.get("code").toString();
+        String useStatus =  params.get("useStatus") == null ? "" : params.get("useStatus").toString();
 
         LambdaQueryWrapper<MtTable> lambdaQueryWrapper = Wrappers.lambdaQuery();
+        lambdaQueryWrapper.ne(MtTable::getStatus, StatusEnum.DISABLE.getKey());
         if (StringUtils.isNotBlank(code)) {
             lambdaQueryWrapper.eq(MtTable::getCode, code);
         }
         if (StringUtils.isNotBlank(status)) {
             lambdaQueryWrapper.eq(MtTable::getStatus, status);
+        }
+        if (StringUtils.isNotBlank(useStatus)) {
+            lambdaQueryWrapper.eq(MtTable::getUseStatus, useStatus);
         }
         if (StringUtils.isNotBlank(merchantId)) {
             lambdaQueryWrapper.eq(MtTable::getMerchantId, merchantId);
