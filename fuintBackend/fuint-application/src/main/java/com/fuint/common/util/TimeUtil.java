@@ -2,6 +2,8 @@ package com.fuint.common.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -28,6 +30,50 @@ public class TimeUtil {
      */
     private static final DateTimeFormatter DATE_TIME_FORMATTER1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter DATE_TIME_FORMATTER2 = DateTimeFormatter.ofPattern("MM-dd");
+
+    /**
+     * 计算用餐使用时长，并返回格式化字符串（如 "1天2小时30分钟"）
+     *
+     * @param startTime 用餐开始时间（Date）
+     * @param endTime   用餐结束时间（Date）
+     * @return 格式化后的时长字符串，如 "1小时30分"、"2天5小时"
+     * @throws IllegalArgumentException 如果参数为 null 或结束时间早于开始时间
+     */
+    public static String getMealTime(Date startTime, Date endTime) {
+        if (startTime == null || endTime == null) {
+            return "";
+        }
+        if (endTime.before(startTime)) {
+            return "";
+        }
+        // 转换为 Instant 并计算 Duration
+        Instant start = startTime.toInstant();
+        Instant end = endTime.toInstant();
+        Duration duration = Duration.between(start, end);
+        long seconds = duration.getSeconds(); // 总秒数
+        if (seconds == 0) {
+            return "0秒";
+        }
+        long days = seconds / 86400;         // 1天 = 86400秒
+        long hours = (seconds % 86400) / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long secs = seconds % 60;
+        StringBuilder sb = new StringBuilder();
+        if (days > 0) {
+            sb.append(days).append("天");
+        }
+        if (hours > 0) {
+            sb.append(hours).append("小时");
+        }
+        if (minutes > 0) {
+            sb.append(minutes).append("分钟");
+        }
+        if (secs > 0 && sb.length() == 0) {
+            // 如果前面都是0（比如只用了30秒），则显示秒
+            sb.append(secs).append("秒");
+        }
+        return sb.toString();
+    }
 
     public static String showTime(Date now, Date targetDate) {
         String showTime = "";

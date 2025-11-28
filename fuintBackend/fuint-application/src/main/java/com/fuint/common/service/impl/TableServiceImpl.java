@@ -12,6 +12,7 @@ import com.fuint.common.service.CartService;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.OrderService;
 import com.fuint.common.util.DateUtil;
+import com.fuint.common.util.TimeUtil;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
@@ -214,6 +215,9 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
         if (mtTable.getUseStatus() != null) {
             table.setUseStatus(mtTable.getUseStatus());
         }
+        if (mtTable.getUpdateTime() != null && table.getUseTime() == null) {
+            table.setUseTime(mtTable.getUpdateTime());
+        }
         if (mtTable.getSort() != null) {
             table.setSort(mtTable.getSort());
         }
@@ -297,6 +301,8 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
                 dto.setDateTime(dateTime);
                 dto.setIsEmpty(false);
             }
+            dto.setTableInfo(mtTable);
+            dto.setUseTime(TimeUtil.getMealTime(mtTable.getUseTime(), new Date()));
             dto.setHangNo(hangNo);
             dataList.add(dto);
         }

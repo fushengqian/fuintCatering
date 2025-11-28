@@ -324,9 +324,9 @@ public class BackendCashierController extends BaseController {
     }
 
     /**
-     * 获取挂单列表
+     * 获取桌台列表
      */
-    @ApiOperation(value = "获取挂单列表")
+    @ApiOperation(value = "获取桌台列表")
     @RequestMapping(value = "/getHangUpList", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")

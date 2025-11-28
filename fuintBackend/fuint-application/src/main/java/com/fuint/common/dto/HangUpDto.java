@@ -34,6 +34,9 @@ public class HangUpDto {
     @ApiModelProperty("时间")
     private String dateTime;
 
+    @ApiModelProperty("使用时长")
+    private String useTime;
+
     @ApiModelProperty("桌台")
     private MtTable tableInfo;
 
