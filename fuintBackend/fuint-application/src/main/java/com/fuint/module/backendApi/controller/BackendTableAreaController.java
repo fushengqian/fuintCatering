@@ -122,7 +122,7 @@ public class BackendTableAreaController extends BaseController {
     @PreAuthorize("@pms.hasPermission('tableArea:add')")
     public ResponseObject saveHandler(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
         String id = params.get("id") == null ? "" : params.get("id").toString();
-        String status = params.get("status") == null ? "" : params.get("status").toString();
+        String status = params.get("status") == null ? StatusEnum.ENABLED.getKey() : params.get("status").toString();
         String storeId = params.get("storeId") == null ? "0" : params.get("storeId").toString();
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));

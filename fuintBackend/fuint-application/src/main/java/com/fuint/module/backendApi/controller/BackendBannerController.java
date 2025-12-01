@@ -145,7 +145,7 @@ public class BackendBannerController extends BaseController {
         String description = params.get("description") == null ? "" : params.get("description").toString();
         String image = params.get("image") == null ? "" : params.get("image").toString();
         String url = params.get("url") == null ? "" : params.get("url").toString();
-        String status = params.get("status") == null ? "" : params.get("status").toString();
+        String status = params.get("status") == null ? StatusEnum.ENABLED.getKey() : params.get("status").toString();
         String storeId = params.get("storeId") == null ? "0" : params.get("storeId").toString();
         String sort = params.get("sort") == null ? "0" : params.get("sort").toString();
         String position = params.get("position") == null ? "" : params.get("position").toString();

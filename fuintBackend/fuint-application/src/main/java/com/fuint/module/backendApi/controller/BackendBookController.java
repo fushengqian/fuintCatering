@@ -2,6 +2,7 @@ package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.dto.AccountInfo;
 import com.fuint.common.dto.BookDto;
+import com.fuint.common.enums.BookStatusEnum;
 import com.fuint.common.service.BookCateService;
 import com.fuint.common.service.BookService;
 import com.fuint.common.service.StoreService;
@@ -160,17 +161,15 @@ public class BackendBookController extends BaseController {
         String name = params.get("name") == null ? "" : params.get("name").toString();
         String description = params.get("description") == null ? "" : params.get("description").toString();
         String logo = params.get("logo") == null ? "" : params.get("logo").toString();
-        String status = params.get("status") == null ? "" : params.get("status").toString();
+        String status = params.get("status") == null ? BookStatusEnum.CREATED.getKey() : params.get("status").toString();
         String storeId = (params.get("storeId") == null || StringUtil.isEmpty(params.get("storeId").toString())) ? "0" : params.get("storeId").toString();
         String sort = (params.get("sort") == null || StringUtil.isEmpty(params.get("sort").toString())) ? "0" : params.get("sort").toString();
         String dates = params.get("dates") == null ? "" : params.get("dates").toString();
         List<LinkedHashMap> times = params.get("times") == null ? new ArrayList<>() : (List) params.get("times");
-
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() < 1) {
             throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
         }
-
         MtBook mtBook = new MtBook();
         mtBook.setName(name);
         mtBook.setDescription(description);
