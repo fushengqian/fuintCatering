@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.HangUpDto;
-import com.fuint.common.enums.OrderModeEnum;
-import com.fuint.common.enums.PlatformTypeEnum;
-import com.fuint.common.enums.YesOrNoEnum;
+import com.fuint.common.enums.*;
 import com.fuint.common.param.TableParam;
 import com.fuint.common.service.CartService;
 import com.fuint.common.service.MemberService;
@@ -20,7 +18,6 @@ import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtCart;
 import com.fuint.repository.model.MtTable;
 import com.fuint.common.service.TableService;
-import com.fuint.common.enums.StatusEnum;
 import com.fuint.repository.mapper.MtTableMapper;
 import com.fuint.repository.model.MtUser;
 import com.github.pagehelper.PageHelper;
@@ -286,7 +283,7 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
             param.put("storeId", tableParam.getStoreId());
             List<MtCart> cartList = cartService.queryCartListByParams(param);
             HangUpDto dto = new HangUpDto();
-            dto.setIsEmpty(true);
+            dto.setIsEmpty(false);
             if (cartList.size() > 0) {
                 Integer userId = cartList.get(0).getUserId();
                 String isVisitor = cartList.get(0).getIsVisitor();
@@ -299,9 +296,11 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
                 }
                 String dateTime = DateUtil.formatDate(cartList.get(0).getUpdateTime(), "yyyy-MM-dd HH:mm:ss");
                 dto.setDateTime(dateTime);
-                dto.setIsEmpty(false);
             }
             dto.setTableInfo(mtTable);
+            if (mtTable.getUseStatus().equals(TableUseStatusEnum.AVAILABLE.getKey())) {
+                dto.setIsEmpty(true);
+            }
             dto.setUseTime(TimeUtil.getMealTime(mtTable.getUseTime(), new Date()));
             dto.setHangNo(hangNo);
             dataList.add(dto);
