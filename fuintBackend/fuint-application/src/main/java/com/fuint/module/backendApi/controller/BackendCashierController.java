@@ -4,6 +4,7 @@ import com.fuint.common.Constants;
 import com.fuint.common.dto.*;
 import com.fuint.common.enums.PlatformTypeEnum;
 import com.fuint.common.enums.StatusEnum;
+import com.fuint.common.enums.TableUseStatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.param.TableParam;
 import com.fuint.common.service.*;
@@ -298,7 +299,7 @@ public class BackendCashierController extends BaseController {
     @PreAuthorize("@pms.hasPermission('cashier:index')")
     public ResponseObject doHangUp(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
         String cartIds = param.get("cartIds") == null ? "" : param.get("cartIds").toString();
-        String hangNo = param.get("hangNo") == null ? "" : param.get("hangNo").toString();
+        String tableId = param.get("tableId") == null ? "" : param.get("tableId").toString();
         String userId = param.get("userId") == null ? "" : param.get("userId").toString();
 
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
@@ -315,7 +316,7 @@ public class BackendCashierController extends BaseController {
             String[] ids = cartIds.split(",");
             if (ids.length > 0) {
                 for (int i = 0; i < ids.length; i++) {
-                     cartService.setHangNo(Integer.parseInt(ids[i]), hangNo, isVisitor);
+                     cartService.setTableId(Integer.parseInt(ids[i]), Integer.parseInt(tableId), isVisitor);
                 }
             }
         }
@@ -324,9 +325,9 @@ public class BackendCashierController extends BaseController {
     }
 
     /**
-     * 获取桌台列表
+     * 获取挂单列表
      */
-    @ApiOperation(value = "获取桌台列表")
+    @ApiOperation(value = "获取挂单列表")
     @RequestMapping(value = "/getHangUpList", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
@@ -338,7 +339,42 @@ public class BackendCashierController extends BaseController {
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
             tableParam.setStoreId(accountInfo.getStoreId());
         }
-        List<HangUpDto> tableList = tableService.getActiveTableList(tableParam);
+        List<HangUpDto> tableList = tableService.getHangUpList(tableParam);
         return getSuccessResult(tableList);
+    }
+
+    /**
+     * 获取桌台列表
+     */
+    @ApiOperation(value = "获取桌台列表")
+    @RequestMapping(value = "/getTableList", method = RequestMethod.GET)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('cashier:index')")
+    public ResponseObject getTableList(HttpServletRequest request, TableParam tableParam) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+            tableParam.setMerchantId(accountInfo.getMerchantId());
+        }
+        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
+            tableParam.setStoreId(accountInfo.getStoreId());
+        }
+        List<TableDto> tableList = tableService.getTableList(tableParam);
+        return getSuccessResult(tableList);
+    }
+
+    /**
+     * 清空桌台
+     */
+    @ApiOperation(value = "清空桌台")
+    @RequestMapping(value = "/cleanTable/{tableId}", method = RequestMethod.GET)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('cashier:index')")
+    public ResponseObject cleanTable(@PathVariable("tableId") Integer tableId) throws BusinessCheckException {
+        if (tableId == null || tableId <= 0) {
+            return getFailureResult(201);
+        }
+        tableService.updateUseStatus(tableId, TableUseStatusEnum.AVAILABLE.getKey(), "");
+        cartService.removeCartByTableId(tableId);
+        return getSuccessResult(true);
     }
 }

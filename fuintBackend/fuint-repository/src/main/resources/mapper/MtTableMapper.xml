@@ -12,4 +12,8 @@
         select * from mt_table t where t.STORE_ID = #{storeId} and t.CODE = #{code} and t.STATUS = 'A' limit 1
     </select>
 
+    <update id="updateUseStatus">
+        update mt_table set USE_STATUS = #{useStatus}, USE_TIME = #{useTime} where ID = #{tableId}
+    </update>
+
 </mapper>

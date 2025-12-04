@@ -1271,6 +1271,22 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     }
 
     /**
+     * 通过桌台获取订单信息
+     *
+     * @param  tableId 桌台ID
+     * @throws BusinessCheckException
+     * @return
+     */
+    @Override
+    public UserOrderDto getOrderInfoByTableId(Integer tableId) throws BusinessCheckException {
+        MtOrder mtOrder = mtOrderMapper.findByTableId(tableId);
+        if (mtOrder == null) {
+            return null;
+        }
+        return getOrderDetail(mtOrder, true, false);
+    }
+
+    /**
      * 根据ID获取订单详情
      *
      * @param orderId 订单ID

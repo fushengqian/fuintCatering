@@ -16,6 +16,6 @@ public interface MtCartMapper extends BaseMapper<MtCart> {
 
     void clearCart(@Param("userId") Integer userId);
 
-    void deleteCartByHangNo(@Param("hangNo") String hangNo);
+    void deleteCartByTableId(@Param("tableId") Integer tableId);
 
 }

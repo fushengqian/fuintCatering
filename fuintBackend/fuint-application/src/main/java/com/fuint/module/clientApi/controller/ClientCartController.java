@@ -4,6 +4,7 @@ import com.fuint.common.dto.AccountInfo;
 import com.fuint.common.dto.UserInfo;
 import com.fuint.common.enums.OrderModeEnum;
 import com.fuint.common.enums.StatusEnum;
+import com.fuint.common.enums.TableUseStatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.param.CartClearParam;
 import com.fuint.common.param.CartListParam;
@@ -80,6 +81,7 @@ public class ClientCartController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject save(HttpServletRequest request, @RequestBody CartSaveParam saveParam) throws BusinessCheckException {
+        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
         Integer tableId = StringUtil.isEmpty(request.getHeader("tableId")) ? 0 : Integer.parseInt(request.getHeader("tableId"));
@@ -89,21 +91,22 @@ public class ClientCartController extends BaseController {
         String skuNo = saveParam.getSkuNo() == null ? "" : saveParam.getSkuNo();
         Double buyNum = saveParam.getBuyNum() == null ? 1 : saveParam.getBuyNum();
         String action = saveParam.getAction() == null ? "+" : saveParam.getAction();
-        String hangNo = saveParam.getHangNo() == null ? "" : saveParam.getHangNo();
         Integer userId = saveParam.getUserId() == null ? 0 : saveParam.getUserId(); // 指定会员ID
+        Integer tableId1 = saveParam.getTableId() == null ? 0 : saveParam.getTableId();
 
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         MtUser mtUser;
         if (userInfo == null) {
             mtUser = memberService.getCurrentUserInfo(request, userId, request.getHeader("Access-Token"));
         } else {
             mtUser = memberService.queryMemberById(userInfo.getId());
         }
+        if (tableId <= 0 && tableId1 != null) {
+            tableId = tableId1;
+        }
         if (tableId > 0) {
             MtTable mtTable = tableService.queryTableById(tableId);
             if (mtTable != null && mtTable.getStoreId() > 0) {
                 storeId = mtTable.getStoreId();
-                hangNo = mtTable.getCode();
             }
         }
         if (mtUser == null && StringUtil.isNotEmpty(request.getHeader("Access-Token"))) {
@@ -154,12 +157,6 @@ public class ClientCartController extends BaseController {
         if (storeId <= 0 && mtUser.getStoreId() != null) {
             storeId = mtUser.getStoreId();
         }
-        if (StringUtil.isNotBlank(hangNo) && tableId <= 0) {
-            MtTable mtTable = tableService.queryTableByCode(storeId, hangNo);
-            if (mtTable != null && mtTable.getStoreId() > 0) {
-                tableId = mtTable.getId();
-            }
-        }
         MtCart mtCart = new MtCart();
         mtCart.setGoodsId(goodsId);
         mtCart.setUserId(mtUser.getId());
@@ -167,7 +164,6 @@ public class ClientCartController extends BaseController {
         mtCart.setNum(buyNum);
         mtCart.setSkuId(skuId);
         mtCart.setId(cartId);
-        mtCart.setHangNo(hangNo);
         mtCart.setIsVisitor(YesOrNoEnum.NO.getKey());
         mtCart.setMerchantId(merchantId);
         mtCart.setTableId(tableId);
@@ -188,7 +184,7 @@ public class ClientCartController extends BaseController {
     public ResponseObject clear(HttpServletRequest request, @RequestBody CartClearParam clearParam) throws BusinessCheckException {
         String cartIds = clearParam.getCartId() == null ? "" : String.join(",", clearParam.getCartId());
         Integer userId = clearParam.getUserId() == null ? 0 : clearParam.getUserId();
-        String hangNo = clearParam.getHangNo() == null ? "" : clearParam.getHangNo();
+        Integer tableId = clearParam.getTableId() == null ? 0 : clearParam.getTableId();
 
         UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         MtUser mtUser;
@@ -203,8 +199,12 @@ public class ClientCartController extends BaseController {
         }
 
         if (StringUtil.isEmpty(cartIds)) {
-            if (StringUtil.isNotEmpty(hangNo)) {
-                cartService.removeCartByHangNo(hangNo);
+            if (tableId != null && tableId > 0) {
+                MtTable mtTable = tableService.queryTableById(tableId);
+                if (mtTable != null) {
+                    tableService.updateUseStatus(mtTable.getId(), TableUseStatusEnum.AVAILABLE.getKey(), "");
+                    cartService.removeCartByTableId(mtTable.getId());
+                }
             } else {
                 cartService.clearCart(mtUser.getId());
             }
@@ -233,8 +233,8 @@ public class ClientCartController extends BaseController {
         Integer userCouponId = params.getCouponId() == null ? 0 : params.getCouponId();// 会员卡券ID
         Integer userId = params.getUserId() == null ? 0 : params.getUserId(); // 会员ID
         String point = params.getPoint() == null ? "" : params.getPoint();
-        String hangNo = params.getHangNo() == null ? "" : params.getHangNo();
         String orderMode = params.getOrderMode() == null ? OrderModeEnum.ONESELF.getKey() : params.getOrderMode();
+        Integer tableId1 = params.getTableId() == null ? 0 : params.getTableId();
         Integer merchantId = merchantService.getMerchantId(merchantNo);
         boolean isUsePoint = false;
         if (point.equals(YesOrNoEnum.TRUE.getKey())) {
@@ -288,11 +288,11 @@ public class ClientCartController extends BaseController {
             param.put("merchantId", merchantId);
         }
         param.put("status", StatusEnum.ENABLED.getKey());
-        if (StringUtil.isNotEmpty(hangNo)) {
+        if (tableId1 != null && tableId1 > 0) {
             param.remove("userId");
-            param.put("hangNo", hangNo);
+            param.put("tableId", tableId1);
         } else {
-            param.put("hangNo", "");
+            param.put("tableId", 0);
         }
         if (storeId > 0) {
             param.put("storeId", storeId);

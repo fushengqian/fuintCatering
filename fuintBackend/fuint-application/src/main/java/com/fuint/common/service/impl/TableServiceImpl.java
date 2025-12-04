@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.HangUpDto;
+import com.fuint.common.dto.TableDto;
+import com.fuint.common.dto.UserOrderDto;
 import com.fuint.common.enums.*;
 import com.fuint.common.param.TableParam;
 import com.fuint.common.service.CartService;
@@ -16,10 +18,12 @@ import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtCart;
+import com.fuint.repository.model.MtOrder;
 import com.fuint.repository.model.MtTable;
 import com.fuint.common.service.TableService;
 import com.fuint.repository.mapper.MtTableMapper;
 import com.fuint.repository.model.MtUser;
+import com.fuint.utils.StringUtil;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
@@ -264,21 +268,20 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
     }
 
     /**
-     * 获取桌台列表
+     * 获取挂单列表
      *
      * @param tableParam 请求参数
      * @throws BusinessCheckException
      * @return
      */
     @Override
-    public List<HangUpDto> getActiveTableList(TableParam tableParam) throws BusinessCheckException {
+    public List<HangUpDto> getHangUpList(TableParam tableParam) throws BusinessCheckException {
         List<MtTable> tableList = mtTableMapper.getActiveTableList(tableParam.getMerchantId(), tableParam.getStoreId());
 
         List<HangUpDto> dataList = new ArrayList<>();
         for (MtTable mtTable : tableList) {
-            String hangNo = mtTable.getCode();
             Map<String, Object> param = new HashMap<>();
-            param.put("hangNo", hangNo);
+            param.put("tableId", mtTable.getId());
             param.put("merchantId", tableParam.getMerchantId());
             param.put("storeId", tableParam.getStoreId());
             List<MtCart> cartList = cartService.queryCartListByParams(param);
@@ -302,10 +305,65 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
                 dto.setIsEmpty(true);
             }
             dto.setUseTime(TimeUtil.getMealTime(mtTable.getUseTime(), new Date()));
-            dto.setHangNo(hangNo);
+            dto.setTableId(mtTable.getId());
+            dto.setTableCode(mtTable.getCode());
             dataList.add(dto);
         }
 
         return dataList;
+    }
+
+    /**
+     * 获取挂单列表
+     *
+     * @param tableParam 请求参数
+     * @throws BusinessCheckException
+     * @return
+     */
+    @Override
+    public List<TableDto> getTableList(TableParam tableParam) throws BusinessCheckException {
+        List<MtTable> tableList = mtTableMapper.getActiveTableList(tableParam.getMerchantId(), tableParam.getStoreId());
+        List<TableDto> dataList = new ArrayList<>();
+        for (MtTable mtTable : tableList) {
+             UserOrderDto orderInfo = orderService.getOrderInfoByTableId(mtTable.getId());
+             TableDto dto = new TableDto();
+             dto.setIsEmpty(false);
+             if (orderInfo != null) {
+                 dto.setNum(1d);
+                 dto.setAmount(orderInfo.getAmount());
+                 if (orderInfo.getIsVisitor().equals(YesOrNoEnum.NO.getKey())) {
+                    MtUser userInfo = memberService.queryMemberById(orderInfo.getUserId());
+                    dto.setMemberInfo(userInfo);
+                 }
+                 dto.setDateTime(orderInfo.getCreateTime());
+             }
+             dto.setTableInfo(mtTable);
+             if (mtTable.getUseStatus().equals(TableUseStatusEnum.AVAILABLE.getKey())) {
+                 dto.setIsEmpty(true);
+             }
+             dto.setUseTime(TimeUtil.getMealTime(mtTable.getUseTime(), new Date()));
+             dto.setTableId(mtTable.getId());
+             dto.setTableCode(mtTable.getCode());
+             dataList.add(dto);
+        }
+        return dataList;
+    }
+
+    /**
+     * 更新桌台使用状态
+     *
+     * @param tableId 请求参数
+     * @param useStatus 使用状态
+     * @param useTime 使用时间
+     * @return
+     * */
+    @Override
+    public Boolean updateUseStatus(Integer tableId, String useStatus, String useTime) throws BusinessCheckException {
+        MtTable table = queryTableById(tableId);
+        if (table.getUseStatus().equals(useStatus)) {
+            return true;
+        }
+        mtTableMapper.updateUseStatus(tableId, useStatus, (StringUtil.isBlank(useTime) ? null : useTime));
+        return false;
     }
 }

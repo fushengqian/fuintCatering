@@ -18,4 +18,6 @@ public interface MtTableMapper extends BaseMapper<MtTable> {
 
     MtTable queryTableByTableCode(@Param("storeId") Integer storeId, @Param("code") String code);
 
+    void updateUseStatus(@Param("tableId") Integer tableId, @Param("useStatus") String useStatus, @Param("useTime") String useTime);
+
 }

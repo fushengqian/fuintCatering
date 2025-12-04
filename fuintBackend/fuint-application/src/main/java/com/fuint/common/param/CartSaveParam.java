@@ -30,8 +30,8 @@ public class CartSaveParam implements Serializable {
     @ApiModelProperty(value="操作类型，+：增加，-：减少", name="action")
     private String action;
 
-    @ApiModelProperty(value="挂单编码", name="hangNo")
-    private String hangNo;
+    @ApiModelProperty(value="桌台ID", name="tableId")
+    private Integer tableId;
 
     @ApiModelProperty(value="下单会员ID", name="userId")
     private Integer userId;

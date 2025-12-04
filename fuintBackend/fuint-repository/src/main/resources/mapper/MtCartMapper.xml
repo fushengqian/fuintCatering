@@ -9,7 +9,7 @@
         delete from mt_cart where USER_ID = #{userId}
     </delete>
 
-    <delete id="deleteCartByHangNo">
-        delete from mt_cart where HANG_NO = #{hangNo}
+    <delete id="deleteCartByTableId">
+        delete from mt_cart where TABLE_ID = #{tableId}
     </delete>
 </mapper>

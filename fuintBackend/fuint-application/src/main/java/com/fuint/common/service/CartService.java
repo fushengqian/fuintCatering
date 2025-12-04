@@ -45,11 +45,11 @@ public interface CartService extends IService<MtCart> {
     /**
      * 删除购物车
      *
-     * @param  hangNo 挂单序号
+     * @param  tableId 桌台ID
      * @throws BusinessCheckException
      * @return
      */
-    void removeCartByHangNo(String hangNo) throws BusinessCheckException;
+    void removeCartByTableId(Integer tableId) throws BusinessCheckException;
 
     /**
      * 清空会员购物车
@@ -72,9 +72,9 @@ public interface CartService extends IService<MtCart> {
      * 挂单
      *
      * @param  cartId 购物车ID
-     * @param  hangNo 挂单序号
+     * @param  tableId 桌台ID
      * @param  isVisitor 是否游客
      * @return
      */
-    MtCart setHangNo(Integer cartId, String hangNo, String isVisitor) throws BusinessCheckException;
+    MtCart setTableId(Integer cartId, Integer tableId, String isVisitor) throws BusinessCheckException;
 }

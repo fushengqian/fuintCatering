@@ -4,17 +4,16 @@ import com.fuint.repository.model.MtTable;
 import com.fuint.repository.model.MtUser;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
 import java.math.BigDecimal;
 
 /**
- * 收银挂单实体类
+ * 桌台实体类
  *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
 @Data
-public class HangUpDto {
+public class TableDto {
 
     @ApiModelProperty("桌台ID")
     private Integer tableId;

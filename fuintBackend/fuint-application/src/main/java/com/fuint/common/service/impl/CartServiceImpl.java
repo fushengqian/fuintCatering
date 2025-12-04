@@ -3,8 +3,10 @@ package com.fuint.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.enums.StatusEnum;
+import com.fuint.common.enums.TableUseStatusEnum;
 import com.fuint.common.service.CartService;
 import com.fuint.common.service.TableService;
+import com.fuint.common.util.DateUtil;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.repository.mapper.MtCartMapper;
@@ -142,6 +144,11 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
             mtCartMapper.deleteCartItem(reqDto.getUserId(), reqDto.getGoodsId(), reqDto.getSkuId());
         }
 
+        // 将桌台置为开台
+        if (reqDto.getTableId() != null && reqDto.getTableId() > 0) {
+            tableService.updateUseStatus(reqDto.getTableId(), TableUseStatusEnum.TAKEN.getKey(), DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        }
+
         // 校验skuId是否正确
         if (reqDto.getSkuId() != null) {
             if (reqDto.getSkuId() > 0) {
@@ -162,7 +169,7 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
         mtCart.setUpdateTime(new Date());
         mtCart.setSkuId(reqDto.getSkuId());
         mtCart.setNum(reqDto.getNum());
-        mtCart.setHangNo(reqDto.getHangNo());
+        mtCart.setTableId(reqDto.getTableId());
         mtCart.setIsVisitor(reqDto.getIsVisitor());
         mtCart.setTableId(reqDto.getTableId());
         Map<String, Object> params = new HashMap<>();
@@ -174,7 +181,7 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
         } else {
             params.put("userId", mtCart.getUserId());
         }
-        params.put("hangNo", reqDto.getHangNo() == null ? "" : reqDto.getHangNo());
+        params.put("tableId", reqDto.getTableId() == null ? "" : reqDto.getTableId());
 
         List<MtCart> cartList = queryCartListByParams(params);
         if (action.equals("-") && cartList.size() == 0) {
@@ -231,16 +238,19 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
     /**
      * 删除挂单购物车
      *
-     * @param  hangNo 挂单序号
+     * @param  tableId 桌台ID
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @OperationServiceLog(description = "删除挂单")
     @Transactional(rollbackFor = Exception.class)
-    public void removeCartByHangNo(String hangNo) {
-        if (hangNo != null && StringUtil.isNotEmpty(hangNo)) {
-            mtCartMapper.deleteCartByHangNo(hangNo);
+    public void removeCartByTableId(Integer tableId) throws BusinessCheckException {
+        if (tableId != null) {
+            MtTable mtTable = tableService.queryTableById(tableId);
+            if (mtTable != null) {
+                mtCartMapper.deleteCartByTableId(tableId);
+            }
         }
     }
 
@@ -265,15 +275,14 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
      * */
     @Override
     public List<MtCart> queryCartListByParams(Map<String, Object> params) {
-        String status =  params.get("status") == null ? StatusEnum.ENABLED.getKey() : params.get("status").toString();
-        String userId =  params.get("userId") == null ? "" : params.get("userId").toString();
+        String status = params.get("status") == null ? StatusEnum.ENABLED.getKey() : params.get("status").toString();
+        String userId = params.get("userId") == null ? "" : params.get("userId").toString();
         String ids =  params.get("ids") == null ? "" : params.get("ids").toString();
-        String hangNo =  params.get("hangNo") == null ? "" : params.get("hangNo").toString();
-        String goodsId =  params.get("goodsId") == null ? "" : params.get("goodsId").toString();
-        String skuId =  params.get("skuId") == null ? "" : params.get("skuId").toString();
-        String storeId =  params.get("storeId") == null ? "" : params.get("storeId").toString();
-        String merchantId =  params.get("merchantId") == null ? "" : params.get("merchantId").toString();
-        String tableId =  params.get("tableId") == null ? "" : params.get("tableId").toString();
+        String goodsId = params.get("goodsId") == null ? "" : params.get("goodsId").toString();
+        String skuId = params.get("skuId") == null ? "" : params.get("skuId").toString();
+        String storeId = params.get("storeId") == null ? "" : params.get("storeId").toString();
+        String merchantId = params.get("merchantId") == null ? "" : params.get("merchantId").toString();
+        String tableId = params.get("tableId") == null ? "" : params.get("tableId").toString();
 
         LambdaQueryWrapper<MtCart> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(MtCart::getStatus, status);
@@ -284,11 +293,6 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
         if (StringUtil.isNotBlank(ids)) {
             List<String> idList = Arrays.asList(ids.split(","));
             lambdaQueryWrapper.in(MtCart::getId, idList);
-            if (StringUtil.isNotEmpty(hangNo)) {
-                lambdaQueryWrapper.eq(MtCart::getHangNo, hangNo);
-            }
-        } else if (StringUtil.isBlank(tableId)) {
-            lambdaQueryWrapper.eq(MtCart::getHangNo, hangNo);
         }
         if (StringUtil.isNotBlank(goodsId)) {
             lambdaQueryWrapper.eq(MtCart::getGoodsId, goodsId);
@@ -299,7 +303,7 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
         if (StringUtil.isNotBlank(storeId) && Integer.parseInt(storeId) > 0) {
             lambdaQueryWrapper.eq(MtCart::getStoreId, storeId);
         }
-        if (StringUtil.isNotBlank(tableId) && Integer.parseInt(tableId) > 0) {
+        if (StringUtil.isNotBlank(tableId)) {
             lambdaQueryWrapper.eq(MtCart::getTableId, tableId);
         }
         if (StringUtil.isNotBlank(skuId)) {
@@ -313,23 +317,28 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
      * 执行挂单
      *
      * @param  cartId  ID
-     * @param  hangNo 挂单序号
+     * @param  tableId 桌台ID
      * @param  isVisitor 是否游客
      * @return
      */
     @Override
     @OperationServiceLog(description = "执行挂单")
     @Transactional(rollbackFor = Exception.class)
-    public MtCart setHangNo(Integer cartId, String hangNo, String isVisitor) throws BusinessCheckException {
+    public MtCart setTableId(Integer cartId, Integer tableId, String isVisitor) throws BusinessCheckException {
         MtCart mtCart = mtCartMapper.selectById(cartId);
-        if (mtCart.getTableId() == null || mtCart.getTableId() <= 0) {
-            MtTable mtTable = tableService.queryTableByCode(mtCart.getStoreId(), hangNo);
-            if (mtTable != null) {
-                mtCart.setTableId(mtTable.getId());
+        Integer tableId1 = mtCart.getTableId();
+        MtTable mtTable = tableService.queryTableById(tableId);
+        if (mtTable != null) {
+            mtCart.setTableId(mtTable.getId());
+            if (mtTable.getUseStatus().equals(TableUseStatusEnum.AVAILABLE.getKey())) {
+                tableService.updateUseStatus(mtTable.getId(), TableUseStatusEnum.TAKEN.getKey(), DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
             }
         }
+        if (tableId1 != null && tableId1 > 0) {
+            tableService.updateUseStatus(tableId1, TableUseStatusEnum.AVAILABLE.getKey(), null);
+        }
         if (mtCart != null) {
-            mtCart.setHangNo(hangNo);
+            mtCart.setTableId(tableId);
             mtCart.setUpdateTime(new Date());
             mtCart.setIsVisitor(isVisitor);
             this.updateById(mtCart);
