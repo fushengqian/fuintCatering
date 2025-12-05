@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.HangUpDto;
+import com.fuint.common.dto.TableDetail;
 import com.fuint.common.dto.TableDto;
 import com.fuint.common.dto.UserOrderDto;
 import com.fuint.common.enums.*;
@@ -280,34 +281,31 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
 
         List<HangUpDto> dataList = new ArrayList<>();
         for (MtTable mtTable : tableList) {
-            Map<String, Object> param = new HashMap<>();
-            param.put("tableId", mtTable.getId());
-            param.put("merchantId", tableParam.getMerchantId());
-            param.put("storeId", tableParam.getStoreId());
-            List<MtCart> cartList = cartService.queryCartListByParams(param);
-            HangUpDto dto = new HangUpDto();
-            dto.setIsEmpty(false);
+            List<MtCart> cartList = cartService.getCartByTableId(mtTable.getId());
+            HangUpDto hangUpDto = new HangUpDto();
+            hangUpDto.setIsEmpty(false);
+            String useStatus = getTableUseStatus(mtTable.getId());
             if (cartList.size() > 0) {
                 Integer userId = cartList.get(0).getUserId();
                 String isVisitor = cartList.get(0).getIsVisitor();
                 Map<String, Object> cartInfo = orderService.calculateCartGoods(tableParam.getMerchantId(), userId, cartList, 0, false, PlatformTypeEnum.PC.getCode(), OrderModeEnum.ONESELF.getKey());
-                dto.setNum(Double.parseDouble(cartInfo.get("totalNum").toString()));
-                dto.setAmount(new BigDecimal(cartInfo.get("totalPrice").toString()));
+                hangUpDto.setNum(Double.parseDouble(cartInfo.get("totalNum").toString()));
+                hangUpDto.setAmount(new BigDecimal(cartInfo.get("totalPrice").toString()));
                 if (isVisitor.equals(YesOrNoEnum.NO.getKey())) {
                     MtUser userInfo = memberService.queryMemberById(userId);
-                    dto.setMemberInfo(userInfo);
+                    hangUpDto.setMemberInfo(userInfo);
                 }
                 String dateTime = DateUtil.formatDate(cartList.get(0).getUpdateTime(), "yyyy-MM-dd HH:mm:ss");
-                dto.setDateTime(dateTime);
+                hangUpDto.setDateTime(dateTime);
             }
-            dto.setTableInfo(mtTable);
-            if (mtTable.getUseStatus().equals(TableUseStatusEnum.AVAILABLE.getKey())) {
-                dto.setIsEmpty(true);
+            hangUpDto.setTableInfo(mtTable);
+            if (useStatus.equals(TableUseStatusEnum.AVAILABLE.getKey())) {
+                hangUpDto.setIsEmpty(true);
             }
-            dto.setUseTime(TimeUtil.getMealTime(mtTable.getUseTime(), new Date()));
-            dto.setTableId(mtTable.getId());
-            dto.setTableCode(mtTable.getCode());
-            dataList.add(dto);
+            hangUpDto.setUseTime(TimeUtil.getMealTime(mtTable.getUseTime(), new Date()));
+            hangUpDto.setTableId(mtTable.getId());
+            hangUpDto.setTableCode(mtTable.getCode());
+            dataList.add(hangUpDto);
         }
 
         return dataList;
@@ -316,7 +314,7 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
     /**
      * 获取挂单列表
      *
-     * @param tableParam 请求参数
+     * @param  tableParam 请求参数
      * @throws BusinessCheckException
      * @return
      */
@@ -326,25 +324,30 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
         List<TableDto> dataList = new ArrayList<>();
         for (MtTable mtTable : tableList) {
              UserOrderDto orderInfo = orderService.getOrderInfoByTableId(mtTable.getId());
-             TableDto dto = new TableDto();
-             dto.setIsEmpty(false);
+             TableDto tableDto = new TableDto();
+             tableDto.setIsEmpty(false);
+             String useStatus = getTableUseStatus(mtTable.getId());
              if (orderInfo != null) {
-                 dto.setNum(1d);
-                 dto.setAmount(orderInfo.getAmount());
-                 if (orderInfo.getIsVisitor().equals(YesOrNoEnum.NO.getKey())) {
-                    MtUser userInfo = memberService.queryMemberById(orderInfo.getUserId());
-                    dto.setMemberInfo(userInfo);
+                 if (orderInfo.getGoods() != null) {
+                     tableDto.setNum(orderInfo.getGoods().size());
+                 } else {
+                     tableDto.setNum(1);
                  }
-                 dto.setDateTime(orderInfo.getCreateTime());
+                 tableDto.setAmount(orderInfo.getAmount());
+                 if (orderInfo.getIsVisitor().equals(YesOrNoEnum.NO.getKey())) {
+                     MtUser userInfo = memberService.queryMemberById(orderInfo.getUserId());
+                     tableDto.setMemberInfo(userInfo);
+                 }
+                 tableDto.setDateTime(orderInfo.getCreateTime());
              }
-             dto.setTableInfo(mtTable);
-             if (mtTable.getUseStatus().equals(TableUseStatusEnum.AVAILABLE.getKey())) {
-                 dto.setIsEmpty(true);
+             if (useStatus.equals(TableUseStatusEnum.AVAILABLE.getKey())) {
+                 tableDto.setIsEmpty(true);
              }
-             dto.setUseTime(TimeUtil.getMealTime(mtTable.getUseTime(), new Date()));
-             dto.setTableId(mtTable.getId());
-             dto.setTableCode(mtTable.getCode());
-             dataList.add(dto);
+             tableDto.setTableInfo(mtTable);
+             tableDto.setUseTime(TimeUtil.getMealTime(mtTable.getUseTime(), new Date()));
+             tableDto.setTableId(mtTable.getId());
+             tableDto.setTableCode(mtTable.getCode());
+             dataList.add(tableDto);
         }
         return dataList;
     }
@@ -353,17 +356,67 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
      * 更新桌台使用状态
      *
      * @param tableId 请求参数
-     * @param useStatus 使用状态
-     * @param useTime 使用时间
      * @return
      * */
     @Override
-    public Boolean updateUseStatus(Integer tableId, String useStatus, String useTime) throws BusinessCheckException {
+    public String getTableUseStatus(Integer tableId) throws BusinessCheckException {
+       List<MtCart> carts = cartService.getCartByTableId(tableId);
+       UserOrderDto orderInfo = orderService.getOrderInfoByTableId(tableId);
+
+        // 默认空闲中
+       String useStatus = TableUseStatusEnum.AVAILABLE.getKey();
+
+       // 订单存在，表示就餐中
+       if (orderInfo != null) {
+           useStatus = TableUseStatusEnum.DURING.getKey();
+       }
+
+       // 购物车存在，表示已开台
+       else if (carts != null && carts.size() > 0) {
+           useStatus = TableUseStatusEnum.TAKEN.getKey();
+       }
+
         MtTable table = queryTableById(tableId);
-        if (table.getUseStatus().equals(useStatus)) {
+        if (!table.getUseStatus().equals(useStatus)) {
+            updateUseStatus(tableId, useStatus, null);
+        }
+
+       return useStatus;
+    }
+
+    /**
+     * 更新桌台使用状态
+     *
+     * @param tableId 桌台ID
+     * @param useStatus 使用状态
+     * @param useTime 开台时间
+     * @return
+     * */
+    @Override
+    public Boolean updateUseStatus(Integer tableId, String useStatus, String useTime) {
+        MtTable table = queryTableById(tableId);
+        // 就餐状态不能转成已开台
+        if (table.getUseStatus().equals(TableUseStatusEnum.DURING.getKey()) && useStatus.equals(TableUseStatusEnum.TAKEN.getKey())) {
             return true;
         }
         mtTableMapper.updateUseStatus(tableId, useStatus, (StringUtil.isBlank(useTime) ? null : useTime));
         return false;
+    }
+
+    /**
+     * 桌台详情
+     *
+     * @param tableId 桌台ID
+     * @return
+     * */
+    @Override
+    public TableDetail getTableDetail(Integer tableId) throws BusinessCheckException {
+        UserOrderDto orderInfo = orderService.getOrderInfoByTableId(tableId);
+        TableDetail tableDetail = new TableDetail();
+        tableDetail.setOrderInfo(orderInfo);
+        MtTable mtTable = queryTableById(tableId);
+        tableDetail.setTableCode(mtTable.getCode());
+        tableDetail.setTableId(tableId);
+        return tableDetail;
     }
 }

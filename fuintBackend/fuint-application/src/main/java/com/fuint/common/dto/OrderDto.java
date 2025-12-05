@@ -63,6 +63,9 @@ public class OrderDto implements Serializable {
     @ApiModelProperty("桌码ID")
     private Integer tableId;
 
+    @ApiModelProperty("占用桌码ID")
+    private Integer takenTableId;
+
     @ApiModelProperty("就餐人数")
     private Integer peopleNum;
 

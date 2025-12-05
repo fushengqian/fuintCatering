@@ -236,6 +236,20 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
     }
 
     /**
+     * 获取购物车
+     *
+     * @param  tableId 桌台ID
+     * @throws BusinessCheckException
+     * @return
+     */
+    @Override
+    public List<MtCart> getCartByTableId(Integer tableId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("tableId", tableId);
+        return queryCartListByParams(param);
+    }
+
+    /**
      * 删除挂单购物车
      *
      * @param  tableId 桌台ID

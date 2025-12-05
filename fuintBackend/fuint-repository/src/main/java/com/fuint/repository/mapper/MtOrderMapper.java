@@ -27,6 +27,8 @@ public interface MtOrderMapper extends BaseMapper<MtOrder> {
 
     MtOrder findByTableId(@Param("tableId") Integer tableId);
 
+    void removeTakenTableId(@Param("tableId") Integer tableId);
+
     BigDecimal getPayMoney(@Param("merchantId") Integer merchantId);
 
     BigDecimal getPayMoneyByTime(@Param("merchantId") Integer merchantId, @Param("beginTime") Date beginTime, @Param("endTime") Date endTime);

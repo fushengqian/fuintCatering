@@ -43,6 +43,15 @@ public interface CartService extends IService<MtCart> {
     void removeCart(String cartIds) throws BusinessCheckException;
 
     /**
+     * 获取购物车
+     *
+     * @param  tableId 桌台ID
+     * @throws BusinessCheckException
+     * @return
+     */
+    List<MtCart> getCartByTableId(Integer tableId);
+
+    /**
      * 删除购物车
      *
      * @param  tableId 桌台ID

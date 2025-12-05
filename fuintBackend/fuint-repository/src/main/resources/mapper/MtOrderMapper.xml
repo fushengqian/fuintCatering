@@ -28,8 +28,12 @@
     </select>
 
     <select id="findByTableId" resultType="com.fuint.repository.model.MtOrder">
-        select * from mt_order o where o.TABLE_ID = #{tableId} and o.STATUS = 'A' and o.PAY_STATUS = 'A' order by ID desc LIMIT 1
+        select * from mt_order o where o.TAKEN_TABLE_ID = #{tableId} and o.STATUS = 'A' and o.PAY_STATUS = 'A' order by ID desc
     </select>
+
+    <update id="removeTakenTableId">
+        update mt_order o set o.TAKEN_TABLE_ID = 0 where o.TAKEN_TABLE_ID = #{tableId}
+    </update>
 
     <select id="getPayMoney" resultType="java.math.BigDecimal">
         SELECT sum(t.PAY_AMOUNT) as num FROM mt_order t where t.PAY_STATUS='B' and t.STATUS not in('C', 'G', 'H')

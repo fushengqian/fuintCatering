@@ -398,6 +398,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         mtOrder.setMerchantId(orderDto.getMerchantId());
         mtOrder.setStoreId(orderDto.getStoreId());
         mtOrder.setTableId(orderDto.getTableId());
+        mtOrder.setTakenTableId(orderDto.getTableId());
         mtOrder.setCouponId(orderDto.getCouponId());
         mtOrder.setParam(orderDto.getParam());
         mtOrder.setRemark(orderDto.getRemark());
@@ -767,7 +768,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         Double buyNum = param.getBuyNum() == null ? 1.0 : param.getBuyNum(); // 立即购买商品数量
         String orderMode = StringUtil.isEmpty(param.getOrderMode()) ? OrderModeEnum.ONESELF.getKey() : param.getOrderMode(); // 订单模式(配送or自取)
         Integer orderId = param.getOrderId() == null ? null : param.getOrderId(); // 订单ID
-        String tableCode = param.getTableCode() == null ? "" : param.getTableCode();
+        Integer tableId1 = param.getTableId() == null ? 0 : param.getTableId();
         Integer merchantId = merchantService.getMerchantId(merchantNo);
         UserInfo loginInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
         MtUser userInfo = null;
@@ -819,12 +820,12 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         // 继续点单的订单ID
         Integer myOrderId = 0;
-        if (tableId > 0 || StringUtil.isNotBlank(tableCode)) {
+        if (tableId > 0 || tableId1 > 0) {
             MtTable mtTable = null;
             if (tableId > 0) {
                 mtTable = tableService.queryTableById(tableId);
-            } else if (storeId != null && storeId > 0 && StringUtil.isNotBlank(tableCode)) {
-                mtTable = tableService.queryTableByCode(storeId, tableCode);
+            } else if (tableId1 > 0) {
+                mtTable = tableService.queryTableById(tableId1);
             }
             if (mtTable != null) {
                 tableId = mtTable.getId();
@@ -920,6 +921,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         orderDto.setMerchantId(merchantId);
         orderDto.setStoreId(storeId);
         orderDto.setTableId(tableId);
+        orderDto.setTakenTableId(tableId);
         orderDto.setType(type);
         orderDto.setGoodsId(goodsId);
         orderDto.setSkuId(skuId);
@@ -1284,6 +1286,18 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             return null;
         }
         return getOrderDetail(mtOrder, true, false);
+    }
+
+    /**
+     * 清空桌台订单信息
+     *
+     * @param  tableId 桌台ID
+     * @throws BusinessCheckException
+     * @return
+     */
+    @Override
+    public void removeTakenTableId(Integer tableId) {
+        mtOrderMapper.removeTakenTableId(tableId);
     }
 
     /**

@@ -61,6 +61,11 @@ public class BackendCashierController extends BaseController {
     private StoreService storeService;
 
     /**
+     * 订单服务接口
+     * */
+    private OrderService orderService;
+
+    /**
      * 系统设置服务接口
      */
     private SettingService settingService;
@@ -363,6 +368,18 @@ public class BackendCashierController extends BaseController {
     }
 
     /**
+     * 获取桌台详情
+     */
+    @ApiOperation(value = "获取桌台详情")
+    @RequestMapping(value = "/getTableDetail/{tableId}", method = RequestMethod.GET)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('cashier:index')")
+    public ResponseObject getTableDetail(@PathVariable("tableId") Integer tableId) throws BusinessCheckException {
+        TableDetail tableDetail = tableService.getTableDetail(tableId);
+        return getSuccessResult(tableDetail);
+    }
+
+    /**
      * 清空桌台
      */
     @ApiOperation(value = "清空桌台")
@@ -373,8 +390,9 @@ public class BackendCashierController extends BaseController {
         if (tableId == null || tableId <= 0) {
             return getFailureResult(201);
         }
-        tableService.updateUseStatus(tableId, TableUseStatusEnum.AVAILABLE.getKey(), "");
         cartService.removeCartByTableId(tableId);
+        orderService.removeTakenTableId(tableId);
+        tableService.updateUseStatus(tableId, TableUseStatusEnum.AVAILABLE.getKey(), null);
         return getSuccessResult(true);
     }
 }

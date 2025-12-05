@@ -202,7 +202,6 @@ public class ClientCartController extends BaseController {
             if (tableId != null && tableId > 0) {
                 MtTable mtTable = tableService.queryTableById(tableId);
                 if (mtTable != null) {
-                    tableService.updateUseStatus(mtTable.getId(), TableUseStatusEnum.AVAILABLE.getKey(), "");
                     cartService.removeCartByTableId(mtTable.getId());
                 }
             } else {

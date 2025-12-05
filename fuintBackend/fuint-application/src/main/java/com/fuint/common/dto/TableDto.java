@@ -28,7 +28,7 @@ public class TableDto {
     private MtUser memberInfo;
 
     @ApiModelProperty("件数")
-    private Double num;
+    private Integer num;
 
     @ApiModelProperty("金额")
     private BigDecimal amount;
