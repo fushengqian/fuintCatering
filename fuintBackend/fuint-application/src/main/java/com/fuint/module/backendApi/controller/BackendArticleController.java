@@ -87,10 +87,9 @@ public class BackendArticleController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('content:article:edit')")
     public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
-
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
 
         MtArticle mtArticle = articleService.queryArticleById(id);
         if (mtArticle == null) {
