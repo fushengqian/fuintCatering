@@ -34,7 +34,7 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系
 代客下单和收银系统，支持余额、微信、支付宝等支付渠道，已对接好扫码枪、扫码盒子、云打印机，订单提交后自动打印小票。
 <p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/cashierV11.png" alt="餐饮收银-收银首页"></p>
 <p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/cashierV22.png" alt="餐饮收银-提交订单"></p>
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/cashierV23.png" alt="餐饮收银-桌台预览"></p>
+<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/cashierV33.png" alt="餐饮收银-桌台预览"></p>
 
 前端使用技术<br>
 2.1 Vue2<br>
