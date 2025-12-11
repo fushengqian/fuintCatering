@@ -5,6 +5,7 @@ import com.fuint.common.dto.HangUpDto;
 import com.fuint.common.dto.TableDetail;
 import com.fuint.common.dto.TableDto;
 import com.fuint.common.param.TableParam;
+import com.fuint.common.param.TurnTableParam;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtTable;
@@ -102,7 +103,7 @@ public interface TableService extends IService<MtTable> {
     List<TableDto> getTableList(TableParam tableParam) throws BusinessCheckException;
 
     /**
-     * 更新桌台使用状态
+     * 获取桌台使用状态
      *
      * @param tableId 请求参数
      * @return
@@ -120,11 +121,19 @@ public interface TableService extends IService<MtTable> {
     Boolean updateUseStatus(Integer tableId, String useStatus, String useTime);
 
     /**
-     * 桌台详情
+     * 获取桌台详情
      *
      * @param tableId 桌台ID
      * @return
      * */
     TableDetail getTableDetail(Integer tableId) throws BusinessCheckException;
+
+    /**
+     * 桌台转台
+     *
+     * @param param 请求参数
+     * @return
+     * */
+    Boolean turnTable(TurnTableParam param) throws BusinessCheckException;
 
 }

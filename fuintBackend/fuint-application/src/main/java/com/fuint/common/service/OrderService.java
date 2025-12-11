@@ -5,6 +5,7 @@ import com.fuint.common.dto.UserOrderDto;
 import com.fuint.common.dto.OrderDto;
 import com.fuint.common.param.OrderListParam;
 import com.fuint.common.param.RechargeParam;
+import com.fuint.common.param.RemoveGoodsParam;
 import com.fuint.common.param.SettlementParam;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationResponse;
@@ -36,11 +37,11 @@ public interface OrderService extends IService<MtOrder> {
     /**
      * 创建订单
      *
-     * @param  reqDto
+     * @param  orderDto
      * @throws BusinessCheckException
      * @return
      */
-    MtOrder saveOrder(OrderDto reqDto) throws BusinessCheckException;
+    MtOrder saveOrder(OrderDto orderDto) throws BusinessCheckException;
 
     /**
      * 订单提交结算
@@ -137,11 +138,11 @@ public interface OrderService extends IService<MtOrder> {
     /**
      * 更新订单
      *
-     * @param  reqDto
+     * @param  orderDto
      * @throws BusinessCheckException
      * @return
      * */
-    MtOrder updateOrder(OrderDto reqDto) throws BusinessCheckException;
+    MtOrder updateOrder(OrderDto orderDto) throws BusinessCheckException;
 
     /**
      * 更新订单
@@ -274,4 +275,13 @@ public interface OrderService extends IService<MtOrder> {
      * @return
      * */
     MtOrder doRecharge(HttpServletRequest request, RechargeParam rechargeParam) throws BusinessCheckException;
+
+    /**
+     * 取消订单商品
+     *
+     * @param removeGoodsParam 请求参数
+     * @return
+     * */
+    Boolean removeGoods(RemoveGoodsParam removeGoodsParam) throws BusinessCheckException;
+
 }

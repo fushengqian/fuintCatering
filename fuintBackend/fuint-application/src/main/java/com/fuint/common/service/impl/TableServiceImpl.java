@@ -9,6 +9,7 @@ import com.fuint.common.dto.TableDto;
 import com.fuint.common.dto.UserOrderDto;
 import com.fuint.common.enums.*;
 import com.fuint.common.param.TableParam;
+import com.fuint.common.param.TurnTableParam;
 import com.fuint.common.service.CartService;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.OrderService;
@@ -278,7 +279,6 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
     @Override
     public List<HangUpDto> getHangUpList(TableParam tableParam) throws BusinessCheckException {
         List<MtTable> tableList = mtTableMapper.getActiveTableList(tableParam.getMerchantId(), tableParam.getStoreId());
-
         List<HangUpDto> dataList = new ArrayList<>();
         for (MtTable mtTable : tableList) {
             List<MtCart> cartList = cartService.getCartByTableId(mtTable.getId());
@@ -298,16 +298,17 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
                 String dateTime = DateUtil.formatDate(cartList.get(0).getUpdateTime(), "yyyy-MM-dd HH:mm:ss");
                 hangUpDto.setDateTime(dateTime);
             }
+            mtTable.setUseStatus(useStatus);
             hangUpDto.setTableInfo(mtTable);
             if (useStatus.equals(TableUseStatusEnum.AVAILABLE.getKey())) {
                 hangUpDto.setIsEmpty(true);
             }
+            hangUpDto.setUseStatus(useStatus);
             hangUpDto.setUseTime(TimeUtil.getMealTime(mtTable.getUseTime(), new Date()));
             hangUpDto.setTableId(mtTable.getId());
             hangUpDto.setTableCode(mtTable.getCode());
             dataList.add(hangUpDto);
         }
-
         return dataList;
     }
 
@@ -343,7 +344,9 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
              if (useStatus.equals(TableUseStatusEnum.AVAILABLE.getKey())) {
                  tableDto.setIsEmpty(true);
              }
+             mtTable.setUseStatus(useStatus);
              tableDto.setTableInfo(mtTable);
+             tableDto.setUseStatus(useStatus);
              tableDto.setUseTime(TimeUtil.getMealTime(mtTable.getUseTime(), new Date()));
              tableDto.setTableId(mtTable.getId());
              tableDto.setTableCode(mtTable.getCode());
@@ -353,34 +356,36 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
     }
 
     /**
-     * 更新桌台使用状态
+     * 获取桌台使用状态
      *
      * @param tableId 请求参数
      * @return
      * */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String getTableUseStatus(Integer tableId) throws BusinessCheckException {
+       MtTable table = queryTableById(tableId);
        List<MtCart> carts = cartService.getCartByTableId(tableId);
        UserOrderDto orderInfo = orderService.getOrderInfoByTableId(tableId);
 
         // 默认空闲中
        String useStatus = TableUseStatusEnum.AVAILABLE.getKey();
-
+       String useTime = "";
        // 订单存在，表示就餐中
        if (orderInfo != null) {
            useStatus = TableUseStatusEnum.DURING.getKey();
+           useTime = DateUtil.formatDate(table.getUseTime(), "yyyy-MM-dd HH:mm:ss");
        }
 
        // 购物车存在，表示已开台
        else if (carts != null && carts.size() > 0) {
            useStatus = TableUseStatusEnum.TAKEN.getKey();
+           useTime = DateUtil.formatDate(table.getUseTime(), "yyyy-MM-dd HH:mm:ss");
        }
 
-        MtTable table = queryTableById(tableId);
-        if (!table.getUseStatus().equals(useStatus)) {
-            updateUseStatus(tableId, useStatus, null);
-        }
-
+       if (!table.getUseStatus().equals(useStatus)) {
+           updateUseStatus(tableId, useStatus, useTime);
+       }
        return useStatus;
     }
 
@@ -404,7 +409,7 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
     }
 
     /**
-     * 桌台详情
+     * 获取桌台详情
      *
      * @param tableId 桌台ID
      * @return
@@ -418,5 +423,31 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
         tableDetail.setTableCode(mtTable.getCode());
         tableDetail.setTableId(tableId);
         return tableDetail;
+    }
+
+    /**
+     * 桌台转台
+     *
+     * @param param 请求参数
+     * @return
+     * */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean turnTable(TurnTableParam param) throws BusinessCheckException {
+       String useStatus = getTableUseStatus(param.getTableId());
+       if (!useStatus.equals(TableUseStatusEnum.AVAILABLE.getKey())) {
+           throw new BusinessCheckException("转台失败，桌台已被占用");
+       }
+       UserOrderDto orderInfo = orderService.getOrderInfoByTableId(param.getTurnTableId());
+       if (orderInfo == null) {
+           throw new BusinessCheckException("转台失败，订单不存在");
+       }
+       MtOrder mtOrder = orderService.getOrderInfo(orderInfo.getId());
+       mtOrder.setTableId(param.getTableId());
+       mtOrder.setTakenTableId(param.getTableId());
+       orderService.updateOrder(mtOrder);
+
+       updateUseStatus(param.getTableId(), TableUseStatusEnum.AVAILABLE.getKey(), null);
+       return true;
     }
 }

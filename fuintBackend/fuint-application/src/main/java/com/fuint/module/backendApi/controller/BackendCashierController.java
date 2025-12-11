@@ -6,7 +6,9 @@ import com.fuint.common.enums.PlatformTypeEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.TableUseStatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
+import com.fuint.common.param.RemoveGoodsParam;
 import com.fuint.common.param.TableParam;
+import com.fuint.common.param.TurnTableParam;
 import com.fuint.common.service.*;
 import com.fuint.common.util.PhoneFormatCheckUtils;
 import com.fuint.common.util.TokenUtil;
@@ -303,11 +305,11 @@ public class BackendCashierController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
     public ResponseObject doHangUp(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         String cartIds = param.get("cartIds") == null ? "" : param.get("cartIds").toString();
         String tableId = param.get("tableId") == null ? "" : param.get("tableId").toString();
         String userId = param.get("userId") == null ? "" : param.get("userId").toString();
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
             return getFailureResult(201, "平台账号不能执行该操作");
         }
@@ -363,8 +365,7 @@ public class BackendCashierController extends BaseController {
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
             tableParam.setStoreId(accountInfo.getStoreId());
         }
-        List<TableDto> tableList = tableService.getTableList(tableParam);
-        return getSuccessResult(tableList);
+        return getSuccessResult(tableService.getTableList(tableParam));
     }
 
     /**
@@ -393,6 +394,38 @@ public class BackendCashierController extends BaseController {
         cartService.removeCartByTableId(tableId);
         orderService.removeTakenTableId(tableId);
         tableService.updateUseStatus(tableId, TableUseStatusEnum.AVAILABLE.getKey(), null);
+        return getSuccessResult(true);
+    }
+
+    /**
+     * 桌台转台
+     */
+    @ApiOperation(value = "桌台转台")
+    @RequestMapping(value = "/turnTable", method = RequestMethod.POST)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('cashier:index')")
+    public ResponseObject turnTable(HttpServletRequest request, @RequestBody TurnTableParam param) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
+            return getFailureResult(201, "平台账号不能执行该操作");
+        }
+        tableService.turnTable(param);
+        return getSuccessResult(true);
+    }
+
+    /**
+     * 取消商品
+     */
+    @ApiOperation(value = "取消商品")
+    @RequestMapping(value = "/removeGoods", method = RequestMethod.POST)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('cashier:index')")
+    public ResponseObject removeGoods(HttpServletRequest request, @RequestBody RemoveGoodsParam param) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
+            return getFailureResult(201, "平台账号不能执行该操作");
+        }
+        orderService.removeGoods(param);
         return getSuccessResult(true);
     }
 }

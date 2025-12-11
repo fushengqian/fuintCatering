@@ -37,6 +37,9 @@ public class HangUpDto {
     @ApiModelProperty("时间")
     private String dateTime;
 
+    @ApiModelProperty("使用状态")
+    private String useStatus;
+
     @ApiModelProperty("使用时长")
     private String useTime;
 

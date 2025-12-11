@@ -177,33 +177,9 @@ public class BannerServiceImpl extends ServiceImpl<MtBannerMapper, MtBanner> imp
         if (mtBanner == null) {
             throw new BusinessCheckException("该Banner状态异常");
         }
-        mtBanner.setId(bannerDto.getId());
+        BeanUtils.copyProperties(bannerDto, mtBanner);
         if (bannerDto.getImage() != null) {
             mtBanner.setImage(bannerDto.getImage());
-        }
-        if (bannerDto.getTitle() != null) {
-            mtBanner.setTitle(bannerDto.getTitle());
-        }
-        if (bannerDto.getStoreId() != null) {
-            mtBanner.setStoreId(bannerDto.getStoreId());
-        }
-        if (bannerDto.getDescription() != null) {
-            mtBanner.setDescription(bannerDto.getDescription());
-        }
-        if (bannerDto.getOperator() != null) {
-            mtBanner.setOperator(bannerDto.getOperator());
-        }
-        if (bannerDto.getStatus() != null) {
-            mtBanner.setStatus(bannerDto.getStatus());
-        }
-        if (bannerDto.getUrl() != null) {
-            mtBanner.setUrl(bannerDto.getUrl());
-        }
-        if (bannerDto.getSort() != null) {
-            mtBanner.setSort(bannerDto.getSort());
-        }
-        if (bannerDto.getPosition() != null) {
-            mtBanner.setPosition(bannerDto.getPosition());
         }
         mtBanner.setUpdateTime(new Date());
         mtBannerMapper.updateById(mtBanner);

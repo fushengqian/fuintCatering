@@ -32,6 +32,9 @@ public class DateUtil {
     }
 
     public static String formatDate(Date date, String pattern) {
+        if (date == null) {
+            return "";
+        }
         if(StringUtils.isEmpty(pattern)) {
             pattern = "yyyy-MM-dd";
         }

@@ -24,6 +24,9 @@ public class OrderUserDto implements Serializable {
     @ApiModelProperty("会员姓名")
     private String name;
 
+    @ApiModelProperty("会员头像")
+    private String avatar;
+
     @ApiModelProperty("会员手机")
     private String mobile;
 

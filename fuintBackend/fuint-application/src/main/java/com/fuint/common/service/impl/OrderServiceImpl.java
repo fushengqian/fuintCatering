@@ -9,6 +9,7 @@ import com.fuint.common.dto.*;
 import com.fuint.common.enums.*;
 import com.fuint.common.param.OrderListParam;
 import com.fuint.common.param.RechargeParam;
+import com.fuint.common.param.RemoveGoodsParam;
 import com.fuint.common.param.SettlementParam;
 import com.fuint.common.service.*;
 import com.fuint.common.util.CommonUtil;
@@ -1871,6 +1872,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             if (StringUtil.isNotBlank(user.getMobile())) {
                 userInfo.setMobile(CommonUtil.hidePhone(user.getMobile()));
             }
+            userInfo.setAvatar(user.getAvatar());
             userInfo.setCardNo(user.getIdcard());
             userInfo.setNo(user.getUserNo());
             userInfo.setAddress(user.getAddress());
@@ -2545,5 +2547,28 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         orderDto.setMerchantId(merchantId);
 
         return saveOrder(orderDto);
+    }
+
+    /**
+     * 取消订单商品
+     *
+     * @param removeGoodsParam 请求参数
+     * @return
+     * */
+    @Override
+    public Boolean removeGoods(RemoveGoodsParam removeGoodsParam) throws BusinessCheckException {
+       MtOrderGoods mtOrderGoods = mtOrderGoodsMapper.selectById(removeGoodsParam.getId());
+       MtOrder mtOrder = mtOrderMapper.selectById(mtOrderGoods.getOrderId());
+       if (mtOrderGoods == null) {
+           throw new BusinessCheckException("该商品不存在");
+       }
+       mtOrderGoodsMapper.deleteById(removeGoodsParam.getId());
+       mtOrder.setAmount(mtOrder.getAmount().subtract(mtOrderGoods.getPrice()));
+       if (mtOrder.getPayAmount() != null && mtOrder.getPayAmount().compareTo(new BigDecimal("0")) > 0) {
+           mtOrder.setPayAmount(mtOrder.getPayAmount().subtract(mtOrderGoods.getPrice()));
+       }
+       mtOrder.setUpdateTime(new Date());
+       mtOrderMapper.updateById(mtOrder);
+       return true;
     }
 }
