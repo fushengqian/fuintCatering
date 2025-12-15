@@ -1326,7 +1326,7 @@ public class WeixinServiceImpl implements WeixinService {
                    .build();
 
         // 微信内h5公众号支付或PC收银
-        if (platform.equals(PlatformTypeEnum.H5.getCode()) || platform.equals(PlatformTypeEnum.PC.getCode())) {
+        if (platform.equals(PlatformTypeEnum.H5.getCode()) || StringUtil.isBlank(appId)) {
             String wxAppId = env.getProperty("weixin.official.appId");
             String wxAppSecret = env.getProperty("weixin.official.appSecret");
 

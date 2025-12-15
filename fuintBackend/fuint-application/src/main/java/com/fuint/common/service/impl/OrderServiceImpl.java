@@ -183,6 +183,11 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     private PrinterService printerService;
 
     /**
+     * 商品分类服务接口
+     */
+    private StockService stockService;
+
+    /**
      * 获取用户订单列表
      * @param  orderListParam
      * @throws BusinessCheckException
@@ -660,6 +665,10 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                          }
                      }
                  }
+                 // 生成库存记录
+                 stockService.addStockRecord(orderInfo.getMerchantId(), orderInfo.getStoreId(), cart.getGoodsId(), cart.getSkuId(), "reduce", cart.getNum(), "订单扣减库存，订单号："+orderInfo.getOrderSn());
+
+                 // 删除购物车
                  if (cart.getId() > 0) {
                      mtCartMapper.deleteById(cart.getId());
                  }
