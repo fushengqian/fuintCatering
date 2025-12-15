@@ -18,4 +18,6 @@ public interface MtCartMapper extends BaseMapper<MtCart> {
 
     void deleteCartByTableId(@Param("tableId") Integer tableId);
 
+    void turnTable(@Param("tableId") Integer tableId, @Param("turnTableId") Integer turnTableId);
+
 }

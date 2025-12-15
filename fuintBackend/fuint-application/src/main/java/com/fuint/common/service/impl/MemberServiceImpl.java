@@ -297,7 +297,6 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         List<MtUser> userList = mtUserMapper.selectList(wrapper);
         List<UserDto> dataList = new ArrayList<>();
         for (MtUser mtUser : userList) {
-            String phone = mtUser.getMobile();
             UserDto userDto = new UserDto();
             BeanUtils.copyProperties(mtUser, userDto);
             userDto.setMobile(CommonUtil.hidePhone(mtUser.getMobile()));
@@ -531,6 +530,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         mtUser.setStatus(StatusEnum.ENABLED.getKey());
         mtUser.setMerchantId(merchantId);
         mtUser.setStoreId(0);
+        mtUser.setIsStaff(YesOrNoEnum.NO.getKey());
         mtUser.setSource(MemberSourceEnum.MOBILE_LOGIN.getKey());
         mtUserMapper.insert(mtUser);
         mtUser = queryMemberByMobile(merchantId, mobile);
@@ -624,6 +624,9 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
                         updateById(mtUser);
                     }
                 }
+            }
+            if (mtUser.getIsStaff() == null) {
+                mtUser.setIsStaff(YesOrNoEnum.NO.getKey());
             }
         }
         return mtUser;

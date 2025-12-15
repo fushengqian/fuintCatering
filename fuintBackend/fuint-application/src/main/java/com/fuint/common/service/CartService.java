@@ -86,4 +86,13 @@ public interface CartService extends IService<MtCart> {
      * @return
      */
     MtCart setTableId(Integer cartId, Integer tableId, String isVisitor) throws BusinessCheckException;
+
+    /**
+     * 转台
+     *
+     * @param  tableId 桌台ID
+     * @param  turnTableId
+     * @return
+     */
+    void turnTable(Integer tableId, Integer turnTableId);
 }

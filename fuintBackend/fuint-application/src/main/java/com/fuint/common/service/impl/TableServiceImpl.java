@@ -442,10 +442,15 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
        if (orderInfo == null) {
            throw new BusinessCheckException("转台失败，订单不存在");
        }
+
+       // 转移订单
        MtOrder mtOrder = orderService.getOrderInfo(orderInfo.getId());
        mtOrder.setTableId(param.getTableId());
        mtOrder.setTakenTableId(param.getTableId());
        orderService.updateOrder(mtOrder);
+
+       // 转移购物车
+       cartService.turnTable(param.getTableId(), param.getTurnTableId());
 
        updateUseStatus(param.getTableId(), TableUseStatusEnum.AVAILABLE.getKey(), null);
        return true;

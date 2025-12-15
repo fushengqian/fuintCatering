@@ -12,4 +12,8 @@
     <delete id="deleteCartByTableId">
         delete from mt_cart where TABLE_ID = #{tableId}
     </delete>
+
+    <update id="turnTable">
+        update mt_cart set TABLE_ID = #{tableId} where TABLE_ID = #{turnTableId}
+    </update>
 </mapper>

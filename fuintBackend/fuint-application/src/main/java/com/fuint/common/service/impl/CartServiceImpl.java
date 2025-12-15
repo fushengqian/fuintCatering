@@ -361,4 +361,16 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
         }
         return mtCart;
     }
+
+    /**
+     * 转台
+     *
+     * @param  tableId 桌台ID
+     * @return
+     */
+    @Override
+    @OperationServiceLog(description = "执行转台")
+    public void turnTable(Integer tableId, Integer turnTableId) {
+        mtCartMapper.turnTable(tableId, turnTableId);
+    }
 }
