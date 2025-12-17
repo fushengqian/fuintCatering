@@ -6,7 +6,6 @@ import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.repository.model.MtBookCate;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 预约类别业务接口
@@ -52,12 +51,13 @@ public interface BookCateService extends IService<MtBookCate> {
     MtBookCate updateBookCate(MtBookCate mtBookCate) throws BusinessCheckException;
 
     /**
-     * 根据条件搜索预约类别
+     * 获取可用的预约类别
      *
-     * @param  params 查询参数
+     * @param  merchantId 商户ID
+     * @param  storeId 店铺ID
      * @throws BusinessCheckException
      * @return
      * */
-    List<MtBookCate> queryBookCateListByParams(Map<String, Object> params) throws BusinessCheckException;
+    List<MtBookCate> getAvailableBookCate(Integer merchantId, Integer storeId) throws BusinessCheckException;
 
 }

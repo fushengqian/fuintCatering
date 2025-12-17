@@ -1,18 +1,17 @@
 package com.fuint.module.backendApi.controller;
 
-import com.fuint.common.Constants;
 import com.fuint.common.dto.AccountInfo;
 import com.fuint.common.dto.BalanceDto;
 import com.fuint.common.dto.RechargeRuleDto;
 import com.fuint.common.enums.BalanceSettingEnum;
 import com.fuint.common.enums.SettingTypeEnum;
 import com.fuint.common.enums.StatusEnum;
+import com.fuint.common.param.BalancePage;
 import com.fuint.common.service.BalanceService;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.SettingService;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
@@ -20,7 +19,6 @@ import com.fuint.module.backendApi.request.RechargeRequest;
 import com.fuint.repository.model.MtBalance;
 import com.fuint.repository.model.MtSetting;
 import com.fuint.repository.model.MtUser;
-import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -64,42 +62,16 @@ public class BackendBalanceController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('balance:list')")
-    public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
-        Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
-        String mobile = request.getParameter("mobile") == null ? "" : request.getParameter("mobile");
-        String userId = request.getParameter("userId") == null ? "" : request.getParameter("userId");
-        String userNo = request.getParameter("userNo") == null ? "" : request.getParameter("userNo");
-        String orderSn = request.getParameter("orderSn") == null ? "" : request.getParameter("orderSn");
-        String status = request.getParameter("status") == null ? StatusEnum.ENABLED.getKey() : request.getParameter("status");
-
+    public ResponseObject list(HttpServletRequest request, @ModelAttribute BalancePage balancePage) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-
-        Map<String, Object> searchParams = new HashMap<>();
-        if (StringUtil.isNotEmpty(mobile)) {
-            searchParams.put("mobile", mobile);
-        }
-        if (StringUtil.isNotEmpty(userId)) {
-            searchParams.put("userId", userId);
-        }
-        if (StringUtil.isNotEmpty(userNo)) {
-            searchParams.put("userNo", userNo);
-        }
-        if (StringUtil.isNotEmpty(orderSn)) {
-            searchParams.put("orderSn", orderSn);
-        }
-        if (StringUtil.isNotEmpty(status)) {
-            searchParams.put("status", status);
-        }
-        Integer storeId = accountInfo.getStoreId();
-        if (storeId != null && storeId > 0) {
-            searchParams.put("storeId", storeId);
+        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
+            balancePage.setStoreId(accountInfo.getStoreId());
         }
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            searchParams.put("merchantId", accountInfo.getMerchantId());
+            balancePage.setMerchantId(accountInfo.getMerchantId());
         }
 
-        PaginationResponse<BalanceDto> paginationResponse = balanceService.queryBalanceListByPagination(new PaginationRequest(page, pageSize, searchParams));
+        PaginationResponse<BalanceDto> paginationResponse = balanceService.queryBalanceListByPagination(balancePage);
 
         Map<String, Object> result = new HashMap<>();
         result.put("paginationResponse", paginationResponse);

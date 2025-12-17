@@ -27,11 +27,11 @@ public interface CateService extends IService<MtGoodsCate> {
     /**
      * 添加商品分类
      *
-     * @param  reqDto 分类参数
+     * @param  mtGoodsCate 分类参数
      * @throws BusinessCheckException
      * @return
      */
-    MtGoodsCate addCate(MtGoodsCate reqDto) throws BusinessCheckException;
+    MtGoodsCate addCate(MtGoodsCate mtGoodsCate) throws BusinessCheckException;
 
     /**
      * 根据ID获取商品分类信息
@@ -53,11 +53,11 @@ public interface CateService extends IService<MtGoodsCate> {
 
     /**
      * 更新分类
-     * @param  reqDto 分类参数
+     * @param  mtGoodsCate 分类参数
      * @throws BusinessCheckException
      * @return
      * */
-    MtGoodsCate updateCate(MtGoodsCate reqDto) throws BusinessCheckException;
+    MtGoodsCate updateCate(MtGoodsCate mtGoodsCate) throws BusinessCheckException;
 
     /**
      * 获取分类列表

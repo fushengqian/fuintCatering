@@ -6,13 +6,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.BookDto;
 import com.fuint.common.dto.DayDto;
 import com.fuint.common.dto.TimeDto;
+import com.fuint.common.param.BookPage;
 import com.fuint.common.param.BookableParam;
 import com.fuint.common.service.BookService;
 import com.fuint.common.service.StoreService;
 import com.fuint.common.util.DateUtil;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.mapper.MtBookItemMapper;
 import com.fuint.repository.mapper.MtBookMapper;
@@ -69,33 +69,33 @@ public class BookServiceImpl extends ServiceImpl<MtBookMapper, MtBook> implement
     /**
      * 分页查询预约列表
      *
-     * @param paginationRequest
+     * @param bookPage
      * @return
      */
     @Override
-    public PaginationResponse<BookDto> queryBookListByPagination(PaginationRequest paginationRequest) {
-        Page<MtBanner> pageHelper = PageHelper.startPage(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
+    public PaginationResponse<BookDto> queryBookListByPagination(BookPage bookPage) {
+        Page<MtBanner> pageHelper = PageHelper.startPage(bookPage.getPage(), bookPage.getPageSize());
         LambdaQueryWrapper<MtBook> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.ne(MtBook::getStatus, StatusEnum.DISABLE.getKey());
 
-        String name = paginationRequest.getSearchParams().get("name") == null ? "" : paginationRequest.getSearchParams().get("name").toString();
+        String name = bookPage.getName();
         if (StringUtils.isNotBlank(name)) {
             lambdaQueryWrapper.like(MtBook::getName, name);
         }
-        String cateId = paginationRequest.getSearchParams().get("cateId") == null ? "" : paginationRequest.getSearchParams().get("cateId").toString();
-        if (StringUtils.isNotBlank(cateId)) {
+        Integer cateId = bookPage.getCateId();
+        if (cateId != null && cateId > 0) {
             lambdaQueryWrapper.like(MtBook::getCateId, cateId);
         }
-        String status = paginationRequest.getSearchParams().get("status") == null ? "" : paginationRequest.getSearchParams().get("status").toString();
+        String status = bookPage.getStatus();
         if (StringUtils.isNotBlank(status)) {
             lambdaQueryWrapper.eq(MtBook::getStatus, status);
         }
-        String merchantId = paginationRequest.getSearchParams().get("merchantId") == null ? "" : paginationRequest.getSearchParams().get("merchantId").toString();
-        if (StringUtils.isNotBlank(merchantId)) {
+        Integer merchantId = bookPage.getMerchantId();
+        if (merchantId != null && merchantId > 0) {
             lambdaQueryWrapper.eq(MtBook::getMerchantId, merchantId);
         }
-        String storeId = paginationRequest.getSearchParams().get("storeId") == null ? "" : paginationRequest.getSearchParams().get("storeId").toString();
-        if (StringUtils.isNotBlank(storeId)) {
+        Integer storeId = bookPage.getStoreId();
+        if (storeId != null && storeId > 0) {
             lambdaQueryWrapper.and(wq -> wq
                     .eq(MtBook::getStoreId, 0)
                     .or()
@@ -115,7 +115,7 @@ public class BookServiceImpl extends ServiceImpl<MtBookMapper, MtBook> implement
             }
         }
 
-        PageRequest pageRequest = PageRequest.of(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
+        PageRequest pageRequest = PageRequest.of(bookPage.getPage(), bookPage.getPageSize());
         PageImpl pageImpl = new PageImpl(dataList, pageRequest, pageHelper.getTotal());
         PaginationResponse<BookDto> paginationResponse = new PaginationResponse(pageImpl, BookDto.class);
         paginationResponse.setTotalPages(pageHelper.getPages());
