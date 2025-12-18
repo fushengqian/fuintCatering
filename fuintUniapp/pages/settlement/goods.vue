@@ -492,11 +492,6 @@
               return false
           }
           
-          const tableId = uni.getStorageSync("tableId") ? uni.getStorageSync("tableId") : 0;
-          if (tableId > 0) {
-              return app.doSubmitOrder(PayTypeEnum.WECHAT.value);
-          }
-          
           if (app.totalPrice < 0 || app.goodsCart.length < 1) {
               app.disabled = true
               return false

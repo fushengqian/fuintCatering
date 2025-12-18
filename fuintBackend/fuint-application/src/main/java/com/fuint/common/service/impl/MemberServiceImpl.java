@@ -630,9 +630,6 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
                 mtUser.setIsStaff(YesOrNoEnum.NO.getKey());
             }
         }
-        if (mtUser.getIsStaff() == null) {
-            mtUser.setIsStaff(YesOrNoEnum.NO.getKey());
-        }
         return mtUser;
     }
 

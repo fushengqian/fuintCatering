@@ -123,7 +123,7 @@ public class BackendBookController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
-    public ResponseObject saveHandler(HttpServletRequest request, BookDto bookDto) throws BusinessCheckException {
+    public ResponseObject saveHandler(HttpServletRequest request, @RequestBody BookDto bookDto) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() < 1) {
             getFailureResult(5002);
