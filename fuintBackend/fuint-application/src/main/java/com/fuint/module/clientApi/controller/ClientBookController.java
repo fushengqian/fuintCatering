@@ -75,7 +75,7 @@ public class ClientBookController extends BaseController {
     @ApiOperation(value="获取预约项目列表", notes="获取预约项目列表")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject list(HttpServletRequest request,  @RequestBody BookListParam param) throws BusinessCheckException, InvocationTargetException, IllegalAccessException {
+    public ResponseObject list(HttpServletRequest request, @RequestBody BookListParam param) throws BusinessCheckException, InvocationTargetException, IllegalAccessException {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
 
@@ -166,7 +166,7 @@ public class ClientBookController extends BaseController {
         String date = param.get("date") == null ? "" : param.get("date").toString();
         String time = param.get("time") == null ? "" : param.get("time").toString();
 
-        UserInfo loginInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo loginInfo = TokenUtil.getUserInfo();
 
         MtUser mtUser = memberService.queryMemberById(loginInfo.getId());
         BookDto bookInfo = bookService.getBookById(Integer.parseInt(bookId), true);
@@ -203,7 +203,7 @@ public class ClientBookController extends BaseController {
         if (merchantId > 0) {
             bookItemPage.setMerchantId(merchantId);
         }
-        UserInfo loginInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo loginInfo = TokenUtil.getUserInfo();
         bookItemPage.setUserId(loginInfo.getId());
         if (StringUtil.isNotEmpty(status)) {
             bookItemPage.setStatus(status);
@@ -231,7 +231,7 @@ public class ClientBookController extends BaseController {
     public ResponseObject cancel(HttpServletRequest request) throws BusinessCheckException {
         String bookId = request.getParameter("bookId");
         String remark = request.getParameter("remark") == null ? "会员取消" : request.getParameter("remark");
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo mtUser = TokenUtil.getUserInfo();
 
         if (StringUtil.isEmpty(bookId)) {
             return getFailureResult(2000, "订单不能为空");

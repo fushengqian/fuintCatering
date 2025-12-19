@@ -35,7 +35,7 @@ public class ClassUtil {
                                                               .valueOf(INNER_CLASS_SEPARATOR_CHAR);
 
     /** 所有类的信息表，包括父类, 接口, 数组的维数等信息。 */
-    private static Map         TYPE_MAP                   = Collections
+    private static final Map         TYPE_MAP                   = Collections
                                                               .synchronizedMap(new WeakHashMap());
 
     /* ============================================================================ */
@@ -971,11 +971,11 @@ public class ClassUtil {
      * 代表一个类的信息, 包括父类, 接口, 数组的维数等.
      */
     protected static class TypeInfo {
-        private Class type;
-        private Class componentType;
+        private final Class type;
+        private final Class componentType;
         private int   dimension;
-        private List  superclasses = new ArrayList(2);
-        private List  interfaces   = new ArrayList(2);
+        private final List  superclasses = new ArrayList(2);
+        private final List  interfaces   = new ArrayList(2);
 
         /**
          * 创建 <code>TypeInfo</code>。

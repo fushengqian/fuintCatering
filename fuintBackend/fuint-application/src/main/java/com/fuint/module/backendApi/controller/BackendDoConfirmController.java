@@ -23,7 +23,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -129,12 +128,12 @@ public class BackendDoConfirmController extends BaseController {
     @RequestMapping(value = "/doConfirm", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:confirm:index')")
-    public ResponseObject doConfirm(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject doConfirm(@RequestBody Map<String, Object> param) throws BusinessCheckException {
         String userCouponId = param.get("userCouponId") == null ? "" : param.get("userCouponId").toString();
         String amount = (param.get("amount") == null || StringUtil.isEmpty(param.get("amount").toString())) ? "0" : param.get("amount").toString();
         String remark = (param.get("remark") == null || StringUtil.isEmpty(param.get("remark").toString())) ? "后台核销" : param.get("remark").toString();
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (StringUtil.isEmpty(userCouponId)) {
             return getFailureResult(201, "系统参数有误");
         }

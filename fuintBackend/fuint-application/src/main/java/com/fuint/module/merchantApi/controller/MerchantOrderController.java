@@ -22,7 +22,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 订单类controller
@@ -57,8 +56,8 @@ public class MerchantOrderController extends BaseController {
     @ApiOperation(value = "获取订单列表")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject list(HttpServletRequest request, @RequestBody OrderListParam params) throws BusinessCheckException {
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject list(@RequestBody OrderListParam params) throws BusinessCheckException {
+        UserInfo userInfo = TokenUtil.getUserInfo();
 
         MtUser mtUser = memberService.queryMemberById(userInfo.getId());
         MtStaff staffInfo = staffService.queryStaffByMobile(mtUser.getMobile());
@@ -80,8 +79,8 @@ public class MerchantOrderController extends BaseController {
     @ApiOperation(value = "获取订单详情")
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject detail(HttpServletRequest request, @RequestBody OrderDetailParam param) throws BusinessCheckException {
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject detail(@RequestBody OrderDetailParam param) throws BusinessCheckException {
+        UserInfo userInfo = TokenUtil.getUserInfo();
 
         MtUser mtUser = memberService.queryMemberById(userInfo.getId());
         MtStaff mtStaff = staffService.queryStaffByMobile(mtUser.getMobile());
@@ -105,8 +104,8 @@ public class MerchantOrderController extends BaseController {
     @ApiOperation(value = "取消订单")
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject cancel(HttpServletRequest request, @RequestBody OrderDetailParam param) throws BusinessCheckException {
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject cancel(@RequestBody OrderDetailParam param) throws BusinessCheckException {
+        UserInfo mtUser = TokenUtil.getUserInfo();
 
         String orderId = param.getOrderId();
         if (orderId == null || StringUtil.isEmpty(orderId)) {
@@ -135,8 +134,8 @@ public class MerchantOrderController extends BaseController {
     @ApiOperation(value = "核销订单")
     @RequestMapping(value = "/confirm", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject confirm(HttpServletRequest request, @RequestBody OrderConfirmParam param) throws BusinessCheckException {
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject confirm(@RequestBody OrderConfirmParam param) throws BusinessCheckException {
+        UserInfo mtUser = TokenUtil.getUserInfo();
 
         Integer orderId = param.getOrderId();
 

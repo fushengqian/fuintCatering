@@ -60,7 +60,7 @@ public class MerchantBalanceController extends BaseController {
     @CrossOrigin
     public ResponseObject doRecharge(HttpServletRequest request, @RequestBody RechargeParam rechargeParam) throws BusinessCheckException {
         Integer merchantId = merchantService.getMerchantId(request.getHeader("merchantNo"));
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo userInfo = TokenUtil.getUserInfo();
         if (null == userInfo) {
             return getFailureResult(1001);
         }

@@ -69,7 +69,7 @@ public class BackendStoreController extends BaseController {
         String storeName = request.getParameter("name");
         String storeStatus = request.getParameter("status");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         Map<String, Object> params = new HashMap<>();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
@@ -106,7 +106,7 @@ public class BackendStoreController extends BaseController {
         Integer storeId = request.getParameter("id") == null ? 0 : Integer.parseInt(request.getParameter("id"));
         String storeName = request.getParameter("name") == null ? "" : request.getParameter("name");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
             storeId = accountInfo.getStoreId();
@@ -129,11 +129,11 @@ public class BackendStoreController extends BaseController {
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('store:add')")
-    public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
+    public ResponseObject updateStatus(@RequestBody Map<String, Object> params) throws BusinessCheckException {
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer storeId = params.get("storeId") == null ? 0 : Integer.parseInt(params.get("storeId").toString());
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         storeService.updateStatus(storeId, accountInfo.getAccountName(), status);
 
         return getSuccessResult(true);
@@ -146,8 +146,8 @@ public class BackendStoreController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('store:add')")
-    public ResponseObject saveHandler(HttpServletRequest request, @RequestBody StoreSubmitRequest storeParam) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject saveHandler(@RequestBody StoreSubmitRequest storeParam) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         StoreDto storeDto = new StoreDto();
 
         if ((StringUtil.isEmpty(storeParam.getLatitude()) || StringUtil.isEmpty(storeParam.getLongitude())) && StringUtil.isNotEmpty(storeParam.getAddress())) {
@@ -155,7 +155,6 @@ public class BackendStoreController extends BaseController {
             storeParam.setLatitude(latAndLng.get("lat").toString());
             storeParam.setLongitude(latAndLng.get("lng").toString());
         }
-
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
             if (storeParam.getId() == null) {
                 return getFailureResult(201, "店铺帐号不能新增店铺，请使用商户帐号添加！");
@@ -191,8 +190,8 @@ public class BackendStoreController extends BaseController {
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('store:list')")
-    public ResponseObject getStoreInfo(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject getStoreInfo(@PathVariable("id") Integer id) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         StoreDto storeInfo = storeService.queryStoreDtoById(id);
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {

@@ -60,9 +60,8 @@ public class MerchantController extends BaseController {
     @ApiOperation(value = "查询商户信息")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject info(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(token);
+    public ResponseObject info() throws BusinessCheckException {
+        UserInfo userInfo = TokenUtil.getUserInfo();
         if (null == userInfo) {
             return getFailureResult(1001, "用户未登录");
         }

@@ -67,7 +67,7 @@ public class BackendTableController extends BaseController {
         String status = request.getParameter("status");
         String searchStoreId = request.getParameter("storeId");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         Integer storeId = accountInfo.getStoreId();
 
         Map<String, Object> params = new HashMap<>();
@@ -105,11 +105,11 @@ public class BackendTableController extends BaseController {
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('table:index')")
-    public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
+    public ResponseObject updateStatus(@RequestBody Map<String, Object> params) throws BusinessCheckException {
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         MtTable mtTable = tableService.queryTableById(id);
         if (mtTable == null) {
@@ -130,7 +130,7 @@ public class BackendTableController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('table:index')")
-    public ResponseObject saveHandler(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
+    public ResponseObject saveHandler(@RequestBody Map<String, Object> params) throws BusinessCheckException {
         String id = params.get("id") == null ? "" : params.get("id").toString();
         String status = params.get("status") == null ? StatusEnum.ENABLED.getKey() : params.get("status").toString();
         String storeId = params.get("storeId") == null ? "0" : params.get("storeId").toString();
@@ -140,7 +140,7 @@ public class BackendTableController extends BaseController {
         String maxPeople = params.get("maxPeople") == null ? "0" : params.get("maxPeople").toString();
         String useStatus = params.get("useStatus") == null ? TableUseStatusEnum.AVAILABLE.getKey() : params.get("useStatus").toString();
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         MtTable mtTable = new MtTable();
         mtTable.setOperator(accountInfo.getAccountName());
         mtTable.setStatus(status);
@@ -174,8 +174,8 @@ public class BackendTableController extends BaseController {
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('table:index')")
-    public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject info(@PathVariable("id") Integer id) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         MtTable tableInfo = tableService.queryTableById(id);
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {

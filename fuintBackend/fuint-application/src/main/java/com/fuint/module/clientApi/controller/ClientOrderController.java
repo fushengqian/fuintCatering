@@ -45,8 +45,8 @@ public class ClientOrderController extends BaseController {
     @ApiOperation(value = "获取我的订单列表")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject list(HttpServletRequest request, @RequestBody OrderListParam orderListParam) throws BusinessCheckException {
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject list(@RequestBody OrderListParam orderListParam) throws BusinessCheckException {
+        UserInfo userInfo = TokenUtil.getUserInfo();
         orderListParam.setUserId(userInfo.getId());
         PaginationResponse orderData = orderService.getUserOrderList(orderListParam);
         return getSuccessResult(orderData);
@@ -59,7 +59,7 @@ public class ClientOrderController extends BaseController {
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject detail(HttpServletRequest request) throws BusinessCheckException {
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo userInfo = TokenUtil.getUserInfo();
         if (userInfo == null) {
             return getFailureResult(1001, "用户未登录");
         }
@@ -87,7 +87,7 @@ public class ClientOrderController extends BaseController {
     @RequestMapping(value = "/cancel", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject cancel(HttpServletRequest request) throws BusinessCheckException {
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo mtUser = TokenUtil.getUserInfo();
         String orderId = request.getParameter("orderId");
         if (StringUtil.isEmpty(orderId)) {
             return getFailureResult(201, "订单不能为空");
@@ -115,7 +115,7 @@ public class ClientOrderController extends BaseController {
     @RequestMapping(value = "/receipt", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject receipt(HttpServletRequest request) throws BusinessCheckException {
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo mtUser = TokenUtil.getUserInfo();
 
         String orderId = request.getParameter("orderId");
         if (StringUtil.isEmpty(orderId)) {
@@ -142,7 +142,7 @@ public class ClientOrderController extends BaseController {
     @RequestMapping(value = "/todoCounts", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject todoCounts(HttpServletRequest request) throws BusinessCheckException {
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo userInfo = TokenUtil.getUserInfo();
 
         Map<String, Object> result = new HashMap<>();
 

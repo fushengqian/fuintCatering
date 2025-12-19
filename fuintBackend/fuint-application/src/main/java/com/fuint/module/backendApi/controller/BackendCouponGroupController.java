@@ -81,7 +81,7 @@ public class BackendCouponGroupController extends BaseController {
         String id = request.getParameter("id") == null ? "" : request.getParameter("id");
         String status = request.getParameter("status") == null ? StatusEnum.ENABLED.getKey() : request.getParameter("status");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         Map<String, Object> searchParams = new HashMap<>();
         if (StringUtil.isNotEmpty(name)) {
             searchParams.put("name", name);
@@ -145,9 +145,8 @@ public class BackendCouponGroupController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:group:edit')")
-    public ResponseObject save(HttpServletRequest request, @RequestBody ReqCouponGroupDto reqCouponGroupDto) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+    public ResponseObject save(@RequestBody ReqCouponGroupDto reqCouponGroupDto) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         reqCouponGroupDto.setMerchantId(accountInfo.getMerchantId());
         reqCouponGroupDto.setStoreId(accountInfo.getStoreId());
         reqCouponGroupDto.setOperator(accountInfo.getAccountName());
@@ -166,9 +165,8 @@ public class BackendCouponGroupController extends BaseController {
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:group:edit')")
-    public ResponseObject delete(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+    public ResponseObject delete(@PathVariable("id") Integer id) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         // 该分组已有数据，不允许删除
         Map<String, Object> searchParams = new HashMap<>();
@@ -192,11 +190,10 @@ public class BackendCouponGroupController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:group:edit')")
     public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         ReqCouponGroupDto groupDto = new ReqCouponGroupDto();
         groupDto.setOperator(accountInfo.getAccountName());
         groupDto.setId(id);
@@ -256,8 +253,7 @@ public class BackendCouponGroupController extends BaseController {
     @RequestMapping(value = "/upload/", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
     @CrossOrigin
     public ResponseObject uploadFile(HttpServletRequest request, @RequestParam("fileInput") MultipartFile file) throws Exception {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         String filePath = uploadService.saveUploadFile(request, file);
         String uuid = couponGroupService.importSendCoupon(file, accountInfo.getAccountName(), filePath);
@@ -270,8 +266,8 @@ public class BackendCouponGroupController extends BaseController {
     @ApiOperation(value = "查询分组列表")
     @RequestMapping(value = "/quickSearch", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject quickSearch(HttpServletRequest request) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject quickSearch() throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         Map<String, Object> param = new HashMap<>();
         param.put("status", StatusEnum.ENABLED.getKey());

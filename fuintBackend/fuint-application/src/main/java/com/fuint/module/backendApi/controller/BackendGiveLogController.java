@@ -71,7 +71,7 @@ public class BackendGiveLogController extends BaseController {
         String userId = request.getParameter("userId") == null ? "" : request.getParameter("userId");
         String couponId = request.getParameter("couponId") == null ? "" : request.getParameter("couponId");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         Integer storeId = accountInfo.getStoreId() == null ? 0 : accountInfo.getStoreId();
         Map<String, Object> params = new HashMap<>();
         if (StringUtil.isNotEmpty(mobile)) {
@@ -123,17 +123,17 @@ public class BackendGiveLogController extends BaseController {
                 MtCouponGroup groupInfo = mtCouponGroupMapper.selectById(userCouponInfo.getGroupId());
                 MtCoupon couponInfo = mtCouponMapper.selectById(userCouponInfo.getCouponId());
                 if (groupInfo != null && couponInfo != null) {
-                    GiveItemDto dto = new GiveItemDto();
-                    dto.setId(item.getId());
-                    dto.setMobile(CommonUtil.hidePhone(giveInfo.getUserMobile()));
-                    dto.setUserMobile(CommonUtil.hidePhone(giveInfo.getUserMobile()));
-                    dto.setGroupId(userCouponInfo.getGroupId());
-                    dto.setGroupName(groupInfo.getName());
-                    dto.setCouponId(userCouponInfo.getCouponId());
-                    dto.setCouponName(couponInfo.getName());
-                    dto.setMoney(userCouponInfo.getAmount());
-                    dto.setCreateTime(item.getCreateTime());
-                    dataList.add(dto);
+                    GiveItemDto giveItem = new GiveItemDto();
+                    giveItem.setId(item.getId());
+                    giveItem.setMobile(CommonUtil.hidePhone(giveInfo.getUserMobile()));
+                    giveItem.setUserMobile(CommonUtil.hidePhone(giveInfo.getUserMobile()));
+                    giveItem.setGroupId(userCouponInfo.getGroupId());
+                    giveItem.setGroupName(groupInfo.getName());
+                    giveItem.setCouponId(userCouponInfo.getCouponId());
+                    giveItem.setCouponName(couponInfo.getName());
+                    giveItem.setMoney(userCouponInfo.getAmount());
+                    giveItem.setCreateTime(item.getCreateTime());
+                    dataList.add(giveItem);
                 }
             }
         }

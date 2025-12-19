@@ -61,8 +61,8 @@ public class BackendCateController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:cate:index')")
-    public ResponseObject list(HttpServletRequest request, @ModelAttribute GoodsCatePage goodsCatePage) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject list(@ModelAttribute GoodsCatePage goodsCatePage) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             goodsCatePage.setMerchantId(accountInfo.getMerchantId());
         }
@@ -88,11 +88,11 @@ public class BackendCateController extends BaseController {
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:cate:index')")
-    public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
+    public ResponseObject updateStatus(@RequestBody Map<String, Object> params) throws BusinessCheckException {
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         MtGoodsCate mtCate = cateService.queryCateById(id);
         if (mtCate == null) {
@@ -114,7 +114,7 @@ public class BackendCateController extends BaseController {
     @ApiOperation(value = "保存商品分类")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('goods:cate:index')")
-    public ResponseObject save(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
+    public ResponseObject save(@RequestBody Map<String, Object> params) throws BusinessCheckException {
         String id = params.get("id") == null ? "" : params.get("id").toString();
         String name = params.get("name") == null ? "" : CommonUtil.replaceXSS(params.get("name").toString());
         String description = params.get("description") == null ? "" : CommonUtil.replaceXSS(params.get("description").toString());
@@ -123,7 +123,7 @@ public class BackendCateController extends BaseController {
         String status = params.get("status") == null ? StatusEnum.ENABLED.getKey() : params.get("status").toString();
         Integer storeId = (params.get("storeId") == null || StringUtil.isEmpty(params.get("storeId").toString())) ? 0 : Integer.parseInt(params.get("storeId").toString());
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         Integer myStoreId = accountInfo.getStoreId();
         if (myStoreId > 0) {
             storeId = myStoreId;
@@ -157,21 +157,17 @@ public class BackendCateController extends BaseController {
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:cate:index')")
-    public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
-
+    public ResponseObject info(@PathVariable("id") Integer id) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         MtGoodsCate mtCate = cateService.queryCateById(id);
-
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             if (!accountInfo.getMerchantId().equals(mtCate.getMerchantId())) {
                 return getFailureResult(1004);
             }
         }
-
         Map<String, Object> result = new HashMap<>();
         result.put("cateInfo", mtCate);
         result.put("imagePath", settingService.getUploadBasePath());
-
         return getSuccessResult(result);
     }
 }

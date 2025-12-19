@@ -71,11 +71,11 @@ public class BackendCommonController extends BaseController {
     @ApiOperation(value = "生成二维码")
     @RequestMapping(value = "/createQrCode", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject createQrCode(HttpServletRequest request, @RequestBody QrParam qrParam) throws Exception {
+    public ResponseObject createQrCode(@RequestBody QrParam qrParam) throws Exception {
         String type = qrParam.getType() != null ? qrParam.getType() : "";
         Integer id = qrParam.getId() == null ? 0 : qrParam.getId();
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         Integer merchantId = accountInfo.getMerchantId();
         String page = QrCodeEnum.STORE.getPage() + "?" + QrCodeEnum.STORE.getKey() + "Id=" + id;
         if (type.equals(QrCodeEnum.TABLE.getKey())) {

@@ -10,7 +10,7 @@ import java.security.SecureRandom;
 
 /**
  * 支持SHA-1/MD5消息摘要的工具类.
- * 
+ *
  * 返回ByteSource，可进一步被编码为Hex, Base64或UrlSafeBase64
  *
  * Created by FSQ
@@ -21,7 +21,7 @@ public class Digests {
     private static final String SHA1 = "SHA-1";
     private static final String MD5  = "MD5";
 
-    private static SecureRandom random = new SecureRandom();
+    private static final SecureRandom random = new SecureRandom();
 
     /**
      * 对输入字符串进行sha1散列.
@@ -63,7 +63,7 @@ public class Digests {
 
     /**
      * 生成随机的Byte[]作为salt.
-     * 
+     *
      * @param numBytes byte数组的大小
      */
     public static byte[] generateSalt(int numBytes) {

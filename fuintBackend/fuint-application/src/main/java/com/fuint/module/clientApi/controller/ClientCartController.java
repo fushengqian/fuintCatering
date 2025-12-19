@@ -81,7 +81,7 @@ public class ClientCartController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject save(HttpServletRequest request, @RequestBody CartSaveParam saveParam) throws BusinessCheckException {
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo userInfo = TokenUtil.getUserInfo();
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
         Integer tableId = StringUtil.isEmpty(request.getHeader("tableId")) ? 0 : Integer.parseInt(request.getHeader("tableId"));
@@ -110,7 +110,7 @@ public class ClientCartController extends BaseController {
             }
         }
         if (mtUser == null && StringUtil.isNotEmpty(request.getHeader("Access-Token"))) {
-            AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+            AccountInfo accountInfo = TokenUtil.getAccountInfo();
             if (accountInfo != null) {
                 if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
                     return getFailureResult(5002);
@@ -146,7 +146,7 @@ public class ClientCartController extends BaseController {
             merchantId = mtUser.getMerchantId();
         }
         if (merchantId <= 0) {
-            AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+            AccountInfo accountInfo = TokenUtil.getAccountInfo();
             if (accountInfo != null) {
                 merchantId = accountInfo.getMerchantId();
                 if (merchantId == null || merchantId <= 0) {
@@ -186,7 +186,7 @@ public class ClientCartController extends BaseController {
         Integer userId = clearParam.getUserId() == null ? 0 : clearParam.getUserId();
         Integer tableId = clearParam.getTableId() == null ? 0 : clearParam.getTableId();
 
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo userInfo = TokenUtil.getUserInfo();
         MtUser mtUser;
         if (userInfo == null) {
             mtUser = memberService.getCurrentUserInfo(request, userId, request.getHeader("Access-Token"));
@@ -257,7 +257,7 @@ public class ClientCartController extends BaseController {
         result.put("memberDiscount", 0);
 
         Map<String, Object> param = new HashMap<>();
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo userInfo = TokenUtil.getUserInfo();
         MtUser mtUser;
         // 没有会员信息，则查询是否是后台收银员下单
         if (userInfo == null) {

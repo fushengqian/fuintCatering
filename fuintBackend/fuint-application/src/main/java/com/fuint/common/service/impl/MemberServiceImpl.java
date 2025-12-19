@@ -156,7 +156,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         MtUser mtUser = null;
 
         // 没有会员信息，则查询是否是后台收银员下单
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo != null) {
             // 输入了会员ID就用会员的账号下单，否则用员工账号下单
             if (userId != null && userId > 0) {

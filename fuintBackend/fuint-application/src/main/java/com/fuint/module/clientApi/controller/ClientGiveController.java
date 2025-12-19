@@ -19,7 +19,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,8 +50,8 @@ public class ClientGiveController extends BaseController {
     @ApiOperation(value = "转赠卡券")
     @RequestMapping(value = "/doGive", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject doGive(HttpServletRequest request, @RequestBody GiveParam giveParam) throws BusinessCheckException {
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject doGive(@RequestBody GiveParam giveParam) throws BusinessCheckException {
+        UserInfo userInfo = TokenUtil.getUserInfo();
         MtUser mtUser = memberService.queryMemberById(userInfo.getId());
         giveParam.setUserId(mtUser.getId());
         giveParam.setStoreId(mtUser.getStoreId());
@@ -67,8 +66,8 @@ public class ClientGiveController extends BaseController {
     @ApiOperation(value = "查询转赠记录")
     @RequestMapping(value = "/giveLog", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject giveLog(HttpServletRequest request, @RequestBody GiveListParam giveListParam) throws BusinessCheckException {
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject giveLog(@RequestBody GiveListParam giveListParam) throws BusinessCheckException {
+        UserInfo mtUser = TokenUtil.getUserInfo();
         String mobile = giveListParam.getMobile() == null ? "" : giveListParam.getMobile();
         String type = giveListParam.getType() == null ? "give" : giveListParam.getType();
         Integer page = giveListParam.getPage() == null ? Constants.PAGE_NUMBER : giveListParam.getPage();

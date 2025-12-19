@@ -67,11 +67,11 @@ public class ClientShareController extends BaseController {
     @ApiOperation(value="获取邀请列表", notes="获取邀请列表")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject list(HttpServletRequest request,  @RequestBody ShareListParam param) throws BusinessCheckException, InvocationTargetException, IllegalAccessException {
+    public ResponseObject list(HttpServletRequest request, @RequestBody ShareListParam param) throws BusinessCheckException, InvocationTargetException, IllegalAccessException {
         Integer page = param.getPage() == null ? Constants.PAGE_NUMBER : param.getPage();
         Integer pageSize = param.getPageSize() == null ? Constants.PAGE_SIZE : param.getPageSize();
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo userInfo = TokenUtil.getUserInfo();
 
         Map<String, Object> params = new HashMap<>();
         params.put("status", StatusEnum.ENABLED.getKey());
@@ -98,7 +98,7 @@ public class ClientShareController extends BaseController {
     @CrossOrigin
     public ResponseObject getMiniAppLink(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo mtUser = TokenUtil.getUserInfo();
         if (null == mtUser) {
             return getFailureResult(1001);
         }
@@ -115,7 +115,6 @@ public class ClientShareController extends BaseController {
         }
 
         String link = weixinService.createMiniAppLink(merchantId, path + query);
-
         Map<String, Object> outParams = new HashMap();
         outParams.put("link", link);
 

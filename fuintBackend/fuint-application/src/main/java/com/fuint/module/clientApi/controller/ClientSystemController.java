@@ -76,7 +76,7 @@ public class ClientSystemController extends BaseController {
         String longitude = request.getHeader("longitude") == null ? "" : request.getHeader("longitude");
         String tableId =  request.getHeader("tableId") == null ? "" : request.getHeader("tableId");
 
-        UserInfo loginInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo loginInfo = TokenUtil.getUserInfo();
         Integer merchantId = merchantService.getMerchantId(merchantNo);
 
         // 默认店铺，取会员之前选择的店铺

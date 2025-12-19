@@ -51,7 +51,7 @@ public class BackendActionLogController extends BaseController {
         String beginTime = request.getParameter("params[beginTime]") == null ? "" : request.getParameter("params[beginTime]");
         String endTime = request.getParameter("params[endTime]") == null ? "" : request.getParameter("params[endTime]");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         Map<String, Object> searchParams = new HashMap<>();
         if (StringUtil.isNotEmpty(accountName)) {

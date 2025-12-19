@@ -19,7 +19,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +57,8 @@ public class BackendArticleController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('content:article:index')")
-    public ResponseObject list(HttpServletRequest request, @ModelAttribute ArticlePage articlePage) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject list(@ModelAttribute ArticlePage articlePage) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             articlePage.setMerchantId(accountInfo.getMerchantId());
         }
@@ -86,8 +85,8 @@ public class BackendArticleController extends BaseController {
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('content:article:edit')")
-    public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject updateStatus(@RequestBody Map<String, Object> params) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
@@ -112,8 +111,8 @@ public class BackendArticleController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('content:article:add')")
-    public ResponseObject saveHandler(HttpServletRequest request, @RequestBody ArticleDto articleDto) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject saveHandler(@RequestBody ArticleDto articleDto) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         articleDto.setOperator(accountInfo.getAccountName());
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             articleDto.setMerchantId(accountInfo.getMerchantId());
@@ -138,8 +137,8 @@ public class BackendArticleController extends BaseController {
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('content:article:index')")
-    public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject info(@PathVariable("id") Integer id) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         MtArticle articleInfo = articleService.queryArticleById(id);
 
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {

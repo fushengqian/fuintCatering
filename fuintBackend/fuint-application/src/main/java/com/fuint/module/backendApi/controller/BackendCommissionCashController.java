@@ -67,7 +67,7 @@ public class BackendCommissionCashController extends BaseController {
         String startTime = request.getParameter("startTime") == null ? "" : request.getParameter("startTime");
         String endTime = request.getParameter("endTime") == null ? "" : request.getParameter("endTime");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         Integer storeId = accountInfo.getStoreId();
 
         Map<String, Object> params = new HashMap<>();
@@ -117,8 +117,8 @@ public class BackendCommissionCashController extends BaseController {
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:cash:index')")
-    public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject info(@PathVariable("id") Integer id) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         CommissionCashDto commissionCash = commissionCashService.queryCommissionCashById(id);
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
@@ -139,8 +139,8 @@ public class BackendCommissionCashController extends BaseController {
     @ApiOperation(value = "修改分销提成提现")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:cash:index')")
-    public ResponseObject save(HttpServletRequest request, @RequestBody CommissionCashRequest commissionCashRequest) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject save(@RequestBody CommissionCashRequest commissionCashRequest) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (!checkOwner(commissionCashRequest.getId(), accountInfo)) {
             return getFailureResult(1004);
         }
@@ -155,8 +155,8 @@ public class BackendCommissionCashController extends BaseController {
     @ApiOperation(value = "支付结算金额到用户余额")
     @RequestMapping(value = "/payToBalance", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:cash:index')")
-    public ResponseObject payToBalance(HttpServletRequest request, @RequestBody CommissionCashRequest commissionCashRequest) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject payToBalance(@RequestBody CommissionCashRequest commissionCashRequest) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         commissionCashRequest.setOperator(accountInfo.getAccountName());
         if (!checkOwner(commissionCashRequest.getId(), accountInfo)) {
             return getFailureResult(1004);
@@ -171,8 +171,8 @@ public class BackendCommissionCashController extends BaseController {
     @ApiOperation(value = "结算确认")
     @RequestMapping(value = "/confirm", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:cash:index')")
-    public ResponseObject confirm(HttpServletRequest request, @RequestBody CommissionSettleConfirmRequest requestParam) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject confirm(@RequestBody CommissionSettleConfirmRequest requestParam) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         requestParam.setOperator(accountInfo.getAccountName());
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             requestParam.setMerchantId(accountInfo.getMerchantId());
@@ -187,8 +187,8 @@ public class BackendCommissionCashController extends BaseController {
     @ApiOperation(value = "取消结算")
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:cash:index')")
-    public ResponseObject cancel(HttpServletRequest request, @RequestBody CommissionSettleConfirmRequest requestParam) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject cancel(@RequestBody CommissionSettleConfirmRequest requestParam) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             requestParam.setMerchantId(accountInfo.getMerchantId());
         }

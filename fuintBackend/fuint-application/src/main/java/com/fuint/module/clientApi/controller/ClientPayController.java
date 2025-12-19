@@ -100,7 +100,7 @@ public class ClientPayController extends BaseController {
         String useFor = request.getParameter("type") == null ? "" : request.getParameter("type");
         String merchantNo = request.getHeader("merchantNo");
 
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo userInfo = TokenUtil.getUserInfo();
         MtUser mtUser = memberService.queryMemberById(userInfo.getId());
         Map<String, Object> outParams = new HashMap<>();
 

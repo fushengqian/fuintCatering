@@ -42,7 +42,7 @@ import java.util.Map;
 @Aspect
 public class TActionLogAop {
 
-    private Logger logger = LoggerFactory.getLogger(TActionLogAop.class);
+    private final Logger logger = LoggerFactory.getLogger(TActionLogAop.class);
 
     @Lazy
     @Autowired
@@ -150,7 +150,7 @@ public class TActionLogAop {
                 module = module.substring(0, 255);
             }
             if (StringUtils.isNotEmpty(request.getHeader("Access-Token"))) {
-                AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+                AccountInfo accountInfo = TokenUtil.getAccountInfo();
                 if (accountInfo != null) {
                     userName = accountInfo.getAccountName();
                     merchantId = accountInfo.getMerchantId() == null ? 0 : accountInfo.getMerchantId();

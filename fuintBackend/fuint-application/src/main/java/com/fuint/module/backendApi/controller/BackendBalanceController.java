@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -62,8 +61,8 @@ public class BackendBalanceController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('balance:list')")
-    public ResponseObject list(HttpServletRequest request, @ModelAttribute BalancePage balancePage) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject list(@ModelAttribute BalancePage balancePage) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
             balancePage.setStoreId(accountInfo.getStoreId());
         }
@@ -85,13 +84,13 @@ public class BackendBalanceController extends BaseController {
     @RequestMapping(value = "/doRecharge", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('balance:modify')")
-    public ResponseObject doRecharge(HttpServletRequest request, @RequestBody RechargeRequest rechargeParam) throws BusinessCheckException {
+    public ResponseObject doRecharge(@RequestBody RechargeRequest rechargeParam) throws BusinessCheckException {
         BigDecimal amount = rechargeParam.getAmount();
         String remark = rechargeParam.getRemark();
         Integer userId = rechargeParam.getUserId();
         Integer type = rechargeParam.getType();// 1 增加，2 扣减
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (userId < 1) {
             return getFailureResult(201, "充值会员信息不能为空");
         }
@@ -125,13 +124,13 @@ public class BackendBalanceController extends BaseController {
     @RequestMapping(value = "/distribute", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('balance:distribute')")
-    public ResponseObject distribute(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject distribute(@RequestBody Map<String, Object> param) throws BusinessCheckException {
         String amount = param.get("amount") == null ? "0" : param.get("amount").toString();
         String remark = param.get("remark") == null ? "后台充值" : param.get("remark").toString();
         String userIds = param.get("userIds") == null ? "" : param.get("userIds").toString();
         String object = param.get("object") == null ? "" : param.get("object").toString();
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         balanceService.distribute(accountInfo, object, userIds, amount, remark);
         return getSuccessResult(true);
     }
@@ -143,8 +142,8 @@ public class BackendBalanceController extends BaseController {
     @RequestMapping(value = "/setting", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('balance:setting')")
-    public ResponseObject setting(HttpServletRequest request) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject setting() throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         List<MtSetting> settingList = settingService.getSettingList(accountInfo.getMerchantId(), SettingTypeEnum.BALANCE.getKey());
 
@@ -188,12 +187,12 @@ public class BackendBalanceController extends BaseController {
     @RequestMapping(value = "/saveSetting", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('balance:setting')")
-    public ResponseObject saveSetting(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject saveSetting(@RequestBody Map<String, Object> param) throws BusinessCheckException {
         String status = param.get("status") == null ? StatusEnum.ENABLED.getKey() : param.get("status").toString();
         String remark = param.get("remark") == null ? "" : param.get("remark").toString();
         List<LinkedHashMap> rechargeItems = (List) param.get("rechargeItem");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
             throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
         }

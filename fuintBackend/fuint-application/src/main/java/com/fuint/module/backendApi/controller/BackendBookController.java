@@ -24,7 +24,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -68,8 +67,8 @@ public class BackendBookController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
-    public ResponseObject list(HttpServletRequest request, @ModelAttribute BookPage bookPage) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject list(@ModelAttribute BookPage bookPage) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             bookPage.setMerchantId(accountInfo.getMerchantId());
         }
@@ -97,11 +96,11 @@ public class BackendBookController extends BaseController {
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
-    public ResponseObject updateStatus(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException, ParseException {
+    public ResponseObject updateStatus(@RequestBody Map<String, Object> params) throws BusinessCheckException, ParseException {
         String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
         Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         BookDto bookDto = bookService.getBookById(id, false);
         if (bookDto == null) {
             return getFailureResult(201);
@@ -123,8 +122,8 @@ public class BackendBookController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
-    public ResponseObject saveHandler(HttpServletRequest request, @RequestBody BookDto bookDto) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject saveHandler(@RequestBody BookDto bookDto) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() < 1) {
             getFailureResult(5002);
         }
@@ -170,8 +169,8 @@ public class BackendBookController extends BaseController {
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('book:index')")
-    public ResponseObject info(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException, ParseException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject info(@PathVariable("id") Integer id) throws BusinessCheckException, ParseException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         BookDto bookDto = bookService.getBookById(id, false);
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {

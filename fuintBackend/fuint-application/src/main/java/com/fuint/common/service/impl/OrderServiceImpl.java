@@ -780,7 +780,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         Integer orderId = param.getOrderId() == null ? null : param.getOrderId(); // 订单ID
         Integer tableId1 = param.getTableId() == null ? 0 : param.getTableId();
         Integer merchantId = merchantService.getMerchantId(merchantNo);
-        UserInfo loginInfo = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo loginInfo = TokenUtil.getUserInfo();
         MtUser userInfo = null;
         if (loginInfo != null) {
             userInfo = memberService.queryMemberById(loginInfo.getId());
@@ -790,7 +790,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         String operator = null;
         Integer staffId = 0;
         String isVisitor = YesOrNoEnum.NO.getKey();
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo != null) {
             operator = accountInfo.getAccountName();
             staffId = accountInfo.getStaffId() == null ? 0 : accountInfo.getStaffId();

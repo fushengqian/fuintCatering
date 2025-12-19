@@ -47,7 +47,7 @@ public class ClientPointsController extends BaseController {
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
 
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo mtUser = TokenUtil.getUserInfo();
         Map<String, Object> param = new HashMap<>();
         param.put("userId", mtUser.getId());
         param.put("status", StatusEnum.ENABLED.getKey());
@@ -62,8 +62,8 @@ public class ClientPointsController extends BaseController {
     @ApiOperation(value = "转赠积分")
     @RequestMapping(value = "/doGive", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject doGive(HttpServletRequest request, @RequestBody GivePointParam param) throws BusinessCheckException {
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject doGive(@RequestBody GivePointParam param) throws BusinessCheckException {
+        UserInfo mtUser = TokenUtil.getUserInfo();
 
         String mobile = param.getMobile();
         Integer amount = param.getAmount();

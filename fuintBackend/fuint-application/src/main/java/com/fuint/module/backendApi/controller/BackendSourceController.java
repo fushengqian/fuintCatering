@@ -18,8 +18,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -46,8 +44,8 @@ public class BackendSourceController extends BaseController {
     @ApiOperation(value = "获取菜单列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @PreAuthorize("@pms.hasPermission('system:menu:index')")
-    public ResponseObject list(HttpServletRequest request) {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject list() {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         List<TreeNode> sources = sourceService.getSourceTree(accountInfo.getMerchantId(), "");
         return getSuccessResult(sources);
     }
@@ -86,8 +84,8 @@ public class BackendSourceController extends BaseController {
     @ApiOperation(value = "新增菜单")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('system:menu:add')")
-    public ResponseObject addSource(HttpServletRequest request, @RequestBody Map<String, Object> param) {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject addSource(@RequestBody Map<String, Object> param) {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         String name = param.get("name").toString();
         String status = param.get("status").toString();
@@ -136,8 +134,8 @@ public class BackendSourceController extends BaseController {
     @ApiOperation(value = "修改菜单")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('system:menu:edit')")
-    public ResponseObject update(HttpServletRequest request, @RequestBody Map<String, Object> param) {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject update(@RequestBody Map<String, Object> param) {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         String name = param.get("name").toString();
         String status = param.get("status").toString();
@@ -193,8 +191,8 @@ public class BackendSourceController extends BaseController {
     @ApiOperation(value = "删除菜单")
     @RequestMapping(value = "/delete/{sourceId}", method = RequestMethod.GET)
     @PreAuthorize("@pms.hasPermission('system:menu:delete')")
-    public ResponseObject delete(HttpServletRequest request, @PathVariable("sourceId") Long sourceId) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject delete(@PathVariable("sourceId") Long sourceId) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         TSource tSource = sourceService.getById(sourceId);
         if (!tSource.getMerchantId().equals(accountInfo.getMerchantId()) && accountInfo.getMerchantId() > 0) {
             return getFailureResult(201, "抱歉，您没有删除的权限");
@@ -208,8 +206,8 @@ public class BackendSourceController extends BaseController {
      * */
     @ApiOperation(value = "获取菜单下拉树列表")
     @RequestMapping(value = "/treeselect", method = RequestMethod.GET)
-    public ResponseObject treeselect(HttpServletRequest request) {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject treeselect() {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         List<TreeNode> sources = sourceService.getSourceTree(accountInfo.getMerchantId(), "");
         List<TreeSelect> data = sourceService.buildMenuTreeSelect(sources);

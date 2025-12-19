@@ -84,7 +84,7 @@ public class ClientUserCouponController extends BaseController {
     @ApiOperation(value = "查询会员卡券详情")
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject detail(HttpServletRequest request, @RequestParam Map<String, Object> param) throws BusinessCheckException, InvocationTargetException, IllegalAccessException {
+    public ResponseObject detail(@RequestParam Map<String, Object> param) throws BusinessCheckException, InvocationTargetException, IllegalAccessException {
         Integer userCouponId = param.get("userCouponId") == null ? 0 : Integer.parseInt(param.get("userCouponId").toString());
         String userCouponCode = param.get("userCouponCode") == null ? "" : param.get("userCouponCode").toString();
 
@@ -96,7 +96,7 @@ public class ClientUserCouponController extends BaseController {
             return getFailureResult(1004);
         }
 
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+        UserInfo mtUser = TokenUtil.getUserInfo();
         MtUser loginInfo = memberService.queryMemberById(mtUser.getId());
         MtUserCoupon userCoupon;
         if (userCouponId > 0) {

@@ -26,7 +26,7 @@ public class Constants {
     /**
      * 系统配置, 从setting表中读取
      */
-    public static Map<String, String> SYS_CONFIGS = new HashMap<String, String>();
+    public static final Map<String, String> SYS_CONFIGS = new HashMap<String, String>();
 
     public static final int HTTP_RESPONSE_CODE_PARAM_ERROR = 202;
     public static final int HTTP_RESPONSE_CODE_USER_NOT_EXIST = 402;

@@ -8,7 +8,6 @@ import com.fuint.framework.web.ResponseObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
 /**
@@ -28,8 +27,8 @@ public class ClientHelpController extends BaseController {
     @ApiOperation(value = "查询帮助列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        UserInfo mtUser = TokenUtil.getUserInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject list() throws BusinessCheckException {
+        UserInfo mtUser = TokenUtil.getUserInfo();
         if (null == mtUser) {
             return getFailureResult(1001);
         }

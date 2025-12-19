@@ -82,7 +82,7 @@ public class BackendOrderController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('order:index')")
     public ResponseObject list(HttpServletRequest request, @RequestBody OrderListParam orderListParam) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             orderListParam.setMerchantId(accountInfo.getMerchantId());
         }
@@ -155,12 +155,12 @@ public class BackendOrderController extends BaseController {
     @RequestMapping(value = "/delivered", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('order:delivery')")
-    public ResponseObject delivered(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject delivered(@RequestBody Map<String, Object> param) throws BusinessCheckException {
         Integer orderId = param.get("orderId") == null ? 0 : Integer.parseInt(param.get("orderId").toString());
         String expressCompany = param.get("expressCompany") == null ? "" : param.get("expressCompany").toString();
         String expressNo = param.get("expressNo") == null ? "" : param.get("expressNo").toString();
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         if (orderId < 0) {
             return getFailureResult(201, "系统出错啦，订单ID不能为空");
@@ -213,14 +213,14 @@ public class BackendOrderController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('order:edit')")
-    public ResponseObject save(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject save(@RequestBody Map<String, Object> param) throws BusinessCheckException {
         Integer orderId = param.get("orderId") == null ? 0 : Integer.parseInt(param.get("orderId").toString());
         String status = param.get("status") == null ? "" : param.get("status").toString();
         String amount = param.get("amount") == null ? "" : param.get("amount").toString();
         String discount = param.get("discount") == null ? "" : param.get("discount").toString();
         String remark = param.get("remark") == null ? "" : param.get("remark").toString();
         String orderMode = param.get("orderMode") == null ? "" : param.get("orderMode").toString();
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (orderId < 0) {
             return getFailureResult(201, "系统出错啦，订单ID不能为空");
         }
@@ -259,11 +259,11 @@ public class BackendOrderController extends BaseController {
     @RequestMapping(value = "/verify", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('order:edit')")
-    public ResponseObject verify(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject verify(@RequestBody Map<String, Object> param) throws BusinessCheckException {
         Integer orderId = param.get("orderId") == null ? 0 : Integer.parseInt(param.get("orderId").toString());
         String remark = param.get("remark") == null ? "" : param.get("remark").toString();
         String verifyCode = param.get("verifyCode") == null ? "" : param.get("verifyCode").toString();
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (orderId < 0) {
             return getFailureResult(201, "系统出错啦，订单ID不能为空");
         }
@@ -288,8 +288,8 @@ public class BackendOrderController extends BaseController {
     @ApiOperation(value = "最新订单列表查询")
     @RequestMapping(value = "/latest", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject latest(HttpServletRequest request, @RequestBody OrderListParam orderListParam) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject latest(@RequestBody OrderListParam orderListParam) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         Map<String, Object> result = new HashMap<>();
         if (accountInfo == null) {
@@ -317,8 +317,8 @@ public class BackendOrderController extends BaseController {
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('order:delete')")
-    public ResponseObject delete(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject delete(@PathVariable("id") Integer id) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         orderService.deleteOrder(id, accountInfo.getAccountName());
         return getSuccessResult(true);
     }
@@ -330,8 +330,8 @@ public class BackendOrderController extends BaseController {
     @RequestMapping(value = "/setting", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('order:setting')")
-    public ResponseObject setting(HttpServletRequest request) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+    public ResponseObject setting() throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         List<MtSetting> settingList = settingService.getSettingList(accountInfo.getMerchantId(), SettingTypeEnum.ORDER.getKey());
         Map<String, Object> result = new HashMap();
@@ -378,7 +378,7 @@ public class BackendOrderController extends BaseController {
     @RequestMapping(value = "/saveSetting", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('order:setting')")
-    public ResponseObject saveSetting(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject saveSetting(@RequestBody Map<String, Object> param) throws BusinessCheckException {
         String deliveryFee = param.get("deliveryFee") != null ? param.get("deliveryFee").toString() : "0";
         String isClose = param.get("isClose") != null ? param.get("isClose").toString() : YesOrNoEnum.FALSE.getKey();
         String deliveryMinAmount = param.get("deliveryMinAmount") != null ? param.get("deliveryMinAmount").toString() : "0";
@@ -387,7 +387,7 @@ public class BackendOrderController extends BaseController {
         String deliveryRange = param.get("deliveryRange") != null ? param.get("deliveryRange").toString() : "";
         String peopleNum = param.get("peopleNum") != null ? param.get("peopleNum").toString() : "";
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         OrderSettingEnum[] settingList = OrderSettingEnum.values();
         for (OrderSettingEnum setting : settingList) {
             MtSetting info = new MtSetting();

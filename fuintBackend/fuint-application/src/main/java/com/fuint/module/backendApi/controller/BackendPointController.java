@@ -75,7 +75,7 @@ public class BackendPointController extends BaseController {
         String userNo = request.getParameter("userNo") == null ? "" : request.getParameter("userNo");
         String status = request.getParameter("status") == null ? StatusEnum.ENABLED.getKey() : request.getParameter("status");
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("Access-Token"));
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         Map<String, Object> searchParams = new HashMap<>();
         if (StringUtil.isNotEmpty(mobile)) {
             MtUser userInfo = memberService.queryMemberByMobile(accountInfo.getMerchantId(), mobile);
@@ -115,9 +115,8 @@ public class BackendPointController extends BaseController {
     @RequestMapping(value = "/setting", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('point:setting')")
-    public ResponseObject setting(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+    public ResponseObject setting() throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         List<MtSetting> settingList = settingService.getSettingList(accountInfo.getMerchantId(), SettingTypeEnum.POINT.getKey());
         Map<String, Object> result = new HashMap();
@@ -157,7 +156,6 @@ public class BackendPointController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('point:setting')")
     public ResponseObject saveSetting(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String pointNeedConsume = param.get("pointNeedConsume") != null ? param.get("pointNeedConsume").toString() : "1";
         String canUsedAsMoney = param.get("canUsedAsMoney") != null ? param.get("canUsedAsMoney").toString() : YesOrNoEnum.FALSE.getKey();
         String exchangeNeedPoint = param.get("exchangeNeedPoint") != null ? param.get("exchangeNeedPoint").toString() : "0";
@@ -168,7 +166,7 @@ public class BackendPointController extends BaseController {
             return getFailureResult(201, "输入参数有误");
         }
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
             return getFailureResult(5002);
         }
@@ -209,14 +207,13 @@ public class BackendPointController extends BaseController {
     @RequestMapping(value = "/doRecharge", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('point:modify')")
-    public ResponseObject doRecharge(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
+    public ResponseObject doRecharge(@RequestBody Map<String, Object> param) throws BusinessCheckException {
         String amount = param.get("amount") == null ? "0" : param.get("amount").toString();
         String remark = param.get("remark") == null ? "后台充值" : param.get("remark").toString();
         Integer userId = param.get("userId") == null ? 0 : Integer.parseInt(param.get("userId").toString());
         Integer type = param.get("type") == null ? 1 : Integer.parseInt(param.get("type").toString());
 
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         if (!CommonUtil.isNumeric(amount)) {
             return getFailureResult(201, "充值积分必须是数字");

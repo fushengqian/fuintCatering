@@ -374,9 +374,8 @@ public class ClientSignController extends BaseController {
     @ApiOperation(value = "获取会员信息")
     @RequestMapping(value = "/doGetUserInfo", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject doGetUserInfo(HttpServletRequest request) {
-        String token = request.getHeader("Access-Token");
-        UserInfo userInfo = TokenUtil.getUserInfoByToken(token);
+    public ResponseObject doGetUserInfo() {
+        UserInfo userInfo = TokenUtil.getUserInfo();
         if (userInfo == null) {
             return getFailureResult(1001, "用户没登录!");
         }
