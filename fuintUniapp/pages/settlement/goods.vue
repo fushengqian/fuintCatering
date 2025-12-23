@@ -497,6 +497,13 @@
               return false
           }
           
+          // 如果是扫码点餐并且是餐后支付，直接提交订单
+          const tableId = uni.getStorageSync("tableId") ? uni.getStorageSync("tableId") : 0;
+          const payFirst = uni.getStorageSync("payFirst") ? uni.getStorageSync("payFirst") : 'Y';
+          if (tableId > 0 && payFirst == 'N') {
+              return app.doSubmitOrder(PayTypeEnum.WECHAT.value);
+          }
+          
           // 表单验证
           if (!app.orderMode && app.address == undefined) {
               app.$toast('请先选择配送地址哦')
