@@ -5,7 +5,6 @@ import com.fuint.common.dto.AccountInfo;
 import com.fuint.common.dto.ConfirmLogDto;
 import com.fuint.common.dto.ParamDto;
 import com.fuint.common.enums.CouponTypeEnum;
-import com.fuint.common.service.AccountService;
 import com.fuint.common.service.ConfirmLogService;
 import com.fuint.common.service.CouponService;
 import com.fuint.common.service.MemberService;

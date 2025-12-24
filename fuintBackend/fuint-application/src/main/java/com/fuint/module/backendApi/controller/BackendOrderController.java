@@ -5,6 +5,7 @@ import com.fuint.common.dto.*;
 import com.fuint.common.enums.*;
 import com.fuint.common.param.OrderListParam;
 import com.fuint.common.service.*;
+import com.fuint.common.util.DateUtil;
 import com.fuint.common.util.ExcelUtil;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -14,25 +15,22 @@ import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtSetting;
 import com.fuint.repository.model.MtStore;
 import com.fuint.repository.model.MtUser;
-import com.fuint.common.util.DateUtil;
 import com.fuint.utils.StringUtil;
 import com.fuint.utils.TimeUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Date;
+import java.util.*;
+
 import static com.fuint.common.util.XlsUtil.objectConvertToString;
 
 /**
@@ -81,7 +79,7 @@ public class BackendOrderController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('order:index')")
-    public ResponseObject list(HttpServletRequest request, @RequestBody OrderListParam orderListParam) throws BusinessCheckException {
+    public ResponseObject list(@RequestBody OrderListParam orderListParam) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             orderListParam.setMerchantId(accountInfo.getMerchantId());

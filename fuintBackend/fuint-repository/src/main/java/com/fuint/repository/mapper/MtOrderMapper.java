@@ -23,6 +23,8 @@ public interface MtOrderMapper extends BaseMapper<MtOrder> {
 
     BigDecimal getStoreOrderCountByTime(@Param("storeId") Integer storeId, @Param("beginTime") Date beginTime, @Param("endTime") Date endTime);
 
+    Integer getPickupNo(@Param("storeId") Integer storeId, @Param("beginTime") Date beginTime, @Param("endTime") Date endTime);
+
     MtOrder findByOrderSn(@Param("orderSn") String orderSn);
 
     MtOrder findByTableId(@Param("tableId") Integer tableId);

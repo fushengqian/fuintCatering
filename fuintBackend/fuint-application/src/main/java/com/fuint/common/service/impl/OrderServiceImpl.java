@@ -451,6 +451,13 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 mtOrder.setConfirmStatus(YesOrNoEnum.YES.getKey());
             }
         }
+
+        // 商品订单，生成取单号
+        if (orderDto.getType().equals(OrderTypeEnum.GOODS.getKey())) {
+            Integer pickupNo = mtOrderMapper.getPickupNo(mtOrder.getStoreId(), DateUtil.getDayBegin(), DateUtil.getDayEnd());
+            mtOrder.setPickupNo(pickupNo + 1);
+        }
+
         // 首先生成订单
         if (mtOrder.getId() == null || mtOrder.getId() < 1) {
             mtOrderMapper.insert(mtOrder);
@@ -1797,6 +1804,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         userOrderDto.setUserId(orderInfo.getUserId());
         userOrderDto.setCouponId(orderInfo.getCouponId());
         userOrderDto.setOrderSn(orderInfo.getOrderSn());
+        userOrderDto.setPickupNo(orderInfo.getPickupNo());
         userOrderDto.setRemark(orderInfo.getRemark());
         userOrderDto.setType(orderInfo.getType());
         userOrderDto.setPayType(orderInfo.getPayType());

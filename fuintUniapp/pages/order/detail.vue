@@ -52,7 +52,8 @@
     
     <!--订单类型-->
     <view class="order-type">
-        <text class="type">{{ order.typeName }}</text>
+      <text class="type">{{ order.typeName }}</text>
+      <text class="pickup-no">取单号：{{ order.pickupNo }}89</text>
     </view>
 
     <!-- 快递配送：配送地址 -->
@@ -506,7 +507,7 @@
       }
       .verify-code {
           color: #ffffff;
-          margin-left: 60rpx;
+          margin-left: 100rpx;
           font-size: 30rpx;
           .code {
               font-size: 50rpx;
@@ -550,7 +551,10 @@
   // 订单类型
   .order-type {
     font-weight: bold;
-    margin: 25rpx;
+    margin: 20rpx 50rpx;
+    .pickup-no {
+       float: right; 
+    }
   }
 
   // 收货地址

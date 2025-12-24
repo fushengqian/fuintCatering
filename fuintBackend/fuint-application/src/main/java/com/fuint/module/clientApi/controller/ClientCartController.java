@@ -4,7 +4,6 @@ import com.fuint.common.dto.AccountInfo;
 import com.fuint.common.dto.UserInfo;
 import com.fuint.common.enums.OrderModeEnum;
 import com.fuint.common.enums.StatusEnum;
-import com.fuint.common.enums.TableUseStatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.param.CartClearParam;
 import com.fuint.common.param.CartListParam;
@@ -24,6 +23,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;

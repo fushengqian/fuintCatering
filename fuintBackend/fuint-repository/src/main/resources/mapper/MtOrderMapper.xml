@@ -23,6 +23,10 @@
         select count(0) from mt_order t where t.STORE_ID = #{storeId} and t.CREATE_TIME &lt; #{endTime} and t.CREATE_TIME &gt;= #{beginTime} and t.STATUS not in('C', 'G', 'H')
     </select>
 
+    <select id="getPickupNo" resultType="java.lang.Integer">
+        select count(0) from mt_order t where t.STORE_ID = #{storeId} and t.type = 'goods' and t.CREATE_TIME &lt; #{endTime} and t.CREATE_TIME &gt;= #{beginTime}
+    </select>
+
     <select id="findByOrderSn" resultType="com.fuint.repository.model.MtOrder">
         select * from mt_order o where o.ORDER_SN = #{orderSn}
     </select>
