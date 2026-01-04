@@ -114,8 +114,7 @@ public class MessageServiceImpl extends ServiceImpl<MtMessageMapper, MtMessage> 
         List<MtMessage> messageList = messageRepository.findNewMessage(userId, MessageEnum.POP_MSG.getKey());
 
         if (messageList.size() > 0) {
-            MtMessage messageInfo = messageList.get(0);
-            return messageInfo;
+            return messageList.get(0);
         }
 
         return null;
@@ -128,7 +127,6 @@ public class MessageServiceImpl extends ServiceImpl<MtMessageMapper, MtMessage> 
      */
     @Override
     public List<MtMessage> getNeedSendList() {
-        List<MtMessage> messageList = messageRepository.findNeedSendMessage(MessageEnum.SUB_MSG.getKey());
-        return messageList;
+        return messageRepository.findNeedSendMessage(MessageEnum.SUB_MSG.getKey());
     }
 }
