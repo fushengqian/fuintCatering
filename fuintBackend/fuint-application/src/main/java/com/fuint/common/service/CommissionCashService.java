@@ -2,9 +2,9 @@ package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.common.dto.CommissionCashDto;
-import com.fuint.framework.pagination.PaginationRequest;
-import com.fuint.framework.pagination.PaginationResponse;
+import com.fuint.common.param.CommissionCashPage;
 import com.fuint.framework.exception.BusinessCheckException;
+import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.module.backendApi.request.CommissionCashRequest;
 import com.fuint.module.backendApi.request.CommissionSettleConfirmRequest;
 import com.fuint.module.backendApi.request.CommissionSettleRequest;
@@ -21,10 +21,10 @@ public interface CommissionCashService extends IService<MtCommissionCash> {
     /**
      * 分页查询列表
      *
-     * @param paginationRequest
+     * @param commissionCashPage
      * @return
      */
-    PaginationResponse<CommissionCashDto> queryCommissionCashByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<CommissionCashDto> queryCommissionCashByPagination(CommissionCashPage commissionCashPage) throws BusinessCheckException;
 
     /**
      * 计算订单分销提成

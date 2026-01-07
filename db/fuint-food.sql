@@ -772,7 +772,7 @@ CREATE TABLE `mt_setting` (
   `STORE_ID` int DEFAULT '0' COMMENT '店铺ID',
   `TYPE` varchar(30) NOT NULL DEFAULT '' COMMENT '类型',
   `NAME` varchar(50) NOT NULL DEFAULT '' COMMENT '配置项',
-  `VALUE` varchar(1000) NOT NULL DEFAULT '' COMMENT '配置值',
+  `VALUE` longtext NOT NULL COMMENT '配置值',
   `DESCRIPTION` varchar(200) DEFAULT '' COMMENT '配置说明',
   `CREATE_TIME` datetime DEFAULT NULL COMMENT '创建时间',
   `UPDATE_TIME` datetime DEFAULT NULL COMMENT '更新时间',
