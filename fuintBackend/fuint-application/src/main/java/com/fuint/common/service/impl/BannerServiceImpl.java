@@ -3,32 +3,34 @@ package com.fuint.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
+import com.fuint.common.dto.BannerDto;
+import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.BannerPage;
+import com.fuint.common.service.BannerService;
+import com.fuint.common.service.SettingService;
 import com.fuint.common.service.StoreService;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationResponse;
-import com.fuint.repository.model.MtBanner;
-import com.fuint.common.dto.BannerDto;
-import com.fuint.common.service.BannerService;
-import com.fuint.common.service.SettingService;
-import com.fuint.common.enums.StatusEnum;
 import com.fuint.repository.mapper.MtBannerMapper;
-
+import com.fuint.repository.model.MtBanner;
 import com.fuint.repository.model.MtStore;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.github.pagehelper.Page;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 焦点图服务接口
@@ -37,7 +39,7 @@ import java.util.*;
  * CopyRight https://www.fuint.cn
  */
 @Service
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_= {@Lazy})
 public class BannerServiceImpl extends ServiceImpl<MtBannerMapper, MtBanner> implements BannerService {
 
     private static final Logger logger = LoggerFactory.getLogger(BannerServiceImpl.class);

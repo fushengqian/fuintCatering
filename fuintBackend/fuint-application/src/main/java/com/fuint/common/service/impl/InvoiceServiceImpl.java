@@ -3,32 +3,35 @@ package com.fuint.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.InvoiceParam;
+import com.fuint.common.service.InvoiceService;
 import com.fuint.common.service.OrderService;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
-import com.fuint.repository.model.MtInvoice;
-import com.fuint.common.service.InvoiceService;
-import com.fuint.common.enums.StatusEnum;
 import com.fuint.repository.mapper.MtInvoiceMapper;
+import com.fuint.repository.model.MtInvoice;
 import com.fuint.repository.model.MtOrder;
 import com.fuint.utils.StringUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.github.pagehelper.Page;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 发票服务接口
@@ -37,7 +40,7 @@ import java.util.*;
  * CopyRight https://www.fuint.cn
  */
 @Service
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_= {@Lazy})
 public class InvoiceServiceImpl extends ServiceImpl<MtInvoiceMapper, MtInvoice> implements InvoiceService {
 
     private static final Logger logger = LoggerFactory.getLogger(InvoiceServiceImpl.class);

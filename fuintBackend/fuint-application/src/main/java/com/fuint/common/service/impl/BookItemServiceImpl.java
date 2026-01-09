@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.BookItemDto;
 import com.fuint.common.enums.BookStatusEnum;
+import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.BookItemPage;
 import com.fuint.common.param.BookableParam;
 import com.fuint.common.service.BookItemService;
@@ -15,20 +16,20 @@ import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.mapper.MtBookItemMapper;
-import com.fuint.common.enums.StatusEnum;
 import com.fuint.repository.mapper.MtBookMapper;
 import com.fuint.repository.mapper.MtStoreMapper;
 import com.fuint.repository.model.MtBook;
 import com.fuint.repository.model.MtBookItem;
 import com.fuint.repository.model.MtStore;
 import com.fuint.utils.StringUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.github.pagehelper.Page;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ import java.util.*;
  * CopyRight https://www.fuint.cn
  */
 @Service
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_= {@Lazy})
 public class BookItemServiceImpl extends ServiceImpl<MtBookItemMapper, MtBookItem> implements BookItemService {
 
     private static final Logger logger = LoggerFactory.getLogger(BookItemServiceImpl.class);

@@ -13,32 +13,36 @@ import com.fuint.common.param.TurnTableParam;
 import com.fuint.common.service.CartService;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.OrderService;
+import com.fuint.common.service.TableService;
 import com.fuint.common.util.DateUtil;
 import com.fuint.common.util.TimeUtil;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
+import com.fuint.repository.mapper.MtTableMapper;
 import com.fuint.repository.model.MtCart;
 import com.fuint.repository.model.MtOrder;
 import com.fuint.repository.model.MtTable;
-import com.fuint.common.service.TableService;
-import com.fuint.repository.mapper.MtTableMapper;
 import com.fuint.repository.model.MtUser;
 import com.fuint.utils.StringUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.github.pagehelper.Page;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 桌码服务接口
@@ -47,7 +51,7 @@ import java.util.*;
  * CopyRight https://www.fuint.cn
  */
 @Service
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_= {@Lazy})
 public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implements TableService {
 
     private static final Logger logger = LoggerFactory.getLogger(TableServiceImpl.class);

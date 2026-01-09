@@ -1,14 +1,16 @@
 package com.fuint.common.service.impl;
 
-import com.fuint.common.util.RedisUtil;
 import com.fuint.common.service.CaptchaService;
+import com.fuint.common.util.RedisUtil;
+import com.fuint.utils.StringUtil;
 import com.google.code.kaptcha.Constants;
 import com.google.code.kaptcha.Producer;
-import com.fuint.utils.StringUtil;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
 import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 
@@ -19,7 +21,7 @@ import java.awt.image.BufferedImage;
  * CopyRight https://www.fuint.cn
  */
 @Service
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_= {@Lazy})
 public class CaptchaServiceImpl implements CaptchaService {
 
     private static final Logger logger = LoggerFactory.getLogger(CaptchaServiceImpl.class);

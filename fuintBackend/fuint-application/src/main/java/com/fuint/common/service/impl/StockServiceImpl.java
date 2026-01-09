@@ -6,23 +6,34 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.StockGoodsDto;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
-import com.fuint.common.service.*;
+import com.fuint.common.service.StockService;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.ResponseObject;
-import com.fuint.repository.mapper.*;
-import com.fuint.repository.model.*;
+import com.fuint.repository.mapper.MtGoodsMapper;
+import com.fuint.repository.mapper.MtGoodsSkuMapper;
+import com.fuint.repository.mapper.MtStockItemMapper;
+import com.fuint.repository.mapper.MtStockMapper;
+import com.fuint.repository.model.MtGoods;
+import com.fuint.repository.model.MtGoodsSku;
+import com.fuint.repository.model.MtStock;
+import com.fuint.repository.model.MtStockItem;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 库存业务实现类
@@ -31,7 +42,7 @@ import java.util.*;
  * CopyRight https://www.fuint.cn
  */
 @Service
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_= {@Lazy})
 public class StockServiceImpl extends ServiceImpl<MtStockMapper, MtStock> implements StockService {
 
     private MtStockMapper mtStockMapper;
