@@ -8,19 +8,15 @@ import java.math.BigDecimal;
 import java.util.Date;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
- * <p>
  * 订单商品表
- * </p>
  *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Getter
-@Setter
+@Data
 @TableName("mt_order_goods")
 @ApiModel(value = "MtOrderGoods对象", description = "订单商品表")
 public class MtOrderGoods implements Serializable {
@@ -57,6 +53,5 @@ public class MtOrderGoods implements Serializable {
 
     @ApiModelProperty("A：正常；D：删除")
     private String status;
-
 
 }
