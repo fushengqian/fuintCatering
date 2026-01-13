@@ -9,7 +9,7 @@ package com.fuint.framework.web;
  */
 public class ResponseObject {
 
-    private int code;
+    private Integer code;
     private String message;
     private Object data;
 
@@ -19,11 +19,11 @@ public class ResponseObject {
         this.data = data;
     }
 
-    public int getCode() {
+    public Integer getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public void setCode(Integer code) {
         this.code = code;
     }
 

@@ -8,6 +8,7 @@ import com.fuint.common.enums.SettingTypeEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.BalancePage;
 import com.fuint.common.service.BalanceService;
+import com.fuint.common.service.CouponService;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.SettingService;
 import com.fuint.common.util.TokenUtil;
@@ -17,8 +18,10 @@ import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.module.backendApi.request.RechargeRequest;
 import com.fuint.repository.model.MtBalance;
+import com.fuint.repository.model.MtCoupon;
 import com.fuint.repository.model.MtSetting;
 import com.fuint.repository.model.MtUser;
+import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -54,6 +57,11 @@ public class BackendBalanceController extends BaseController {
      * 会员服务接口
      * */
     private MemberService memberService;
+
+    /**
+     * 卡券服务接口
+     * */
+    private CouponService couponService;
 
     /**
      * 余额明细列表查询
@@ -159,11 +167,14 @@ public class BackendBalanceController extends BaseController {
                      if (item.length > 0) {
                          for (String value : item) {
                               String el[] = value.split("_");
-                              if (el.length == 2) {
-                                  RechargeRuleDto e = new RechargeRuleDto();
-                                  e.setRechargeAmount(el[0]);
-                                  e.setGiveAmount(el[1]);
-                                  rechargeRuleList.add(e);
+                              if (el.length >= 2) {
+                                  RechargeRuleDto ruleDto = new RechargeRuleDto();
+                                  ruleDto.setRechargeAmount(el[0]);
+                                  ruleDto.setGiveAmount(el[1]);
+                                  if (el.length >= 3) {
+                                      ruleDto.setGiveCouponIds(el[2]);
+                                  }
+                                  rechargeRuleList.add(ruleDto);
                               }
                          }
                      }
@@ -211,10 +222,23 @@ public class BackendBalanceController extends BaseController {
              if (amounts.contains(amount)) {
                  return getFailureResult(201, "充值金额设置不能有重复");
              }
+             String giveCouponIds = item.get("giveCouponIds") == null ? "" : item.get("giveCouponIds").toString();
+             if (StringUtil.isNotBlank(giveCouponIds)) {
+                 String[] couponIds = giveCouponIds.split("\\|");
+                 for (int i = 0; i < couponIds.length; i++) {
+                     MtCoupon mtCoupon = couponService.queryCouponById(Integer.parseInt(couponIds[i]));
+                     if (mtCoupon == null) {
+                         return getFailureResult(201, "赠送卡券ID:"+couponIds[i]+"不存在，请核实！");
+                     }
+                 }
+             }
              if (rechargeRule.length() == 0) {
                  rechargeRule = item.get("rechargeAmount").toString() + '_' + item.get("giveAmount").toString();
              } else {
                  rechargeRule = rechargeRule + ',' + item.get("rechargeAmount").toString() + '_' + item.get("giveAmount").toString();
+             }
+             if (StringUtil.isNotBlank(giveCouponIds)) {
+                 rechargeRule = rechargeRule + '_' + giveCouponIds;
              }
              amounts.add(amount);
         }

@@ -98,7 +98,7 @@ public class ClientBalanceController extends BaseController {
                     if (item.length > 0) {
                         for (String value : item) {
                             String el[] = value.split("_");
-                            if (el.length == 2) {
+                            if (el.length >= 2) {
                                 RechargeRuleDto e = new RechargeRuleDto();
                                 e.setRechargeAmount(el[0]);
                                 e.setGiveAmount(el[1]);

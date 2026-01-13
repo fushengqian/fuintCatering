@@ -23,6 +23,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +43,8 @@ import java.util.*;
 @Service
 @AllArgsConstructor(onConstructor_= {@Lazy})
 public class OpenGiftServiceImpl extends ServiceImpl<MtOpenGiftMapper, MtOpenGift> implements OpenGiftService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OpenGiftServiceImpl.class);
 
     private MtOpenGiftMapper mtOpenGiftMapper;
 
@@ -291,13 +295,19 @@ public class OpenGiftServiceImpl extends ServiceImpl<MtOpenGiftMapper, MtOpenGif
                if (item.getCouponId() > 0) {
                    MtCoupon mtCoupon = couponService.queryCouponById(item.getCouponId());
                    if (mtCoupon != null && mtCoupon.getStatus().equals(StatusEnum.ENABLED.getKey())) {
-                       CouponReceiveParam param = new CouponReceiveParam();
-                       param.setCouponId(item.getCouponId());
-                       param.setUserId(userId);
-                       param.setNum(item.getCouponNum() == null ? 1 : item.getCouponNum());
-                       String uuid = SeqUtil.getUUID();
-                       couponService.sendCoupon(item.getCouponId(), userId, param.getNum(), true, uuid, "");
-                       totalAmount = totalAmount.add(mtCoupon.getAmount());
+                       try {
+                           CouponReceiveParam param = new CouponReceiveParam();
+                           param.setCouponId(item.getCouponId());
+                           param.setUserId(userId);
+                           param.setNum(item.getCouponNum() == null ? 1 : item.getCouponNum());
+                           ResponseObject result = couponService.sendCoupon(item.getCouponId(), userId, param.getNum(), true, SeqUtil.getUUID(), "");
+                           if (!result.getCode().equals(200)) {
+                               logger.error("会员开卡赠礼赠送卡券失败：", result.getMessage());
+                           }
+                           totalAmount = totalAmount.add(mtCoupon.getAmount());
+                       } catch (Exception e) {
+                           logger.error("会员开卡赠礼异常：", e.getMessage());
+                       }
                    }
                }
             }
