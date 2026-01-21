@@ -1,15 +1,14 @@
 package com.fuint.module.clientApi.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.fuint.common.Constants;
 import com.fuint.common.dto.*;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.param.GoodsInfoParam;
+import com.fuint.common.param.GoodsListParam;
 import com.fuint.common.service.*;
 import com.fuint.common.util.CommonUtil;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
@@ -19,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -130,43 +130,23 @@ public class ClientGoodsController extends BaseController {
     @ApiOperation(value = "搜索商品")
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject search(HttpServletRequest request, @RequestBody Map<String, Object> params) throws BusinessCheckException {
+    public ResponseObject search(HttpServletRequest request, @RequestBody GoodsListParam params) throws BusinessCheckException {
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
+        String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
-        Integer page = params.get("page") == null ? 1 : Integer.parseInt(params.get("page").toString());
-        Integer pageSize = params.get("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(params.get("pageSize").toString());
-        String name = params.get("name") == null ? "" : params.get("name").toString();
-        Integer cateId = params.get("cateId") == null ? 0 : Integer.parseInt(params.get("cateId").toString());
-        String sortType = params.get("sortType") == null ? "all" : params.get("sortType").toString();
-        String sortPrice = params.get("sortPrice") == null ? "0" : params.get("sortPrice").toString();
-
-        Map<String, Object> searchParams = new HashMap<>();
-        searchParams.put("status", StatusEnum.ENABLED.getKey());
-        searchParams.put("hasPrice", YesOrNoEnum.YES.getKey());
-        if (storeId > 0) {
-            searchParams.put("storeId", storeId.toString());
-        }
-        if (cateId > 0) {
-            searchParams.put("cateId", cateId);
-        }
-        if (StringUtil.isNotEmpty(name)) {
-            searchParams.put("name", name);
-        }
-        Integer merchantId = merchantService.getMerchantId(request.getHeader("merchantNo"));
+        Integer merchantId = merchantService.getMerchantId(merchantNo);
         if (merchantId > 0 ) {
-            searchParams.put("merchantId", merchantId);
+            params.setMerchantId(merchantId);
         }
-        if (StringUtil.isNotEmpty(sortType)) {
-            searchParams.put("sortType", sortType);
+        if (storeId > 0) {
+            params.setStoreId(storeId);
         }
-        if (StringUtil.isNotEmpty(sortPrice)) {
-            searchParams.put("sortPrice", sortPrice);
+        if (StringUtil.isNotBlank(platform)) {
+            params.setPlatform(platform);
         }
-        if (StringUtil.isNotEmpty(platform)) {
-            searchParams.put("platform", platform);
-        }
-
-        PaginationResponse<GoodsDto> paginationResponse = goodsService.queryGoodsListByPagination(new PaginationRequest(page, pageSize, searchParams));
+        params.setStatus(StatusEnum.ENABLED.getKey());
+        params.setHasPrice(YesOrNoEnum.YES.getKey());
+        PaginationResponse<GoodsDto> paginationResponse = goodsService.queryGoodsListByPagination(params);
         return getSuccessResult(paginationResponse);
     }
 

@@ -12,7 +12,6 @@ import com.fuint.common.util.CommonUtil;
 import com.fuint.common.util.ExcelUtil;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
@@ -88,7 +87,7 @@ public class BackendGoodsController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:index')")
-    public ResponseObject list(GoodsListParam param) throws BusinessCheckException, IllegalAccessException {
+    public ResponseObject list(GoodsListParam param) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();;
         Integer storeId = accountInfo.getStoreId() == null ? 0 : accountInfo.getStoreId();
         Integer merchantId = accountInfo.getMerchantId() == null ? 0 : accountInfo.getMerchantId();
@@ -100,7 +99,7 @@ public class BackendGoodsController extends BaseController {
             param.setStoreId(storeId);
         }
 
-        PaginationResponse<GoodsDto> paginationResponse = goodsService.queryGoodsListByPagination(new PaginationRequest(param.getPage(), param.getPageSize(), CommonUtil.convert(param)));
+        PaginationResponse<GoodsDto> paginationResponse = goodsService.queryGoodsListByPagination(param);
 
         // 商品类型列表
         List<ParamDto> typeList = GoodsTypeEnum.getGoodsTypeList();
