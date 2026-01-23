@@ -2,6 +2,7 @@ package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.dto.AccountInfo;
 import com.fuint.common.dto.BannerDto;
+import com.fuint.common.enums.PositionEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.BannerPage;
 import com.fuint.common.service.BannerService;
@@ -73,6 +74,7 @@ public class BackendBannerController extends BaseController {
         result.put("dataList", paginationResponse);
         result.put("imagePath", settingService.getUploadBasePath());
         result.put("storeList", storeList);
+        result.put("positionList", PositionEnum.getPositionList());
 
         return getSuccessResult(result);
     }
