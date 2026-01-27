@@ -106,6 +106,9 @@ public class UserGradeServiceImpl extends ServiceImpl<MtUserGradeMapper, MtUserG
         if (mtUserGrade.getDiscount() != null && (mtUserGrade.getDiscount() > 10 || mtUserGrade.getDiscount() < 0)) {
             throw new BusinessCheckException("会员折扣需在0和10之间");
         }
+        if (mtUserGrade.getStatus() == null) {
+            mtUserGrade.setStatus(StatusEnum.ENABLED.getKey());
+        }
         mtUserGradeMapper.insert(mtUserGrade);
         return mtUserGrade;
     }

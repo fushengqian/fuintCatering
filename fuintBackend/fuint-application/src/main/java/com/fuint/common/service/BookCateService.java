@@ -21,7 +21,7 @@ public interface BookCateService extends IService<MtBookCate> {
      * @param bookCatePage
      * @return
      */
-    PaginationResponse<MtBookCate> queryBookCateListByPagination(BookCatePage bookCatePage) throws BusinessCheckException;
+    PaginationResponse<MtBookCate> queryBookCateListByPagination(BookCatePage bookCatePage);
 
     /**
      * 添加预约类别
@@ -36,10 +36,9 @@ public interface BookCateService extends IService<MtBookCate> {
      * 根据ID获取预约类别
      *
      * @param  id 预约分类ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtBookCate getBookCateById(Integer id) throws BusinessCheckException;
+    MtBookCate getBookCateById(Integer id);
 
     /**
      * 更新预约类别
@@ -55,9 +54,8 @@ public interface BookCateService extends IService<MtBookCate> {
      *
      * @param  merchantId 商户ID
      * @param  storeId 店铺ID
-     * @throws BusinessCheckException
      * @return
      * */
-    List<MtBookCate> getAvailableBookCate(Integer merchantId, Integer storeId) throws BusinessCheckException;
+    List<MtBookCate> getAvailableBookCate(Integer merchantId, Integer storeId);
 
 }

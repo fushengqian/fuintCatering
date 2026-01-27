@@ -204,7 +204,6 @@ public class BookCateServiceImpl extends ServiceImpl<MtBookCateMapper, MtBookCat
      *
      * @param  merchantId 商户ID
      * @param  storeId 店铺ID
-     * @throws BusinessCheckException
      * @return
      * */
     @Override

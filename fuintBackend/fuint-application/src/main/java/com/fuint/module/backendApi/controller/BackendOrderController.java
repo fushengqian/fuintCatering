@@ -427,10 +427,10 @@ public class BackendOrderController extends BaseController {
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getParameter("token"));
         params.setPage(Constants.PAGE_NUMBER);
         params.setPageSize(Constants.MAX_ROWS);
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+        if (accountInfo.getMerchantId() != null) {
             params.setMerchantId(accountInfo.getMerchantId());
         }
-        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
+        if (accountInfo.getStoreId() != null) {
             params.setStoreId(accountInfo.getStoreId());
         }
 

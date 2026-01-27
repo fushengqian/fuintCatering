@@ -22,7 +22,7 @@ public interface UserGradeService extends IService<MtUserGrade> {
      * @param paginationRequest
      * @return
      */
-    PaginationResponse<MtUserGrade> queryUserGradeListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<MtUserGrade> queryUserGradeListByPagination(PaginationRequest paginationRequest);
 
     /**
      * 添加会员等级
@@ -48,39 +48,35 @@ public interface UserGradeService extends IService<MtUserGrade> {
      * @param merchantId
      * @param gradeId ID
      * @param userId
-     * @throws BusinessCheckException
      * @return
      */
-    MtUserGrade queryUserGradeById(Integer merchantId, Integer gradeId, Integer userId) throws BusinessCheckException;
+    MtUserGrade queryUserGradeById(Integer merchantId, Integer gradeId, Integer userId);
 
     /**
      * 根据ID删除会员等级
      *
      * @param  id      ID
      * @param  operator 操作人
-     * @throws BusinessCheckException
      * @return
      */
-    Integer deleteUserGrade(Integer id, String operator) throws BusinessCheckException;
+    Integer deleteUserGrade(Integer id, String operator);
 
     /**
      * 获取默认的会员等级
      *
      * @param merchantId
-     * @throws BusinessCheckException
      * @return
      */
-    MtUserGrade getInitUserGrade(Integer merchantId) throws BusinessCheckException;
+    MtUserGrade getInitUserGrade(Integer merchantId);
 
     /**
-     * 获取付费会员等级列表
+     * 获取付费会员等级列
      *
      * @param  merchantId
      * @param  userInfo
-     * @throws BusinessCheckException
      * @return
      * */
-    List<MtUserGrade> getPayUserGradeList(Integer merchantId, MtUser userInfo) throws BusinessCheckException;
+    List<MtUserGrade> getPayUserGradeList(Integer merchantId, MtUser userInfo);
 
     /**
      * 获取商户会员等级列表
