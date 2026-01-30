@@ -128,7 +128,6 @@ public class SettingServiceImpl extends ServiceImpl<MtSettingMapper, MtSetting> 
      * @param  merchantId 商户ID
      * @param  type 类型
      * @param  name 配置名称
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -143,7 +142,6 @@ public class SettingServiceImpl extends ServiceImpl<MtSettingMapper, MtSetting> 
      * @param  storeId 店铺ID
      * @param  type 类型
      * @param  name 配置名称
-     * @throws BusinessCheckException
      * @return
      */
     @Override

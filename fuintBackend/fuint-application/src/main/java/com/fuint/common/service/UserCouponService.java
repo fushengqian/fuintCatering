@@ -55,9 +55,9 @@ public interface UserCouponService extends IService<MtUserCoupon> {
     /**
      * 获取用户的卡券
      * @param paramMap 查询参数
-     * @throws BusinessCheckException
+     * @return
      * */
-    ResponseObject getUserCouponList(Map<String, Object> paramMap) throws BusinessCheckException;
+    ResponseObject getUserCouponList(Map<String, Object> paramMap);
 
     /**
      * 获取会员可支付用的卡券

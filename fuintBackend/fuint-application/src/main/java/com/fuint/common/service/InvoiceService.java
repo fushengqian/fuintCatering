@@ -26,7 +26,7 @@ public interface InvoiceService extends IService<MtInvoice> {
      * @param paginationRequest
      * @return
      */
-    PaginationResponse<MtInvoice> queryInvoiceListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<MtInvoice> queryInvoiceListByPagination(PaginationRequest paginationRequest);
 
     /**
      * 添加发票
@@ -41,10 +41,9 @@ public interface InvoiceService extends IService<MtInvoice> {
      * 根据ID获取发票信息
      *
      * @param id ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtInvoice queryInvoiceById(Integer id) throws BusinessCheckException;
+    MtInvoice queryInvoiceById(Integer id);
 
     /**
      * 根据ID删除发票
@@ -69,10 +68,9 @@ public interface InvoiceService extends IService<MtInvoice> {
      * 根据条件搜索发票
      *
      * @param  params 查询参数
-     * @throws BusinessCheckException
      * @return
      * */
-    List<MtInvoice> queryInvoiceListByParams(Map<String, Object> params) throws BusinessCheckException;
+    List<MtInvoice> queryInvoiceListByParams(Map<String, Object> params);
 
     /**
      * 获取开票金额

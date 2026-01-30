@@ -22,7 +22,7 @@ public interface CommissionRuleService extends IService<MtCommissionRule> {
      * @param paginationRequest
      * @return
      */
-    PaginationResponse<MtCommissionRule> queryDataByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<MtCommissionRule> queryDataByPagination(PaginationRequest paginationRequest);
 
     /**
      * 添加分佣提成规则
@@ -36,9 +36,9 @@ public interface CommissionRuleService extends IService<MtCommissionRule> {
      * 根据ID获取规则信息
      *
      * @param  id
-     * @throws BusinessCheckException
+     * @return
      */
-    CommissionRuleDto queryCommissionRuleById(Integer id) throws BusinessCheckException;
+    CommissionRuleDto queryCommissionRuleById(Integer id);
 
     /**
      * 更新分佣提成规则

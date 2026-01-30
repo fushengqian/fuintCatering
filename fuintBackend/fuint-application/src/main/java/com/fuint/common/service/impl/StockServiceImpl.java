@@ -201,7 +201,6 @@ public class StockServiceImpl extends ServiceImpl<MtStockMapper, MtStock> implem
      * 根据ID获取库存管理记录
      *
      * @param  id ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override

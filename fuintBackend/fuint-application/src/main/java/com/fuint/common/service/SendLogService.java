@@ -21,13 +21,14 @@ public interface SendLogService extends IService<MtSendLog> {
      * @param paginationRequest
      * @return
      */
-    PaginationResponse<MtSendLog> querySendLogListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<MtSendLog> querySendLogListByPagination(PaginationRequest paginationRequest);
 
     /**
      * 添加记录
      *
      * @param  reqSendLogDto
      * @throws BusinessCheckException
+     * @return
      */
     MtSendLog addSendLog(ReqSendLogDto reqSendLogDto) throws BusinessCheckException;
 
@@ -35,17 +36,16 @@ public interface SendLogService extends IService<MtSendLog> {
      * 根据组ID获取发券记录
      *
      * @param  id ID
-     * @throws BusinessCheckException
+     * @return
      */
-    MtSendLog querySendLogById(Long id) throws BusinessCheckException;
+    MtSendLog querySendLogById(Long id);
 
     /**
      * 删除发券记录
      *
      * @param  id       ID
      * @param  operator 操作人
-     * @throws BusinessCheckException
      * @return
      */
-    void deleteSendLog(Long id, String operator) throws BusinessCheckException;
+    void deleteSendLog(Long id, String operator);
 }

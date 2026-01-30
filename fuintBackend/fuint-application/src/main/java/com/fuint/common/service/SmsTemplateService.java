@@ -24,7 +24,7 @@ public interface SmsTemplateService extends IService<MtSmsTemplate> {
      * @param paginationRequest
      * @return
      */
-    PaginationResponse<MtSmsTemplate> querySmsTemplateListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<MtSmsTemplate> querySmsTemplateListByPagination(PaginationRequest paginationRequest);
 
     /**
      * 添加模板
@@ -46,13 +46,13 @@ public interface SmsTemplateService extends IService<MtSmsTemplate> {
      * 根据模板ID获取模板信息
      *
      * @param id ID
-     * @throws BusinessCheckException
+     * @return
      */
-    MtSmsTemplate querySmsTemplateById(Integer id) throws BusinessCheckException;
+    MtSmsTemplate querySmsTemplateById(Integer id);
 
     /**
      * 根据条件搜索模板
      * */
-    List<MtSmsTemplate> querySmsTemplateByParams(Map<String, Object> params) throws BusinessCheckException;
+    List<MtSmsTemplate> querySmsTemplateByParams(Map<String, Object> params);
 
 }

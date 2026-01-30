@@ -16,10 +16,9 @@ public interface MessageService {
      * 添加消息
      *
      * @param reqMsgDto
-     * @throws BusinessCheckException
      * @return
      */
-    void addMessage(MtMessage reqMsgDto) throws BusinessCheckException;
+    void addMessage(MtMessage reqMsgDto);
 
     /**
      * 置为已读

@@ -74,7 +74,7 @@ public class PointServiceImpl extends ServiceImpl<MtPointMapper, MtPoint> implem
      * @return
      */
     @Override
-    public PaginationResponse<PointDto> queryPointListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException {
+    public PaginationResponse<PointDto> queryPointListByPagination(PaginationRequest paginationRequest) {
         LambdaQueryWrapper<MtPoint> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.ne(MtPoint::getStatus, StatusEnum.DISABLE.getKey());
 

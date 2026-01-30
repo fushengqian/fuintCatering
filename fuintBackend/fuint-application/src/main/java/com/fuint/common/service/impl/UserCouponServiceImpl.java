@@ -349,11 +349,10 @@ public class UserCouponServiceImpl extends ServiceImpl<MtUserCouponMapper, MtUse
      * 获取会员卡券列表
      *
      * @param paramMap
-     * @throws BusinessCheckException
      * @return
      * */
     @Override
-    public ResponseObject getUserCouponList(Map<String, Object> paramMap) throws BusinessCheckException {
+    public ResponseObject getUserCouponList(Map<String, Object> paramMap) {
         Integer pageNumber = paramMap.get("pageNumber") == null ? Constants.PAGE_NUMBER : Integer.parseInt(paramMap.get("pageNumber").toString());
         Integer pageSize = paramMap.get("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(paramMap.get("pageSize").toString());
         String userId = paramMap.get("userId") == null ? "" : paramMap.get("userId").toString();

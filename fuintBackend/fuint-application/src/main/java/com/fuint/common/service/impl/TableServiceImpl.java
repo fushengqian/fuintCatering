@@ -324,7 +324,7 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
      * @return
      */
     @Override
-    public List<TableDto> getTableList(TableParam tableParam) throws BusinessCheckException {
+    public List<TableDto> getTableList(TableParam tableParam) {
         List<MtTable> tableList = mtTableMapper.getActiveTableList(tableParam.getMerchantId(), tableParam.getStoreId());
         List<TableDto> dataList = new ArrayList<>();
         for (MtTable mtTable : tableList) {
@@ -367,7 +367,7 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
      * */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String getTableUseStatus(Integer tableId) throws BusinessCheckException {
+    public String getTableUseStatus(Integer tableId) {
        MtTable table = queryTableById(tableId);
        List<MtCart> carts = cartService.getCartByTableId(tableId);
        UserOrderDto orderInfo = orderService.getOrderInfoByTableId(tableId);
@@ -419,7 +419,7 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
      * @return
      * */
     @Override
-    public TableDetail getTableDetail(Integer tableId) throws BusinessCheckException {
+    public TableDetail getTableDetail(Integer tableId) {
         UserOrderDto orderInfo = orderService.getOrderInfoByTableId(tableId);
         TableDetail tableDetail = new TableDetail();
         tableDetail.setOrderInfo(orderInfo);

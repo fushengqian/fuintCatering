@@ -244,8 +244,7 @@ public class UserGradeServiceImpl extends ServiceImpl<MtUserGradeMapper, MtUserG
     /**
      * 获取商户会员等级列表
      *
-     * @param  merchantId
-     * @throws BusinessCheckException
+     * @param  merchantId 商户ID
      * @return
      * */
     @Override

@@ -60,7 +60,7 @@ public class CommissionRelationServiceImpl extends ServiceImpl<MtCommissionRelat
      * @return
      */
     @Override
-    public PaginationResponse<CommissionRelationDto> queryRelationByPagination(CommissionRelationPage commissionRelationPage) throws BusinessCheckException {
+    public PaginationResponse<CommissionRelationDto> queryRelationByPagination(CommissionRelationPage commissionRelationPage) {
         Page<MtCommissionRelation> pageHelper = PageHelper.startPage(commissionRelationPage.getPage(), commissionRelationPage.getPageSize());
         LambdaQueryWrapper<MtCommissionRelation> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.ne(MtCommissionRelation::getStatus, StatusEnum.DISABLE.getKey());
@@ -120,11 +120,10 @@ public class CommissionRelationServiceImpl extends ServiceImpl<MtCommissionRelat
      *
      * @param userInfo 会员信息
      * @param shareId 分享者ID
-     * @throws BusinessCheckException
      * @retrurn
      */
     @Override
-    public void setCommissionRelation(MtUser userInfo, String shareId) throws BusinessCheckException {
+    public void setCommissionRelation(MtUser userInfo, String shareId) {
         if (userInfo == null || StringUtil.isBlank(shareId) || Integer.parseInt(shareId) <= 0) {
             return;
         }

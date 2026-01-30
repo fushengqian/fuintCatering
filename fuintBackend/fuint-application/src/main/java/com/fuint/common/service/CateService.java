@@ -22,7 +22,7 @@ public interface CateService extends IService<MtGoodsCate> {
      * @param catePage
      * @return
      */
-    PaginationResponse<GoodsCateDto> queryCateListByPagination(GoodsCatePage catePage) throws BusinessCheckException;
+    PaginationResponse<GoodsCateDto> queryCateListByPagination(GoodsCatePage catePage);
 
     /**
      * 添加商品分类
@@ -39,7 +39,7 @@ public interface CateService extends IService<MtGoodsCate> {
      * @param  id ID
      * @throws BusinessCheckException
      */
-    MtGoodsCate queryCateById(Integer id) throws BusinessCheckException;
+    MtGoodsCate queryCateById(Integer id);
 
     /**
      * 根据ID删除
@@ -68,7 +68,7 @@ public interface CateService extends IService<MtGoodsCate> {
      * @param status 状态
      * @return
      * */
-    List<MtGoodsCate> getCateList(Integer merchantId, Integer storeId, String name, String status) throws BusinessCheckException;
+    List<MtGoodsCate> getCateList(Integer merchantId, Integer storeId, String name, String status);
 
     /**
      * 获取分类ID

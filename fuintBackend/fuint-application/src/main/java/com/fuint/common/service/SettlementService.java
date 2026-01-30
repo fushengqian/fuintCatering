@@ -21,7 +21,7 @@ public interface SettlementService {
      * @param paginationRequest
      * @return
      */
-    PaginationResponse<MtSettlement> querySettlementListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<MtSettlement> querySettlementListByPagination(PaginationRequest paginationRequest);
 
     /**
      * 提交结算
@@ -50,5 +50,5 @@ public interface SettlementService {
      * @param pageSize
      * @return
      * */
-    SettlementDto getSettlementInfo(Integer settlementId, Integer page, Integer pageSize) throws BusinessCheckException;
+    SettlementDto getSettlementInfo(Integer settlementId, Integer page, Integer pageSize);
 }

@@ -31,16 +31,18 @@ public interface SettingService extends IService<MtSetting> {
      *
      * @param  mtSetting
      * @throws BusinessCheckException
+     * @return
      */
     MtSetting saveSetting(MtSetting mtSetting) throws BusinessCheckException;
 
     /**
      * 获取配置列表
      *
-     * @param  type
-     * @throws BusinessCheckException
+     * @param merchantId 商户ID
+     * @param  type 类型
+     * @return
      */
-    List<MtSetting> getSettingList(Integer merchantId, String type) throws BusinessCheckException;
+    List<MtSetting> getSettingList(Integer merchantId, String type);
 
     /**
      * 根据配置名称获取配置信息
@@ -48,9 +50,9 @@ public interface SettingService extends IService<MtSetting> {
      * @param  merchantId 商户ID
      * @param  type 类型
      * @param  name 配置名称
-     * @throws BusinessCheckException
+     * @return
      */
-    MtSetting querySettingByName(Integer merchantId, String type, String name) throws BusinessCheckException;
+    MtSetting querySettingByName(Integer merchantId, String type, String name);
 
     /**
      * 根据配置名称获取配置信息
@@ -59,9 +61,9 @@ public interface SettingService extends IService<MtSetting> {
      * @param storeId 店铺ID
      * @param  type 类型
      * @param  name 配置名称
-     * @throws BusinessCheckException
+     * @return
      */
-    MtSetting querySettingByName(Integer merchantId, Integer storeId, String type, String name) throws BusinessCheckException;
+    MtSetting querySettingByName(Integer merchantId, Integer storeId, String type, String name);
 
     /**
      * 获取系统上传文件的根路径

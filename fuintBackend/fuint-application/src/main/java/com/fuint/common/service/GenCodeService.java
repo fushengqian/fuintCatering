@@ -19,7 +19,7 @@ public interface GenCodeService {
      * @param paginationRequest
      * @return
      */
-    PaginationResponse<TGenCode> queryGenCodeListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<TGenCode> queryGenCodeListByPagination(PaginationRequest paginationRequest);
 
     /**
      * 添加生成代码
@@ -34,10 +34,9 @@ public interface GenCodeService {
      * 根据ID获取信息
      *
      * @param  id
-     * @throws BusinessCheckException
      * @return
      */
-    TGenCode queryGenCodeById(Integer id) throws BusinessCheckException;
+    TGenCode queryGenCodeById(Integer id);
 
     /**
      * 更新生成代码
@@ -49,7 +48,7 @@ public interface GenCodeService {
 
     /**
      * 生成代码（自定义路径）
-     * 
+     *
      * @param tableName 表名称
      * @return
      */

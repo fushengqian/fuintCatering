@@ -95,7 +95,7 @@ public class BackendCashierController extends BaseController {
     @RequestMapping(value = "/init/{userId}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject init(HttpServletRequest request, @PathVariable("userId") Integer userId) throws BusinessCheckException {
+    public ResponseObject init(HttpServletRequest request, @PathVariable("userId") Integer userId) {
         Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
         Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
         Integer cateId = request.getParameter("cateId") == null ? 0 : Integer.parseInt(request.getParameter("cateId"));
@@ -141,7 +141,7 @@ public class BackendCashierController extends BaseController {
     @RequestMapping(value = "/searchGoods", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject searchGoods(@RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject searchGoods(@RequestBody Map<String, Object> param) {
         String keyword =  param.get("keyword") == null ? "" : param.get("keyword").toString();
 
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
@@ -240,7 +240,7 @@ public class BackendCashierController extends BaseController {
     @RequestMapping(value = "/getMemberInfo", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject getMemberInfo(@RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject getMemberInfo(@RequestBody Map<String, Object> param) {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         String keyword = param.get("keyword") == null ? "" : param.get("keyword").toString();
         if (StringUtil.isEmpty(keyword)) {
@@ -282,7 +282,7 @@ public class BackendCashierController extends BaseController {
     @RequestMapping(value = "/getMemberInfoById/{userId}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject getMemberInfoById(@PathVariable("userId") String userId) throws BusinessCheckException {
+    public ResponseObject getMemberInfoById(@PathVariable("userId") String userId) {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (StringUtil.isEmpty(userId)) {
             return getFailureResult(201);
@@ -358,7 +358,7 @@ public class BackendCashierController extends BaseController {
     @RequestMapping(value = "/getTableList", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject getTableList(TableParam tableParam) throws BusinessCheckException {
+    public ResponseObject getTableList(TableParam tableParam) {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             tableParam.setMerchantId(accountInfo.getMerchantId());
@@ -376,7 +376,7 @@ public class BackendCashierController extends BaseController {
     @RequestMapping(value = "/getTableDetail/{tableId}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject getTableDetail(@PathVariable("tableId") Integer tableId) throws BusinessCheckException {
+    public ResponseObject getTableDetail(@PathVariable("tableId") Integer tableId) {
         TableDetail tableDetail = tableService.getTableDetail(tableId);
         return getSuccessResult(tableDetail);
     }

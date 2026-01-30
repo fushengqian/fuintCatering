@@ -73,7 +73,7 @@ public class StaffServiceImpl extends ServiceImpl<MtStaffMapper, MtStaff> implem
      * @return
      */
     @Override
-    public PaginationResponse<StaffDto> queryStaffListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException {
+    public PaginationResponse<StaffDto> queryStaffListByPagination(PaginationRequest paginationRequest) {
         Page<MtStaff> pageHelper = PageHelper.startPage(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
         LambdaQueryWrapper<MtStaff> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.ne(MtStaff::getAuditedStatus, StatusEnum.DISABLE.getKey());
@@ -109,14 +109,14 @@ public class StaffServiceImpl extends ServiceImpl<MtStaffMapper, MtStaff> implem
 
         if (staffList != null && staffList.size() > 0) {
             for (MtStaff mtStaff : staffList) {
-                StaffDto staffDto = new StaffDto();
-                mtStaff.setMobile(CommonUtil.hidePhone(mtStaff.getMobile()));
-                BeanUtils.copyProperties(mtStaff, staffDto);
-                if (mtStaff.getStoreId() != null && mtStaff.getStoreId() > 0) {
-                    MtStore mtStore = storeService.queryStoreById(mtStaff.getStoreId());
-                    staffDto.setStoreInfo(mtStore);
-                }
-                dataList.add(staffDto);
+                 StaffDto staffDto = new StaffDto();
+                 mtStaff.setMobile(CommonUtil.hidePhone(mtStaff.getMobile()));
+                 BeanUtils.copyProperties(mtStaff, staffDto);
+                 if (mtStaff.getStoreId() != null && mtStaff.getStoreId() > 0) {
+                     MtStore mtStore = storeService.queryStoreById(mtStaff.getStoreId());
+                     staffDto.setStoreInfo(mtStore);
+                 }
+                 dataList.add(staffDto);
             }
         }
         PageRequest pageRequest = PageRequest.of(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());

@@ -22,7 +22,7 @@ public interface TableAreaService extends IService<MtTableArea> {
      * @param paginationRequest
      * @return
      */
-    PaginationResponse<MtTableArea> queryTableAreaListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<MtTableArea> queryTableAreaListByPagination(PaginationRequest paginationRequest);
 
     /**
      * 添加桌码区域
@@ -37,10 +37,9 @@ public interface TableAreaService extends IService<MtTableArea> {
      * 根据ID获取桌码区域信息
      *
      * @param id ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtTableArea queryTableAreaById(Integer id) throws BusinessCheckException;
+    MtTableArea queryTableAreaById(Integer id);
 
     /**
      * 根据ID删除桌码区域
@@ -64,8 +63,7 @@ public interface TableAreaService extends IService<MtTableArea> {
      * 根据条件搜索桌码区域
      *
      * @param params 查询参数
-     * @throws BusinessCheckException
      * @return
      * */
-    List<MtTableArea> queryTableAreaListByParams(Map<String, Object> params) throws BusinessCheckException;
+    List<MtTableArea> queryTableAreaListByParams(Map<String, Object> params);
 }

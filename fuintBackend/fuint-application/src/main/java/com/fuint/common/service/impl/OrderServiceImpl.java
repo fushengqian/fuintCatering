@@ -877,7 +877,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         BigDecimal myAmount = new BigDecimal(0);
         BigDecimal myPayAmount = new BigDecimal(0);
         BigDecimal myPointAmount = new BigDecimal(0);
-        if (myOrderId != null && myOrderId > 0 && !payFirst) {
+        if (myOrderId != null && myOrderId > 0) {
             orderId = myOrderId;
             myOrder = getOrderInfo(orderId);
             myAmount = myOrder.getAmount();
@@ -1072,7 +1072,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         }
 
         // 继续点单，合并订单金额等信息
-        if (myOrder != null && !payFirst) {
+        if (myOrder != null) {
             orderInfo.setAmount(orderInfo.getAmount().add(myAmount));
             orderInfo.setPayAmount(orderInfo.getPayAmount().add(myPayAmount));
             orderInfo.setPointAmount(orderInfo.getPointAmount().add(myPointAmount));
@@ -1295,7 +1295,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      * @return
      */
     @Override
-    public UserOrderDto getOrderInfoByTableId(Integer tableId) throws BusinessCheckException {
+    public UserOrderDto getOrderInfoByTableId(Integer tableId) {
         MtOrder mtOrder = mtOrderMapper.findByTableId(tableId);
         if (mtOrder == null) {
             return null;
@@ -1319,11 +1319,10 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      * 根据ID获取订单详情
      *
      * @param orderId 订单ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override
-    public UserOrderDto getOrderById(Integer orderId) throws BusinessCheckException {
+    public UserOrderDto getOrderById(Integer orderId) {
         if (orderId == null || orderId <= 0) {
             return null;
         }
@@ -1335,11 +1334,10 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      * 根据ID获取我的订单详情
      *
      * @param  orderId 订单ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override
-    public UserOrderDto getMyOrderById(Integer orderId) throws BusinessCheckException {
+    public UserOrderDto getMyOrderById(Integer orderId) {
         if (orderId == null || orderId <= 0) {
             return null;
         }
@@ -1793,7 +1791,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      * @param  getPayStatus 是否获取支付状态
      * @return UserOrderDto
      * */
-    private UserOrderDto getOrderDetail(MtOrder orderInfo, boolean needAddress, boolean getPayStatus) throws BusinessCheckException {
+    private UserOrderDto getOrderDetail(MtOrder orderInfo, boolean needAddress, boolean getPayStatus) {
         UserOrderDto userOrderDto = new UserOrderDto();
 
         userOrderDto.setId(orderInfo.getId());
@@ -2568,6 +2566,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      * 取消订单商品
      *
      * @param removeGoodsParam 请求参数
+     * @throws BusinessCheckException
      * @return
      * */
     @Override

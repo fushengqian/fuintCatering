@@ -235,7 +235,7 @@ public class OpenGiftServiceImpl extends ServiceImpl<MtOpenGiftMapper, MtOpenGif
      * @return
      * */
     @Override
-    public Boolean openGift(Integer userId, Integer gradeId, boolean isNewMember) throws BusinessCheckException {
+    public Boolean openGift(Integer userId, Integer gradeId, boolean isNewMember) {
         if (gradeId == null || gradeId.compareTo(0) <= 0) {
             return false;
         }
@@ -244,7 +244,7 @@ public class OpenGiftServiceImpl extends ServiceImpl<MtOpenGiftMapper, MtOpenGif
             return false;
         }
         if (user == null) {
-            throw new BusinessCheckException("会员状态异常");
+            return false;
         }
         if (user.getGradeId() == null) {
             user.setGradeId(0);
@@ -283,13 +283,17 @@ public class OpenGiftServiceImpl extends ServiceImpl<MtOpenGiftMapper, MtOpenGif
             for(MtOpenGift item : openGiftList) {
                // 加积分
                if (item.getPoint() > 0) {
-                   MtPoint reqPointDto = new MtPoint();
-                   reqPointDto.setUserId(userId);
-                   reqPointDto.setAmount(item.getPoint());
-                   reqPointDto.setDescription("开卡赠送"+ item.getPoint() +"积分");
-                   reqPointDto.setOperator("系统");
-                   pointService.addPoint(reqPointDto);
-                   totalPoint = totalPoint + item.getPoint();
+                   try {
+                       MtPoint reqPointDto = new MtPoint();
+                       reqPointDto.setUserId(userId);
+                       reqPointDto.setAmount(item.getPoint());
+                       reqPointDto.setDescription("开卡赠送" + item.getPoint() + "积分");
+                       reqPointDto.setOperator("系统");
+                       pointService.addPoint(reqPointDto);
+                       totalPoint = totalPoint + item.getPoint();
+                   } catch (BusinessCheckException e) {
+                       logger.error("会员开卡赠礼赠送积分失败：", e.getMessage());
+                   }
                }
                // 返卡券
                if (item.getCouponId() > 0) {

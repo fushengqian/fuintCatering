@@ -214,10 +214,10 @@ public class SettlementServiceImpl implements SettlementService {
      * @return
      * */
     @Override
-    public SettlementDto getSettlementInfo(Integer settlementId, Integer page, Integer pageSize) throws BusinessCheckException {
+    public SettlementDto getSettlementInfo(Integer settlementId, Integer page, Integer pageSize) {
         MtSettlement mtSettlement = mtSettlementMapper.selectById(settlementId);
         if (mtSettlement == null) {
-            throw new BusinessCheckException("结算单不存在");
+            return null;
         }
 
         SettlementDto settlementDto = new SettlementDto();

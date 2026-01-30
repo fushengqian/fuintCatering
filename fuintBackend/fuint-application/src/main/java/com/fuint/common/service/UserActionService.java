@@ -20,7 +20,7 @@ public interface UserActionService extends IService<MtUserAction> {
      * @param paginationRequest
      * @return
      */
-    PaginationResponse<MtUserAction> queryUserActionListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<MtUserAction> queryUserActionListByPagination(PaginationRequest paginationRequest);
 
     /**
      * 新增会员行为

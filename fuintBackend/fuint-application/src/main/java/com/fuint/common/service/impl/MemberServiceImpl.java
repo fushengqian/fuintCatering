@@ -153,7 +153,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      * @return
      * */
     @Override
-    public MtUser getCurrentUserInfo(HttpServletRequest request, Integer userId, String token) throws BusinessCheckException {
+    public MtUser getCurrentUserInfo(HttpServletRequest request, Integer userId, String token) {
         MtUser mtUser = null;
 
         // 没有会员信息，则查询是否是后台收银员下单
@@ -193,7 +193,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      * @return
      */
     @Override
-    public PaginationResponse<UserDto> queryMemberListByPagination(MemberListParam params) throws BusinessCheckException {
+    public PaginationResponse<UserDto> queryMemberListByPagination(MemberListParam params) {
         Page<MtUser> pageHelper = PageHelper.startPage(params.getPage(), params.getPageSize());
         LambdaQueryWrapper<MtUser> wrapper = Wrappers.lambdaQuery();
         wrapper.ne(MtUser::getStatus, StatusEnum.DISABLE.getKey());
@@ -591,11 +591,10 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      * 根据会员ID获取会员信息
      *
      * @param  id 会员ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override
-    public MtUser queryMemberById(Integer id) throws BusinessCheckException {
+    public MtUser queryMemberById(Integer id) {
         MtUser mtUser = mtUserMapper.selectById(id);
 
         if (mtUser != null) {
@@ -658,11 +657,10 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      *
      * @param  merchantId 商户ID
      * @param  openId 微信openId
-     * @throws BusinessCheckException
      * @return
      */
     @Override
-    public MtUser queryMemberByOpenId(Integer merchantId, String openId, JSONObject userInfo) throws BusinessCheckException {
+    public MtUser queryMemberByOpenId(Integer merchantId, String openId, JSONObject userInfo) {
         MtUser user = mtUserMapper.queryMemberByOpenId(merchantId, openId);
         if (user != null && !user.getStatus().equals(StatusEnum.ENABLED.getKey())) {
             return null;

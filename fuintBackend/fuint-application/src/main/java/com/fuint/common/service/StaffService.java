@@ -23,7 +23,7 @@ public interface StaffService extends IService<MtStaff> {
      * @param paginationRequest
      * @return
      */
-    PaginationResponse<StaffDto> queryStaffListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<StaffDto> queryStaffListByPagination(PaginationRequest paginationRequest);
 
     /**
      * 保存员工信息
@@ -39,9 +39,9 @@ public interface StaffService extends IService<MtStaff> {
      * 根据ID获取店铺信息
      *
      * @param  id 员工id
-     * @throws BusinessCheckException
+     * @return
      */
-    MtStaff queryStaffById(Integer id) throws BusinessCheckException;
+    MtStaff queryStaffById(Integer id);
 
     /**
      * 审核更改状态(禁用，审核通过)

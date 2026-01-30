@@ -27,7 +27,7 @@ public interface TableService extends IService<MtTable> {
      * @param paginationRequest
      * @return
      */
-    PaginationResponse<MtTable> queryTableListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<MtTable> queryTableListByPagination(PaginationRequest paginationRequest);
 
     /**
      * 添加桌码
@@ -42,20 +42,18 @@ public interface TableService extends IService<MtTable> {
      * 根据ID获取桌码信息
      *
      * @param  id ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtTable queryTableById(Integer id) throws BusinessCheckException;
+    MtTable queryTableById(Integer id);
 
     /**
      * 根据ID获取桌码信息
      *
      * @param storeId 店铺ID
      * @param code 桌码
-     * @throws BusinessCheckException
      * @return
      */
-    MtTable queryTableByCode(Integer storeId, String code) throws BusinessCheckException;
+    MtTable queryTableByCode(Integer storeId, String code);
 
     /**
      * 根据ID删除桌码
@@ -79,10 +77,9 @@ public interface TableService extends IService<MtTable> {
      * 根据条件搜索桌码
      *
      * @param  params 查询参数
-     * @throws BusinessCheckException
      * @return
      * */
-    List<MtTable> queryTableListByParams(Map<String, Object> params) throws BusinessCheckException;
+    List<MtTable> queryTableListByParams(Map<String, Object> params);
 
     /**
      * 获取挂单列表
@@ -97,10 +94,9 @@ public interface TableService extends IService<MtTable> {
      * 获取桌台列表
      *
      * @param tableParam 请求参数
-     * @throws BusinessCheckException
      * @return
      * */
-    List<TableDto> getTableList(TableParam tableParam) throws BusinessCheckException;
+    List<TableDto> getTableList(TableParam tableParam);
 
     /**
      * 获取桌台使用状态
@@ -108,7 +104,7 @@ public interface TableService extends IService<MtTable> {
      * @param tableId 请求参数
      * @return
      * */
-    String getTableUseStatus(Integer tableId) throws BusinessCheckException;
+    String getTableUseStatus(Integer tableId);
 
     /**
      * 更新桌台使用状态
@@ -126,7 +122,7 @@ public interface TableService extends IService<MtTable> {
      * @param tableId 桌台ID
      * @return
      * */
-    TableDetail getTableDetail(Integer tableId) throws BusinessCheckException;
+    TableDetail getTableDetail(Integer tableId);
 
     /**
      * 桌台转台

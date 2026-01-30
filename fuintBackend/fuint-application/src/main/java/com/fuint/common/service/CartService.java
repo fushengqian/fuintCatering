@@ -46,7 +46,6 @@ public interface CartService extends IService<MtCart> {
      * 获取购物车
      *
      * @param  tableId 桌台ID
-     * @throws BusinessCheckException
      * @return
      */
     List<MtCart> getCartByTableId(Integer tableId);
@@ -75,7 +74,7 @@ public interface CartService extends IService<MtCart> {
      * @param params 查询参数
      * @return
      * */
-    List<MtCart> queryCartListByParams(Map<String, Object> params) throws BusinessCheckException;
+    List<MtCart> queryCartListByParams(Map<String, Object> params);
 
     /**
      * 挂单

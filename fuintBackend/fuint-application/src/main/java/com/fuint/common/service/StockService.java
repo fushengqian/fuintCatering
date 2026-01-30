@@ -25,7 +25,7 @@ public interface StockService extends IService<MtStock> {
      * @param paginationRequest
      * @return
      */
-    PaginationResponse<MtStock> queryStockListByPagination(PaginationRequest paginationRequest) throws BusinessCheckException;
+    PaginationResponse<MtStock> queryStockListByPagination(PaginationRequest paginationRequest);
 
     /**
      * 新增库存管理记录
@@ -49,19 +49,17 @@ public interface StockService extends IService<MtStock> {
      * 根据ID获取信息
      *
      * @param  id ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtStock queryStockById(Long id) throws BusinessCheckException;
+    MtStock queryStockById(Long id);
 
     /**
      * 根据条件搜索详情
      *
      * @param  params
-     * @throws BusinessCheckException
      * @return
      * */
-    List<MtStockItem> queryItemByParams(Map<String, Object> params) throws BusinessCheckException;
+    List<MtStockItem> queryItemByParams(Map<String, Object> params);
 
     /**
      * 生成出入库记录
