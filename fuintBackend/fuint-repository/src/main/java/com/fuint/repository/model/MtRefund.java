@@ -69,5 +69,4 @@ public class MtRefund implements Serializable {
     @ApiModelProperty("最后操作人")
     private String operator;
 
-
 }

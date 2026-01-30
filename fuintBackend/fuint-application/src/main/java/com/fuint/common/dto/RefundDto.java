@@ -3,6 +3,7 @@ package com.fuint.common.dto;
 import com.fuint.repository.model.MtStore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;

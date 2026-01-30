@@ -143,10 +143,9 @@ public interface OrderService extends IService<MtOrder> {
      * 更新订单
      *
      * @param  mtOrder
-     * @throws BusinessCheckException
      * @return
      * */
-    MtOrder updateOrder(MtOrder mtOrder) throws BusinessCheckException;
+    MtOrder updateOrder(MtOrder mtOrder);
 
     /**
      * 把订单置为已支付
@@ -162,20 +161,18 @@ public interface OrderService extends IService<MtOrder> {
      * 根据条件搜索订单
      *
      * @param params 查询参数
-     * @throws BusinessCheckException
      * @return
      * */
-    List<MtOrder> getOrderListByParams(Map<String, Object> params) throws BusinessCheckException;
+    List<MtOrder> getOrderListByParams(Map<String, Object> params);
 
     /**
      * 获取订单总数
      *
      * @param merchantId 商户ID
      * @param storeId 店铺ID
-     * @throws BusinessCheckException
      * @return
      * */
-    BigDecimal getOrderCount(Integer merchantId, Integer storeId) throws BusinessCheckException;
+    BigDecimal getOrderCount(Integer merchantId, Integer storeId);
 
     /**
      * 获取订单数量
@@ -184,10 +181,9 @@ public interface OrderService extends IService<MtOrder> {
      * @param storeId 店铺ID
      * @param beginTime 开始时间
      * @param endTime 结束时间
-     * @throws BusinessCheckException
      * @return
      * */
-    BigDecimal getOrderCount(Integer merchantId, Integer storeId, Date beginTime, Date endTime) throws BusinessCheckException;
+    BigDecimal getOrderCount(Integer merchantId, Integer storeId, Date beginTime, Date endTime);
 
     /**
      * 计算购物车
@@ -199,10 +195,9 @@ public interface OrderService extends IService<MtOrder> {
      * @param isUsePoint 是否使用积分抵扣
      * @param platform 平台 h5
      * @param orderMode 订单模式，自取或配送
-     * @throws BusinessCheckException
      * @return
      * */
-    Map<String, Object> calculateCartGoods(Integer merchantId, Integer userId, List<MtCart> cartList, Integer couponId, boolean isUsePoint, String platform, String orderMode) throws BusinessCheckException;
+    Map<String, Object> calculateCartGoods(Integer merchantId, Integer userId, List<MtCart> cartList, Integer couponId, boolean isUsePoint, String platform, String orderMode);
 
     /**
      * 获取支付金额
@@ -211,62 +206,57 @@ public interface OrderService extends IService<MtOrder> {
      * @param storeId 店铺ID
      * @param beginTime 开始时间
      * @param endTime 结束时间
-     * @throws BusinessCheckException
      * @return
      * */
-    BigDecimal getPayMoney(Integer merchantId, Integer storeId, Date beginTime, Date endTime) throws BusinessCheckException;
+    BigDecimal getPayMoney(Integer merchantId, Integer storeId, Date beginTime, Date endTime);
 
     /**
      * 获取支付人数
      *
      * @param merchantId 商户ID
      * @param storeId 店铺ID
-     * @throws BusinessCheckException
      * @return
      * */
-    Integer getPayUserCount(Integer merchantId, Integer storeId) throws BusinessCheckException;
+    Integer getPayUserCount(Integer merchantId, Integer storeId);
 
     /**
      * 获取支付金额
      *
      * @param merchantId 商户ID
      * @param storeId 店铺ID
-     * @throws BusinessCheckException
      * @return
      * */
-    BigDecimal getPayMoney(Integer merchantId, Integer storeId) throws BusinessCheckException;
+    BigDecimal getPayMoney(Integer merchantId, Integer storeId);
 
     /**
      * 获取会员支付金额
      *
-     * @param userId 会员ID
-     * @throws BusinessCheckException
+     * @param userId 会员IDs
      * @return
      * */
-    BigDecimal getUserPayMoney(Integer userId) throws BusinessCheckException;
+    BigDecimal getUserPayMoney(Integer userId);
 
     /**
      * 获取会员订单数
      *
      * @param userId 会员ID
-     * @throws BusinessCheckException
      * @return
      * */
-    Integer getUserPayOrderCount(Integer userId) throws BusinessCheckException;
+    Integer getUserPayOrderCount(Integer userId);
 
     /**
      * 获取等待分佣的订单列表
      *
      * @param dateTime 时间
-     * @throws BusinessCheckException
      * @return
      * */
-    List<MtOrder> getTobeCommissionOrderList(String dateTime) throws BusinessCheckException;
+    List<MtOrder> getTobeCommissionOrderList(String dateTime);
 
     /**
      * 提交充值订单
      *
      * @param rechargeParam 充值参数
+     * @throws BusinessCheckException
      * @return
      * */
     MtOrder doRecharge(HttpServletRequest request, RechargeParam rechargeParam) throws BusinessCheckException;

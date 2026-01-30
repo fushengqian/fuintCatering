@@ -194,7 +194,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      * */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PaginationResponse getUserOrderList(OrderListParam orderListParam) throws BusinessCheckException {
+    public PaginationResponse getUserOrderList(OrderListParam orderListParam) {
         Integer pageNumber = orderListParam.getPage() == null ? Constants.PAGE_NUMBER : orderListParam.getPage();
         Integer pageSize = orderListParam.getPageSize() == null ? Constants.PAGE_SIZE : orderListParam.getPageSize();
         String userId = orderListParam.getUserId() == null ? "" : orderListParam.getUserId().toString();
@@ -1276,7 +1276,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      * 获取订单详情
      *
      * @param  orderId 订单ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -1291,7 +1290,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      * 通过桌台获取订单信息
      *
      * @param  tableId 桌台ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -1472,11 +1470,10 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      * 根据订单号获取订单详情
      *
      * @param  orderSn 订单号
-     * @throws BusinessCheckException
      * @return
      */
     @Override
-    public UserOrderDto getOrderByOrderSn(String orderSn) throws BusinessCheckException {
+    public UserOrderDto getOrderByOrderSn(String orderSn) {
         MtOrder orderInfo = mtOrderMapper.findByOrderSn(orderSn);
         if (orderInfo == null) {
             return null;
@@ -2154,7 +2151,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      * @return
      * */
     @Override
-    public Map<String, Object> calculateCartGoods(Integer merchantId, Integer userId, List<MtCart> cartList, Integer couponId, boolean isUsePoint, String platform, String orderMode) throws BusinessCheckException {
+    public Map<String, Object> calculateCartGoods(Integer merchantId, Integer userId, List<MtCart> cartList, Integer couponId, boolean isUsePoint, String platform, String orderMode) {
         MtUser userInfo = memberService.queryMemberById(userId);
 
         // 设置是否不能用积分抵扣
@@ -2575,6 +2572,12 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
        MtOrder mtOrder = mtOrderMapper.selectById(mtOrderGoods.getOrderId());
        if (mtOrderGoods == null) {
            throw new BusinessCheckException("该商品不存在");
+       }
+       if (mtOrder == null) {
+           throw new BusinessCheckException("该订单不存在");
+       }
+       if (mtOrder.getPayStatus().equals(PayStatusEnum.SUCCESS.getKey())) {
+           throw new BusinessCheckException("该订单已支付，不能去除");
        }
        mtOrderGoodsMapper.deleteById(removeGoodsParam.getId());
        mtOrder.setAmount(mtOrder.getAmount().subtract(mtOrderGoods.getPrice()));
