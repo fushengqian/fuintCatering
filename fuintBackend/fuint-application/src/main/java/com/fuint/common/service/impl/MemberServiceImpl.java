@@ -342,7 +342,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      */
     @Override
     @OperationServiceLog(description = "新增会员信息")
-    public MtUser addMember(MtUser mtUser, String shareId) throws BusinessCheckException {
+    public MtUser addMember(MtUser mtUser, String shareId) {
         // 用户名就是手机号
         if (StringUtil.isNotEmpty(mtUser.getName()) && StringUtil.isEmpty(mtUser.getMobile()) && PhoneFormatCheckUtils.isChinaPhoneLegal(mtUser.getName())) {
             mtUser.setMobile(mtUser.getName());
@@ -511,7 +511,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "通过手机号新增会员")
-    public MtUser addMemberByMobile(Integer merchantId, String mobile, String shareId) throws BusinessCheckException {
+    public MtUser addMemberByMobile(Integer merchantId, String mobile, String shareId) {
         MtUser mtUser = new MtUser();
         mtUser.setUserNo(CommonUtil.createUserNo());
         String nickName = mobile.replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2");

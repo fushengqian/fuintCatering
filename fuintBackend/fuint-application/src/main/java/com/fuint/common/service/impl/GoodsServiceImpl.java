@@ -458,7 +458,6 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
      * 根据ID获取商品信息
      *
      * @param  id 商品ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -475,7 +474,6 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
      *
      * @param  merchantId 商户ID
      * @param  goodsNo 商品编码
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -487,7 +485,7 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
      * 根据条码获取sku信息
      *
      * @param  skuNo skuNo
-     * @throws BusinessCheckException
+     * @return
      * */
     @Override
     public MtGoodsSku getSkuInfoBySkuNo(String skuNo) {
@@ -502,7 +500,7 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
      * 根据ID获取商品详情
      *
      * @param  id 商品ID
-     * @throws BusinessCheckException
+     * @return
      */
     @Override
     public GoodsDto getGoodsDetail(Integer id, boolean getDeleteSpec) {
@@ -607,7 +605,6 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
      * @param cateId 分类ID
      * @param page 当前页码
      * @param pageSize 每页页数
-     * @throws BusinessCheckException
      * @return
      * */
     @Override

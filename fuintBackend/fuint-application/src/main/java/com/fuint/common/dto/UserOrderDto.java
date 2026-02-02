@@ -6,6 +6,7 @@ import com.fuint.repository.model.MtStore;
 import com.fuint.repository.model.MtTable;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;

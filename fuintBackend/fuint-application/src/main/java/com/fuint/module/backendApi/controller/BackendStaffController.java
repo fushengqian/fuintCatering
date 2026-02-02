@@ -169,7 +169,7 @@ public class BackendStaffController extends BaseController {
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('staff:list')")
-    public ResponseObject getStaffInfo(@PathVariable("id") Integer id) throws BusinessCheckException {
+    public ResponseObject getStaffInfo(@PathVariable("id") Integer id) {
         MtStaff staffInfo = staffService.queryStaffById(id);
         if (staffInfo != null) {
             staffInfo.setMobile(CommonUtil.hidePhone(staffInfo.getMobile()));

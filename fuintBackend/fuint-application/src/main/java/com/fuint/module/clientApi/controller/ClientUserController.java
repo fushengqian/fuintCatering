@@ -182,7 +182,7 @@ public class ClientUserController extends BaseController {
     @ApiOperation(value = "获取会员资产数据")
     @RequestMapping(value = "/asset", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject asset(HttpServletRequest request) throws BusinessCheckException {
+    public ResponseObject asset(HttpServletRequest request) {
         String userId = request.getParameter("userId");
         UserInfo mtUser = TokenUtil.getUserInfo();
         if (StringUtil.isNotEmpty(userId)) {
@@ -347,7 +347,7 @@ public class ClientUserController extends BaseController {
     @ApiOperation(value = "获取会员二维码")
     @RequestMapping(value = "/qrCode", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject qrCode() throws BusinessCheckException {
+    public ResponseObject qrCode() {
         UserInfo loginInfo = TokenUtil.getUserInfo();
 
         if (loginInfo == null) {

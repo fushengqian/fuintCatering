@@ -128,22 +128,22 @@ public class BackendCateController extends BaseController {
             storeId = myStoreId;
         }
 
-        MtGoodsCate info = new MtGoodsCate();
-        info.setName(name);
-        info.setDescription(description);
-        info.setLogo(logo);
-        info.setSort(Integer.parseInt(sort));
-        info.setStatus(status);
-        info.setMerchantId(accountInfo.getMerchantId());
-        info.setStoreId(storeId);
+        MtGoodsCate mtGoodsCate = new MtGoodsCate();
+        mtGoodsCate.setName(name);
+        mtGoodsCate.setDescription(description);
+        mtGoodsCate.setLogo(logo);
+        mtGoodsCate.setSort(Integer.parseInt(sort));
+        mtGoodsCate.setStatus(status);
+        mtGoodsCate.setMerchantId(accountInfo.getMerchantId());
+        mtGoodsCate.setStoreId(storeId);
         String operator = accountInfo.getAccountName();
-        info.setOperator(operator);
+        mtGoodsCate.setOperator(operator);
 
         if (StringUtil.isNotEmpty(id)) {
-            info.setId(Integer.parseInt(id));
-            cateService.updateCate(info);
+            mtGoodsCate.setId(Integer.parseInt(id));
+            cateService.updateCate(mtGoodsCate);
         } else {
-            cateService.addCate(info);
+            cateService.addCate(mtGoodsCate);
         }
 
         return getSuccessResult(true);

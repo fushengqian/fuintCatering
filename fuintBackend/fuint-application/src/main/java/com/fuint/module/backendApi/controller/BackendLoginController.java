@@ -74,7 +74,7 @@ public class BackendLoginController extends BaseController {
      * */
     @ApiOperation(value = "获取登录信息")
     @RequestMapping(value = "/getInfo", method = RequestMethod.GET)
-    public ResponseObject getInfo(HttpServletRequest request) throws BusinessCheckException {
+    public ResponseObject getInfo() throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo == null) {
             return getFailureResult(401, "登录信息已失效，请重新登录");

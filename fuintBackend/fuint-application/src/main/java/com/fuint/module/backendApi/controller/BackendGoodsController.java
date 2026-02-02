@@ -178,7 +178,7 @@ public class BackendGoodsController extends BaseController {
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:index')")
-    public ResponseObject info(@PathVariable("id") Integer goodsId) throws BusinessCheckException, InvocationTargetException, IllegalAccessException {
+    public ResponseObject info(@PathVariable("id") Integer goodsId) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         Integer storeId = accountInfo.getStoreId();

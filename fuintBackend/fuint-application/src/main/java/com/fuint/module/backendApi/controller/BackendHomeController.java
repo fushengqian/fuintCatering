@@ -104,7 +104,7 @@ public class BackendHomeController extends BaseController {
     @ApiOperation(value = "首页图表统计数据")
     @RequestMapping(value = "/statistic", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject statistic(HttpServletRequest request) throws BusinessCheckException {
+    public ResponseObject statistic(HttpServletRequest request) {
         String tag = request.getParameter("tag") == null ? "order,user_active" : request.getParameter("tag");
         Integer storeId = StringUtil.isEmpty(request.getParameter("storeId")) ? 0 : Integer.parseInt(request.getParameter("storeId"));
 
@@ -155,7 +155,7 @@ public class BackendHomeController extends BaseController {
     @ApiOperation(value = "获取收款结果")
     @RequestMapping(value = "/cashierResult", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject cashierResult(HttpServletRequest request) throws BusinessCheckException {
+    public ResponseObject cashierResult(HttpServletRequest request) {
         Integer orderId = request.getParameter("orderId") == null ? 0 : Integer.parseInt(request.getParameter("orderId"));
 
         UserOrderDto orderInfo = orderService.getOrderById(orderId);

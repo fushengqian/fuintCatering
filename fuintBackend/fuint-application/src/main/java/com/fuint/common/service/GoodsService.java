@@ -31,7 +31,7 @@ public interface GoodsService {
      * @param  param
      * @return
      */
-    PaginationResponse<GoodsDto> queryGoodsListByPagination(GoodsListParam param) throws BusinessCheckException;
+    PaginationResponse<GoodsDto> queryGoodsListByPagination(GoodsListParam param);
 
     /**
      * 保存商品
@@ -73,10 +73,9 @@ public interface GoodsService {
      * 根据ID获取商品详情
      *
      * @param  id
-     * @throws BusinessCheckException
      * @return
      */
-    GoodsDto getGoodsDetail(Integer id, boolean getDeleteSpec) throws InvocationTargetException, IllegalAccessException;
+    GoodsDto getGoodsDetail(Integer id, boolean getDeleteSpec);
 
     /**
      * 根据ID删除
@@ -132,7 +131,7 @@ public interface GoodsService {
      * @param params 查询参数
      * @return
      */
-    PaginationResponse<GoodsDto> selectGoodsList(Map<String, Object> params) throws BusinessCheckException;
+    PaginationResponse<GoodsDto> selectGoodsList(Map<String, Object> params);
 
     /**
      * 获取商品销售排行榜
