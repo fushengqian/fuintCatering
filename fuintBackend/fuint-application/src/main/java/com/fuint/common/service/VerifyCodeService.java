@@ -18,10 +18,9 @@ public interface VerifyCodeService extends IService<MtVerifyCode> {
      * @param mobile 手机号
      * @param verifyCode 验证码
      * @param expireSecond 间隔秒数
-     * @throws BusinessCheckException
      * @return
      */
-    MtVerifyCode addVerifyCode(String mobile, String verifyCode, Integer expireSecond) throws BusinessCheckException;
+    MtVerifyCode addVerifyCode(String mobile, String verifyCode, Integer expireSecond);
 
     /**
      * 根据手机号,验证码，查询时间

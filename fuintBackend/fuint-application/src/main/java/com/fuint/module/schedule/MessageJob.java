@@ -77,7 +77,9 @@ public class MessageJob {
                             // 如果到了发送时间，发送并删除该条消息
                             if (dealNum <= MAX_SEND_NUM && mtMessage.getSendTime().before(nowTime) && StringUtil.isNotEmpty(mtMessage.getParams())) {
                                 boolean result = weixinService.doSendSubscribeMessage(mtMessage.getMerchantId(), mtMessage.getParams());
-                                messageService.sendMessage(mtMessage.getId(), result);
+                                if (result) {
+                                    messageService.sendMessage(mtMessage.getId(), true);
+                                }
                                 dealNum++;
                             }
                         }

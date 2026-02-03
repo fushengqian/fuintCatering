@@ -190,7 +190,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     /**
      * 获取用户订单列表
      * @param  orderListParam
-     * @throws BusinessCheckException
+     * @return
      * */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -1644,28 +1644,24 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         // 处理购物订单
         UserOrderDto orderInfo = getOrderByOrderSn(mtOrder.getOrderSn());
         if (orderInfo.getType().equals(OrderTypeEnum.GOODS.getKey())) {
-            try {
-                List<OrderGoodsDto> goodsList = orderInfo.getGoods();
-                if (goodsList != null && goodsList.size() > 0) {
-                    for (OrderGoodsDto goodsDto : goodsList) {
-                        MtGoods mtGoods = goodsService.queryGoodsById(goodsDto.getGoodsId());
-                        if (mtGoods != null) {
-                            // 购买虚拟卡券商品发放处理
-                            if (mtGoods.getType().equals(GoodsTypeEnum.COUPON.getKey()) && mtGoods.getCouponIds() != null && StringUtil.isNotEmpty(mtGoods.getCouponIds())) {
-                                String couponIds[] = mtGoods.getCouponIds().split(",");
-                                if (couponIds.length > 0) {
-                                    for (int i = 0; i < couponIds.length; i++) {
-                                         userCouponService.buyCouponItem(orderInfo.getId(), Integer.parseInt(couponIds[i]), orderInfo.getUserId(), orderInfo.getUserInfo().getMobile(), goodsDto.getNum());
-                                    }
+            List<OrderGoodsDto> goodsList = orderInfo.getGoods();
+            if (goodsList != null && goodsList.size() > 0) {
+                for (OrderGoodsDto goodsDto : goodsList) {
+                    MtGoods mtGoods = goodsService.queryGoodsById(goodsDto.getGoodsId());
+                    if (mtGoods != null) {
+                        // 购买虚拟卡券商品发放处理
+                        if (mtGoods.getType().equals(GoodsTypeEnum.COUPON.getKey()) && mtGoods.getCouponIds() != null && StringUtil.isNotEmpty(mtGoods.getCouponIds())) {
+                            String couponIds[] = mtGoods.getCouponIds().split(",");
+                            if (couponIds.length > 0) {
+                                for (int i = 0; i < couponIds.length; i++) {
+                                     userCouponService.buyCouponItem(orderInfo.getId(), Integer.parseInt(couponIds[i]), orderInfo.getUserId(), orderInfo.getUserInfo().getMobile(), goodsDto.getNum());
                                 }
                             }
-                            // 将已销售数量+1
-                            goodsService.updateInitSale(mtGoods.getId(), goodsDto.getNum());
                         }
+                        // 将已销售数量+1
+                        goodsService.updateInitSale(mtGoods.getId(), goodsDto.getNum());
                     }
                 }
-            } catch (BusinessCheckException e) {
-                logger.error("会员购买的卡券发送给会员失败......" + e.getMessage());
             }
         }
 
@@ -2147,7 +2143,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      * @param couponId 卡券ID
      * @param isUsePoint 使用积分数量
      * @param orderMode 订单模式
-     * @throws BusinessCheckException
      * @return
      * */
     @Override

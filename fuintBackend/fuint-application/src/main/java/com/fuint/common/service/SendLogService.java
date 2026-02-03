@@ -2,7 +2,6 @@ package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.common.dto.ReqSendLogDto;
-import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtSendLog;
@@ -27,10 +26,9 @@ public interface SendLogService extends IService<MtSendLog> {
      * 添加记录
      *
      * @param  reqSendLogDto
-     * @throws BusinessCheckException
      * @return
      */
-    MtSendLog addSendLog(ReqSendLogDto reqSendLogDto) throws BusinessCheckException;
+    MtSendLog addSendLog(ReqSendLogDto reqSendLogDto);
 
     /**
      * 根据组ID获取发券记录

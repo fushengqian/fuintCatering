@@ -41,10 +41,10 @@ public interface BookService extends IService<MtBook> {
      *
      * @param  id 预约项目ID
      * @param fillDate 填充日期
-     * @throws BusinessCheckException
+     * @throws ParseException
      * @return
      */
-    BookDto getBookById(Integer id, boolean fillDate) throws BusinessCheckException, ParseException;
+    BookDto getBookById(Integer id, boolean fillDate) throws ParseException;
 
     /**
      * 更新预约项目

@@ -64,7 +64,6 @@ public interface GoodsService {
      * 根据条码获取sku信息
      *
      * @param  skuNo skuNo
-     * @throws BusinessCheckException
      * @return
      * */
     MtGoodsSku getSkuInfoBySkuNo(String skuNo);

@@ -68,7 +68,7 @@ public interface WeixinService {
      * @param code 登录编码
      * @return
      * */
-    JSONObject getWxProfile(Integer merchantId, String code) throws BusinessCheckException;
+    JSONObject getWxProfile(Integer merchantId, String code);
 
     /**
      * 获取微信openId
@@ -77,7 +77,7 @@ public interface WeixinService {
      * @param code 登录编码
      * @return
      * */
-    JSONObject getWxOpenId(Integer merchantId, String code) throws BusinessCheckException;
+    JSONObject getWxOpenId(Integer merchantId, String code);
 
     /**
      * 获取会员微信绑定的手机号
@@ -101,7 +101,7 @@ public interface WeixinService {
      * @param sendTime 发送时间
      * @return
      * */
-    Boolean sendSubscribeMessage(Integer merchantId, Integer userId, String toUserOpenId, String key, String page, Map<String,Object> params, Date sendTime) throws BusinessCheckException;
+    Boolean sendSubscribeMessage(Integer merchantId, Integer userId, String toUserOpenId, String key, String page, Map<String,Object> params, Date sendTime);
 
     /**
      * 发送订阅消息

@@ -259,7 +259,7 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
     @Override
     @OperationServiceLog(description = "删除挂单")
     @Transactional(rollbackFor = Exception.class)
-    public void removeCartByTableId(Integer tableId) throws BusinessCheckException {
+    public void removeCartByTableId(Integer tableId) {
         if (tableId != null) {
             MtTable mtTable = tableService.queryTableById(tableId);
             if (mtTable != null) {

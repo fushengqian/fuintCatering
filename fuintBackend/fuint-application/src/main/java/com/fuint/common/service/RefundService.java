@@ -32,15 +32,15 @@ public interface RefundService extends IService<MtRefund> {
      * @param paramMap 查询参数
      * @throws BusinessCheckException
      * */
-    ResponseObject getUserRefundList(Map<String, Object> paramMap) throws BusinessCheckException;
+    ResponseObject getUserRefundList(Map<String, Object> paramMap);
 
     /**
      * 创建售后订单
      *
      * @param reqDto
-     * @throws BusinessCheckException
+     * @return
      */
-    MtRefund createRefund(RefundDto reqDto) throws BusinessCheckException;
+    MtRefund createRefund(RefundDto reqDto);
 
     /**
      * 根据ID获取售后订单信息

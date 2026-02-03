@@ -337,7 +337,6 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      *
      * @param mtUser 用户信息
      * @param shareId 分享用户ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -505,7 +504,6 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      * @param merchantId 商户ID
      * @param  mobile 手机号
      * @param  shareId 分享用户ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -551,7 +549,6 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      *
      * @param  merchantId 商户ID
      * @param  mobile 手机号
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -638,7 +635,6 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      *
      * @param  merchantId 商户ID
      * @param  name 会员名称
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -788,7 +784,6 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      * 根据等级ID获取会员等级信息
      *
      * @param  id 等级ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override

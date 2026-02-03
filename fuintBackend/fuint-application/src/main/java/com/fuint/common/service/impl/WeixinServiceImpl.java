@@ -332,11 +332,10 @@ public class WeixinServiceImpl implements WeixinService {
      *
      * @param merchantId 商户ID
      * @param code 微信返回编码
-     * @throws BusinessCheckException
      * @return
      * */
     @Override
-    public JSONObject getWxProfile(Integer merchantId, String code) throws BusinessCheckException {
+    public JSONObject getWxProfile(Integer merchantId, String code) {
         String wxAppId = env.getProperty("wxpay.appId");
         String wxAppSecret = env.getProperty("wxpay.appSecret");
 
@@ -370,11 +369,10 @@ public class WeixinServiceImpl implements WeixinService {
      *
      * @param merchantId 商户ID
      * @param code 微信返回编码
-     * @throws BusinessCheckException
      * @return
      * */
     @Override
-    public JSONObject getWxOpenId(Integer merchantId, String code) throws BusinessCheckException {
+    public JSONObject getWxOpenId(Integer merchantId, String code) {
         String wxAppId = env.getProperty("weixin.official.appId");
         String wxAppSecret = env.getProperty("weixin.official.appSecret");
 
@@ -459,11 +457,10 @@ public class WeixinServiceImpl implements WeixinService {
      * @param page 跳转页面
      * @param params 发送参数
      * @param sendTime 发送时间
-     * @throws BusinessCheckException
      * @return
      * */
     @Override
-    public Boolean sendSubscribeMessage(Integer merchantId, Integer userId, String toUserOpenId, String key, String page, Map<String,Object> params, Date sendTime) throws BusinessCheckException {
+    public Boolean sendSubscribeMessage(Integer merchantId, Integer userId, String toUserOpenId, String key, String page, Map<String,Object> params, Date sendTime) {
         if (StringUtil.isEmpty(toUserOpenId) || StringUtil.isEmpty(key) || userId < 1) {
             return false;
         }

@@ -149,7 +149,7 @@ public class CateServiceImpl extends ServiceImpl<MtGoodsCateMapper, MtGoodsCate>
      * 根据ID获取分类信息
      *
      * @param  id 分类ID
-     * @throws BusinessCheckException
+     * @return
      */
     @Override
     public MtGoodsCate queryCateById(Integer id) {

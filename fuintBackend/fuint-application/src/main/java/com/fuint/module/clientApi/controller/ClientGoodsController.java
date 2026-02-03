@@ -66,7 +66,7 @@ public class ClientGoodsController extends BaseController {
     @ApiOperation(value = "获取商品分类列表")
     @RequestMapping(value = "/cateList", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject cateList(HttpServletRequest request) throws BusinessCheckException {
+    public ResponseObject cateList(HttpServletRequest request) {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
         Integer tableId = StringUtil.isEmpty(request.getHeader("tableId")) ? 0 : Integer.parseInt(request.getHeader("tableId"));
@@ -130,7 +130,7 @@ public class ClientGoodsController extends BaseController {
     @ApiOperation(value = "搜索商品")
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject search(HttpServletRequest request, @RequestBody GoodsListParam params) throws BusinessCheckException {
+    public ResponseObject search(HttpServletRequest request, @RequestBody GoodsListParam params) {
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
@@ -276,7 +276,7 @@ public class ClientGoodsController extends BaseController {
     @ApiOperation(value = "通过sku编码获取商品信息")
     @RequestMapping(value = "/getGoodsInfoBySkuNo", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject getGoodsInfoBySkuNo(HttpServletRequest request, @RequestBody GoodsInfoParam goodsInfoParam) throws BusinessCheckException, InvocationTargetException, IllegalAccessException {
+    public ResponseObject getGoodsInfoBySkuNo(HttpServletRequest request, @RequestBody GoodsInfoParam goodsInfoParam) {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String skuNo = goodsInfoParam.getSkuNo() == null ? "" : goodsInfoParam.getSkuNo();
         if (StringUtil.isEmpty(skuNo)) {

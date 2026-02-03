@@ -57,10 +57,9 @@ public interface MemberService extends IService<MtUser> {
      *
      * @param mtUser 用户信息
      * @param shareId 分享用户ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtUser addMember(MtUser mtUser, String shareId) throws BusinessCheckException;
+    MtUser addMember(MtUser mtUser, String shareId);
 
     /**
      * 编辑会员
@@ -78,10 +77,9 @@ public interface MemberService extends IService<MtUser> {
      * @param  merchantId 商户ID
      * @param  mobile 手机号
      * @param  shareId 分享用户ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtUser addMemberByMobile(Integer merchantId, String mobile, String shareId) throws BusinessCheckException;
+    MtUser addMemberByMobile(Integer merchantId, String mobile, String shareId);
 
     /**
      * 根据会员ID获取会员信息
@@ -113,10 +111,9 @@ public interface MemberService extends IService<MtUser> {
      * 根据会员组ID获取会员组信息
      *
      * @param  id 会员组ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtUserGrade queryMemberGradeByGradeId(Integer id) throws BusinessCheckException;
+    MtUserGrade queryMemberGradeByGradeId(Integer id);
 
     /**
      * 根据会员手机获取会员信息

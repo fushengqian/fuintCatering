@@ -543,7 +543,7 @@ public class UserCouponServiceImpl extends ServiceImpl<MtUserCouponMapper, MtUse
      * @return
      * */
     @Override
-    public List<CouponDto> getPayAbleCouponList(Integer userId, Integer storeId, String useFor) throws BusinessCheckException {
+    public List<CouponDto> getPayAbleCouponList(Integer userId, Integer storeId, String useFor) {
         List<String> statusList = Arrays.asList(UserCouponStatusEnum.UNUSED.getKey());
         List<MtUserCoupon> userCouponList = mtUserCouponMapper.getUserCouponList(userId, statusList);
         List<CouponDto> dataList = new ArrayList<>();
@@ -642,7 +642,7 @@ public class UserCouponServiceImpl extends ServiceImpl<MtUserCouponMapper, MtUse
      * */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean buyCouponItem(Integer orderId, Integer couponId, Integer userId, String mobile, Double num) throws BusinessCheckException {
+    public boolean buyCouponItem(Integer orderId, Integer couponId, Integer userId, String mobile, Double num) {
         if (num == null || num <= 0) {
             num = 1.0;
         }

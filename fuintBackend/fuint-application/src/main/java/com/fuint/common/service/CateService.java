@@ -37,7 +37,7 @@ public interface CateService extends IService<MtGoodsCate> {
      * 根据ID获取商品分类信息
      *
      * @param  id ID
-     * @throws BusinessCheckException
+     * @return
      */
     MtGoodsCate queryCateById(Integer id);
 

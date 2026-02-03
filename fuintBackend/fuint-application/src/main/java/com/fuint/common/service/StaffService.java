@@ -49,10 +49,9 @@ public interface StaffService extends IService<MtStaff> {
      * @param  staffId 员工ID
      * @param status 状态
      * @param operator 操作人
-     * @throws BusinessCheckException
      * @return
      */
-    Integer updateAuditedStatus(Integer staffId, String status, String operator) throws BusinessCheckException;
+    Integer updateAuditedStatus(Integer staffId, String status, String operator);
 
     /**
      * 根据条件搜索员工
@@ -60,32 +59,29 @@ public interface StaffService extends IService<MtStaff> {
      * @param params 请求参数
      * @return
      * */
-    List<MtStaff> queryStaffByParams(Map<String, Object> params) throws BusinessCheckException;
+    List<MtStaff> queryStaffByParams(Map<String, Object> params);
 
     /**
      * 根据手机号获取员工信息
      *
      * @param  mobile 手机
-     * @throws BusinessCheckException
      * @return
      */
-    MtStaff queryStaffByMobile(String mobile) throws BusinessCheckException;
+    MtStaff queryStaffByMobile(String mobile);
 
     /**
      * 根据会员ID获取员工信息
      *
      * @param userId 会员ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtStaff queryStaffByUserId(Integer userId) throws BusinessCheckException;
+    MtStaff queryStaffByUserId(Integer userId);
 
     /**
      * 根据手机号获取员工信息
      *
      * @param  mobile 手机
-     * @throws BusinessCheckException
      * @return
      */
-    StaffDto getStaffInfoByMobile(String mobile) throws BusinessCheckException;
+    StaffDto getStaffInfoByMobile(String mobile);
 }

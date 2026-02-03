@@ -381,7 +381,6 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
     * 根据条件搜索打印机
     *
     * @param params 查询参数
-    * @throws BusinessCheckException
     * @return
     * */
     @Override

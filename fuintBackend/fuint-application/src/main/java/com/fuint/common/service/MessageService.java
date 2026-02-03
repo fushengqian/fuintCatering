@@ -33,7 +33,6 @@ public interface MessageService {
      * 置为发送
      *
      * @param  msgId
-     * @throws BusinessCheckException
      * @return
      */
     void sendMessage(Integer msgId, boolean isRead) throws BusinessCheckException;
@@ -42,16 +41,14 @@ public interface MessageService {
      * 获取最新一条未读消息
      *
      * @param userId 会员ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtMessage getOne(Integer userId) throws BusinessCheckException;
+    MtMessage getOne(Integer userId);
 
     /**
      * 获取需要发送的消息
      *
-     * @throws BusinessCheckException
      * @return
      * */
-    List<MtMessage> getNeedSendList() throws BusinessCheckException;
+    List<MtMessage> getNeedSendList();
 }

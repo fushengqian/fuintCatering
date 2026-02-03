@@ -21,7 +21,7 @@ public interface CartService extends IService<MtCart> {
      * @param cartIds
      * @return
      * */
-    Boolean switchCartIds(Integer userId, String cartIds) throws BusinessCheckException;
+    Boolean switchCartIds(Integer userId, String cartIds);
 
     /**
      * 保存购物车
@@ -57,7 +57,7 @@ public interface CartService extends IService<MtCart> {
      * @throws BusinessCheckException
      * @return
      */
-    void removeCartByTableId(Integer tableId) throws BusinessCheckException;
+    void removeCartByTableId(Integer tableId);
 
     /**
      * 清空会员购物车

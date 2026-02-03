@@ -2,7 +2,6 @@ package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.repository.model.MtAddress;
-import com.fuint.framework.exception.BusinessCheckException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,19 +17,17 @@ public interface AddressService extends IService<MtAddress> {
      * 保存收货地址
      *
      * @param  mtAddress
-     * @throws BusinessCheckException
      * @return
      */
-    MtAddress saveAddress(MtAddress mtAddress) throws BusinessCheckException;
+    MtAddress saveAddress(MtAddress mtAddress);
 
     /**
      * 根据ID获取地址信息
      *
      * @param  id 地址ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtAddress detail(Integer id) throws BusinessCheckException;
+    MtAddress detail(Integer id);
 
     /**
      * 根据条件查询地址列表
@@ -38,15 +35,14 @@ public interface AddressService extends IService<MtAddress> {
      * @param params 查询参数
      * @return
      * */
-    List<MtAddress> queryListByParams(Map<String, Object> params) throws BusinessCheckException;
+    List<MtAddress> queryListByParams(Map<String, Object> params);
 
     /**
      * 获取会员默认地址
      *
      * @param  userId 会员ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtAddress getDefaultAddress(Integer userId) throws BusinessCheckException;
+    MtAddress getDefaultAddress(Integer userId);
 
 }

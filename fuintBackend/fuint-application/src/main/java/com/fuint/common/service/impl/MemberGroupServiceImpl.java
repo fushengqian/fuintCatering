@@ -111,12 +111,11 @@ public class MemberGroupServiceImpl extends ServiceImpl<MtUserGroupMapper, MtUse
      * 添加会员分组
      *
      * @param  memberGroupDto 会员分组
-     * @throws BusinessCheckException
      * @return
      */
     @Override
     @OperationServiceLog(description = "新增会员分组")
-    public MtUserGroup addMemberGroup(MemberGroupDto memberGroupDto) throws BusinessCheckException {
+    public MtUserGroup addMemberGroup(MemberGroupDto memberGroupDto) {
         MtUserGroup userGroup = new MtUserGroup();
         Integer storeId = memberGroupDto.getStoreId() == null ? 0 : memberGroupDto.getStoreId();
         if (memberGroupDto.getMerchantId() == null || memberGroupDto.getMerchantId() <= 0) {
@@ -142,7 +141,6 @@ public class MemberGroupServiceImpl extends ServiceImpl<MtUserGroupMapper, MtUse
      * 根据分组ID获取分组信息
      *
      * @param  id 分组ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -155,7 +153,6 @@ public class MemberGroupServiceImpl extends ServiceImpl<MtUserGroupMapper, MtUse
      *
      * @param  id       分组ID
      * @param  operator 操作人
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -237,8 +234,7 @@ public class MemberGroupServiceImpl extends ServiceImpl<MtUserGroupMapper, MtUse
      * */
     public Long getMemberNum(Integer groupId) {
         List<Integer> groupIds = getGroupIds(groupId);
-        Long totalMember = mtUserGroupMapper.getMemberNum(groupIds);
-        return totalMember;
+        return mtUserGroupMapper.getMemberNum(groupIds);
     }
 
     /**

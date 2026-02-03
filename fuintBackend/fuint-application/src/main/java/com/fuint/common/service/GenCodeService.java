@@ -41,10 +41,9 @@ public interface GenCodeService {
     /**
      * 更新生成代码
      * @param  tGenCode
-     * @throws BusinessCheckException
      * @return
      * */
-    TGenCode updateGenCode(TGenCode tGenCode) throws BusinessCheckException;
+    TGenCode updateGenCode(TGenCode tGenCode);
 
     /**
      * 生成代码（自定义路径）

@@ -129,7 +129,7 @@ public class ClientBookController extends BaseController {
     @ApiOperation(value = "获取预约分类列表")
     @RequestMapping(value = "/cateList", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject cateList(HttpServletRequest request) throws BusinessCheckException {
+    public ResponseObject cateList(HttpServletRequest request) {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
 

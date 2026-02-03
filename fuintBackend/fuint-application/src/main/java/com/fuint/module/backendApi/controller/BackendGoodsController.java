@@ -33,7 +33,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -697,7 +696,7 @@ public class BackendGoodsController extends BaseController {
     @ApiOperation(value = "获取选择商品列表")
     @RequestMapping(value = "/selectGoods", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject selectGoods(@RequestBody Map<String, Object> params) throws BusinessCheckException {
+    public ResponseObject selectGoods(@RequestBody Map<String, Object> params) {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             params.put("merchantId", accountInfo.getMerchantId());

@@ -23,7 +23,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -122,7 +121,7 @@ public class MerchantBookController extends BaseController {
     @ApiOperation(value = "取消预约")
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject cancel(HttpServletRequest request, @RequestBody BookDetailParam param) throws BusinessCheckException {
+    public ResponseObject cancel(@RequestBody BookDetailParam param) throws BusinessCheckException {
         UserInfo mtUser = TokenUtil.getUserInfo();
 
         Integer bookId = param.getBookId();

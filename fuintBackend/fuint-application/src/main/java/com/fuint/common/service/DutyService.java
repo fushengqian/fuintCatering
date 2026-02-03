@@ -17,7 +17,7 @@ import java.util.List;
  * CopyRight https://www.fuint.cn
  */
 public interface DutyService extends IService<TDuty> {
-    
+
     /**
      * 角色保存方法
      *
@@ -66,7 +66,7 @@ public interface DutyService extends IService<TDuty> {
      * @param dutyId 角色ID
      * @return
      */
-    void deleteDuty(Integer merchantId, long dutyId) throws BusinessCheckException;
+    void deleteDuty(Integer merchantId, long dutyId);
 
     /**
      * 更新状态

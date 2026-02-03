@@ -198,7 +198,7 @@ public class AccountServiceImpl extends ServiceImpl<TAccountMapper, TAccount> im
      * */
     @Override
     @OperationServiceLog(description = "新增后台账户")
-    public TAccount createAccountInfo(TAccount tAccount, List<TDuty> duties) throws BusinessCheckException {
+    public TAccount createAccountInfo(TAccount tAccount, List<TDuty> duties) {
         TAccount account = new TAccount();
         account.setAccountKey(tAccount.getAccountKey());
         account.setAccountName(tAccount.getAccountName().toLowerCase());

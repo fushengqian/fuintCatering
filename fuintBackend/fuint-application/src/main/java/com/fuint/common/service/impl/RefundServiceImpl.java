@@ -175,12 +175,11 @@ public class RefundServiceImpl extends ServiceImpl<MtRefundMapper, MtRefund> imp
      * 获取用户售后订单列表
      *
      * @param  paramMap 查询参数
-     * @throws BusinessCheckException
      * @return
      * */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseObject getUserRefundList(Map<String, Object> paramMap) throws BusinessCheckException {
+    public ResponseObject getUserRefundList(Map<String, Object> paramMap) {
         Integer pageNumber = paramMap.get("pageNumber") == null ? Constants.PAGE_NUMBER : Integer.parseInt(paramMap.get("pageNumber").toString());
         Integer pageSize = paramMap.get("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(paramMap.get("pageSize").toString());
         String userId = paramMap.get("userId") == null ? "0" : paramMap.get("userId").toString();
@@ -246,7 +245,6 @@ public class RefundServiceImpl extends ServiceImpl<MtRefundMapper, MtRefund> imp
      * 创建售后订单
      *
      * @param refundDto 订单参数
-     * @throws BusinessCheckException
      * @return
      */
     @Override

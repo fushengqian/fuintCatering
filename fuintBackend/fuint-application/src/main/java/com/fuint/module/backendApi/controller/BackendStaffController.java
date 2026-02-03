@@ -186,7 +186,7 @@ public class BackendStaffController extends BaseController {
     @ApiOperation(value = "店铺员工列表")
     @RequestMapping(value = "/storeStaffList/{storeId}", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject storeStaffList(@PathVariable("storeId") Integer storeId) throws BusinessCheckException {
+    public ResponseObject storeStaffList(@PathVariable("storeId") Integer storeId) {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         Map<String, Object> params = new HashMap<>();
@@ -215,7 +215,7 @@ public class BackendStaffController extends BaseController {
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('staff:list')")
-    public ResponseObject deleteStaff(@PathVariable("id") Integer id) throws BusinessCheckException {
+    public ResponseObject deleteStaff(@PathVariable("id") Integer id) {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         staffService.updateAuditedStatus(id, StatusEnum.DISABLE.getKey(), accountInfo.getAccountName());
         return getSuccessResult(true);

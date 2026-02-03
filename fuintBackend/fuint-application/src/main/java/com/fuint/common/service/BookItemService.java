@@ -25,7 +25,7 @@ public interface BookItemService extends IService<MtBookItem> {
      * @param bookItemPage
      * @return
      */
-    PaginationResponse<BookItemDto> queryBookItemListByPagination(BookItemPage bookItemPage) throws BusinessCheckException;
+    PaginationResponse<BookItemDto> queryBookItemListByPagination(BookItemPage bookItemPage);
 
     /**
      * 添加预约订单
@@ -40,16 +40,14 @@ public interface BookItemService extends IService<MtBookItem> {
      * 根据ID获取预约订单信息
      *
      * @param  id 预约订单ID
-     * @throws BusinessCheckException
      * @return
      */
-    MtBookItem getBookItemById(Integer id) throws BusinessCheckException;
+    MtBookItem getBookItemById(Integer id);
 
     /**
      * 根据ID获取预约订单详情
      *
      * @param  id 预约订单ID
-     * @throws BusinessCheckException
      * @return
      */
     BookItemDto getBookDetail(Integer id) throws BusinessCheckException;
@@ -67,10 +65,9 @@ public interface BookItemService extends IService<MtBookItem> {
      * 根据条件搜索预约订单
      *
      * @param  params 查询参数
-     * @throws BusinessCheckException
      * @return
      * */
-    List<MtBookItem> queryBookItemListByParams(Map<String, Object> params) throws BusinessCheckException;
+    List<MtBookItem> queryBookItemListByParams(Map<String, Object> params);
 
     /**
      * 取消预约

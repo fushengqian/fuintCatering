@@ -84,7 +84,7 @@ public class ClientRefundController extends BaseController {
     @ApiOperation(value = "售后订单提交")
     @RequestMapping(value = "/submit", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject submit(@RequestBody RefundSubmitRequest param) throws BusinessCheckException {
+    public ResponseObject submit(@RequestBody RefundSubmitRequest param) {
         UserInfo mtUser = TokenUtil.getUserInfo();
         param.setUserId(mtUser.getId());
 

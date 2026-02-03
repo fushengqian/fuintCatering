@@ -25,7 +25,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -168,7 +167,7 @@ public class BackendCashierController extends BaseController {
     @RequestMapping(value = "/getGoodsInfo/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject getGoodsInfo(@PathVariable("id") Integer goodsId) throws InvocationTargetException, IllegalAccessException {
+    public ResponseObject getGoodsInfo(@PathVariable("id") Integer goodsId) {
         GoodsDto goodsInfo = goodsService.getGoodsDetail(goodsId, false);
 
         Map<String, Object> result = new HashMap<>();

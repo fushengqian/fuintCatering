@@ -18,10 +18,9 @@ public interface OpenGiftService {
      * 获取用户的开卡赠礼
      *
      * @param paramMap 查询参数
-     * @throws BusinessCheckException
      * @return
      * */
-    ResponseObject getOpenGiftList(Map<String, Object> paramMap) throws BusinessCheckException;
+    ResponseObject getOpenGiftList(Map<String, Object> paramMap);
 
     /**
      * 新增开卡赠礼
@@ -36,10 +35,9 @@ public interface OpenGiftService {
      * 根据ID获取开卡赠礼
      *
      * @param id ID
-     * @throws BusinessCheckException
      * @return
      */
-    OpenGiftDto getOpenGiftDetail(Integer id) throws BusinessCheckException;
+    OpenGiftDto getOpenGiftDetail(Integer id);
 
     /**
      * 根据ID删除开卡赠礼

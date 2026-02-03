@@ -29,10 +29,9 @@ public interface OrderService extends IService<MtOrder> {
      * 获取用户的订单
      *
      * @param  orderListParam
-     * @throws BusinessCheckException
      * @return
      * */
-    PaginationResponse getUserOrderList(OrderListParam orderListParam) throws BusinessCheckException;
+    PaginationResponse getUserOrderList(OrderListParam orderListParam);
 
     /**
      * 创建订单
@@ -117,10 +116,9 @@ public interface OrderService extends IService<MtOrder> {
      * 根据订单号获取订单详情
      *
      * @param  orderSn
-     * @throws BusinessCheckException
      * @return
      */
-    UserOrderDto getOrderByOrderSn(String orderSn) throws BusinessCheckException;
+    UserOrderDto getOrderByOrderSn(String orderSn);
 
     /**
      * 根据订单号获取订单详情
