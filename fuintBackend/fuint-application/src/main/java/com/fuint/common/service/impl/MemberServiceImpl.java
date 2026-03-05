@@ -388,6 +388,11 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         Date time = new Date();
         mtUser.setCreateTime(time);
         mtUser.setUpdateTime(time);
+        if (mtUser.getStartTime() != null && mtUser.getEndTime() != null) {
+            if (mtUser.getEndTime().before(mtUser.getStartTime())) {
+                mtUser.setEndTime(mtUser.getStartTime());
+            }
+        }
         mtUser.setStartTime(mtUser.getStartTime());
         mtUser.setEndTime(mtUser.getEndTime());
         if (mtUser.getStoreId() != null && mtUser.getStoreId() > 0) {
@@ -464,7 +469,11 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         } else {
             mtUser.setMobile(oldUserInfo.getMobile());
         }
-
+        if (mtUser.getStartTime() != null && mtUser.getEndTime() != null) {
+            if (mtUser.getEndTime().before(mtUser.getStartTime())) {
+                mtUser.setEndTime(mtUser.getStartTime());
+            }
+        }
         // 检查会员号是否重复
         if (StringUtil.isNotEmpty(mtUser.getUserNo())) {
             List<MtUser> userList = mtUserMapper.findMembersByUserNo(mtUser.getMerchantId(), mtUser.getUserNo());
