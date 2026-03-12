@@ -1,8 +1,8 @@
 package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.Constants;
-import com.fuint.common.dto.AccountInfo;
-import com.fuint.common.dto.SmsTemplateDto;
+import com.fuint.common.dto.message.SmsTemplateDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.service.SmsTemplateService;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;

@@ -1,7 +1,7 @@
 package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.fuint.common.dto.BookDto;
+import com.fuint.common.dto.book.BookDto;
 import com.fuint.common.param.BookPage;
 import com.fuint.common.param.BookableParam;
 import com.fuint.framework.pagination.PaginationResponse;
@@ -9,7 +9,6 @@ import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.repository.model.MtBook;
 import java.text.ParseException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 预约业务接口
@@ -25,7 +24,7 @@ public interface BookService extends IService<MtBook> {
      * @param bookPage
      * @return
      */
-    PaginationResponse<BookDto> queryBookListByPagination(BookPage bookPage) throws BusinessCheckException;
+    PaginationResponse<BookDto> queryBookListByPagination(BookPage bookPage);
 
     /**
      * 添加预约
@@ -63,14 +62,5 @@ public interface BookService extends IService<MtBook> {
      * @return
      * */
     List<String> isBookable(BookableParam param) throws BusinessCheckException, ParseException;
-
-    /**
-     * 根据条件搜索预约项目
-     *
-     * @param  params 查询参数
-     * @throws BusinessCheckException
-     * @return
-     * */
-    List<MtBook> queryBookListByParams(Map<String, Object> params) throws BusinessCheckException;
 
 }

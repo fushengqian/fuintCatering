@@ -1,7 +1,7 @@
 package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.fuint.common.dto.CommissionCashDto;
+import com.fuint.common.dto.commission.CommissionCashDto;
 import com.fuint.common.param.CommissionCashPage;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationResponse;
@@ -39,10 +39,9 @@ public interface CommissionCashService extends IService<MtCommissionCash> {
      * 根据ID获取记录信息
      *
      * @param  id 记录ID
-     * @throws BusinessCheckException
      * @return
      */
-    CommissionCashDto queryCommissionCashById(Integer id) throws BusinessCheckException;
+    CommissionCashDto queryCommissionCashById(Integer id);
 
     /**
      * 更新分销提成记录

@@ -1,8 +1,8 @@
 package com.fuint.module.clientApi.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.fuint.common.dto.TokenDto;
-import com.fuint.common.dto.UserInfo;
+import com.fuint.common.dto.common.TokenDto;
+import com.fuint.common.dto.member.UserInfo;
 import com.fuint.common.enums.GenderEnum;
 import com.fuint.common.enums.MemberSourceEnum;
 import com.fuint.common.enums.StatusEnum;
@@ -85,7 +85,7 @@ public class ClientSignController extends BaseController {
     @RequestMapping(value = "/mpWxLogin", method = RequestMethod.POST)
     @ResponseBody
     @CrossOrigin
-    public ResponseObject mpWxLogin(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject mpWxLogin(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         String storeId = request.getHeader("storeId") == null ? "0" : request.getHeader("storeId");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String shareId = param.get("shareId") == null ? "0" : param.get("shareId").toString();
@@ -144,7 +144,7 @@ public class ClientSignController extends BaseController {
     @RequestMapping(value = "/mpWxAuth", method = RequestMethod.POST)
     @ResponseBody
     @CrossOrigin
-    public ResponseObject mpWxAuth(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject mpWxAuth(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String storeId = request.getHeader("storeId") == null ? "0" : request.getHeader("storeId");
         String shareId = param.get("shareId") == null ? "0" : param.get("shareId").toString();
@@ -188,7 +188,7 @@ public class ClientSignController extends BaseController {
     @ApiOperation(value = "通过账号密码注册")
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject register(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject register(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String account = param.get("account").toString();
         String password = param.get("password").toString();

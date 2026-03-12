@@ -1,6 +1,6 @@
 package com.fuint.common.service;
 
-import com.fuint.common.dto.OpenGiftDto;
+import com.fuint.common.dto.member.OpenGiftDto;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtOpenGift;
@@ -25,11 +25,11 @@ public interface OpenGiftService {
     /**
      * 新增开卡赠礼
      *
-     * @param reqDto
+     * @param  mtOpenGift
      * @throws BusinessCheckException
      * @return
      */
-    MtOpenGift addOpenGift(MtOpenGift reqDto) throws BusinessCheckException;
+    MtOpenGift addOpenGift(MtOpenGift mtOpenGift) throws BusinessCheckException;
 
     /**
      * 根据ID获取开卡赠礼
@@ -42,8 +42,8 @@ public interface OpenGiftService {
     /**
      * 根据ID删除开卡赠礼
      *
-     * @param id       ID
-     * @param operator 操作人
+     * @param  id       ID
+     * @param  operator 操作人
      * @throws BusinessCheckException
      * @return
      */
@@ -52,7 +52,7 @@ public interface OpenGiftService {
     /**
      * 更新开卡赠礼
      *
-     * @param reqDto
+     * @param  reqDto
      * @throws BusinessCheckException
      * @return
      * */

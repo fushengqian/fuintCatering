@@ -73,7 +73,7 @@ public class ReportServiceImpl implements ReportService {
         Integer totalPayUserCount = orderService.getPayUserCount(merchantId, storeId);
 
         // 店铺列表
-        List<MtStore> storeList = storeService.getMyStoreList(merchantId, storeId, StatusEnum.ENABLED.getKey());
+        List<MtStore> storeList = storeService.getActiveStoreList(merchantId, storeId, null);
 
         Map<String, Object> result = new HashMap<>();
         result.put("userCount", userCount);

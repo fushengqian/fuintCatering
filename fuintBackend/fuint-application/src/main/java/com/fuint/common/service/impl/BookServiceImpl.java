@@ -3,9 +3,9 @@ package com.fuint.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fuint.common.dto.BookDto;
-import com.fuint.common.dto.DayDto;
-import com.fuint.common.dto.TimeDto;
+import com.fuint.common.dto.book.BookDto;
+import com.fuint.common.dto.common.DayDto;
+import com.fuint.common.dto.common.TimeDto;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.BookPage;
 import com.fuint.common.param.BookableParam;
@@ -371,47 +371,5 @@ public class BookServiceImpl extends ServiceImpl<MtBookMapper, MtBook> implement
            }
        }
        return result;
-    }
-
-    /**
-     * 根据条件搜索预约项目
-     *
-     * @param  params 查询参数
-     * @throws BusinessCheckException
-     * @return
-     * */
-    @Override
-    public List<MtBook> queryBookListByParams(Map<String, Object> params) {
-        String status =  params.get("status") == null ? StatusEnum.ENABLED.getKey(): params.get("status").toString();
-        String storeId =  params.get("storeId") == null ? "" : params.get("storeId").toString();
-        String merchantId =  params.get("merchantId") == null ? "" : params.get("merchantId").toString();
-        String name = params.get("name") == null ? "" : params.get("name").toString();
-
-        LambdaQueryWrapper<MtBook> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        lambdaQueryWrapper.ne(MtBook::getStatus, StatusEnum.DISABLE.getKey());
-        if (StringUtils.isNotBlank(name)) {
-            lambdaQueryWrapper.like(MtBook::getName, name);
-        }
-        if (StringUtils.isNotBlank(status)) {
-            lambdaQueryWrapper.eq(MtBook::getStatus, status);
-        }
-        if (StringUtils.isNotBlank(merchantId)) {
-            lambdaQueryWrapper.eq(MtBook::getMerchantId, merchantId);
-        }
-        if (StringUtils.isNotBlank(storeId)) {
-            lambdaQueryWrapper.eq(MtBook::getStoreId, storeId);
-        }
-
-        lambdaQueryWrapper.orderByAsc(MtBook::getSort);
-        List<MtBook> dataList = mtBookMapper.selectList(lambdaQueryWrapper);
-        String baseImage = settingService.getUploadBasePath();
-
-        if (dataList.size() > 0) {
-            for (MtBook book : dataList) {
-                 book.setLogo(baseImage + book.getLogo());
-            }
-        }
-
-        return dataList;
     }
 }

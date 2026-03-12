@@ -3,8 +3,8 @@ package com.fuint.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fuint.common.dto.CommissionCashDto;
-import com.fuint.common.dto.OrderUserDto;
+import com.fuint.common.dto.commission.CommissionCashDto;
+import com.fuint.common.dto.order.OrderUserDto;
 import com.fuint.common.enums.CommissionCashStatusEnum;
 import com.fuint.common.enums.CommissionStatusEnum;
 import com.fuint.common.enums.CommissionTargetEnum;
@@ -379,7 +379,7 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
     /**
      * 支付结算金额到用户余额
      *
-     * @param commissionCashRequest 请求参数
+     * @param  commissionCashRequest 请求参数
      * @throws BusinessCheckException
      * @return
      */

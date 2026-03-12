@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fuint.common.dto.NavigationDto;
-import com.fuint.common.dto.ParamDto;
+import com.fuint.common.dto.common.ParamDto;
+import com.fuint.common.dto.content.NavigationDto;
 import com.fuint.common.enums.*;
 import com.fuint.common.service.SettingService;
 import com.fuint.framework.annoation.OperationServiceLog;
@@ -182,7 +182,7 @@ public class SettingServiceImpl extends ServiceImpl<MtSettingMapper, MtSetting> 
      * @return
      * */
     @Override
-    public List<ParamDto> getPayTypeList(Integer merchantId, Integer storeId, String platform) throws BusinessCheckException {
+    public List<ParamDto> getPayTypeList(Integer merchantId, Integer storeId, String platform) {
         List<ParamDto> payTypeList = new ArrayList<>();
 
         // 微信jsapi

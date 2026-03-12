@@ -1,8 +1,8 @@
 package com.fuint.module.clientApi.controller;
 
-import com.fuint.common.dto.BookDto;
-import com.fuint.common.dto.BookItemDto;
-import com.fuint.common.dto.UserInfo;
+import com.fuint.common.dto.book.BookDto;
+import com.fuint.common.dto.book.BookItemDto;
+import com.fuint.common.dto.member.UserInfo;
 import com.fuint.common.enums.BookStatusEnum;
 import com.fuint.common.param.*;
 import com.fuint.common.service.*;
@@ -22,7 +22,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +75,7 @@ public class ClientBookController extends BaseController {
     @ApiOperation(value="获取预约项目列表", notes="获取预约项目列表")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject list(HttpServletRequest request, @RequestBody BookListParam param) throws BusinessCheckException, InvocationTargetException, IllegalAccessException {
+    public ResponseObject list(HttpServletRequest request, @RequestBody BookListParam param) throws BusinessCheckException {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
 
@@ -113,7 +112,7 @@ public class ClientBookController extends BaseController {
     @ApiOperation(value="获取预约项目详情", notes="根据ID获取预约项目详情")
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject detail(@RequestBody BookDetailParam param) throws BusinessCheckException, InvocationTargetException, IllegalAccessException, ParseException {
+    public ResponseObject detail(@RequestBody BookDetailParam param) throws BusinessCheckException, ParseException {
         Integer bookId = param.getBookId() == null ? 0 : param.getBookId();
 
         BookDto bookInfo = bookService.getBookById(bookId, true);
@@ -197,7 +196,7 @@ public class ClientBookController extends BaseController {
     @ApiOperation(value = "获取我的预约")
     @RequestMapping(value = "/myBook", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject myBook(HttpServletRequest request) throws BusinessCheckException {
+    public ResponseObject myBook(HttpServletRequest request) {
         String status = request.getParameter("status") == null ? "" : request.getParameter("status");
         BookItemPage bookItemPage = new BookItemPage();
         Integer merchantId = merchantService.getMerchantId(request.getHeader("merchantNo"));

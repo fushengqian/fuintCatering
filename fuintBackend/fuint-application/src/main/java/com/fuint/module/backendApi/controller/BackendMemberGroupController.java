@@ -1,10 +1,11 @@
 package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.Constants;
-import com.fuint.common.dto.AccountInfo;
-import com.fuint.common.dto.MemberGroupDto;
-import com.fuint.common.dto.UserGroupDto;
+import com.fuint.common.dto.member.MemberGroupDto;
+import com.fuint.common.dto.member.UserGroupDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
+import com.fuint.common.param.StatusParam;
 import com.fuint.common.service.MemberGroupService;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -140,15 +141,12 @@ public class BackendMemberGroupController extends BaseController {
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('member:group:index')")
-    public ResponseObject updateStatus(@RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
-        Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
-
+    public ResponseObject updateStatus(@RequestBody StatusParam params) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         MemberGroupDto groupDto = new MemberGroupDto();
         groupDto.setOperator(accountInfo.getAccountName());
-        groupDto.setId(id);
-        groupDto.setStatus(status);
+        groupDto.setId(params.getId());
+        groupDto.setStatus(params.getStatus());
         memberGroupService.updateMemberGroup(groupDto);
 
         return getSuccessResult(true);

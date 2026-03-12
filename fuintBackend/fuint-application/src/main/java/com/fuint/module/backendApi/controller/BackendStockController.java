@@ -1,9 +1,9 @@
 package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.Constants;
-import com.fuint.common.dto.AccountInfo;
-import com.fuint.common.dto.GoodsDto;
-import com.fuint.common.dto.StockGoodsDto;
+import com.fuint.common.dto.goods.GoodsDto;
+import com.fuint.common.dto.goods.StockGoodsDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.service.SettingService;
 import com.fuint.common.service.StockService;

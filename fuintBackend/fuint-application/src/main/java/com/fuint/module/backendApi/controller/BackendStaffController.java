@@ -1,12 +1,13 @@
 package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.Constants;
-import com.fuint.common.dto.AccountInfo;
-import com.fuint.common.dto.ParamDto;
-import com.fuint.common.dto.StaffDto;
+import com.fuint.common.dto.merchant.StaffDto;
+import com.fuint.common.dto.system.AccountInfo;
+import com.fuint.common.dto.common.ParamDto;
 import com.fuint.common.enums.StaffCategoryEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.StaffParam;
+import com.fuint.common.param.StatusParam;
 import com.fuint.common.service.StaffService;
 import com.fuint.common.util.CommonUtil;
 import com.fuint.common.util.PhoneFormatCheckUtils;
@@ -105,12 +106,9 @@ public class BackendStaffController extends BaseController {
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('staff:list')")
-    public ResponseObject updateStatus(@RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
-        Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
-
+    public ResponseObject updateStatus(@RequestBody StatusParam params) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        staffService.updateAuditedStatus(id, status, accountInfo.getAccountName());
+        staffService.updateAuditedStatus(params.getId(), params.getStatus(), accountInfo.getAccountName());
         return getSuccessResult(true);
     }
 

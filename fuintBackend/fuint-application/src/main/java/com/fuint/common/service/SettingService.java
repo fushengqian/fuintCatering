@@ -2,8 +2,8 @@ package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fuint.common.dto.NavigationDto;
-import com.fuint.common.dto.ParamDto;
+import com.fuint.common.dto.common.ParamDto;
+import com.fuint.common.dto.content.NavigationDto;
 import com.fuint.repository.model.MtSetting;
 import com.fuint.framework.exception.BusinessCheckException;
 import java.util.List;
@@ -80,7 +80,7 @@ public interface SettingService extends IService<MtSetting> {
      * @param platform 平台
      * @return
      * */
-    List<ParamDto> getPayTypeList(Integer merchantId, Integer storeId, String platform) throws BusinessCheckException;
+    List<ParamDto> getPayTypeList(Integer merchantId, Integer storeId, String platform);
 
     /**
      * 获取导航栏

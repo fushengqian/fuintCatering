@@ -1,8 +1,8 @@
 package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.Constants;
-import com.fuint.common.dto.AccountInfo;
-import com.fuint.common.dto.StoreDto;
+import com.fuint.common.dto.merchant.StoreDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.service.MerchantService;
 import com.fuint.common.service.SettingService;

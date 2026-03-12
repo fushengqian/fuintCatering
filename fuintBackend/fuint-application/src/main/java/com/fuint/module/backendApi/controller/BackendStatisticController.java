@@ -1,8 +1,8 @@
 package com.fuint.module.backendApi.controller;
 
-import com.fuint.common.dto.AccountInfo;
-import com.fuint.common.dto.GoodsTopDto;
-import com.fuint.common.dto.MemberTopDto;
+import com.fuint.common.dto.goods.GoodsTopDto;
+import com.fuint.common.dto.member.MemberTopDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.param.StatisticParam;
 import com.fuint.common.service.GoodsService;
 import com.fuint.common.service.MemberService;
@@ -10,7 +10,6 @@ import com.fuint.common.service.OrderService;
 import com.fuint.common.service.StoreService;
 import com.fuint.common.util.DateUtil;
 import com.fuint.common.util.TokenUtil;
-import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtStore;

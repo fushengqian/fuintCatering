@@ -3,7 +3,7 @@ package com.fuint.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fuint.common.dto.PointDto;
+import com.fuint.common.dto.member.PointDto;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.WxMessageEnum;
 import com.fuint.common.service.MemberService;
@@ -169,7 +169,10 @@ public class PointServiceImpl extends ServiceImpl<MtPointMapper, MtPoint> implem
             mtPoint.setStoreId(mtUser.getStoreId());
         }
         mtPoint.setMerchantId(mtUser.getMerchantId());
-        mtUserMapper.updateById(mtUser);
+        int result = mtUserMapper.updateById(mtUser);
+        if (result <= 0) {
+            throw new BusinessCheckException("会员积分修改失败");
+        }
         mtPointMapper.insert(mtPoint);
 
         try {

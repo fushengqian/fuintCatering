@@ -1,9 +1,10 @@
 package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.Constants;
-import com.fuint.common.dto.AccountInfo;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.TableUseStatusEnum;
+import com.fuint.common.param.StatusParam;
 import com.fuint.common.service.SettingService;
 import com.fuint.common.service.StoreService;
 import com.fuint.common.service.TableService;
@@ -106,19 +107,16 @@ public class BackendTableController extends BaseController {
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('table:index')")
-    public ResponseObject updateStatus(@RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
-        Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
-
+    public ResponseObject updateStatus(@RequestBody StatusParam params) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
-        MtTable mtTable = tableService.queryTableById(id);
+        MtTable mtTable = tableService.queryTableById(params.getId());
         if (mtTable == null) {
             return getFailureResult(201);
         }
 
         mtTable.setOperator(accountInfo.getAccountName());
-        mtTable.setStatus(status);
+        mtTable.setStatus(params.getStatus());
         tableService.updateTable(mtTable);
 
         return getSuccessResult(true);

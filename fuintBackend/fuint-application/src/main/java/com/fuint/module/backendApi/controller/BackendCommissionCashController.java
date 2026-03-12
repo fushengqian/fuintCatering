@@ -1,8 +1,8 @@
 package com.fuint.module.backendApi.controller;
 
-import com.fuint.common.dto.AccountInfo;
-import com.fuint.common.dto.CommissionCashDto;
-import com.fuint.common.dto.ParamDto;
+import com.fuint.common.dto.commission.CommissionCashDto;
+import com.fuint.common.dto.system.AccountInfo;
+import com.fuint.common.dto.common.ParamDto;
 import com.fuint.common.enums.CommissionCashStatusEnum;
 import com.fuint.common.param.CommissionCashPage;
 import com.fuint.common.service.CommissionCashService;
@@ -161,7 +161,7 @@ public class BackendCommissionCashController extends BaseController {
         return getSuccessResult(true);
     }
 
-    private boolean checkOwner(Integer commissionCashId, AccountInfo accountInfo) throws BusinessCheckException {
+    private boolean checkOwner(Integer commissionCashId, AccountInfo accountInfo) {
         CommissionCashDto commissionCash = commissionCashService.queryCommissionCashById(commissionCashId);
         if (commissionCash == null) {
             return false;

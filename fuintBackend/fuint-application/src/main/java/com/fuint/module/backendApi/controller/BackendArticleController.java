@@ -1,9 +1,9 @@
 package com.fuint.module.backendApi.controller;
 
-import com.fuint.common.dto.AccountInfo;
-import com.fuint.common.dto.ArticleDto;
-import com.fuint.common.enums.StatusEnum;
+import com.fuint.common.dto.content.ArticleDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.param.ArticlePage;
+import com.fuint.common.param.StatusParam;
 import com.fuint.common.service.ArticleService;
 import com.fuint.common.service.SettingService;
 import com.fuint.common.service.StoreService;
@@ -86,20 +86,17 @@ public class BackendArticleController extends BaseController {
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('content:article:edit')")
-    public ResponseObject updateStatus(@RequestBody Map<String, Object> params) throws BusinessCheckException {
+    public ResponseObject updateStatus(@RequestBody StatusParam params) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
-        Integer id = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
-
-        MtArticle mtArticle = articleService.queryArticleById(id);
+        MtArticle mtArticle = articleService.queryArticleById(params.getId());
         if (mtArticle == null) {
             return getFailureResult(201);
         }
 
         ArticleDto article = new ArticleDto();
         article.setOperator(accountInfo.getAccountName());
-        article.setId(id);
-        article.setStatus(status);
+        article.setId(params.getId());
+        article.setStatus(params.getStatus());
         articleService.updateArticle(article);
 
         return getSuccessResult(true);

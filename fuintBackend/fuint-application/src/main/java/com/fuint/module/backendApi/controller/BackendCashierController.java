@@ -1,7 +1,13 @@
 package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.Constants;
-import com.fuint.common.dto.*;
+import com.fuint.common.dto.cashier.HangUpDto;
+import com.fuint.common.dto.cashier.TableDetail;
+import com.fuint.common.dto.goods.GoodsDto;
+import com.fuint.common.dto.goods.GoodsSkuDto;
+import com.fuint.common.dto.goods.GoodsSpecChildDto;
+import com.fuint.common.dto.goods.GoodsSpecItemDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.PlatformTypeEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.TableUseStatusEnum;
@@ -387,7 +393,7 @@ public class BackendCashierController extends BaseController {
     @RequestMapping(value = "/cleanTable/{tableId}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject cleanTable(@PathVariable("tableId") Integer tableId) throws BusinessCheckException {
+    public ResponseObject cleanTable(@PathVariable("tableId") Integer tableId) {
         if (tableId == null || tableId <= 0) {
             return getFailureResult(201);
         }

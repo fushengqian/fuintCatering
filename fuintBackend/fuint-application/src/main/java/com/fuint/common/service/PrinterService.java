@@ -1,7 +1,7 @@
 package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.fuint.common.dto.UserOrderDto;
+import com.fuint.common.dto.order.UserOrderDto;
 import com.fuint.common.param.PrinterPage;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtPrinter;
@@ -42,6 +42,7 @@ public interface PrinterService extends IService<MtPrinter> {
      * @param beforePay 支付前打印
      * @param afterPay 支付后打印
      * @param goodsIds 打印的商品Id
+     * @throws Exception
      * @return
      * */
     Boolean printOrder(UserOrderDto orderInfo, boolean autoPrint, boolean beforePay, boolean afterPay, List<Integer> goodsIds) throws Exception;

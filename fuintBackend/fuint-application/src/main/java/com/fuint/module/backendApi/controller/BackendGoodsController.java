@@ -2,11 +2,17 @@ package com.fuint.module.backendApi.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.fuint.common.dto.*;
+import com.fuint.common.dto.common.ParamDto;
+import com.fuint.common.dto.goods.GoodsDto;
+import com.fuint.common.dto.goods.GoodsSkuDto;
+import com.fuint.common.dto.goods.GoodsSpecChildDto;
+import com.fuint.common.dto.goods.GoodsSpecItemDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.GoodsTypeEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.param.GoodsListParam;
+import com.fuint.common.param.StatusParam;
 import com.fuint.common.service.*;
 import com.fuint.common.util.CommonUtil;
 import com.fuint.common.util.ExcelUtil;
@@ -144,12 +150,9 @@ public class BackendGoodsController extends BaseController {
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:edit')")
-    public ResponseObject updateStatus(@RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String status = params.get("status") != null ? params.get("status").toString() : StatusEnum.ENABLED.getKey();
-        Integer goodsId = params.get("id") == null ? 0 : Integer.parseInt(params.get("id").toString());
-
+    public ResponseObject updateStatus(@RequestBody StatusParam params) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        MtGoods mtGoods = goodsService.queryGoodsById(goodsId);
+        MtGoods mtGoods = goodsService.queryGoodsById(params.getId());
         if (mtGoods == null) {
             return getFailureResult(201, "该商品不存在");
         }
@@ -162,10 +165,10 @@ public class BackendGoodsController extends BaseController {
 
         MtGoods goodsInfo = new MtGoods();
         goodsInfo.setOperator(accountInfo.getAccountName());
-        goodsInfo.setId(goodsId);
-        goodsInfo.setStatus(status);
+        goodsInfo.setId(params.getId());
+        goodsInfo.setStatus(params.getStatus());
         goodsService.saveGoods(goodsInfo, null);
-        logger.info("更新商品状态, goodsId = {},account = {}", goodsId, accountInfo.getAccountName());
+        logger.info("更新商品状态, goodsId = {},account = {}", params.getId(), accountInfo.getAccountName());
 
         return getSuccessResult(true);
     }

@@ -1,6 +1,6 @@
 package com.fuint.module.backendApi.controller;
 
-import com.fuint.common.dto.AccountInfo;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.QrCodeEnum;
 import com.fuint.common.param.QrParam;
 import com.fuint.common.service.*;

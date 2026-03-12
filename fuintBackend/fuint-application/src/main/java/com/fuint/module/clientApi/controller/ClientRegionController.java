@@ -1,6 +1,6 @@
 package com.fuint.module.clientApi.controller;
 
-import com.fuint.common.dto.RegionDto;
+import com.fuint.common.dto.common.RegionDto;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.mapper.MtRegionMapper;

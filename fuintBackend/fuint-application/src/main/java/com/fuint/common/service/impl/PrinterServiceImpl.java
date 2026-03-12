@@ -4,9 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fuint.common.dto.GoodsSpecValueDto;
-import com.fuint.common.dto.OrderGoodsDto;
-import com.fuint.common.dto.UserOrderDto;
+import com.fuint.common.dto.goods.GoodsSpecValueDto;
+import com.fuint.common.dto.order.OrderGoodsDto;
+import com.fuint.common.dto.order.UserOrderDto;
 import com.fuint.common.enums.*;
 import com.fuint.common.param.PrinterPage;
 import com.fuint.common.service.PrinterService;
@@ -161,6 +161,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
      * @param beforePay 支付前打印
      * @param afterPay 支付后打印
      * @param goodsIds 打印的商品Id
+     * @throws Exception
      * @return
      * */
     @Override

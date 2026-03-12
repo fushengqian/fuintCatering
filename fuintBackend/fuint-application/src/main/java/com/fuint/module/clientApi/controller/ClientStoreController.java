@@ -1,6 +1,6 @@
 package com.fuint.module.clientApi.controller;
 
-import com.fuint.common.dto.StoreInfo;
+import com.fuint.common.dto.merchant.StoreInfo;
 import com.fuint.common.service.StoreService;
 import com.fuint.common.service.TableService;
 import com.fuint.framework.exception.BusinessCheckException;

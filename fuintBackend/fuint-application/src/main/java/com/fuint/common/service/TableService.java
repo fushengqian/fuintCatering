@@ -1,9 +1,9 @@
 package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.fuint.common.dto.HangUpDto;
-import com.fuint.common.dto.TableDetail;
-import com.fuint.common.dto.TableDto;
+import com.fuint.common.dto.cashier.HangUpDto;
+import com.fuint.common.dto.cashier.TableDetail;
+import com.fuint.common.dto.cashier.TableDto;
 import com.fuint.common.param.TableParam;
 import com.fuint.common.param.TurnTableParam;
 import com.fuint.framework.pagination.PaginationRequest;

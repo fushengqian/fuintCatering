@@ -1,7 +1,7 @@
 package com.fuint.module.clientApi.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.fuint.common.dto.UserInfo;
+import com.fuint.common.dto.member.UserInfo;
 import com.fuint.common.enums.SettingTypeEnum;
 import com.fuint.common.service.MerchantService;
 import com.fuint.common.service.MessageService;
@@ -60,7 +60,7 @@ public class ClientMessageController extends BaseController {
     @ApiOperation(value = "查询最新一条未读消息")
     @RequestMapping(value = "/getOne", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject getOne(HttpServletRequest request) throws BusinessCheckException {
+    public ResponseObject getOne(HttpServletRequest request) {
         if (StringUtil.isEmpty(request.getHeader("Access-Token"))) {
             return getSuccessResult(false);
         }

@@ -1,7 +1,7 @@
 package com.fuint.module.backendApi.controller;
 
 import com.fuint.common.Constants;
-import com.fuint.common.dto.AccountInfo;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.param.InvoiceParam;
 import com.fuint.common.service.InvoiceService;
 import com.fuint.common.util.TokenUtil;

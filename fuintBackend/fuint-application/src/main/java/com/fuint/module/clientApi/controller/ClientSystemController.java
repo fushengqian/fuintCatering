@@ -1,8 +1,8 @@
 package com.fuint.module.clientApi.controller;
 
-import com.fuint.common.dto.ParamDto;
-import com.fuint.common.dto.StoreInfo;
-import com.fuint.common.dto.UserInfo;
+import com.fuint.common.dto.common.ParamDto;
+import com.fuint.common.dto.member.UserInfo;
+import com.fuint.common.dto.merchant.StoreInfo;
 import com.fuint.common.enums.OrderSettingEnum;
 import com.fuint.common.enums.SettingTypeEnum;
 import com.fuint.common.enums.StatusEnum;
