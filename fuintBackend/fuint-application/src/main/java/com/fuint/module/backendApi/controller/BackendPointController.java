@@ -222,11 +222,13 @@ public class BackendPointController extends BaseController {
         if (userId < 1) {
             return getFailureResult(201, "充值会员信息不能为空");
         }
-
+        MtUser userInfo = memberService.queryMemberById(userId);
+        if (!accountInfo.getMerchantId().equals(userInfo.getMerchantId())) {
+            return getFailureResult(201, "不同商户，无充值权限");
+        }
         MtPoint mtPoint = new MtPoint();
         if (type == 2) {
             // 扣减积分
-            MtUser userInfo = memberService.queryMemberById(userId);
             if (userInfo.getPoint() < (Integer.parseInt(amount))) {
                 return getFailureResult(201, "操作失败，积分余额不足");
             }
