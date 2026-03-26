@@ -385,6 +385,18 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
     }
 
     /**
+     * 根据ID获取店铺列表
+     *
+     * @param merchantId 商户ID
+     * @param storeIds 店铺ID列表
+     * @return
+     * */
+    @Override
+    public List<MtStore> getStoreListByIds(Integer merchantId, List<Integer> storeIds) {
+        return mtStoreMapper.getStoreListByIds(merchantId, storeIds);
+    }
+
+    /**
      * 获取可用店铺列表
      *
      * @param merchantId 商户ID

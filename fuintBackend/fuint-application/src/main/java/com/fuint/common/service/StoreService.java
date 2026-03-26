@@ -7,6 +7,7 @@ import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtStore;
+
 import java.util.List;
 import java.util.Map;
 
@@ -83,6 +84,15 @@ public interface StoreService extends IService<MtStore> {
      * @return
      * */
     List<MtStore> queryStoresByParams(Map<String, Object> params);
+
+    /**
+     * 根据ID获取店铺列表
+     *
+     * @param merchantId 商户ID
+     * @param storeIds 店铺ID列表
+     * @return
+     * */
+    List<MtStore> getStoreListByIds(Integer merchantId, List<Integer> storeIds);
 
     /**
      * 获取可用店铺列表
