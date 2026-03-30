@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.commission.CommissionRuleDto;
 import com.fuint.common.dto.commission.CommissionRuleItemDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.CommissionTypeEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.CommissionRuleItemParam;
@@ -241,17 +242,21 @@ public class CommissionRuleServiceImpl extends ServiceImpl<MtCommissionRuleMappe
      * 更新分销提成规则
      *
      * @param  commissionRule 规则参数
+     * @param  accountInfo
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "更新分销提成规则")
-    public MtCommissionRule updateCommissionRule(CommissionRuleParam commissionRule) throws BusinessCheckException {
+    public MtCommissionRule updateCommissionRule(CommissionRuleParam commissionRule, AccountInfo accountInfo) throws BusinessCheckException {
         MtCommissionRule mtCommissionRule = mtCommissionRuleMapper.selectById(commissionRule.getId());
         if (mtCommissionRule == null) {
             logger.error("更新分销提成规则失败...");
             throw new BusinessCheckException("该数据状态异常");
+        }
+        if (!mtCommissionRule.getMerchantId().equals(accountInfo.getMerchantId())) {
+            throw new BusinessCheckException("您没有操作权限");
         }
         mtCommissionRule.setId(commissionRule.getId());
         if (commissionRule.getName() != null) {

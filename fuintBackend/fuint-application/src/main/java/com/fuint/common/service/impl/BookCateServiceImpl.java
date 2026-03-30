@@ -3,6 +3,7 @@ package com.fuint.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.BookCatePage;
 import com.fuint.common.service.BookCateService;
@@ -159,16 +160,20 @@ public class BookCateServiceImpl extends ServiceImpl<MtBookCateMapper, MtBookCat
      * 修改预约分类
      *
      * @param  mtBookCate
+     * @param  accountInfo
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "修改预约分类")
-    public MtBookCate updateBookCate(MtBookCate mtBookCate) throws BusinessCheckException {
+    public MtBookCate updateBookCate(MtBookCate mtBookCate, AccountInfo accountInfo) throws BusinessCheckException {
         MtBookCate bookCate = getBookCateById(mtBookCate.getId());
         if (bookCate == null) {
             throw new BusinessCheckException("该预约分类状态异常");
+        }
+        if (bookCate.getMerchantId().equals(accountInfo.getMerchantId())) {
+            throw new BusinessCheckException("您没有操作权限");
         }
 
         bookCate.setId(mtBookCate.getId());

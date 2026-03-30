@@ -8,6 +8,7 @@ import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtRefund;
+
 import java.util.Date;
 import java.util.Map;
 
@@ -60,17 +61,19 @@ public interface RefundService extends IService<MtRefund> {
 
     /**
      * 更新售后订单
-     * @param  reqDto
+     * @param  refundDto
+     * @param  accountInfo
      * @throws BusinessCheckException
      * */
-    MtRefund updateRefund(RefundDto reqDto) throws BusinessCheckException;
+    MtRefund updateRefund(RefundDto refundDto, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 同意售后订单
-     * @param  reqDto
+     * @param  refundDto
+     * @param  accountInfo
      * @throws BusinessCheckException
      * */
-    MtRefund agreeRefund(RefundDto reqDto) throws BusinessCheckException;
+    MtRefund agreeRefund(RefundDto refundDto, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 发起退款

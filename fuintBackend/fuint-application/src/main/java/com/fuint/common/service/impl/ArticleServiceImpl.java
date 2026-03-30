@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.content.ArticleDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.ArticlePage;
 import com.fuint.common.service.ArticleService;
@@ -198,15 +199,20 @@ public class ArticleServiceImpl extends ServiceImpl<MtArticleMapper, MtArticle> 
      * 编辑文章
      *
      * @param  articleDto 文章参数
+     * @param accountInfo 登录账号
      * @throws BusinessCheckException
+     * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "编辑文章")
-    public MtArticle updateArticle(ArticleDto articleDto) throws BusinessCheckException {
+    public MtArticle updateArticle(ArticleDto articleDto, AccountInfo accountInfo) throws BusinessCheckException {
         MtArticle mtArticle = queryArticleById(articleDto.getId());
         if (mtArticle == null) {
             throw new BusinessCheckException("该文章状态异常");
+        }
+        if (!mtArticle.getMerchantId().equals(accountInfo.getMerchantId())) {
+            throw new BusinessCheckException("您没有操作权限");
         }
         mtArticle.setId(articleDto.getId());
         if (articleDto.getImage() != null) {

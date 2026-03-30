@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.commission.CommissionLogDto;
 import com.fuint.common.dto.order.OrderUserDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.*;
 import com.fuint.common.param.CommissionLogPage;
 import com.fuint.common.service.*;
@@ -299,16 +300,20 @@ public class CommissionLogServiceImpl extends ServiceImpl<MtCommissionLogMapper,
      * 更新分销提成记录
      *
      * @param requestParam 请求参数
+     * @param accountInfo  登录账号
      * @return
      */
     @Override
     @Transactional
     @OperationServiceLog(description = "更新分销提成记录")
-    public void updateCommissionLog(CommissionLogRequest requestParam) throws BusinessCheckException {
+    public void updateCommissionLog(CommissionLogRequest requestParam, AccountInfo accountInfo) throws BusinessCheckException {
         MtCommissionLog mtCommissionLog =  mtCommissionLogMapper.selectById(requestParam.getId());
         if (mtCommissionLog == null) {
             logger.error("更新分销提成记录失败...");
             throw new BusinessCheckException("更新分销提成记录失败，该记录不存在");
+        }
+        if (!mtCommissionLog.getMerchantId().equals(accountInfo.getMerchantId())) {
+            throw new BusinessCheckException("您没有操作权限");
         }
         if (requestParam.getAmount() != null) {
             mtCommissionLog.setAmount(new BigDecimal(requestParam.getAmount()));

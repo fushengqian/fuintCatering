@@ -1,6 +1,7 @@
 package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.param.BookCatePage;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -44,10 +45,11 @@ public interface BookCateService extends IService<MtBookCate> {
      * 更新预约类别
      *
      * @param  mtBookCate
+     * @param  accountInfo
      * @throws BusinessCheckException
      * @return
      * */
-    MtBookCate updateBookCate(MtBookCate mtBookCate) throws BusinessCheckException;
+    MtBookCate updateBookCate(MtBookCate mtBookCate, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 获取可用的预约类别

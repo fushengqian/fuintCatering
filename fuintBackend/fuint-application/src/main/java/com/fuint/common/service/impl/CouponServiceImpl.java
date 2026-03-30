@@ -7,6 +7,7 @@ import com.fuint.common.Constants;
 import com.fuint.common.dto.coupon.CouponDto;
 import com.fuint.common.dto.coupon.ReqCouponDto;
 import com.fuint.common.dto.coupon.ReqSendLogDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.*;
 import com.fuint.common.param.CouponListParam;
 import com.fuint.common.service.*;
@@ -167,17 +168,24 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
      * 保存卡券信息
      *
      * @param  reqCouponDto 卡券实体
+     * @param  accountInfo 登录帐号信息
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "保存卡券信息")
-    public MtCoupon saveCoupon(ReqCouponDto reqCouponDto) throws BusinessCheckException, ParseException {
+    public MtCoupon saveCoupon(ReqCouponDto reqCouponDto, AccountInfo accountInfo) throws BusinessCheckException, ParseException {
         MtCoupon mtCoupon;
 
         if (reqCouponDto.getId() != null) {
             mtCoupon = mtCouponMapper.selectById(reqCouponDto.getId());
+            if (mtCoupon == null) {
+                throw new BusinessCheckException("卡券不存在");
+            }
+            if (!mtCoupon.getMerchantId().equals(accountInfo.getMerchantId())) {
+                throw new BusinessCheckException("商户信息不匹配");
+            }
         } else {
             mtCoupon = new MtCoupon();
             if (reqCouponDto.getMerchantId() == null || reqCouponDto.getMerchantId() <= 0) {
@@ -433,23 +441,26 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
      * 删除卡券
      *
      * @param  id 券ID
-     * @param  operator 操作人
+     * @param  accountInfo 操作人
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @OperationServiceLog(description = "删除卡券")
     @Transactional(rollbackFor = Exception.class)
-    public void deleteCoupon(Long id, String operator) throws BusinessCheckException {
+    public void deleteCoupon(Long id, AccountInfo accountInfo) throws BusinessCheckException {
         MtCoupon couponInfo = queryCouponById(id.intValue());
         if (null == couponInfo) {
             throw new BusinessCheckException("卡券不存在");
+        }
+        if (!couponInfo.getMerchantId().equals(accountInfo.getMerchantId())) {
+            throw new BusinessCheckException("没有操作权限");
         }
         couponInfo.setStatus(StatusEnum.DISABLE.getKey());
         // 修改时间
         couponInfo.setUpdateTime(new Date());
         // 操作人
-        couponInfo.setOperator(operator);
+        couponInfo.setOperator(accountInfo.getAccountName());
         // 删除会员关联的卡券
         userCouponService.removeUserCouponByCouponId(couponInfo.getId());
 
@@ -632,14 +643,14 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
      * @param  num 发放套数
      * @param  sendMessage 是否发送消息
      * @param  uuid 批次号
-     * @param  operator 操作人
+     * @param  accountInfo 操作人
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "发放卡券")
-    public ResponseObject sendCoupon(Integer couponId, Integer userId, Integer num, Boolean sendMessage, String uuid, String operator) throws BusinessCheckException {
+    public ResponseObject sendCoupon(Integer couponId, Integer userId, Integer num, Boolean sendMessage, String uuid, AccountInfo accountInfo) throws BusinessCheckException {
         ResponseObject response = new ResponseObject(200, "发放成功", null);
         if (StringUtil.isEmpty(uuid)) {
             uuid = UUID.randomUUID().toString().replaceAll("-", "");
@@ -721,7 +732,7 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
                 userCoupon.setStoreId(userInfo.getStoreId());
                 userCoupon.setAmount(couponInfo.getAmount());
                 userCoupon.setBalance(couponInfo.getAmount());
-                userCoupon.setOperator(operator);
+                userCoupon.setOperator(accountInfo.getAccountName());
                 userCoupon.setGroupId(couponInfo.getGroupId());
                 userCoupon.setMobile(mobile);
                 userCoupon.setUserId(userInfo.getId());
@@ -759,7 +770,7 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
         sendLogDto.setGroupName(mtCouponGroup.getName());
         sendLogDto.setCouponId(couponInfo.getId());
         sendLogDto.setSendNum(num);
-        sendLogDto.setOperator(operator);
+        sendLogDto.setOperator(accountInfo.getAccountName());
         sendLogDto.setUuid(uuid);
         sendLogDto.setMerchantId(couponInfo.getMerchantId());
         sendLogDto.setStoreId(couponInfo.getStoreId());
@@ -801,14 +812,14 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
      * @param userIds  会员ID
      * @param num      发放套数
      * @param uuid     批次号
-     * @param operator 操作人
+     * @param accountInfo 操作人
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "发放卡券")
-    public Boolean batchSendCoupon(Integer couponId, List<Integer> userIds, Integer num, String uuid, String operator) throws BusinessCheckException {
+    public Boolean batchSendCoupon(Integer couponId, List<Integer> userIds, Integer num, String uuid, AccountInfo accountInfo) throws BusinessCheckException {
        if (userIds == null || userIds.size() < 1) {
            throw new BusinessCheckException("发放对象异常，卡券发放失败");
        }
@@ -816,7 +827,7 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
        Boolean sendMsg = userIds.size() >= 10 ? false : true;
        if (userIds != null && userIds.size() > 0) {
            for (Integer userId : userIds) {
-                ResponseObject result = sendCoupon(couponId, userId, num, sendMsg, uuid, operator);
+                ResponseObject result = sendCoupon(couponId, userId, num, sendMsg, uuid, accountInfo);
                 if (result.getCode() != 200) {
                     throw new BusinessCheckException("发放卡券失败：" + result.getMessage());
                 }
@@ -1049,16 +1060,19 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
      * 根据券ID删除会员卡券
      *
      * @param  id 券ID
-     * @param  operator 操作人
+     * @param  accountInfo 操作人
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @OperationServiceLog(description = "删除会员卡券")
-    public void deleteUserCoupon(Integer id, String operator) throws BusinessCheckException {
+    public void deleteUserCoupon(Integer id, AccountInfo accountInfo) throws BusinessCheckException {
         MtUserCoupon userCoupon = mtUserCouponMapper.selectById(id);
         if (null == userCoupon) {
-            return;
+            throw new BusinessCheckException("会员卡券不存在");
+        }
+        if (!userCoupon.getMerchantId().equals(accountInfo.getMerchantId())) {
+            throw new BusinessCheckException("商户信息不匹配");
         }
 
         // 未使用状态才能作废删除
@@ -1071,7 +1085,7 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
         userCoupon.setUpdateTime(new Date());
 
         // 操作人
-        userCoupon.setOperator(operator);
+        userCoupon.setOperator(accountInfo.getAccountName());
 
         // 更新发券日志为部分作废状态
         mtSendLogMapper.updateSingleForRemove(userCoupon.getUuid(),UserCouponStatusEnum.USED.getKey());
@@ -1084,14 +1098,14 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
      *
      * @param id             核销流水ID
      * @param userCouponId   用户卡券ID
-     * @param operator       操作人
+     * @param accountInfo       操作人
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "撤销卡券核销")
-    public void rollbackUserCoupon(Integer id, Integer userCouponId,String operator) throws BusinessCheckException {
+    public void rollbackUserCoupon(Integer id, Integer userCouponId, AccountInfo accountInfo) throws BusinessCheckException {
         MtConfirmLog mtConfirmLog = mtConfirmLogMapper.selectById(id);
         MtUserCoupon userCoupon = mtUserCouponMapper.selectById(userCouponId);
 
@@ -1101,6 +1115,10 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
 
         if (null == userCoupon) {
             throw new BusinessCheckException("用户卡券不存在");
+        }
+
+        if (!userCoupon.getMerchantId().equals(accountInfo.getMerchantId())) {
+            throw new BusinessCheckException("商户信息不匹配");
         }
 
         // 卡券未过期才能撤销,当前时间小于过期日期才能删除,48小时
@@ -1146,7 +1164,7 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
         mtUserCouponMapper.updateById(userCoupon);
 
         // 更新流水
-        mtConfirmLog.setOperator(operator);
+        mtConfirmLog.setOperator(accountInfo.getAccountName());
         mtConfirmLog.setStatus(StatusEnum.DISABLE.getKey());
         mtConfirmLog.setUpdateTime(new Date());
         mtConfirmLog.setCancelTime(new Date());
@@ -1168,35 +1186,36 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
     /**
      * 根据批次撤销卡券
      *
-     * @param uuid       批次ID
-     * @param operator   操作人
+     * @param  uuid       批次ID
+     * @param  accountInfo   操作人
      * @throws BusinessCheckException
+     * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "根据批次撤销卡券")
-    public void removeUserCoupon(Long id, String uuid, String operator) {
+    public void removeUserCoupon(Long id, String uuid, AccountInfo accountInfo) {
         Map<String, Object> searchParams = new HashMap<>();
         searchParams.put("uuid", uuid);
         List<MtUserCoupon> paginationResponse = mtUserCouponMapper.selectByMap(searchParams);
 
         Integer total = paginationResponse.size();
 
-        List<Integer> coupondIdList = mtUserCouponMapper.getCouponIdsByUuid(uuid);
+        List<Integer> couponIdList = mtUserCouponMapper.getCouponIdsByUuid(uuid);
         List<Integer> couponIds = new ArrayList<>();
         couponIds.add(0);
 
         Date nowDate = new Date();
 
-        for (int i = 0; i < coupondIdList.size(); i++) {
-            Integer couponId = coupondIdList.get(i);
+        for (int i = 0; i < couponIdList.size(); i++) {
+            Integer couponId = couponIdList.get(i);
             MtCoupon couponInfo = queryCouponById(couponId);
             if (couponInfo.getStatus().equals(StatusEnum.ENABLED.getKey()) && couponInfo.getEndTime().after(nowDate)) {
                 couponIds.add(couponId);
             }
         }
 
-        Integer row = mtUserCouponMapper.removeUserCoupon(uuid, couponIds, operator);
+        Integer row = mtUserCouponMapper.removeUserCoupon(uuid, couponIds, accountInfo.getAccountName());
         if (row.compareTo( total.intValue()) != -1) {
             mtSendLogMapper.updateForRemove(uuid, UserCouponStatusEnum.DISABLE.getKey(), total.intValue(), 0);
         } else {

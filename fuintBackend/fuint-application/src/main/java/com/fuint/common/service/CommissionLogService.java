@@ -2,6 +2,7 @@ package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.common.dto.commission.CommissionLogDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.param.CommissionLogPage;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationResponse;
@@ -44,8 +45,9 @@ public interface CommissionLogService extends IService<MtCommissionLog> {
      * 更新分销提成记录
      *
      * @param requestParam 请求参数
+     * @param accountInfo 登录账号信息
      * @return
      * @throws BusinessCheckException
      */
-    void updateCommissionLog(CommissionLogRequest requestParam) throws BusinessCheckException;
+    void updateCommissionLog(CommissionLogRequest requestParam, AccountInfo accountInfo) throws BusinessCheckException;
 }

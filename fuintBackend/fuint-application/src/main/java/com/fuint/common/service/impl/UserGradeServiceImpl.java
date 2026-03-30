@@ -3,6 +3,7 @@ package com.fuint.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.UserGradeCatchTypeEnum;
 import com.fuint.common.service.UserGradeService;
@@ -145,7 +146,7 @@ public class UserGradeServiceImpl extends ServiceImpl<MtUserGradeMapper, MtUserG
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "修改会员等级")
-    public MtUserGrade updateUserGrade(MtUserGrade mtUserGrade) throws BusinessCheckException {
+    public MtUserGrade updateUserGrade(MtUserGrade mtUserGrade, AccountInfo accountInfo) throws BusinessCheckException {
         if (mtUserGrade.getDiscount() != null && (mtUserGrade.getDiscount() > 10 || mtUserGrade.getDiscount() < 0)) {
             throw new BusinessCheckException("会员折扣需在0和10之间");
         }
@@ -154,6 +155,9 @@ public class UserGradeServiceImpl extends ServiceImpl<MtUserGradeMapper, MtUserG
         }
         MtUserGrade userGrade = mtUserGradeMapper.selectById(mtUserGrade.getId());
         if (null != userGrade) {
+            if (!userGrade.getMerchantId().equals(accountInfo.getMerchantId())) {
+                throw new BusinessCheckException("您没有操作权限");
+            }
             mtUserGrade.setMerchantId(userGrade.getMerchantId());
             mtUserGradeMapper.updateById(mtUserGrade);
         }
@@ -164,15 +168,18 @@ public class UserGradeServiceImpl extends ServiceImpl<MtUserGradeMapper, MtUserG
      * 根据ID删除会员等级
      *
      * @param id ID
-     * @param operator 操作人
+     * @param accountInfo 操作人
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "删除会员等级")
-    public Integer deleteUserGrade(Integer id, String operator) {
+    public Integer deleteUserGrade(Integer id, AccountInfo accountInfo) {
         MtUserGrade mtUserGrade = queryUserGradeById(0, id, 0);
         if (null == mtUserGrade) {
+            return 0;
+        }
+        if (!mtUserGrade.getMerchantId().equals(accountInfo.getMerchantId())) {
             return 0;
         }
         mtUserGrade.setStatus(StatusEnum.DISABLE.getKey());

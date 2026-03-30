@@ -348,16 +348,20 @@ public class RefundServiceImpl extends ServiceImpl<MtRefundMapper, MtRefund> imp
      * 修改售后订单
      *
      * @param  refundDto
+     * @param  accountInfo
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "更新售后订单")
-    public MtRefund updateRefund(RefundDto refundDto) throws BusinessCheckException {
+    public MtRefund updateRefund(RefundDto refundDto, AccountInfo accountInfo) throws BusinessCheckException {
         MtRefund mtRefund = mtRefundMapper.selectById(refundDto.getId());
         if (mtRefund == null) {
             throw new BusinessCheckException("该售后订单状态异常");
+        }
+        if (!mtRefund.getMerchantId().equals(accountInfo.getMerchantId())) {
+            throw new BusinessCheckException("您没有操作权限");
         }
 
         // 已同意的不能再设置为已拒绝
@@ -392,16 +396,20 @@ public class RefundServiceImpl extends ServiceImpl<MtRefundMapper, MtRefund> imp
      * 同意售后订单
      *
      * @param refundDto
+     * @param accountInfo
      * @throws BusinessCheckException
      * @return
      * */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "同意售后订单")
-    public MtRefund agreeRefund(RefundDto refundDto) throws BusinessCheckException {
+    public MtRefund agreeRefund(RefundDto refundDto, AccountInfo accountInfo) throws BusinessCheckException {
         MtRefund refund = mtRefundMapper.selectById(refundDto.getId());
         if (null == refund) {
             throw new BusinessCheckException("该售后订单状态异常");
+        }
+        if (!refund.getMerchantId().equals(accountInfo.getMerchantId())) {
+            throw new BusinessCheckException("您没有操作权限");
         }
 
         // 已经同意过了
@@ -641,7 +649,7 @@ public class RefundServiceImpl extends ServiceImpl<MtRefundMapper, MtRefund> imp
             agreeDto.setId(mtRefund.getId());
             agreeDto.setOperator(accountInfo.getAccountName());
             agreeDto.setStatus(RefundStatusEnum.COMPLETE.getKey());
-            MtRefund refundInfo = agreeRefund(agreeDto);
+            MtRefund refundInfo = agreeRefund(agreeDto, accountInfo);
             if (refundInfo == null) {
                 logger.error("退款审核失败，orderId = " + orderId + ", refundId = " + mtRefund.getId());
                 throw new BusinessCheckException("退款审核失败！");

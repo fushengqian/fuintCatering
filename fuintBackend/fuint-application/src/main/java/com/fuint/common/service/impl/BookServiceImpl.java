@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.book.BookDto;
 import com.fuint.common.dto.common.DayDto;
 import com.fuint.common.dto.common.TimeDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.BookPage;
 import com.fuint.common.param.BookableParam;
@@ -250,16 +251,20 @@ public class BookServiceImpl extends ServiceImpl<MtBookMapper, MtBook> implement
      * 修改预约项目
      *
      * @param  mtBook
+     * @param  accountInfo 操作人
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "修改预约项目")
-    public MtBook updateBook(MtBook mtBook) throws BusinessCheckException {
+    public MtBook updateBook(MtBook mtBook,  AccountInfo accountInfo) throws BusinessCheckException {
         MtBook book = mtBookMapper.selectById(mtBook.getId());
         if (book == null) {
             throw new BusinessCheckException("该预约项目状态异常");
+        }
+        if (!book.getMerchantId().equals(accountInfo.getMerchantId())) {
+            throw new BusinessCheckException("您没有操作权限");
         }
         if (mtBook.getLogo() != null) {
             book.setLogo(mtBook.getLogo());

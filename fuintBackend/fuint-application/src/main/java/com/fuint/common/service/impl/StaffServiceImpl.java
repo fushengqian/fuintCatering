@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.merchant.StaffDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.service.*;
@@ -132,13 +133,16 @@ public class StaffServiceImpl extends ServiceImpl<MtStaffMapper, MtStaff> implem
      * 保存员工信息
      *
      * @param  mtStaff 员工参数
-     * @param operator 操作人
+     * @param accountInfo 操作人
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @OperationServiceLog(description = "保存店铺员工")
-    public MtStaff saveStaff(MtStaff mtStaff, String operator) throws BusinessCheckException {
+    public MtStaff saveStaff(MtStaff mtStaff, AccountInfo accountInfo) throws BusinessCheckException {
+        if (!mtStaff.getMerchantId().equals(accountInfo.getMerchantId())) {
+            throw new BusinessCheckException("您没有操作权限");
+        }
         mtStaff.setUpdateTime(new Date());
         if (mtStaff.getId() == null || mtStaff.getId() <= 0) {
             mtStaff.setCreateTime(new Date());
@@ -170,7 +174,7 @@ public class StaffServiceImpl extends ServiceImpl<MtStaffMapper, MtStaff> implem
             userInfo.setStoreId(mtStaff.getStoreId());
             userInfo.setMerchantId(mtStaff.getMerchantId());
             userInfo.setIsStaff(YesOrNoEnum.YES.getKey());
-            userInfo.setOperator(operator);
+            userInfo.setOperator(accountInfo.getAccountName());
             mtUser = memberService.addMember(userInfo, null);
             if (mtUser != null) {
                 mtStaff.setUserId(mtUser.getId());
@@ -179,13 +183,13 @@ public class StaffServiceImpl extends ServiceImpl<MtStaffMapper, MtStaff> implem
             }
         } else {
             mtUser.setIsStaff(YesOrNoEnum.YES.getKey());
-            mtUser.setOperator(operator);
+            mtUser.setOperator(accountInfo.getAccountName());
             memberService.updateMember(mtUser, false);
         }
 
         // 更新员工
         this.updateById(mtStaff);
-        logger.info("{}保存员工信息：{}", operator, mtStaff);
+        logger.info("{}保存员工信息：{}", accountInfo.getAccountName(), mtStaff);
         return mtStaff;
     }
 

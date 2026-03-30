@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.merchant.MerchantDto;
 import com.fuint.common.dto.merchant.MerchantSettingDto;
 import com.fuint.common.dto.merchant.StoreDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.OrderSettingEnum;
 import com.fuint.common.enums.SettingTypeEnum;
 import com.fuint.common.enums.StatusEnum;
@@ -409,7 +410,7 @@ public class MerchantServiceImpl extends ServiceImpl<MtMerchantMapper, MtMerchan
      * */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MerchantSettingDto saveMerchantSetting(MerchantSettingParam params) throws BusinessCheckException {
+    public MerchantSettingDto saveMerchantSetting(MerchantSettingParam params, AccountInfo accountInfo) throws BusinessCheckException {
         if (params.getStoreId() != null && params.getStoreId() > 0) {
             MtStore storeInfo = storeService.queryStoreById(params.getStoreId());
             if (storeInfo != null) {
@@ -419,7 +420,7 @@ public class MerchantServiceImpl extends ServiceImpl<MtMerchantMapper, MtMerchan
                 storeDto.setContact(params.getContact());
                 storeDto.setPhone(params.getPhone());
                 storeDto.setLogo(params.getLogo());
-                storeService.saveStore(storeDto);
+                storeService.saveStore(storeDto, accountInfo);
             }
         } else {
             MtMerchant merchantInfo = getById(params.getMerchantId());

@@ -2,11 +2,13 @@ package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.common.dto.book.BookDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.param.BookPage;
 import com.fuint.common.param.BookableParam;
-import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.exception.BusinessCheckException;
+import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtBook;
+
 import java.text.ParseException;
 import java.util.List;
 
@@ -39,7 +41,7 @@ public interface BookService extends IService<MtBook> {
      * 根据ID获取预约项目信息
      *
      * @param  id 预约项目ID
-     * @param fillDate 填充日期
+     * @param  fillDate 填充日期
      * @throws ParseException
      * @return
      */
@@ -49,10 +51,11 @@ public interface BookService extends IService<MtBook> {
      * 更新预约项目
      *
      * @param  mtBook
+     * @param  accountInfo
      * @throws BusinessCheckException
      * @return
      * */
-    MtBook updateBook(MtBook mtBook) throws BusinessCheckException;
+    MtBook updateBook(MtBook mtBook, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 是否可预约

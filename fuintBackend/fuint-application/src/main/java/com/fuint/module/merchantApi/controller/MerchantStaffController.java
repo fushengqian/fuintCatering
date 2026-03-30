@@ -1,6 +1,7 @@
 package com.fuint.module.merchantApi.controller;
 
 import com.fuint.common.dto.member.UserInfo;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.param.StaffParam;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.MerchantService;
@@ -139,7 +140,10 @@ public class MerchantStaffController extends BaseController {
         if (staff.getStoreId() != null && staff.getStoreId() > 0) {
             mtStaff.setStoreId(staff.getStoreId());
         }
-        MtStaff staffInfo = staffService.saveStaff(mtStaff, staff.getRealName());
+        AccountInfo accountInfo = new AccountInfo();
+        accountInfo.setAccountName(staff.getRealName());
+        accountInfo.setMerchantId(staff.getMerchantId());
+        MtStaff staffInfo = staffService.saveStaff(mtStaff, accountInfo);
         return getSuccessResult(staffInfo);
     }
 }
