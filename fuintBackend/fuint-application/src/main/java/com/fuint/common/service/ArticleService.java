@@ -8,9 +8,6 @@ import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtArticle;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * 文章业务接口
  *
@@ -60,13 +57,5 @@ public interface ArticleService extends IService<MtArticle> {
      * @return
      * */
     MtArticle updateArticle(ArticleDto articleDto, AccountInfo accountInfo) throws BusinessCheckException;
-
-    /**
-     * 根据条件搜索文章
-     *
-     * @param params
-     * @return
-     * */
-    List<MtArticle> queryArticleListByParams(Map<String, Object> params);
 
 }

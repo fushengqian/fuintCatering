@@ -364,7 +364,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
         }
         if (!printer.getMerchantId().equals(accountInfo.getMerchantId())) {
-            throw new BusinessCheckException("您没有操作权限");
+            throw new BusinessCheckException("不同商户，没有操作权限");
         }
 
         if (mtPrinter.getSn() != null && mtPrinter.getName() != null && !mtPrinter.getStatus().equals(StatusEnum.DISABLE.getKey())) {

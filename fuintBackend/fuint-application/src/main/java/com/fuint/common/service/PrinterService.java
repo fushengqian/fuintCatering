@@ -59,8 +59,8 @@ public interface PrinterService extends IService<MtPrinter> {
     /**
      * 根据ID删除打印机
      *
-     * @param id ID
-     * @param operator 操作人
+     * @param  id ID
+     * @param  operator 操作人
      * @throws BusinessCheckException
      * @return
      */

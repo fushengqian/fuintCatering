@@ -2,10 +2,10 @@ package com.fuint.common.service;
 
 import com.fuint.common.dto.member.OpenGiftDto;
 import com.fuint.common.dto.system.AccountInfo;
+import com.fuint.common.param.OpenGiftPage;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtOpenGift;
-import java.util.Map;
 
 /**
  * 开卡赠礼接口
@@ -18,15 +18,15 @@ public interface OpenGiftService {
     /**
      * 获取用户的开卡赠礼
      *
-     * @param paramMap 查询参数
+     * @param openGiftPage 查询参数
      * @return
      * */
-    ResponseObject getOpenGiftList(Map<String, Object> paramMap);
+    ResponseObject getOpenGiftList(OpenGiftPage openGiftPage);
 
     /**
      * 新增开卡赠礼
      *
-     * @param  mtOpenGift
+     * @param mtOpenGift
      * @throws BusinessCheckException
      * @return
      */

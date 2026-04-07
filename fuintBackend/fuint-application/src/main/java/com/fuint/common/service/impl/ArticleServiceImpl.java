@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 文章服务接口
@@ -251,49 +250,5 @@ public class ArticleServiceImpl extends ServiceImpl<MtArticleMapper, MtArticle> 
         mtArticle.setUpdateTime(new Date());
         mtArticleMapper.updateById(mtArticle);
         return mtArticle;
-    }
-
-    /**
-     * 根据条件搜索文章
-     *
-     * @param params 搜索条件
-     * @return
-     * */
-    @Override
-    public List<MtArticle> queryArticleListByParams(Map<String, Object> params) {
-        String status =  params.get("status") == null ? StatusEnum.ENABLED.getKey(): params.get("status").toString();
-        String storeId =  params.get("storeId") == null ? "" : params.get("storeId").toString();
-        String title = params.get("title") == null ? "" : params.get("title").toString();
-        String merchantId = params.get("merchantId") == null ? "" : params.get("merchantId").toString();
-
-        LambdaQueryWrapper<MtArticle> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        lambdaQueryWrapper.ne(MtArticle::getStatus, StatusEnum.DISABLE.getKey());
-        if (StringUtils.isNotBlank(merchantId)) {
-            lambdaQueryWrapper.like(MtArticle::getMerchantId, merchantId);
-        }
-        if (StringUtils.isNotBlank(title)) {
-            lambdaQueryWrapper.like(MtArticle::getTitle, title);
-        }
-        if (StringUtils.isNotBlank(status)) {
-            lambdaQueryWrapper.eq(MtArticle::getStatus, status);
-        }
-        if (StringUtils.isNotBlank(storeId)) {
-            lambdaQueryWrapper.and(wq -> wq
-                              .eq(MtArticle::getStoreId, 0)
-                              .or()
-                              .eq(MtArticle::getStoreId, storeId));
-        }
-
-        lambdaQueryWrapper.orderByAsc(MtArticle::getSort);
-        List<MtArticle> dataList = mtArticleMapper.selectList(lambdaQueryWrapper);
-        String baseImage = settingService.getUploadBasePath();
-
-        if (dataList.size() > 0) {
-            for (MtArticle article : dataList) {
-                 article.setImage(baseImage + article.getImage());
-            }
-        }
-
-        return dataList;
     }
 }
