@@ -3,14 +3,14 @@ package com.fuint.common.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.common.dto.order.RefundDto;
 import com.fuint.common.dto.system.AccountInfo;
+import com.fuint.common.param.RefundPage;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.ResponseObject;
+import com.fuint.module.clientApi.request.RefundListRequest;
 import com.fuint.repository.model.MtRefund;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * 售后业务接口
@@ -23,25 +23,26 @@ public interface RefundService extends IService<MtRefund> {
     /**
      * 分页查询列表
      *
-     * @param paginationRequest
+     * @param refundPage
      * @return
      */
-    PaginationResponse<RefundDto> getRefundListByPagination(PaginationRequest paginationRequest);
+    PaginationResponse<RefundDto> getRefundListByPagination(RefundPage refundPage);
 
     /**
-     * 获取用户的售后订单
-     * @param paramMap 查询参数
-     * @throws BusinessCheckException
+     * 获取用户售后订单
+     *
+     * @param param 查询参数
+     * @return
      * */
-    ResponseObject getUserRefundList(Map<String, Object> paramMap);
+    ResponseObject getUserRefundList(RefundListRequest param);
 
     /**
      * 创建售后订单
      *
-     * @param reqDto
+     * @param refundDto
      * @return
      */
-    MtRefund createRefund(RefundDto reqDto);
+    MtRefund createRefund(RefundDto refundDto);
 
     /**
      * 根据ID获取售后订单信息
@@ -72,7 +73,6 @@ public interface RefundService extends IService<MtRefund> {
      * 同意售后订单
      *
      * @param  refundDto
-     * @param  accountInfo
      * @throws BusinessCheckException
      * */
     MtRefund agreeRefund(RefundDto refundDto, AccountInfo accountInfo) throws BusinessCheckException;
@@ -95,5 +95,5 @@ public interface RefundService extends IService<MtRefund> {
      * @param endTime
      * @return
      * */
-    Long getRefundCount(Date beginTime, Date endTime) throws BusinessCheckException;
+    Long getRefundCount(Date beginTime, Date endTime);
 }

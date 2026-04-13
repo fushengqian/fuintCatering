@@ -3,12 +3,13 @@ package com.fuint.repository.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 售后表
@@ -53,6 +54,9 @@ public class MtRefund implements Serializable {
 
     @ApiModelProperty("物流单号")
     private String expressNo;
+
+    @ApiModelProperty("拒绝原因")
+    private String rejectReason;
 
     @ApiModelProperty("创建时间")
     private Date createTime;

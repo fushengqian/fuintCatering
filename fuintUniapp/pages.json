@@ -478,7 +478,19 @@
                  "style": {
                    "navigationBarTitleText": "编辑员工"
                  }
-               }
+               },
+               {
+                 "path": "refund/index",
+                 "style": {
+                    "navigationBarTitleText": "售后订单"
+                  }
+                },
+                {
+                  "path": "refund/update",
+                  "style": {
+                    "navigationBarTitleText": "售后更新"
+                  }
+                }
         ]
    }],
    "preloadRule": {

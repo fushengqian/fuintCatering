@@ -3,12 +3,12 @@ package com.fuint.module.backendApi.controller.goods;
 import com.fuint.common.dto.goods.GoodsCateDto;
 import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
+import com.fuint.common.param.GoodsCateInfo;
 import com.fuint.common.param.GoodsCatePage;
 import com.fuint.common.param.StatusParam;
 import com.fuint.common.service.CateService;
 import com.fuint.common.service.SettingService;
 import com.fuint.common.service.StoreService;
-import com.fuint.common.util.CommonUtil;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationResponse;
@@ -16,10 +16,10 @@ import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtGoodsCate;
 import com.fuint.repository.model.MtStore;
-import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -90,7 +90,6 @@ public class BackendCateController extends BaseController {
     @PreAuthorize("@pms.hasPermission('goods:cate:index')")
     public ResponseObject updateStatus(@RequestBody StatusParam params) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-
         MtGoodsCate mtCate = cateService.queryCateById(params.getId());
         if (mtCate == null) {
             return getFailureResult(201, "该类别不存在");
@@ -100,8 +99,8 @@ public class BackendCateController extends BaseController {
         cate.setOperator(accountInfo.getAccountName());
         cate.setId(params.getId());
         cate.setStatus(params.getStatus());
-
         cateService.updateCate(cate, accountInfo);
+
         return getSuccessResult(true);
     }
 
@@ -111,34 +110,18 @@ public class BackendCateController extends BaseController {
     @ApiOperation(value = "保存商品分类")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('goods:cate:index')")
-    public ResponseObject save(@RequestBody Map<String, Object> params) throws BusinessCheckException {
-        String id = params.get("id") == null ? "" : params.get("id").toString();
-        String name = params.get("name") == null ? "" : CommonUtil.replaceXSS(params.get("name").toString());
-        String description = params.get("description") == null ? "" : CommonUtil.replaceXSS(params.get("description").toString());
-        String logo = params.get("logo") == null ? "" : CommonUtil.replaceXSS(params.get("logo").toString());
-        String sort = params.get("sort") == null ? "0" : params.get("sort").toString();
-        String status = params.get("status") == null ? StatusEnum.ENABLED.getKey() : params.get("status").toString();
-        Integer storeId = (params.get("storeId") == null || StringUtil.isEmpty(params.get("storeId").toString())) ? 0 : Integer.parseInt(params.get("storeId").toString());
-
+    public ResponseObject save(@RequestBody GoodsCateInfo cateInfo) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        Integer myStoreId = accountInfo.getStoreId();
-        if (myStoreId > 0) {
-            storeId = myStoreId;
-        }
 
         MtGoodsCate mtGoodsCate = new MtGoodsCate();
-        mtGoodsCate.setName(name);
-        mtGoodsCate.setDescription(description);
-        mtGoodsCate.setLogo(logo);
-        mtGoodsCate.setSort(Integer.parseInt(sort));
-        mtGoodsCate.setStatus(status);
+        BeanUtils.copyProperties(cateInfo, mtGoodsCate);
+        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
+            mtGoodsCate.setStoreId(accountInfo.getStoreId());
+        }
         mtGoodsCate.setMerchantId(accountInfo.getMerchantId());
-        mtGoodsCate.setStoreId(storeId);
-        String operator = accountInfo.getAccountName();
-        mtGoodsCate.setOperator(operator);
+        mtGoodsCate.setOperator(accountInfo.getAccountName());
 
-        if (StringUtil.isNotEmpty(id)) {
-            mtGoodsCate.setId(Integer.parseInt(id));
+        if (cateInfo.getId() != null && cateInfo.getId() > 0) {
             cateService.updateCate(mtGoodsCate, accountInfo);
         } else {
             cateService.addCate(mtGoodsCate);
@@ -156,15 +139,16 @@ public class BackendCateController extends BaseController {
     @PreAuthorize("@pms.hasPermission('goods:cate:index')")
     public ResponseObject info(@PathVariable("id") Integer id) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
+
         MtGoodsCate mtCate = cateService.queryCateById(id);
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            if (!accountInfo.getMerchantId().equals(mtCate.getMerchantId())) {
-                return getFailureResult(1004);
-            }
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0 && !accountInfo.getMerchantId().equals(mtCate.getMerchantId())) {
+            return getFailureResult(1004);
         }
+
         Map<String, Object> result = new HashMap<>();
         result.put("cateInfo", mtCate);
         result.put("imagePath", settingService.getUploadBasePath());
+
         return getSuccessResult(result);
     }
 }

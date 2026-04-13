@@ -5,6 +5,7 @@ import com.fuint.common.dto.order.RefundDto;
 import com.fuint.common.dto.order.UserOrderDto;
 import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.RefundStatusEnum;
+import com.fuint.common.param.RefundInfoParam;
 import com.fuint.common.service.OrderService;
 import com.fuint.common.service.RefundService;
 import com.fuint.common.util.TokenUtil;
@@ -56,26 +57,15 @@ public class ClientRefundController extends BaseController {
     @CrossOrigin
     public ResponseObject list(@ModelAttribute RefundListRequest param) throws BusinessCheckException {
         UserInfo userInfo = TokenUtil.getUserInfo();
-        if (userInfo == null) {
-            return getFailureResult(1001, "用户未登录");
-        }
-
-        param.setUserId(userInfo.getId());
-
         String status = param.getStatus() != null ? param.getStatus() : "";
         if (status.equals("1")) {
             status = RefundStatusEnum.CREATED.getKey();
         } else {
             status = "";
         }
-        Map<String, Object> params = new HashMap();
-        params.put("userId", userInfo.getId());
-        if (StringUtil.isNotEmpty(status)) {
-            params.put("status", status);
-        }
-        params.put("pageNumber", param.getPage());
-
-        ResponseObject orderData = refundService.getUserRefundList(params);
+        param.setUserId(userInfo.getId());
+        param.setStatus(status);
+        ResponseObject orderData = refundService.getUserRefundList(param);
         return getSuccessResult(orderData.getData());
     }
 
@@ -87,6 +77,9 @@ public class ClientRefundController extends BaseController {
     @CrossOrigin
     public ResponseObject submit(@RequestBody RefundSubmitRequest param) {
         UserInfo mtUser = TokenUtil.getUserInfo();
+        if (null == mtUser) {
+            return getFailureResult(1001);
+        }
         param.setUserId(mtUser.getId());
 
         Integer orderId = param.getOrderId() == null ? 0 : param.getOrderId();
@@ -121,7 +114,6 @@ public class ClientRefundController extends BaseController {
         outParams.put("refundInfo", refundInfo);
 
         ResponseObject responseObject = getSuccessResult(outParams);
-
         return getSuccessResult(responseObject.getData());
     }
 
@@ -132,18 +124,11 @@ public class ClientRefundController extends BaseController {
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject detail(HttpServletRequest request) throws BusinessCheckException {
-        UserInfo mtUser = TokenUtil.getUserInfo();
-        if (mtUser == null) {
-            return getFailureResult(1001, "用户未登录");
-        }
-
         String refundId = request.getParameter("refundId");
         if (StringUtil.isEmpty(refundId)) {
             return getFailureResult(2000, "售后订单ID不能为空");
         }
-
         RefundDto refundInfo = refundService.getRefundById(Integer.parseInt(refundId));
-
         return getSuccessResult(refundInfo);
     }
 
@@ -153,27 +138,22 @@ public class ClientRefundController extends BaseController {
     @ApiOperation(value = "售后用户发货")
     @RequestMapping(value = "/delivery", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject delivery(@RequestBody Map<String, Object> param) throws BusinessCheckException {
+    public ResponseObject delivery(@RequestBody RefundInfoParam params) throws BusinessCheckException {
         UserInfo mtUser = TokenUtil.getUserInfo();
-        param.put("userId", mtUser.getId());
 
-        String refundId = param.get("refundId") == null ? "" : param.get("refundId").toString();
-        String expressName = param.get("expressName") == null ? "" : param.get("expressName").toString();
-        String expressNo = param.get("expressNo") == null ? "" : param.get("expressNo").toString();
-
-        RefundDto refundInfo = refundService.getRefundById(Integer.parseInt(refundId));
+        RefundDto refundInfo = refundService.getRefundById(params.getRefundId());
         if (refundInfo == null || (!refundInfo.getUserId().equals(mtUser.getId()))) {
-            return getFailureResult(2001);
+            return getFailureResult(201);
         }
 
-        if (StringUtil.isEmpty(expressName) || StringUtil.isEmpty(expressNo)) {
+        if (StringUtil.isEmpty(params.getExpressName()) || StringUtil.isEmpty(params.getExpressNo())) {
             return getFailureResult(201, "物流信息不能为空");
         }
 
         RefundDto refundDto = new RefundDto();
-        refundDto.setId(Integer.parseInt(refundId));
-        refundDto.setExpressName(expressName);
-        refundDto.setExpressNo(expressNo);
+        refundDto.setId(params.getRefundId());
+        refundDto.setExpressName(params.getExpressName());
+        refundDto.setExpressNo(params.getExpressNo());
         AccountInfo accountInfo = new AccountInfo();
         accountInfo.setAccountName(mtUser.getMobile());
         accountInfo.setMerchantId(refundInfo.getMerchantId());

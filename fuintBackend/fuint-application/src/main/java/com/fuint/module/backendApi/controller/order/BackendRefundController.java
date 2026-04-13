@@ -1,22 +1,20 @@
 package com.fuint.module.backendApi.controller.order;
 
-import com.fuint.common.Constants;
-import com.fuint.common.dto.common.ParamDto;
 import com.fuint.common.dto.order.RefundDto;
-import com.fuint.common.dto.order.UserOrderDto;
 import com.fuint.common.dto.system.AccountInfo;
+import com.fuint.common.dto.common.ParamDto;
+import com.fuint.common.dto.order.UserOrderDto;
 import com.fuint.common.enums.RefundStatusEnum;
 import com.fuint.common.enums.RefundTypeEnum;
-import com.fuint.common.service.MemberService;
+import com.fuint.common.param.RefundInfoParam;
+import com.fuint.common.param.RefundPage;
 import com.fuint.common.service.OrderService;
 import com.fuint.common.service.RefundService;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
-import com.fuint.repository.model.MtUser;
 import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,7 +22,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,66 +49,22 @@ public class BackendRefundController extends BaseController {
     private OrderService orderService;
 
     /**
-     * 会员接口服务
-     * */
-    private MemberService memberService;
-
-    /**
-     * 退款列表查询
+     * 售后列表查询
      */
     @ApiOperation(value = "售后列表查询")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('refund:index')")
-    public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String orderSn = request.getParameter("orderSn");
-        String mobile = request.getParameter("mobile");
-        String userId = request.getParameter("userId");
-        String status = request.getParameter("status");
-        Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
-        Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
-        String startTime = request.getParameter("startTime") == null ? "" : request.getParameter("startTime");
-        String endTime = request.getParameter("endTime") == null ? "" : request.getParameter("endTime");
-
+    public ResponseObject list(@ModelAttribute RefundPage refundPage) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        Integer storeId = accountInfo.getStoreId() == null ? 0 : accountInfo.getStoreId();
 
-        Map<String, Object> params = new HashMap<>();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            params.put("merchantId", accountInfo.getMerchantId());
+            refundPage.setMerchantId(accountInfo.getMerchantId());
         }
-        if (StringUtil.isNotEmpty(status)) {
-            params.put("status", status);
+        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
+            refundPage.setStoreId(accountInfo.getStoreId());
         }
-        if (StringUtil.isNotEmpty(orderSn)) {
-            UserOrderDto orderInfo = orderService.getOrderByOrderSn(orderSn);
-            if (orderInfo != null) {
-                params.put("orderId", orderInfo.getId().toString());
-            } else {
-                params.put("orderId", "0");
-            }
-        }
-        if (StringUtil.isNotEmpty(mobile)) {
-            MtUser userInfo = memberService.queryMemberByMobile(accountInfo.getMerchantId(), mobile);
-            if (userInfo != null) {
-                userId = userInfo.getId().toString();
-            } else {
-                userId = "0";
-            }
-        }
-        if (StringUtil.isNotEmpty(userId)) {
-            params.put("userId", userId);
-        }
-        if (storeId != null && storeId > 0) {
-            params.put("storeId", storeId);
-        }
-        if (StringUtil.isNotEmpty(startTime)) {
-            params.put("startTime", startTime);
-        }
-        if (StringUtil.isNotEmpty(endTime)) {
-            params.put("endTime", endTime);
-        }
-        PaginationResponse<RefundDto> paginationResponse = refundService.getRefundListByPagination(new PaginationRequest(page, pageSize, params));
+        PaginationResponse<RefundDto> paginationResponse = refundService.getRefundListByPagination(refundPage);
 
         // 售后状态列表
         List<ParamDto> statusList = RefundStatusEnum.getRefundStatusList();
@@ -128,21 +81,20 @@ public class BackendRefundController extends BaseController {
     }
 
     /**
-     * 查询退款详情
+     * 查询售后详情
      * */
-    @ApiOperation(value = "查询退款详情")
+    @ApiOperation(value = "查询售后详情")
     @RequestMapping(value = "/info/{refundId}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('refund:index')")
     public ResponseObject info(@PathVariable("refundId") Integer refundId) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
-        UserOrderDto orderInfo = null;
         RefundDto refundInfo = refundService.getRefundById(refundId);
+        UserOrderDto orderInfo = null;
         if (refundInfo != null) {
             orderInfo = orderService.getOrderById(refundInfo.getOrderId());
         }
-
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             if (!accountInfo.getMerchantId().equals(refundInfo.getMerchantId())) {
                 return getFailureResult(1004);
@@ -163,27 +115,28 @@ public class BackendRefundController extends BaseController {
     @RequestMapping(value = "save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('refund:edit')")
-    public ResponseObject save(@RequestBody Map<String, Object> param) throws BusinessCheckException {
-        Integer refundId = param.get("refundId") == null ? 0 : Integer.parseInt(param.get("refundId").toString());
-        String status = param.get("status") == null ? "" : param.get("status").toString();
-        String remark = param.get("remark") == null ? "" : param.get("remark").toString();
-        String rejectReason = param.get("rejectReason") == null ? "" : param.get("rejectReason").toString();
+    public ResponseObject save(@RequestBody RefundInfoParam param) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        if (status.equals(RefundStatusEnum.REJECT.getKey())) {
+        RefundDto refundDto = refundService.getRefundById(param.getRefundId());
+        if (!refundDto.getMerchantId().equals(accountInfo.getMerchantId())) {
+            return getFailureResult(1004);
+        }
+
+        if (param.getStatus().equals(RefundStatusEnum.REJECT.getKey())) {
             RefundDto dto = new RefundDto();
-            dto.setId(refundId);
+            dto.setId(param.getRefundId());
             dto.setOperator(accountInfo.getAccountName());
             dto.setStatus(RefundStatusEnum.REJECT.getKey());
-            dto.setRemark(remark);
-            dto.setRejectReason(rejectReason);
+            dto.setRemark(param.getRemark());
+            dto.setRejectReason(param.getRejectReason());
             refundService.updateRefund(dto, accountInfo);
         } else {
             RefundDto dto = new RefundDto();
-            dto.setId(refundId);
+            dto.setId(param.getRefundId());
             dto.setOperator(accountInfo.getAccountName());
-            dto.setStatus(status);
-            dto.setRemark(remark);
-            if (status.equals(RefundStatusEnum.COMPLETE.getKey())) {
+            dto.setStatus(param.getStatus());
+            dto.setRemark(param.getRemark());
+            if (param.getStatus().equals(RefundStatusEnum.COMPLETE.getKey())) {
                 refundService.agreeRefund(dto, accountInfo);
             } else {
                 refundService.updateRefund(dto, accountInfo);
@@ -204,6 +157,10 @@ public class BackendRefundController extends BaseController {
         String remark = param.get("remark") == null ? "" : param.get("remark").toString();
         String refundAmount = param.get("refundAmount") == null ? "" : param.get("refundAmount").toString();
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
+        UserOrderDto orderInfo = orderService.getOrderById(orderId);
+        if (!orderInfo.getMerchantId().equals(accountInfo.getMerchantId())) {
+            return getFailureResult(1004);
+        }
         if (orderId <= 0 || StringUtil.isEmpty(refundAmount)) {
             return getFailureResult(201, "参数有误，发起退款失败");
         }

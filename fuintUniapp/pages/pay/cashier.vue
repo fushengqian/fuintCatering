@@ -1,18 +1,17 @@
 <template>
-  <view class="container" v-if="userInfo.id">
+  <view class="container">
     <view class="account-panel dis-flex flex-y-center">
       <view class="panel-lable">
         <text>会员账户余额</text>
       </view>
       <view class="panel-balance flex-box">
-        <text>￥{{ userInfo.balance }}</text>
+        <text>￥{{ userInfo ? userInfo.balance : '0.0' }}</text>
       </view>
     </view>
     <view class="recharge-panel">
       <!-- 收款金额输入框 -->
       <view class="recharge-input">
           <view class="label">收款金额</view>
-          <text class="uni">￥</text>
           <input type="number" class="uni-input" placeholder="请输入收款金额（单位：元）" placeholder-class="placeholder" v-model="inputValue" @input="onChangeMoney" />
       </view>
       <view class="remark-input">
@@ -97,6 +96,11 @@
             return false;
         }
         
+		if (!app.userInfo) {
+			app.$error('该会员信息不存在，请确认！');
+			return false;
+		}
+		
         // 按钮禁用
         app.disabled = true
         
@@ -203,7 +207,7 @@
       border-radius: 6rpx;
       padding: 20rpx;
       font-weight: bold;
-      font-size: 58rpx;
+      font-size: 38rpx;
     }
   }
   .remark-input {
