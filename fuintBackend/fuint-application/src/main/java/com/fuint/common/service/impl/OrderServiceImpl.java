@@ -855,9 +855,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                     storeId = mtTable.getStoreId();
                 }
             }
-            MtOrder tableOrder = mtOrderMapper.findByTableId(tableId);
-            if (tableOrder != null) {
-                myOrderId = tableOrder.getId();
+            List<MtOrder> orderList = mtOrderMapper.findByTableId(tableId);
+            if (orderList != null && orderList.size() > 0) {
+                myOrderId = orderList.get(0).getId();
             }
         }
 
@@ -1081,6 +1081,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             orderInfo.setAmount(orderInfo.getAmount().add(myAmount));
             orderInfo.setPayAmount(orderInfo.getPayAmount().add(myPayAmount));
             orderInfo.setPointAmount(orderInfo.getPointAmount().add(myPointAmount));
+            orderInfo.setOrderSn(CommonUtil.createOrderSN(orderDto.getUserId() + ""));
             orderInfo = updateOrder(orderInfo);
         }
 
@@ -1299,11 +1300,11 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      */
     @Override
     public UserOrderDto getOrderInfoByTableId(Integer tableId) {
-        MtOrder mtOrder = mtOrderMapper.findByTableId(tableId);
-        if (mtOrder == null) {
+        List<MtOrder> mtOrders = mtOrderMapper.findByTableId(tableId);
+        if (mtOrders == null) {
             return null;
         }
-        return getOrderDetail(mtOrder, true, false);
+        return getOrderDetail(mtOrders.get(0), true, false);
     }
 
     /**

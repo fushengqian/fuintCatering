@@ -27,7 +27,7 @@ public interface MtOrderMapper extends BaseMapper<MtOrder> {
 
     MtOrder findByOrderSn(@Param("orderSn") String orderSn);
 
-    MtOrder findByTableId(@Param("tableId") Integer tableId);
+    List<MtOrder> findByTableId(@Param("tableId") Integer tableId);
 
     void removeTakenTableId(@Param("tableId") Integer tableId);
 
