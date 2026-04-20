@@ -88,7 +88,7 @@
         <view class="goods-main" v-if="goods.num > 0" @click="handleTargetGoods(goods.goodsId, goods.type)">
           <!-- 商品图片 -->
           <view class="goods-image">
-            <image class="image" :src="goods.image" mode="widthFix"></image>
+            <image class="image" :src="goods.image" mode="aspectFill"></image>
           </view>
           <!-- 商品信息 -->
           <view class="goods-content">
@@ -189,7 +189,7 @@
     <!-- 底部操作按钮 -->
     <view class="footer-fixed" v-if="order.status == OrderStatusEnum.CREATED.value">
       <view class="btn-wrapper">
-        <block v-if="!order.tableInfo">
+        <block v-if="payFirst == 'Y' || !order.tableInfo">
           <view class="btn-item" @click="onCancel(order.id)">取消订单</view>
         </block>
         <block v-if="order.tableInfo">
@@ -296,7 +296,8 @@
         // 支付方式弹窗
         showPayPopup: false,
         // 刷新页面
-        reflash: false
+        reflash: false,
+		payFirst: uni.getStorageSync("payFirst") ? uni.getStorageSync("payFirst") : 'Y'
       }
     },
 
@@ -645,7 +646,8 @@
     // 商品项
     .goods-item {
       margin-bottom: 40rpx;
-
+      border-bottom: #f5f5f5 solid 5rpx;
+      padding-bottom: 20rpx;
       &:last-child {
         margin-bottom: 0;
       }
@@ -658,13 +660,14 @@
       // 商品图片
       .goods-image {
         width: 180rpx;
-        height: 180rpx;
-
+        height: 160rpx;
+        position: relative; 
         .image {
           display: block;
           width: 100%;
           height: 100%;
           border-radius: 8rpx;
+          object-fit: cover; 
         }
       }
 

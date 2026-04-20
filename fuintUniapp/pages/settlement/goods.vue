@@ -557,7 +557,6 @@
         SettlementApi.submit(0, "", "goods", app.remark, 0, app.usePoint, app.selectCouponId, app.options.cartIds, app.options.goodsId, app.options.skuId, app.options.buyNum, orderMode, payType, peopleNum)
           .then(result => {
               app.onSubmitCallback(result);
-              uni.setStorageSync('peopleNum', 0);
           })
           .catch(err => {
             if (err.result) {

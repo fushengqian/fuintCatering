@@ -657,7 +657,11 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
         }
         MtCoupon couponInfo = queryCouponById(couponId);
         MtUser userInfo = memberService.queryMemberById(userId);
-
+        if (!accountInfo.getMerchantId().equals(userInfo.getMerchantId()) || !accountInfo.getMerchantId().equals(couponInfo.getMerchantId())) {
+            response.setMessage("卡券发放有误");
+            response.setCode(201);
+            return response;
+        }
         if (null == userInfo || !userInfo.getStatus().equals(StatusEnum.ENABLED.getKey())) {
             response.setMessage("该会员不存在或已禁用，请先注册会员");
             response.setCode(201);
