@@ -26,6 +26,9 @@ public class PrinterParam implements Serializable {
     @ApiModelProperty("打印机编号")
     private String sn;
 
+    @ApiModelProperty("打印机类型，order：订单小票，label：标签小票")
+    private String type;
+
     @ApiModelProperty("打印机名称")
     private String name;
 

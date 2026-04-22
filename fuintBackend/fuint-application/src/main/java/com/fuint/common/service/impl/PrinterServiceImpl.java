@@ -133,7 +133,9 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
         if (mtPrinter.getMerchantId() == null || mtPrinter.getMerchantId() < 1) {
             throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
         }
-
+        if (StringUtil.isEmpty(mtPrinter.getType())) {
+            mtPrinter.setType(PrinterTypeEnum.ORDER.getKey());
+        }
         Integer printerId = mtPrinterMapper.insert(mtPrinter);
         if (printerId > 0) {
             // 添加云打印机
@@ -167,18 +169,22 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
      * */
     @Override
     public Boolean printOrder(UserOrderDto orderInfo, boolean autoPrint, boolean beforePay, boolean afterPay, List<Integer> goodsIds) throws Exception {
+        if (orderInfo == null) {
+            return false;
+        }
         logger.info("云打印订单信息，订单编号：{}，所属店铺：{}", orderInfo.getOrderSn(), orderInfo.getStoreInfo().getName());
         PrintRequest printRequest = new PrintRequest();
         createRequestHeader(orderInfo.getMerchantId(), printRequest);
         if (orderInfo.getStoreInfo() == null) {
             logger.error("云打印订单失败：订单所属店铺信息为空");
-            throw new BusinessCheckException("打印失败：订单所属店铺信息为空！");
+            throw new BusinessCheckException("打印订单失败：订单所属店铺信息为空！");
         }
 
         // 获取打印机列表
         Map<String, Object> params = new HashMap<>();
         params.put("storeId", orderInfo.getStoreInfo().getId());
         params.put("status", StatusEnum.ENABLED.getKey());
+        params.put("type", PrinterTypeEnum.ORDER.getKey());
 
         if (autoPrint) {
             params.put("autoPrint", YesOrNoEnum.YES.getKey());
@@ -206,7 +212,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             printContent.append("<BR>");
 
             // 分割线
-            printContent.append(org.apache.commons.lang3.StringUtils.repeat("-", 32)).append("<BR>");
+            printContent.append(StringUtils.repeat("-", 32)).append("<BR>");
 
             // 订单ID、单号、桌码
             printContent.append("<L>订单ID：").append(orderInfo.getId()).append("</L>");
@@ -226,15 +232,15 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             printContent.append("<L>").append("支付状态：").append(payStatus).append("<BR></L>");
 
             // 分割线
-            printContent.append(org.apache.commons.lang3.StringUtils.repeat("-", 32)).append("<BR>");
+            printContent.append(StringUtils.repeat("-", 32)).append("<BR>");
 
-            printContent.append("品名").append(org.apache.commons.lang3.StringUtils.repeat(" ", 16))
-                        .append("数量").append(org.apache.commons.lang3.StringUtils.repeat(" ", 2))
-                        .append("单价").append(org.apache.commons.lang3.StringUtils.repeat(" ", 2))
+            printContent.append("品名").append(StringUtils.repeat(" ", 16))
+                        .append("数量").append(StringUtils.repeat(" ", 2))
+                        .append("单价").append(StringUtils.repeat(" ", 2))
                         .append("<BR>");
 
             // 分割线
-            printContent.append(org.apache.commons.lang3.StringUtils.repeat("-", 32)).append("<BR>");
+            printContent.append(StringUtils.repeat("-", 32)).append("<BR>");
 
             // 商品列表
             if (orderInfo.getGoods() != null && orderInfo.getGoods().size() > 0) {
@@ -263,14 +269,14 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             }
 
             // 分割线
-            printContent.append(org.apache.commons.lang3.StringUtils.repeat("-", 32)).append("<BR>");
+            printContent.append(StringUtils.repeat("-", 32)).append("<BR>");
 
             printContent.append("<R>").append("合计：").append(orderInfo.getPayAmount()).append("元").append("<BR></R>");
 
             // 配送订单，打印配送信息
             if (orderInfo.getOrderMode().equals(OrderModeEnum.EXPRESS.getKey())) {
                 printContent.append("<BR>");
-                printContent.append(org.apache.commons.lang3.StringUtils.repeat("-", 32)).append("<BR>");
+                printContent.append(StringUtils.repeat("-", 32)).append("<BR>");
                 printContent.append("<L>")
                         .append("配送姓名：").append(orderInfo.getAddress().getName()).append("<BR>")
                         .append("联系电话：").append(orderInfo.getAddress().getMobile()).append("<BR>")
@@ -300,7 +306,79 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
                 throw new BusinessCheckException("打印失败：" + result.getMsg());
             }
         }
+        return true;
+    }
 
+    /**
+     * 打印标签
+     *
+     * @param orderInfo 订单信息
+     * @param autoPrint 自动打印
+     * @param beforePay 支付前打印
+     * @param afterPay 支付后打印
+     * @param goodsIds 打印的商品Id
+     * @throws Exception
+     * @return
+     * */
+    @Override
+    public Boolean printLabel(UserOrderDto orderInfo, boolean autoPrint, boolean beforePay, boolean afterPay, List<Integer> goodsIds) throws Exception {
+        if (orderInfo == null) {
+            return false;
+        }
+        logger.info("云打印标签信息，订单编号：{}，所属店铺：{}", orderInfo.getOrderSn(), orderInfo.getStoreInfo().getName());
+        PrintRequest printRequest = new PrintRequest();
+        createRequestHeader(orderInfo.getMerchantId(), printRequest);
+        if (orderInfo.getStoreInfo() == null) {
+            logger.error("云打印标签失败：订单所属店铺信息为空");
+            throw new BusinessCheckException("打印标签失败：订单所属店铺信息为空！");
+        }
+
+        // 获取打印机列表
+        Map<String, Object> params = new HashMap<>();
+        params.put("storeId", orderInfo.getStoreInfo().getId());
+        params.put("status", StatusEnum.ENABLED.getKey());
+        params.put("type", PrinterTypeEnum.LABEL.getKey());
+
+        if (autoPrint) {
+            params.put("autoPrint", YesOrNoEnum.YES.getKey());
+        }
+
+        if (beforePay) {
+            params.put("beforePay", YesOrNoEnum.YES.getKey());
+        } else if (afterPay) {
+            params.put("afterPay", YesOrNoEnum.YES.getKey());
+        }
+
+        List<MtPrinter> printers = queryPrinterListByParams(params);
+        logger.info("printers params = {}， size = {}", JSON.toJSONString(params), printers.size());
+        if (printers == null || printers.size() < 1) {
+            logger.error("云打印标签失败：该店铺还没有添加云打印机！");
+            throw new BusinessCheckException("打印失败：该店铺还没有添加云打印机！");
+        }
+        for (MtPrinter mtPrinter : printers) {
+             printRequest.setSn(mtPrinter.getSn());
+             StringBuilder printContent = new StringBuilder();
+             // 商品列表
+             if (orderInfo.getGoods() != null && orderInfo.getGoods().size() > 0) {
+                 for (OrderGoodsDto goodsDto : orderInfo.getGoods()) {
+                      String goodsName = goodsDto.getName();
+                      printContent.append("<PAGE><SIZE>40,30</SIZE>");
+                      printContent.append("<TEXT x=\"9\" y=\"10\" w=\"1\" h=\"2\" r=\"0\">"+ "#" + (orderInfo.getTableInfo() != null ? orderInfo.getTableInfo().getCode() : "") +"</TEXT>");
+                      printContent.append("<TEXT x=\"60\" y=\"80\" w=\"2\" h=\"2\" r=\"0\">"+ goodsName +"</TEXT>");
+                      printContent.append("<TEXT x=\"9\" y=\"180\" w=\"1\" h=\"1\" r=\"0\">" + orderInfo.getOrderSn() + "</TEXT>");
+                      printContent.append("</PAGE");
+                 }
+             }
+             printRequest.setContent(printContent.toString());
+             printRequest.setCopies(1);
+             printRequest.setVoice(2);
+             printRequest.setMode(0);
+             ObjectRestResponse<String> result = PrinterUtil.printLabel(printRequest);
+             if (result != null && result.getCode() != 0) {
+                 logger.error("云打印标签失败：" + result.getMsg());
+                 throw new BusinessCheckException("打印失败：" + result.getMsg());
+             }
+        }
         return true;
     }
 
@@ -318,14 +396,15 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
     /**
      * 根据ID删除打印机
      *
-     * @param id 打印机ID
-     * @param operator 操作人
+     * @param  id 打印机ID
+     * @param  accountInfo 操作人
+     * @throws BusinessCheckException
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "删除打印机")
-    public void deletePrinter(Integer id, String operator) throws BusinessCheckException {
+    public void deletePrinter(Integer id, AccountInfo accountInfo) throws BusinessCheckException {
         MtPrinter mtPrinter = queryPrinterById(id);
         if (null == mtPrinter) {
             return;
@@ -375,7 +454,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             PrinterUtil.updPrinter(restRequest);
         }
         if (mtPrinter.getStatus().equals(StatusEnum.DISABLE.getKey())) {
-            deletePrinter(mtPrinter.getId(), mtPrinter.getOperator());
+            deletePrinter(mtPrinter.getId(), accountInfo);
         }
 
         mtPrinter.setUpdateTime(new Date());
@@ -399,6 +478,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
         String autoPrint = params.get("autoPrint") == null ? "" : params.get("autoPrint").toString();
         String beforePay = params.get("beforePay") == null ? "" : params.get("beforePay").toString();
         String afterPay = params.get("afterPay") == null ? "" : params.get("afterPay").toString();
+        String type = params.get("type") == null ? "" : params.get("type").toString();
 
         LambdaQueryWrapper<MtPrinter> lambdaQueryWrapper = Wrappers.lambdaQuery();
         if (StringUtils.isNotBlank(status)) {
@@ -427,6 +507,9 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
         }
         if (StringUtils.isNotBlank(afterPay)) {
             lambdaQueryWrapper.eq(MtPrinter::getAfterPay, afterPay);
+        }
+        if (StringUtils.isNotBlank(type)) {
+            lambdaQueryWrapper.eq(MtPrinter::getType, type);
         }
         lambdaQueryWrapper.orderByAsc(MtPrinter::getId);
 

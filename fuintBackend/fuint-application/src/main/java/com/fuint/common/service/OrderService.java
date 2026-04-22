@@ -3,6 +3,7 @@ package com.fuint.common.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.common.dto.order.OrderDto;
 import com.fuint.common.dto.order.UserOrderDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.param.OrderListParam;
 import com.fuint.common.param.RechargeParam;
 import com.fuint.common.param.RemoveGoodsParam;
@@ -106,11 +107,11 @@ public interface OrderService extends IService<MtOrder> {
      * 根据订单ID删除
      *
      * @param  orderId 订单ID
-     * @param  operator 操作人
+     * @param  accountInfo 操作人
      * @throws BusinessCheckException
      * @return
      */
-    void deleteOrder(Integer orderId, String operator) throws BusinessCheckException;
+    void deleteOrder(Integer orderId, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 根据订单号获取订单详情

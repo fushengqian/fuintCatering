@@ -186,10 +186,12 @@ public class GiveServiceImpl extends ServiceImpl<MtGiveMapper, MtGive> implement
             userInfo.setName(mobile);
             userInfo.setMobile(mobile);
             MtUserGrade grade = userGradeService.getInitUserGrade(merchantId);
-            userInfo.setGradeId(grade.getId());
+            if (grade != null) {
+                userInfo.setGradeId(grade.getId());
+            }
             userInfo.setBalance(new BigDecimal(0));
             userInfo.setStatus(StatusEnum.ENABLED.getKey());
-            user = memberService.addMember(userInfo, userId.toString());
+            user = memberService.addMember(userInfo, "0");
         } else {
             if (!user.getStatus().equals(StatusEnum.ENABLED.getKey())) {
                 throw new BusinessCheckException("转增对象可能已被禁用");
@@ -212,7 +214,23 @@ public class GiveServiceImpl extends ServiceImpl<MtGiveMapper, MtGive> implement
 
         for (String id : couponIds) {
             MtUserCoupon userCoupon = mtUserCouponMapper.selectById(Integer.parseInt(id));
+            if (userCoupon == null) {
+                throw new BusinessCheckException("转增卡券不存在");
+            } else {
+                if (!userCoupon.getStatus().equals(StatusEnum.ENABLED.getKey())) {
+                    throw new BusinessCheckException("转增卡券必须是未使用状态");
+                }
+                if (userCoupon.getUserId() == null || userCoupon.getUserId() <= 0 || !userCoupon.getUserId().equals(userId)) {
+                    throw new BusinessCheckException("您的券可能已经转赠出去了");
+                }
+            }
             MtCoupon coupon = couponService.queryCouponById(userCoupon.getCouponId());
+            if (coupon.getLimitNum() != null && coupon.getLimitNum() > 0) {
+                Long count = mtUserCouponMapper.selectCount(Wrappers.lambdaQuery(MtUserCoupon.class).eq(MtUserCoupon::getCouponId, coupon.getId()).eq(MtUserCoupon::getUserId, user.getId()));
+                if (count > coupon.getLimitNum()) {
+                    throw new BusinessCheckException("受赠对象拥有该卡券数量已达上限");
+                }
+            }
             if (!couponIdList.contains(coupon.getId().toString())) {
                 couponIdList.add(coupon.getId().toString());
             }
@@ -227,20 +245,8 @@ public class GiveServiceImpl extends ServiceImpl<MtGiveMapper, MtGive> implement
                 groupNames.add(group.getName());
             }
             money = money.add(userCoupon.getAmount());
-            if (null == userCoupon) {
-                throw new BusinessCheckException("转增卡券不存在");
-            } else {
-                if (!userCoupon.getStatus().equals(StatusEnum.ENABLED.getKey())) {
-                    throw new BusinessCheckException("转增卡券必须是未使用状态");
-                }
-                if (!userCoupon.getUserId().toString().equals(userId.toString())) {
-                    throw new BusinessCheckException("您的券可能已经转赠出去了");
-                }
-            }
         }
-
         MtUser myUser = memberService.queryMemberById(userId);
-
         give.setMobile(mobile);
         give.setGiveUserId(userId);
         give.setUserId(user.getId());
@@ -278,14 +284,12 @@ public class GiveServiceImpl extends ServiceImpl<MtGiveMapper, MtGive> implement
             userCoupon.setUpdateTime(new Date());
             userCoupon.setMobile(user.getMobile());
             mtUserCouponMapper.updateById(userCoupon);
-
             MtGiveItem item = new MtGiveItem();
             item.setCreateTime(new Date());
             item.setGiveId(giveInfo.getId());
             item.setStatus(StatusEnum.ENABLED.getKey());
             item.setUpdateTime(new Date());
             item.setUserCouponId(Integer.parseInt(id));
-
             mtGiveItemMapper.insert(item);
         }
 
@@ -297,7 +301,7 @@ public class GiveServiceImpl extends ServiceImpl<MtGiveMapper, MtGive> implement
             params.put("totalMoney", money+"");
             sendSmsService.sendSms(merchantId, "received-coupon", mobileList, params);
         } catch (Exception e) {
-            logger.error("卡券转赠发送短信出错：", e.getMessage());
+            logger.error("核销卡券发送通知消息出错：", e.getMessage());
         }
 
         return new ResponseObject(200, "", giveInfo);

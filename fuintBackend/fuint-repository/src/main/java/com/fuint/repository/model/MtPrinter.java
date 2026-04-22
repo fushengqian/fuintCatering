@@ -3,11 +3,12 @@ package com.fuint.repository.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.util.Date;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 打印机实体
@@ -34,6 +35,9 @@ public class MtPrinter implements Serializable {
 
     @ApiModelProperty("打印机编号")
     private String sn;
+
+    @ApiModelProperty("打印机类型，order：订单小票，label：标签小票")
+    private String type;
 
     @ApiModelProperty("打印机名称")
     private String name;

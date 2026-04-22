@@ -49,6 +49,19 @@ public interface PrinterService extends IService<MtPrinter> {
     Boolean printOrder(UserOrderDto orderInfo, boolean autoPrint, boolean beforePay, boolean afterPay, List<Integer> goodsIds) throws Exception;
 
     /**
+     * 打印标签
+     *
+     * @param orderInfo 订单信息
+     * @param autoPrint 自动打印
+     * @param beforePay 支付前打印
+     * @param afterPay 支付后打印
+     * @param goodsIds 打印的商品Id
+     * @throws Exception
+     * @return
+     * */
+    Boolean printLabel(UserOrderDto orderInfo, boolean autoPrint, boolean beforePay, boolean afterPay, List<Integer> goodsIds) throws Exception;
+
+    /**
      * 根据ID获取打印机信息
      *
      * @param id ID
@@ -60,11 +73,11 @@ public interface PrinterService extends IService<MtPrinter> {
      * 根据ID删除打印机
      *
      * @param  id ID
-     * @param  operator 操作人
+     * @param  accountInfo 操作人
      * @throws BusinessCheckException
      * @return
      */
-    void deletePrinter(Integer id, String operator) throws BusinessCheckException;
+    void deletePrinter(Integer id, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 更新打印机
