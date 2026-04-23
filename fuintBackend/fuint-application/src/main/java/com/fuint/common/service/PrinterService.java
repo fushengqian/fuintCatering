@@ -95,4 +95,17 @@ public interface PrinterService extends IService<MtPrinter> {
      * @return
      * */
     List<MtPrinter> queryPrinterListByParams(Map<String, Object> params);
+
+    /**
+     * 同时打印订单和标签（双线程并行执行）
+     *
+     * @param orderInfo 订单信息
+     * @param autoPrint 自动打印
+     * @param beforePay 支付前打印
+     * @param afterPay 支付后打印
+     * @param goodsIds 打印的商品Id
+     * @return 包含打印订单和标签结果的Map，key为"order"和"label"
+     * @throws Exception
+     */
+    Boolean printOrderAndLabel(UserOrderDto orderInfo, boolean autoPrint, boolean beforePay, boolean afterPay, List<Integer> goodsIds) throws Exception;
 }

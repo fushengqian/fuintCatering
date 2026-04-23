@@ -1266,7 +1266,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         // 打印订单
         try {
             UserOrderDto userOrderDto = getOrderByOrderSn(orderInfo.getOrderSn());
-            printerService.printOrder(userOrderDto, true, true, false, goodsIds);
+            printerService.printOrderAndLabel(userOrderDto, true, true, false, goodsIds);
         } catch (Exception e) {
             logger.error("订单打印出错了：" + e.getMessage());
         }
@@ -1757,7 +1757,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         try {
             // 打印订单
-            printerService.printOrder(orderInfo, true,false, true, null);
+            printerService.printOrderAndLabel(orderInfo, true,false, true, null);
 
             // 给商家发送通知短信
             MtStore mtStore = storeService.queryStoreById(mtOrder.getStoreId());

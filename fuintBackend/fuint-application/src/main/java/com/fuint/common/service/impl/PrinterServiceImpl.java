@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * 打印机服务接口
@@ -514,6 +515,44 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
         lambdaQueryWrapper.orderByAsc(MtPrinter::getId);
 
         return mtPrinterMapper.selectList(lambdaQueryWrapper);
+    }
+
+    /**
+     * 同时打印订单和标签（双线程并行执行）
+     *
+     * @param orderInfo 订单信息
+     * @param autoPrint 自动打印
+     * @param beforePay 支付前打印
+     * @param afterPay 支付后打印
+     * @param goodsIds 打印的商品Id
+     * @return 包含打印订单和标签结果的Map，key为"order"和"label"
+     * @throws Exception
+     */
+    @Override
+    public Boolean printOrderAndLabel(UserOrderDto orderInfo, boolean autoPrint, boolean beforePay, boolean afterPay, List<Integer> goodsIds) throws Exception {
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("order", false);
+        result.put("label", false);
+
+        if (orderInfo == null) {
+            return false;
+        }
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            Future<Boolean> orderFuture = executor.submit(() -> printOrder(orderInfo, autoPrint, beforePay, afterPay, goodsIds));
+
+            Future<Boolean> labelFuture = executor.submit(() -> printLabel(orderInfo, autoPrint, beforePay, afterPay, goodsIds));
+
+            result.put("order", orderFuture.get());
+            result.put("label", labelFuture.get());
+        } finally {
+            executor.shutdown();
+        }
+        if (!result.get("order") && !result.get("label")) {
+            return false;
+        }
+        return true;
     }
 
     /**
