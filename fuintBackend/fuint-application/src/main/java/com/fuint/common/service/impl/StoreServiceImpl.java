@@ -305,7 +305,6 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
      * 根据店铺ID获取店铺信息
      *
      * @param  id 店铺ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -335,7 +334,7 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
      * 更新店铺状态
      *
      * @param  id       店铺ID
-     * @param  operator 操作人
+     * @param  accountInfo 操作人
      * @param  status   状态
      * @throws BusinessCheckException
      * @return
@@ -343,15 +342,18 @@ public class StoreServiceImpl extends ServiceImpl<MtStoreMapper, MtStore> implem
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "修改店铺状态")
-    public void updateStatus(Integer id, String operator, String status) throws BusinessCheckException {
+    public void updateStatus(Integer id, AccountInfo accountInfo, String status) throws BusinessCheckException {
         MtStore mtStore = queryStoreById(id);
         if (null == mtStore) {
             throw new BusinessCheckException("该店铺不存在.");
         }
+        if (accountInfo.getMerchantId() > 0 && !accountInfo.getMerchantId().equals(mtStore.getMerchantId())) {
+            throw new BusinessCheckException("不同商户，无操作权限.");
+        }
 
         mtStore.setStatus(status);
         mtStore.setUpdateTime(new Date());
-        mtStore.setOperator(operator);
+        mtStore.setOperator(accountInfo.getAccountName());
 
         mtStoreMapper.updateById(mtStore);
     }

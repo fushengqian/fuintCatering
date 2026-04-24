@@ -135,7 +135,7 @@ public class BackendStoreController extends BaseController {
         Integer storeId = params.get("storeId") == null ? 0 : Integer.parseInt(params.get("storeId").toString());
 
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        storeService.updateStatus(storeId, accountInfo.getAccountName(), status);
+        storeService.updateStatus(storeId, accountInfo, status);
 
         return getSuccessResult(true);
     }

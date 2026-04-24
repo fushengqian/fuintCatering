@@ -35,6 +35,12 @@ public class PrinterParam implements Serializable {
     @ApiModelProperty("是否自动打印机")
     private String autoPrint;
 
+    @ApiModelProperty("支付前打印")
+    private String beforePay;
+
+    @ApiModelProperty("支付后打印")
+    private String afterPay;
+
     @ApiModelProperty("创建时间")
     private Date createTime;
 
