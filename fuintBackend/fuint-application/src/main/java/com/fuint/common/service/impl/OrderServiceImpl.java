@@ -1301,7 +1301,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     @Override
     public UserOrderDto getOrderInfoByTableId(Integer tableId) {
         List<MtOrder> mtOrders = mtOrderMapper.findByTableId(tableId);
-        if (mtOrders == null) {
+        if (mtOrders == null || mtOrders.size() == 0) {
             return null;
         }
         return getOrderDetail(mtOrders.get(0), true, false);
