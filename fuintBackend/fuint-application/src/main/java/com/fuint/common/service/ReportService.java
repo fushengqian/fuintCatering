@@ -29,6 +29,16 @@ public interface ReportService {
     Map<String, Object> getReportOverview(Integer merchantId, Integer storeId, String startTime, String endTime) throws ParseException;
 
     /**
+     * 获取图表数据
+     *
+     * @param tag 图表标签
+     * @param merchantId 商户ID
+     * @param storeId 店铺ID
+     * @return
+     */
+    Map<String, Object> getChartData(String tag, Integer merchantId, Integer storeId);
+
+    /**
      * 获取日销售统计报表
      *
      * @param merchantId 商户ID

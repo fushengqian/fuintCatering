@@ -1,11 +1,11 @@
 package com.fuint.module.backendApi.controller.common;
 
-import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.dto.order.UserOrderDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.OrderService;
+import com.fuint.common.service.ReportService;
 import com.fuint.common.util.DateUtil;
-import com.fuint.common.util.TimeUtils;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +46,11 @@ public class BackendHomeController extends BaseController {
      * 订单服务接口
      * */
     private OrderService orderService;
+
+    /**
+     * 报表服务接口
+     * */
+    private ReportService reportService;
 
     /**
      * 首页统计数据
@@ -107,45 +111,12 @@ public class BackendHomeController extends BaseController {
     public ResponseObject statistic(HttpServletRequest request) {
         String tag = request.getParameter("tag") == null ? "order,user_active" : request.getParameter("tag");
         Integer storeId = StringUtil.isEmpty(request.getParameter("storeId")) ? 0 : Integer.parseInt(request.getParameter("storeId"));
-
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         Integer merchantId = accountInfo.getMerchantId() == null ? 0 : accountInfo.getMerchantId();
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
             storeId = accountInfo.getStoreId();
         }
-
-        ArrayList<String> days = TimeUtils.getDays(5);
-        days.add("昨天");
-        days.add("今天");
-
-        Map<String, Object> result = new HashMap<>();
-        if (tag.equals("payment")) {
-            BigDecimal[] orderPayData = {new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0")};
-            for (int i = 0; i < 7; i++) {
-                Date beginTime = DateUtil.getDayBegin((6 - i));
-                Date endTime = DateUtil.getDayEnd((6 - i));
-                BigDecimal payMoney = orderService.getPayMoney(merchantId, storeId, beginTime, endTime);
-                orderPayData[i] = payMoney == null ? new BigDecimal("0") : payMoney;
-            }
-            BigDecimal data[][] = { orderPayData };
-            result.put("data", data);
-        } else {
-            BigDecimal[] orderCountData = {new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0")};
-            BigDecimal[] userCountData = {new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0")};
-
-            for (int i = 0; i < 7; i++) {
-                Date beginTime = DateUtil.getDayBegin((6 - i));
-                Date endTime = DateUtil.getDayEnd((6 - i));
-                orderCountData[i] = orderService.getOrderCount(merchantId, storeId, beginTime, endTime);
-                Long userCount = memberService.getActiveUserCount(merchantId, storeId, beginTime, endTime);
-                userCountData[i] = new BigDecimal(userCount);
-            }
-            BigDecimal data[][] = { orderCountData, userCountData };
-            result.put("data", data);
-        }
-
-        result.put("labels", days);
-
+        Map<String, Object> result = reportService.getChartData(tag, merchantId, storeId);
         return getSuccessResult(result);
     }
 

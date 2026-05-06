@@ -490,8 +490,14 @@
                   "style": {
                     "navigationBarTitleText": "售后更新"
                   }
+                },
+                {
+                  "path": "data/index",
+                  "style": {
+                     "navigationBarTitleText": "数据统计"
+                   }
                 }
-        ]
+    ]
    }],
    "preloadRule": {
      "pages/index/index": {
