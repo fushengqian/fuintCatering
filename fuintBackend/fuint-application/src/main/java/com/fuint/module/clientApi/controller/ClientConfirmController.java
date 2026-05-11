@@ -95,7 +95,7 @@ public class ClientConfirmController extends BaseController {
 
         // 员工是否已经被审核
         MtStaff staffInfo = staffService.queryStaffByMobile(mtUser.getMobile());
-        if (staffInfo == null || staffInfo.getAuditedStatus().equals(StatusEnum.ENABLED.getKey())) {
+        if (staffInfo == null || !staffInfo.getAuditedStatus().equals(StatusEnum.ENABLED.getKey())) {
             return getFailureResult(1003, "员工状态异常！");
         }
 

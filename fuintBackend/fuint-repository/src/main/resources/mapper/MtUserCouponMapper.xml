@@ -33,11 +33,11 @@
     </select>
 
     <update id="removeUserCoupon">
-        update mt_user_coupon p set p.STATUS ='D',p.OPERATOR = #{operator} where p.UUID = #{uuid} and p.COUPON_ID in
+        update mt_user_coupon set STATUS ='D',OPERATOR = #{operator} where UUID = #{uuid} and COUPON_ID in
         <foreach collection="couponIds" item="couponId" separator="," open="(" close=")">
             #{couponId}
         </foreach>
-        and p.status='A'
+        and status='A'
     </update>
 
     <select id="queryExpireNumByGroupId" resultType="com.fuint.repository.model.MtUserCoupon">

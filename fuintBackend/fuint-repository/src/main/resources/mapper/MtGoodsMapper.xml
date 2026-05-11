@@ -56,7 +56,7 @@
     </select>
 
     <update id="updateInitSale">
-        update mt_goods t set t.INIT_SALE = t.INIT_SALE + #{saleNum} where t.ID = #{goodsId}
+        update mt_goods set INIT_SALE = INIT_SALE + #{saleNum} where ID = #{goodsId}
     </update>
 
     <select id="selectGoodsList" resultType="com.fuint.repository.bean.GoodsBean">
@@ -78,12 +78,24 @@
     </select>
 
     <select id="getGoodsSaleTopList" resultType="com.fuint.repository.bean.GoodsTopBean">
-        SELECT g.id AS ID,g.name AS NAME,g.GOODS_NO,SUM(o.`NUM`) AS num, SUM(o.price) as amount FROM `mt_goods` g,`mt_order_goods` o WHERE g.`ID` = o.`GOODS_ID`
+        SELECT
+        g.ID,
+        g.NAME,
+        g.GOODS_NO,
+        SUM(o.NUM) AS num,
+        SUM(o.price) AS amount
+        FROM mt_goods g
+        INNER JOIN mt_order_goods o ON g.ID = o.GOODS_ID
+        INNER JOIN mt_order ord ON o.ORDER_ID = ord.ID
+        WHERE g.STATUS = 'A'
+        AND ord.STATUS NOT IN ('C', 'G', 'H')
+        AND ord.PAY_STATUS = 'B'
+
         <if test="merchantId != null and merchantId > 0">
             AND g.MERCHANT_ID = #{merchantId}
         </if>
         <if test="storeId != null and storeId > 0">
-            AND g.STORE_ID = #{storeId}
+            AND ord.STORE_ID = #{storeId}
         </if>
         <if test="startTime != null">
             AND o.CREATE_TIME &gt;= #{startTime}
@@ -91,10 +103,12 @@
         <if test="endTime != null">
             AND o.CREATE_TIME &lt;= #{endTime}
         </if>
-        GROUP BY g.`ID` ORDER BY SUM(o.`NUM`) DESC LIMIT 10
+        GROUP BY g.ID, g.NAME, g.GOODS_NO
+        ORDER BY SUM(o.NUM) DESC
+        LIMIT 10
     </select>
 
     <update id="removeMerchantGoods">
-        update mt_goods t set t.STATUS = 'D' where t.MERCHANT_ID = #{merchantId}
+        update mt_goods set STATUS = 'D' where MERCHANT_ID = #{merchantId}
     </update>
 </mapper>

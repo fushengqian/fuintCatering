@@ -405,7 +405,7 @@ public class BackendMemberController extends BaseController {
     @ApiOperation(value = "获取会员分组")
     @RequestMapping(value = "/groupList", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject groupList() throws BusinessCheckException {
+    public ResponseObject groupList() {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         // 会员分组

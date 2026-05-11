@@ -6,9 +6,9 @@
     </select>
 
     <update id="resetDefaultStore">
-        update mt_store p set p.IS_DEFAULT = 'N' where p.STATUS != 'D'
+        update mt_store set IS_DEFAULT = 'N' where STATUS != 'D'
         <if test="merchantId != null and merchantId != ''">
-            AND p.MERCHANT_ID = #{merchantId}
+            AND MERCHANT_ID = #{merchantId}
         </if>
     </update>
 

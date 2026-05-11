@@ -81,6 +81,12 @@ public class MerchantReportController extends BaseController {
         Integer storeId = StringUtil.isEmpty(request.getParameter("storeId")) ? 0 : Integer.parseInt(request.getParameter("storeId"));
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
+        if (StringUtil.isNotEmpty(startTime)) {
+            startTime = startTime + " 00:00:00";
+        }
+        if (StringUtil.isNotEmpty(endTime)) {
+            endTime = endTime + " 23:59:59";
+        }
 
         if (staff.getStoreId() != null && staff.getStoreId() > 0) {
             storeId = staff.getStoreId();
@@ -104,9 +110,9 @@ public class MerchantReportController extends BaseController {
         MtStaff staff = staffService.queryStaffByMobile(userInfo.getMobile());
         Integer merchantId = merchantService.getMerchantId(request.getHeader("merchantNo"));
         if (staff == null || !merchantId.equals(staff.getMerchantId())) {
-            return getFailureResult(201, "您没有操作权限");
+            return getFailureResult(201, "您不是员工，没有操作权限");
         }
-        if (userInfo.getStoreId() != null && userInfo.getStoreId() > 0) {
+        if (staff.getStoreId() != null && staff.getStoreId() > 0) {
             storeId = userInfo.getStoreId();
         }
         Map<String, Object> result = reportService.getChartData(tag, merchantId, storeId);
@@ -119,18 +125,28 @@ public class MerchantReportController extends BaseController {
     @ApiOperation(value = "排行榜数据")
     @RequestMapping(value = "/top", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject top(@RequestBody StatisticParam param) throws ParseException {
+    public ResponseObject top(HttpServletRequest request, @RequestBody StatisticParam param) throws ParseException {
+        Integer merchantId = merchantService.getMerchantId(request.getHeader("merchantNo"));
         String startTimeStr = param.getStartTime();
         String endTimeStr = param.getEndTime();
-        Integer storeId = param.getStoreId();
+        if (StringUtil.isNotEmpty(startTimeStr)) {
+            startTimeStr = startTimeStr + " 00:00:00";
+        }
+        if (StringUtil.isNotEmpty(endTimeStr)) {
+            endTimeStr = endTimeStr + " 23:59:59";
+        }
 
+        Integer storeId = param.getStoreId();
         Date startTime = StringUtil.isNotEmpty(startTimeStr) ? DateUtil.parseDate(startTimeStr) : null;
         Date endTime = StringUtil.isNotEmpty(endTimeStr) ? DateUtil.parseDate(endTimeStr) : null;
 
         UserInfo loginUser = TokenUtil.getUserInfo();
         MtStaff staff = staffService.queryStaffByMobile(loginUser.getMobile());
 
-        Integer merchantId = staff.getMerchantId();
+        if (staff == null || !merchantId.equals(staff.getMerchantId())) {
+            return getFailureResult(201, "您不是员工，没有操作权限");
+        }
+
         if (staff.getStoreId() != null && staff.getStoreId() > 0) {
             storeId = staff.getStoreId();
         }
