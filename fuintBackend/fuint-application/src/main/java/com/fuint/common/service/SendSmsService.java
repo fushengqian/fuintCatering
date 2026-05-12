@@ -1,9 +1,10 @@
 package com.fuint.common.service;
 
+import com.fuint.common.param.SmsPage;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtSmsSendedLog;
+
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +31,8 @@ public interface SendSmsService {
     /**
      * 分页已发短信列表
      *
-     * @param paginationRequest
+     * @param smsPage
      * @return
      */
-    PaginationResponse<MtSmsSendedLog> querySmsListByPagination(PaginationRequest paginationRequest);
+    PaginationResponse<MtSmsSendedLog> querySmsListByPagination(SmsPage smsPage);
 }

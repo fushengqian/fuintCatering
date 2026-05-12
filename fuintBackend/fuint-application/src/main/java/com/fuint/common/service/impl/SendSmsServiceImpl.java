@@ -16,12 +16,12 @@ import com.fuint.common.dto.message.MessageResDto;
 import com.fuint.common.enums.SettingTypeEnum;
 import com.fuint.common.enums.SmsSettingEnum;
 import com.fuint.common.enums.StatusEnum;
+import com.fuint.common.param.SmsPage;
 import com.fuint.common.service.SendSmsService;
 import com.fuint.common.service.SettingService;
 import com.fuint.common.service.SmsTemplateService;
 import com.fuint.common.util.CommonUtil;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.mapper.MtSmsSendedLogMapper;
 import com.fuint.repository.model.MtSetting;
@@ -128,7 +128,7 @@ public class SendSmsServiceImpl implements SendSmsService {
      * @param templateUname   短信模板英文名称
      * @return
      */
-    public MessageResDto sendMessage(Integer merchantId, String phoneNo, String templateUname, Map<String, String> contentParams) throws BusinessCheckException {
+    public MessageResDto sendMessage(Integer merchantId, String phoneNo, String templateUname, Map<String, String> contentParams) {
         MessageResDto resInfo = new MessageResDto();
         logger.info("sendMessage inParams:phoneNo={}, message={}", phoneNo, templateUname);
         if (StringUtil.isBlank(phoneNo) || phoneNo.split(",").length > 200) {
@@ -271,26 +271,26 @@ public class SendSmsServiceImpl implements SendSmsService {
     /**
      * 分页查询已发短信列表
      *
-     * @param paginationRequest
+     * @param smsPage
      * @return
      */
     @Override
-    public PaginationResponse<MtSmsSendedLog> querySmsListByPagination(PaginationRequest paginationRequest) {
-        Page<MtSmsSendedLog> pageHelper = PageHelper.startPage(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
+    public PaginationResponse<MtSmsSendedLog> querySmsListByPagination(SmsPage smsPage) {
+        Page<MtSmsSendedLog> pageHelper = PageHelper.startPage(smsPage.getPage(), smsPage.getPageSize());
         LambdaQueryWrapper<MtSmsSendedLog> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        String merchantId = paginationRequest.getSearchParams().get("merchantId") == null ? "" : paginationRequest.getSearchParams().get("merchantId").toString();
-        if (StringUtils.isNotBlank(merchantId)) {
+        Integer merchantId = smsPage.getMerchantId();
+        if (merchantId != null && merchantId > 0) {
             lambdaQueryWrapper.eq(MtSmsSendedLog::getMerchantId, merchantId);
         }
-        String storeId = paginationRequest.getSearchParams().get("storeId") == null ? "" : paginationRequest.getSearchParams().get("storeId").toString();
-        if (StringUtils.isNotBlank(storeId)) {
+        Integer storeId = smsPage.getStoreId();
+        if (storeId != null && storeId > 0) {
             lambdaQueryWrapper.eq(MtSmsSendedLog::getStoreId, storeId);
         }
-        String content = paginationRequest.getSearchParams().get("content") == null ? "" : paginationRequest.getSearchParams().get("content").toString();
+        String content = smsPage.getContent();
         if (StringUtils.isNotBlank(content)) {
             lambdaQueryWrapper.like(MtSmsSendedLog::getContent, content);
         }
-        String mobile = paginationRequest.getSearchParams().get("mobile") == null ? "" : paginationRequest.getSearchParams().get("mobile").toString();
+        String mobile = smsPage.getMobile();
         if (StringUtils.isNotBlank(mobile)) {
             lambdaQueryWrapper.eq(MtSmsSendedLog::getMobilePhone, mobile);
         }
@@ -298,7 +298,7 @@ public class SendSmsServiceImpl implements SendSmsService {
         lambdaQueryWrapper.orderByDesc(MtSmsSendedLog::getLogId);
         List<MtSmsSendedLog> dataList = mtSmsSendedLogMapper.selectList(lambdaQueryWrapper);
 
-        PageRequest pageRequest = PageRequest.of(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
+        PageRequest pageRequest = PageRequest.of(smsPage.getPage(), smsPage.getPageSize());
         PageImpl pageImpl = new PageImpl(dataList, pageRequest, pageHelper.getTotal());
         PaginationResponse<MtSmsSendedLog> paginationResponse = new PaginationResponse(pageImpl, MtSmsSendedLog.class);
         paginationResponse.setTotalPages(pageHelper.getPages());

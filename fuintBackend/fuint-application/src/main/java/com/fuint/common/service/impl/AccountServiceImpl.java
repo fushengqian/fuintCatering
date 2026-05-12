@@ -300,11 +300,20 @@ public class AccountServiceImpl extends ServiceImpl<TAccountMapper, TAccount> im
      * 更新账户
      *
      * @param tAccount
+     * @param accountInfo
+     * @throws BusinessCheckException
+     * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "修改后台账户")
-    public void updateAccount(TAccount tAccount) {
+    public void updateAccount(TAccount tAccount, AccountInfo accountInfo) throws BusinessCheckException {
+        if (tAccount == null || accountInfo == null) {
+            throw new BusinessCheckException("该账号不存在");
+        }
+        if (accountInfo.getMerchantId() > 0 && !accountInfo.getMerchantId().equals(tAccount.getMerchantId())) {
+            throw new BusinessCheckException("不同商户，无操作权限");
+        }
         tAccountMapper.updateById(tAccount);
     }
 
@@ -312,13 +321,21 @@ public class AccountServiceImpl extends ServiceImpl<TAccountMapper, TAccount> im
      * 删除账号
      *
      * @param accountId 账号ID
+     * @throws BusinessCheckException
      * @return
      * */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "删除后台账户")
-    public void deleteAccount(Long accountId) {
+    public void deleteAccount(Long accountId, AccountInfo accountInfo) throws BusinessCheckException {
         TAccount tAccount = tAccountMapper.selectById(accountId);
+        if (tAccount == null) {
+            throw new BusinessCheckException("该账号不存在");
+        }
+        if (accountInfo.getMerchantId() > 0 && !accountInfo.getMerchantId().equals(tAccount.getMerchantId())) {
+            throw new BusinessCheckException("不同商户，无操作权限");
+        }
+
         tAccount.setAccountStatus(-1);
         tAccount.setModifyDate(new Date());
         tAccountMapper.updateById(tAccount);

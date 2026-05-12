@@ -6,14 +6,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.UserGradeCatchTypeEnum;
+import com.fuint.common.param.UserGradePage;
 import com.fuint.common.service.UserGradeService;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.mapper.MtStaffMapper;
 import com.fuint.repository.mapper.MtUserGradeMapper;
-import com.fuint.repository.model.MtBanner;
 import com.fuint.repository.model.MtStaff;
 import com.fuint.repository.model.MtUser;
 import com.fuint.repository.model.MtUserGrade;
@@ -49,38 +48,38 @@ public class UserGradeServiceImpl extends ServiceImpl<MtUserGradeMapper, MtUserG
     /**
      * 分页查询会员等级列表
      *
-     * @param paginationRequest
+     * @param userGradePage
      * @return
      */
     @Override
-    public PaginationResponse<MtUserGrade> queryUserGradeListByPagination(PaginationRequest paginationRequest) {
-        Page<MtUserGrade> pageHelper = PageHelper.startPage(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
+    public PaginationResponse<MtUserGrade> queryUserGradeListByPagination(UserGradePage userGradePage) {
+        Page<MtUserGrade> pageHelper = PageHelper.startPage(userGradePage.getPage(), userGradePage.getPageSize());
         LambdaQueryWrapper<MtUserGrade> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.ne(MtUserGrade::getStatus, StatusEnum.DISABLE.getKey());
 
-        String name = paginationRequest.getSearchParams().get("name") == null ? "" : paginationRequest.getSearchParams().get("name").toString();
+        String name = userGradePage.getName();
         if (StringUtils.isNotBlank(name)) {
             lambdaQueryWrapper.like(MtUserGrade::getName, name);
         }
-        String catchType = paginationRequest.getSearchParams().get("catchType") == null ? "" : paginationRequest.getSearchParams().get("catchType").toString();
+        String catchType = userGradePage.getCatchType();
         if (StringUtils.isNotBlank(catchType)) {
             lambdaQueryWrapper.like(MtUserGrade::getCatchType, catchType);
         }
-        String status = paginationRequest.getSearchParams().get("status") == null ? "" : paginationRequest.getSearchParams().get("status").toString();
+        String status = userGradePage.getStatus();
         if (StringUtils.isNotBlank(status)) {
             lambdaQueryWrapper.eq(MtUserGrade::getStatus, status);
         }
-        String merchantId = paginationRequest.getSearchParams().get("merchantId") == null ? "" : paginationRequest.getSearchParams().get("merchantId").toString();
-        if (StringUtils.isNotBlank(merchantId)) {
+        Integer merchantId = userGradePage.getMerchantId();
+        if (merchantId != null && merchantId > 0) {
             lambdaQueryWrapper.eq(MtUserGrade::getMerchantId, merchantId);
         }
 
         lambdaQueryWrapper.orderByDesc(MtUserGrade::getGrade);
         List<MtUserGrade> dataList = mtUserGradeMapper.selectList(lambdaQueryWrapper);
 
-        PageRequest pageRequest = PageRequest.of(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
+        PageRequest pageRequest = PageRequest.of(userGradePage.getPage(), userGradePage.getPageSize());
         PageImpl pageImpl = new PageImpl(dataList, pageRequest, pageHelper.getTotal());
-        PaginationResponse<MtUserGrade> paginationResponse = new PaginationResponse(pageImpl, MtBanner.class);
+        PaginationResponse<MtUserGrade> paginationResponse = new PaginationResponse(pageImpl, MtUserGrade.class);
         paginationResponse.setTotalPages(pageHelper.getPages());
         paginationResponse.setTotalElements(pageHelper.getTotal());
         paginationResponse.setContent(dataList);

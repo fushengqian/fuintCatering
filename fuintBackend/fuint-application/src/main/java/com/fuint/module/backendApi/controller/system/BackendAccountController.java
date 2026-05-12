@@ -284,7 +284,7 @@ public class BackendAccountController extends BaseController {
     @RequestMapping(value = "/delete/{userIds}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('system:account:delete')")
-    public ResponseObject deleteAccount(@PathVariable("userIds") String userIds) {
+    public ResponseObject deleteAccount(@PathVariable("userIds") String userIds) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         String ids[] = userIds.split(",");
         if (ids.length > 0) {
@@ -303,7 +303,7 @@ public class BackendAccountController extends BaseController {
             for (int i = 0; i < ids.length; i++) {
                  if (StringUtil.isNotEmpty(ids[i])) {
                      Long userId = Long.parseLong(ids[i]);
-                     tAccountService.deleteAccount(userId);
+                     tAccountService.deleteAccount(userId, accountInfo);
                  }
             }
         }
@@ -321,18 +321,10 @@ public class BackendAccountController extends BaseController {
         Integer userId = param.get("userId") == null ? 0 : Integer.parseInt(param.get("userId").toString());
         Integer status = param.get("status") == null ? 0 : Integer.parseInt(param.get("status").toString());
 
-        AccountInfo accountDto = TokenUtil.getAccountInfo();
-
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         TAccount tAccount = tAccountService.getAccountInfoById(userId.intValue());
-        if (tAccount == null || accountDto == null) {
-            return getFailureResult(201, "账户不存在");
-        }
-        if (!accountDto.getMerchantId().equals(tAccount.getMerchantId())) {
-            return getFailureResult(1004);
-        }
-
         tAccount.setAccountStatus(status);
-        tAccountService.updateAccount(tAccount);
+        tAccountService.updateAccount(tAccount, accountInfo);
 
         return getSuccessResult(true);
     }
@@ -344,20 +336,15 @@ public class BackendAccountController extends BaseController {
     @RequestMapping(value = "/resetPwd", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('system:account:edit')")
-    public ResponseObject resetPwd(@RequestBody Map<String, Object> param) {
+    public ResponseObject resetPwd(@RequestBody Map<String, Object> param) throws BusinessCheckException {
         Integer userId = param.get("userId") == null ? 0 : Integer.parseInt(param.get("userId").toString());
         String password = param.get("password") == null ? "" : param.get("password").toString();
 
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-
         TAccount tAccount = tAccountService.getAccountInfoById(userId.intValue());
-        if (tAccount != null && !accountInfo.getMerchantId().equals(tAccount.getMerchantId())) {
-            return getFailureResult(1004);
-        }
         tAccount.setPassword(password);
-
         tAccountService.entryptPassword(tAccount);
-        tAccountService.updateAccount(tAccount);
+        tAccountService.updateAccount(tAccount, accountInfo);
 
         return getSuccessResult(true);
     }

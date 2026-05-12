@@ -1,14 +1,13 @@
 package com.fuint.module.backendApi.controller.message;
 
-import com.fuint.common.Constants;
 import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.SettingTypeEnum;
 import com.fuint.common.enums.SmsSettingEnum;
+import com.fuint.common.param.SmsPage;
 import com.fuint.common.service.SendSmsService;
 import com.fuint.common.service.SettingService;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
@@ -21,7 +20,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,28 +53,16 @@ public class BackendSmsController extends BaseController {
     @ApiOperation(value = "查询已发短信列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
-        Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
-        String mobile = request.getParameter("mobile") == null ? "" : request.getParameter("mobile");
-        String content = request.getParameter("content") == null ? "" : request.getParameter("content");
-
+    public ResponseObject list(@ModelAttribute SmsPage smsPage) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        Map<String, Object> searchParams = new HashMap<>();
-        if (StringUtil.isNotEmpty(mobile)) {
-            searchParams.put("mobile", mobile);
-        }
-        if (StringUtil.isNotEmpty(content)) {
-            searchParams.put("content", content);
-        }
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            searchParams.put("merchantId", accountInfo.getMerchantId());
+            smsPage.setMerchantId(accountInfo.getMerchantId());
         }
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
-            searchParams.put("storeId", accountInfo.getStoreId());
+            smsPage.setStoreId(accountInfo.getStoreId());
         }
 
-        PaginationResponse<MtSmsSendedLog> paginationResponse = sendSmsService.querySmsListByPagination(new PaginationRequest(page, pageSize, searchParams));
+        PaginationResponse<MtSmsSendedLog> paginationResponse = sendSmsService.querySmsListByPagination(smsPage);
 
         Map<String, Object> result = new HashMap<>();
         result.put("paginationResponse", paginationResponse);

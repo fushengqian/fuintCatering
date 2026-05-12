@@ -83,9 +83,10 @@ public interface AccountService extends IService<TAccount> {
      * 更新账户信息
      *
      * @param tAccount
+     * @throws BusinessCheckException
      * @return
      */
-    void updateAccount(TAccount tAccount);
+    void updateAccount(TAccount tAccount, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 删除后台账号
@@ -93,7 +94,7 @@ public interface AccountService extends IService<TAccount> {
      * @param accountId 账号ID
      * @return
      * */
-    void deleteAccount(Long accountId);
+    void deleteAccount(Long accountId, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 密码加密

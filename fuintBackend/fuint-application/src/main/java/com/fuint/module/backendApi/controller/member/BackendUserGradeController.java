@@ -1,20 +1,18 @@
 package com.fuint.module.backendApi.controller.member;
 
-import com.fuint.common.Constants;
 import com.fuint.common.dto.common.ParamDto;
 import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.UserGradeCatchTypeEnum;
+import com.fuint.common.param.UserGradePage;
 import com.fuint.common.param.UserGradeParam;
 import com.fuint.common.service.UserGradeService;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtUserGrade;
-import com.fuint.utils.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -22,7 +20,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,28 +49,12 @@ public class BackendUserGradeController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('userGrade:index')")
-    public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        String name = request.getParameter("name");
-        String status = request.getParameter("status");
-        String catchTypeKey = request.getParameter("catchType");
-        Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
-        Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
-
+    public ResponseObject list(@ModelAttribute UserGradePage userGradePage) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        Map<String, Object> params = new HashMap<>();
-        if (StringUtil.isNotEmpty(name)) {
-            params.put("name", name);
-        }
-        if (StringUtil.isNotEmpty(status)) {
-            params.put("status", status);
-        }
-        if (StringUtil.isNotEmpty(catchTypeKey)) {
-            params.put("catchType", catchTypeKey);
-        }
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            params.put("merchantId", accountInfo.getMerchantId());
+            userGradePage.setMerchantId(accountInfo.getMerchantId());
         }
-        PaginationResponse<MtUserGrade> paginationResponse = userGradeService.queryUserGradeListByPagination(new PaginationRequest(page, pageSize, params));
+        PaginationResponse<MtUserGrade> paginationResponse = userGradeService.queryUserGradeListByPagination(userGradePage);
         List<MtUserGrade> dataList = paginationResponse.getContent();
         List<MtUserGrade> content = new ArrayList<>();
         UserGradeCatchTypeEnum[] catchTypeList = UserGradeCatchTypeEnum.values();
@@ -81,7 +62,6 @@ public class BackendUserGradeController extends BaseController {
             for (UserGradeCatchTypeEnum catchType : catchTypeList) {
                 if (grade.getCatchType().equals(catchType.getKey())) {
                     grade.setCatchType(catchType.getValue());
-                    continue;
                 }
             }
             content.add(grade);
