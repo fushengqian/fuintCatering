@@ -28,21 +28,20 @@ public interface UserTagService extends IService<MtUserTag> {
      * 添加标签
      *
      * @param mtUserTag 标签信息
-     * @param merchantId 当前商户ID
      * @return
      * @throws BusinessCheckException
      */
-    MtUserTag addTag(MtUserTag mtUserTag, Integer merchantId) throws BusinessCheckException;
+    MtUserTag addTag(MtUserTag mtUserTag) throws BusinessCheckException;
 
     /**
      * 编辑标签
      *
      * @param mtUserTag 标签信息
-     * @param merchantId 当前商户ID
-     * @return
+     * @param accountInfo 当前登录账号信息
      * @throws BusinessCheckException
+     * @return
      */
-    MtUserTag updateTag(MtUserTag mtUserTag, Integer merchantId) throws BusinessCheckException;
+    MtUserTag updateTag(MtUserTag mtUserTag, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 删除标签

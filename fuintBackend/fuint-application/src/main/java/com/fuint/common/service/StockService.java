@@ -2,6 +2,7 @@ package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.common.dto.goods.StockGoodsDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
@@ -40,10 +41,11 @@ public interface StockService extends IService<MtStock> {
      * 删除库存管理记录
      *
      * @param id
-     * @param operator
+     * @param accountInfo
+     * @throws BusinessCheckException
      * @return
      * */
-    void delete(Integer id, String operator) throws BusinessCheckException;
+    void delete(Integer id, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 根据ID获取信息

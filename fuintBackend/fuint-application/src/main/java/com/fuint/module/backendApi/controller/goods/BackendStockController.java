@@ -133,7 +133,7 @@ public class BackendStockController extends BaseController {
             return getFailureResult(201, "该数据不存在");
         }
 
-        stockService.delete(id, accountInfo.getAccountName());
+        stockService.delete(id, accountInfo);
         return getSuccessResult(true);
     }
 

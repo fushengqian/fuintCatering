@@ -37,9 +37,9 @@ public class UserTagServiceImpl extends ServiceImpl<MtUserTagMapper, MtUserTag> 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MtUserTag addTag(MtUserTag mtUserTag, Integer merchantId) throws BusinessCheckException {
+    public MtUserTag addTag(MtUserTag mtUserTag) throws BusinessCheckException {
         // 平台账号没有新增权限
-        if (merchantId == null || merchantId <= 0) {
+        if (mtUserTag.getMerchantId() == null || mtUserTag.getMerchantId() <= 0) {
             throw new BusinessCheckException("抱歉，您没有新增权限");
         }
 
@@ -62,9 +62,9 @@ public class UserTagServiceImpl extends ServiceImpl<MtUserTagMapper, MtUserTag> 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MtUserTag updateTag(MtUserTag mtUserTag, Integer merchantId) throws BusinessCheckException {
+    public MtUserTag updateTag(MtUserTag mtUserTag, AccountInfo accountInfo) throws BusinessCheckException {
         // 平台账号没有编辑权限
-        if (merchantId == null || merchantId <= 0) {
+        if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
             throw new BusinessCheckException("抱歉，您没有编辑权限");
         }
 
@@ -74,7 +74,7 @@ public class UserTagServiceImpl extends ServiceImpl<MtUserTagMapper, MtUserTag> 
         }
 
         // 校验商户权限
-        if (!merchantId.equals(tagInfo.getMerchantId())) {
+        if (!accountInfo.getMerchantId().equals(tagInfo.getMerchantId())) {
             throw new BusinessCheckException("抱歉，您没有编辑权限");
         }
 

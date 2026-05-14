@@ -79,16 +79,14 @@ public class BackendUserTagController extends BaseController {
     @PreAuthorize("@pms.hasPermission('member:tag:edit')")
     public ResponseObject save(@RequestBody MtUserTag mtUserTag) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        Integer merchantId = accountInfo.getMerchantId();
-        String operator = accountInfo != null ? accountInfo.getAccountName() : "";
 
-        mtUserTag.setMerchantId(merchantId);
-        mtUserTag.setOperator(operator);
+        mtUserTag.setMerchantId(accountInfo.getMerchantId());
+        mtUserTag.setOperator(accountInfo.getAccountName());
 
         if (mtUserTag.getId() != null && mtUserTag.getId() > 0) {
-            userTagService.updateTag(mtUserTag, merchantId);
+            userTagService.updateTag(mtUserTag, accountInfo);
         } else {
-            userTagService.addTag(mtUserTag, merchantId);
+            userTagService.addTag(mtUserTag);
         }
 
         return getSuccessResult(true);
