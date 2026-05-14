@@ -5,25 +5,22 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 积分分页查询参数
+ * 会员分组分页查询参数
  *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
 @Data
-public class PointPage extends PageParam implements Serializable {
+public class MemberGroupPage extends PageParam implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("描述")
-    private String description;
+    @ApiModelProperty("分组名称")
+    private String name;
 
     @ApiModelProperty("状态")
     private String status;
 
-    @ApiModelProperty("会员ID")
-    private Integer userId;
-
-    @ApiModelProperty("会员号")
-    private String userNo;
+    @ApiModelProperty("分组ID")
+    private Integer id;
 }

@@ -5,18 +5,15 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 积分分页查询参数
+ * 发券记录分页查询参数
  *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
 @Data
-public class PointPage extends PageParam implements Serializable {
+public class SendLogPage extends PageParam implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty("描述")
-    private String description;
 
     @ApiModelProperty("状态")
     private String status;
@@ -24,6 +21,9 @@ public class PointPage extends PageParam implements Serializable {
     @ApiModelProperty("会员ID")
     private Integer userId;
 
-    @ApiModelProperty("会员号")
-    private String userNo;
+    @ApiModelProperty("卡券ID")
+    private Integer couponId;
+
+    @ApiModelProperty("手机号")
+    private String mobile;
 }

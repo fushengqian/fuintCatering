@@ -5,13 +5,13 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 积分分页查询参数
+ * 会员行为分页查询参数
  *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
 @Data
-public class PointPage extends PageParam implements Serializable {
+public class UserActionPage extends PageParam implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -20,10 +20,4 @@ public class PointPage extends PageParam implements Serializable {
 
     @ApiModelProperty("状态")
     private String status;
-
-    @ApiModelProperty("会员ID")
-    private Integer userId;
-
-    @ApiModelProperty("会员号")
-    private String userNo;
 }

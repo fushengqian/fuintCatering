@@ -16,11 +16,11 @@ public class GoodsListParam extends PageParam implements Serializable {
     @ApiModelProperty(value="商品名称", name="name")
     private String name;
 
-    @ApiModelProperty(value="商品编码", name="goodsNo")
-    private String goodsNo;
-
     @ApiModelProperty(value="搜索关键字", name="keyword")
     private String keyword;
+
+    @ApiModelProperty(value="商品编码", name="goodsNo")
+    private String goodsNo;
 
     @ApiModelProperty(value="是否单规格", name="isSingleSpec")
     private String isSingleSpec;

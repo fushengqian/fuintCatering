@@ -2,21 +2,24 @@ package com.fuint.common.param;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import java.io.Serializable;
 
 /**
- * 预约分类分页请求参数
+ * 店铺分页查询参数
  *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
 @Data
-public class BookCatePage extends PageParam implements Serializable {
+public class StorePage extends PageParam implements Serializable {
 
-    @ApiModelProperty("名称")
+    private static final long serialVersionUID = 1L;
+
+    @ApiModelProperty("店铺名称")
     private String name;
 
-    @ApiModelProperty("状态，A正常；D作废")
+    @ApiModelProperty("状态")
     private String status;
 
 }

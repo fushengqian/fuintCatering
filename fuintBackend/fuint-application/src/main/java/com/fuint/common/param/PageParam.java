@@ -39,6 +39,5 @@ public class PageParam implements Serializable {
      */
     @ApiModelProperty(value="排序方式",name="order")
     private String order;
-
 }
 
