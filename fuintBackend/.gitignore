@@ -1,7 +1,6 @@
 .buildpath
 .project
 .settings
-.idea/
 .mvn/
 wsdl/
 caches/

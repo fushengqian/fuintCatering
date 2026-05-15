@@ -29,11 +29,11 @@ public interface UserGradeService extends IService<MtUserGrade> {
     /**
      * 添加会员等级
      *
-     * @param  reqDto
+     * @param  mtUserGrade
      * @throws BusinessCheckException
      * @return
      */
-    MtUserGrade addUserGrade(MtUserGrade reqDto) throws BusinessCheckException;
+    MtUserGrade addUserGrade(MtUserGrade mtUserGrade) throws BusinessCheckException;
 
     /**
      * 修改会员等级

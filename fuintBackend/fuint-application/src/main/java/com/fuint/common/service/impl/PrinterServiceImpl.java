@@ -364,9 +364,9 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
                  for (OrderGoodsDto goodsDto : orderInfo.getGoods()) {
                       String goodsName = goodsDto.getName();
                       printContent.append("<PAGE><SIZE>40,30</SIZE>");
-                      printContent.append("<TEXT x=\"9\" y=\"10\" w=\"1\" h=\"2\" r=\"0\">"+ "#" + (orderInfo.getTableInfo() != null ? orderInfo.getTableInfo().getCode() : "") +"</TEXT>");
+                      printContent.append("<TEXT x=\"9\" y=\"10\" w=\"1\" h=\"2\" r=\"0\">"+ "#" + (orderInfo.getTableInfo() != null ? orderInfo.getTableInfo().getCode() : "无桌码") +"</TEXT>");
                       printContent.append("<TEXT x=\"60\" y=\"80\" w=\"2\" h=\"2\" r=\"0\">"+ goodsName +"</TEXT>");
-                      printContent.append("<TEXT x=\"9\" y=\"180\" w=\"1\" h=\"1\" r=\"0\">" + orderInfo.getOrderSn() + "</TEXT>");
+                      printContent.append("<TEXT x=\"9\" y=\"180\" w=\"1\" h=\"1\" r=\"0\">" + (orderInfo.getRemark() != null ? orderInfo.getRemark() : orderInfo.getPayTime()) + "</TEXT>");
                       printContent.append("</PAGE");
                  }
              }

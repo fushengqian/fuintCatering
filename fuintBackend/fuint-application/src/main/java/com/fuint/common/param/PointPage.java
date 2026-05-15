@@ -13,8 +13,6 @@ import java.io.Serializable;
 @Data
 public class PointPage extends PageParam implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     @ApiModelProperty("描述")
     private String description;
 
@@ -26,4 +24,7 @@ public class PointPage extends PageParam implements Serializable {
 
     @ApiModelProperty("会员号")
     private String userNo;
+
+    @ApiModelProperty("手机号")
+    private String mobile;
 }
