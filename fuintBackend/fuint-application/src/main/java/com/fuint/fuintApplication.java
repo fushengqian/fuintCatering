@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
 
@@ -19,7 +18,6 @@ import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
  */
 @EnableScheduling
 @SpringBootApplication
-@PropertySource("file:${env.properties.path}/${env.profile}/application.properties")
 public class fuintApplication {
 
     public static final String REWRITE_FILTER_NAME = "rewriteFilter";
