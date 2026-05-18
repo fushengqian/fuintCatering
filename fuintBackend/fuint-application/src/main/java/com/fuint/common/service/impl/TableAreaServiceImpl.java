@@ -3,11 +3,12 @@ package com.fuint.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
+import com.fuint.common.param.TableAreaPage;
 import com.fuint.common.service.TableAreaService;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.mapper.MtTableAreaMapper;
 import com.fuint.repository.model.MtTableArea;
@@ -25,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 桌码区域服务接口
@@ -44,19 +44,28 @@ public class TableAreaServiceImpl extends ServiceImpl<MtTableAreaMapper, MtTable
     /**
      * 分页查询数据列表
      *
-     * @param paginationRequest
+     * @param tableAreaPage
      * @return
      */
     @Override
-    public PaginationResponse<MtTableArea> queryTableAreaListByPagination(PaginationRequest paginationRequest) {
-        Page<MtTableArea> pageHelper = PageHelper.startPage(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
+    public PaginationResponse<MtTableArea> queryTableAreaListByPagination(TableAreaPage tableAreaPage) {
+        Page<MtTableArea> pageHelper = PageHelper.startPage(tableAreaPage.getPage(), tableAreaPage.getPageSize());
         LambdaQueryWrapper<MtTableArea> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.ne(MtTableArea::getStatus, StatusEnum.DISABLE.getKey());
+
+        String name = tableAreaPage.getName();
+        if (StringUtils.isNotBlank(name)) {
+            lambdaQueryWrapper.like(MtTableArea::getName, name);
+        }
+        String status = tableAreaPage.getStatus();
+        if (StringUtils.isNotBlank(status)) {
+            lambdaQueryWrapper.like(MtTableArea::getStatus, status);
+        }
 
         lambdaQueryWrapper.orderByAsc(MtTableArea::getId);
         List<MtTableArea> dataList = mtTableAreaMapper.selectList(lambdaQueryWrapper);
 
-        PageRequest pageRequest = PageRequest.of(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
+        PageRequest pageRequest = PageRequest.of(tableAreaPage.getPage(), tableAreaPage.getPageSize());
         PageImpl pageImpl = new PageImpl(dataList, pageRequest, pageHelper.getTotal());
         PaginationResponse<MtTableArea> paginationResponse = new PaginationResponse(pageImpl, MtTableArea.class);
         paginationResponse.setTotalPages(pageHelper.getPages());
@@ -79,6 +88,7 @@ public class TableAreaServiceImpl extends ServiceImpl<MtTableAreaMapper, MtTable
         mtTableArea.setUpdateTime(new Date());
         mtTableArea.setCreateTime(new Date());
         Integer id = mtTableAreaMapper.insert(mtTableArea);
+        logger.info("新增桌码区域数据成功，id:{}", id);
         if (id > 0) {
             return mtTableArea;
         } else {
@@ -98,73 +108,27 @@ public class TableAreaServiceImpl extends ServiceImpl<MtTableAreaMapper, MtTable
     }
 
     /**
-     * 根据ID删除桌码区域
-     *
-     * @param id 桌码区域ID
-     * @param operator 操作人
-     * @return
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    @OperationServiceLog(description = "删除桌码区域")
-    public void deleteTableArea(Integer id, String operator) {
-        MtTableArea mtTableArea = queryTableAreaById(id);
-        if (null == mtTableArea) {
-            return;
-        }
-        mtTableArea.setStatus(StatusEnum.DISABLE.getKey());
-        mtTableArea.setUpdateTime(new Date());
-        mtTableAreaMapper.updateById(mtTableArea);
-    }
-
-    /**
      * 修改桌码区域数据
      *
-     * @param mtTableArea
+     * @param  mtTableArea 桌码区域信息
+     * @param  accountInfo 操作人
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "更新桌码区域")
-    public MtTableArea updateTableArea(MtTableArea mtTableArea) throws BusinessCheckException {
+    public MtTableArea updateTableArea(MtTableArea mtTableArea, AccountInfo accountInfo) throws BusinessCheckException {
         mtTableArea = queryTableAreaById(mtTableArea.getId());
         if (mtTableArea == null) {
             throw new BusinessCheckException("该桌码区域状态异常");
+        }
+        if (accountInfo.getMerchantId() > 0 && !accountInfo.getMerchantId().equals(mtTableArea.getMerchantId())) {
+            throw new BusinessCheckException("不同商户，无操作权限");
         }
         mtTableArea.setUpdateTime(new Date());
         mtTableAreaMapper.updateById(mtTableArea);
         return mtTableArea;
     }
 
-   /**
-    * 根据条件搜索桌码区域
-    *
-    * @param  params 查询参数
-    * @throws BusinessCheckException
-    * @return
-    * */
-    @Override
-    public List<MtTableArea> queryTableAreaListByParams(Map<String, Object> params) {
-        String status =  params.get("status") == null ? StatusEnum.ENABLED.getKey(): params.get("status").toString();
-        String storeId =  params.get("storeId") == null ? "" : params.get("storeId").toString();
-        String merchantId =  params.get("merchantId") == null ? "" : params.get("merchantId").toString();
-
-        LambdaQueryWrapper<MtTableArea> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        if (StringUtils.isNotBlank(status)) {
-            lambdaQueryWrapper.eq(MtTableArea::getStatus, status);
-        }
-        if (StringUtils.isNotBlank(merchantId)) {
-            lambdaQueryWrapper.eq(MtTableArea::getMerchantId, merchantId);
-        }
-        if (StringUtils.isNotBlank(storeId)) {
-            lambdaQueryWrapper.and(wq -> wq
-                    .eq(MtTableArea::getStoreId, 0)
-                    .or()
-                    .eq(MtTableArea::getStoreId, storeId));
-        }
-
-        lambdaQueryWrapper.orderByAsc(MtTableArea::getId);
-        return mtTableAreaMapper.selectList(lambdaQueryWrapper);
-    }
 }
