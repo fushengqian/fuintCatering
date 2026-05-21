@@ -6,7 +6,8 @@ import com.fuint.common.dto.member.GroupMemberDto;
 import com.fuint.common.dto.member.MemberTopDto;
 import com.fuint.common.dto.member.UserDto;
 import com.fuint.common.dto.system.AccountInfo;
-import com.fuint.common.param.MemberListParam;
+
+import com.fuint.common.param.MemberPage;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtUser;
@@ -47,10 +48,10 @@ public interface MemberService extends IService<MtUser> {
     /**
      * 分页查询会员列表
      *
-     * @param memberListParam
+     * @param params
      * @return
      */
-    PaginationResponse<UserDto> queryMemberListByPagination(MemberListParam memberListParam);
+    PaginationResponse<UserDto> queryMemberListByPagination(MemberPage params);
 
     /**
      * 添加会员

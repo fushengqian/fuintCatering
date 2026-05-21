@@ -1292,10 +1292,9 @@ public class WeixinServiceImpl implements WeixinService {
      *
      * @param storeId 店铺ID
      * @param platform 支付平台
-     * @throws BusinessCheckException
      * @return
      * */
-    private WxPayApiConfig getApiConfig(Integer storeId, String platform) throws BusinessCheckException {
+    private WxPayApiConfig getApiConfig(Integer storeId, String platform) {
         WxPayApiConfig apiConfig;
         String mchId = wxPayBean.getMchId();
         String apiV2 = wxPayBean.getApiV2();
@@ -1324,7 +1323,7 @@ public class WeixinServiceImpl implements WeixinService {
                    .domain(wxPayBean.getDomain())
                    .build();
 
-        // 微信内h5公众号支付或PC收银
+        // 微信内h5公众号支付
         if (platform.equals(PlatformTypeEnum.H5.getCode()) || StringUtil.isBlank(appId)) {
             String wxAppId = env.getProperty("weixin.official.appId");
             String wxAppSecret = env.getProperty("weixin.official.appSecret");

@@ -1,16 +1,14 @@
 package com.fuint.module.backendApi.controller.member;
 
 import com.fuint.common.Constants;
-import com.fuint.common.dto.member.GroupMemberDto;
-import com.fuint.common.dto.member.UserDto;
-import com.fuint.common.dto.member.UserGroupDto;
-import com.fuint.common.dto.member.WxCardDto;
+import com.fuint.common.dto.member.*;
 import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.SettingTypeEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.UserSettingEnum;
 import com.fuint.common.enums.YesOrNoEnum;
 import com.fuint.common.param.MemberListParam;
+import com.fuint.common.param.MemberPage;
 import com.fuint.common.service.*;
 import com.fuint.common.util.*;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -80,13 +78,23 @@ public class BackendMemberController extends BaseController {
     private UploadService uploadService;
 
     /**
+     * 会员标签服务接口
+     **/
+    private UserTagService userTagService;
+
+    /**
+     * 会员标签关联服务接口
+     **/
+    private UserTagRelationService userTagRelationService;
+
+    /**
      * 查询会员列表
      */
     @ApiOperation(value = "查询会员列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('member:index')")
-    public ResponseObject list(@ModelAttribute MemberListParam memberPage) throws BusinessCheckException {
+    public ResponseObject list(@ModelAttribute MemberPage memberPage) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
             memberPage.setMerchantId(accountInfo.getMerchantId());
@@ -210,6 +218,21 @@ public class BackendMemberController extends BaseController {
         } else {
             memberService.updateMember(mtUser, false);
         }
+        // 保存会员标签
+        String tagIds = memberInfo.getTagIds();
+        if (mtUser.getId() != null && mtUser.getId() > 0) {
+            if (StringUtil.isNotEmpty(tagIds)) {
+                List<Integer> tagIdList = new ArrayList<>();
+                for (String tagId : tagIds.split(",")) {
+                    if (StringUtil.isNotEmpty(tagId)) {
+                        tagIdList.add(Integer.parseInt(tagId.trim()));
+                    }
+                }
+                userTagRelationService.setUserTags(mtUser.getId(), tagIdList, accountInfo.getAccountName());
+            } else {
+                userTagRelationService.setUserTags(mtUser.getId(), new ArrayList<>(), accountInfo.getAccountName());
+            }
+        }
         return getSuccessResult(true);
     }
 
@@ -239,6 +262,8 @@ public class BackendMemberController extends BaseController {
         }
 
         memberInfo.setMobile(CommonUtil.hidePhone(memberInfo.getMobile()));
+        Map<Integer, List<UserTagDto>> userTagMap = userTagService.getUserTagsByUserIds(mtUser.getMerchantId(), Arrays.asList(memberInfo.getId()));
+        memberInfo.setTags(userTagMap.get(memberInfo.getId()));
 
         Map<String, Object> param = new HashMap<>();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {

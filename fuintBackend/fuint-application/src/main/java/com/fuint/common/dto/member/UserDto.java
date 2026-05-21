@@ -3,6 +3,7 @@ package com.fuint.common.dto.member;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
@@ -37,6 +38,9 @@ public class UserDto implements Serializable {
 
     @ApiModelProperty("分组信息")
     private UserGroupDto groupInfo;
+
+    @ApiModelProperty("标签信息")
+    private List<UserTagDto> tags;
 
     @ApiModelProperty("微信open_id")
     private String openId;

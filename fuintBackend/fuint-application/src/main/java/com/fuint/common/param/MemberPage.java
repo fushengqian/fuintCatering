@@ -49,6 +49,9 @@ public class MemberPage extends PageParam implements Serializable {
     @ApiModelProperty("会员有效期")
     private String memberTime;
 
+    @ApiModelProperty(value="数据类型，1）todayRegister：今日注册；2）todayActive：今日活跃", name="dataType")
+    private String dataType;
+
     @ApiModelProperty("状态")
     private String status;
 
@@ -57,5 +60,8 @@ public class MemberPage extends PageParam implements Serializable {
 
     @ApiModelProperty("所属分组ID")
     private String groupIds;
+
+    @ApiModelProperty("会员标签ID-多个用逗号分隔")
+    private String tagIds;
 
 }

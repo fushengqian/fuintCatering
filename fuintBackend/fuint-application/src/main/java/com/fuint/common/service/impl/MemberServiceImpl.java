@@ -9,7 +9,7 @@ import com.fuint.common.dto.member.MemberTopDto;
 import com.fuint.common.dto.member.UserDto;
 import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.*;
-import com.fuint.common.param.MemberListParam;
+import com.fuint.common.param.MemberPage;
 import com.fuint.common.service.*;
 import com.fuint.common.util.*;
 import com.fuint.framework.annoation.OperationServiceLog;
@@ -105,6 +105,11 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
     private CommissionRelationService commissionRelationService;
 
     /**
+     * 会员标签关联服务接口
+     */
+    private UserTagRelationService userTagRelationService;
+
+    /**
      * 更新活跃时间
      * @param userId 会员ID
      * @return
@@ -193,7 +198,7 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
      * @return
      */
     @Override
-    public PaginationResponse<UserDto> queryMemberListByPagination(MemberListParam params) {
+    public PaginationResponse<UserDto> queryMemberListByPagination(MemberPage params) {
         Page<MtUser> pageHelper = PageHelper.startPage(params.getPage(), params.getPageSize());
         LambdaQueryWrapper<MtUser> wrapper = Wrappers.lambdaQuery();
         wrapper.ne(MtUser::getStatus, StatusEnum.DISABLE.getKey());
@@ -203,9 +208,9 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         if (StringUtils.isNotBlank(name)) {
             wrapper.like(MtUser::getName, name);
         }
-        String id = params.getId();
-        if (StringUtils.isNotBlank(id)) {
-            wrapper.eq(MtUser::getId, id);
+        Integer userId = params.getId();
+        if (userId != null && userId > 0) {
+            wrapper.eq(MtUser::getId, userId);
         }
         String keyword = params.getKeyword();
         if (StringUtils.isNotBlank(keyword)) {
@@ -228,8 +233,8 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         if (StringUtils.isNotBlank(userNo)) {
             wrapper.eq(MtUser::getUserNo, userNo);
         }
-        String gradeId = params.getGradeId();
-        if (StringUtils.isNotBlank(gradeId)) {
+        Integer gradeId = params.getGradeId();
+        if (gradeId != null && gradeId > 0) {
             wrapper.eq(MtUser::getGradeId, gradeId);
         }
         Integer merchantId = params.getMerchantId();
@@ -252,6 +257,26 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
             List<String> idList = Arrays.asList(groupIds.split(","));
             if (idList.size() > 0) {
                 wrapper.in(MtUser::getGroupId, idList);
+            }
+        }
+        // 会员标签筛选
+        String tagIds = params.getTagIds();
+        if (StringUtils.isNotBlank(tagIds)) {
+            List<String> tagIdList = Arrays.asList(tagIds.split(","));
+            if (tagIdList.size() > 0) {
+                Set<Integer> userIdSet = new HashSet<>();
+                for (String tagId : tagIdList) {
+                    List<Integer> userIds = userTagRelationService.getUserIdsByTagId(Integer.parseInt(tagId.trim()));
+                    if (userIds != null && userIds.size() > 0) {
+                        userIdSet.addAll(userIds);
+                    }
+                }
+                if (userIdSet.size() > 0) {
+                    wrapper.in(MtUser::getId, userIdSet);
+                } else {
+                    // 没有匹配的用户，直接返回空结果
+                    wrapper.eq(MtUser::getId, -1);
+                }
             }
         }
         String status = params.getStatus();

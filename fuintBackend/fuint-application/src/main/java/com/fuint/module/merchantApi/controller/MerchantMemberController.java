@@ -5,7 +5,7 @@ import com.fuint.common.dto.member.UserInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.MemberDetailParam;
 import com.fuint.common.param.MemberInfoParam;
-import com.fuint.common.param.MemberListParam;
+import com.fuint.common.param.MemberPage;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.StaffService;
 import com.fuint.common.util.DateUtil;
@@ -55,15 +55,15 @@ public class MerchantMemberController extends BaseController {
     @ApiOperation(value = "查询会员列表")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject list(@RequestBody MemberListParam memberListParam) throws BusinessCheckException, IllegalAccessException {
-        String dataType = memberListParam.getDataType();
+    public ResponseObject list(@RequestBody MemberPage memberPage) throws BusinessCheckException, IllegalAccessException {
+        String dataType = memberPage.getDataType();
         // 今日注册、今日活跃
         if (dataType.equals("todayRegister")) {
             String regTime = DateUtil.formatDate(new Date(), "yyyy-MM-dd") + " 00:00:00~" + DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss");
-            memberListParam.setRegTime(regTime);
+            memberPage.setRegTime(regTime);
         } else if (dataType.equals("todayActive")) {
             String activeTime = DateUtil.formatDate(new Date(), "yyyy-MM-dd") + " 00:00:00~" + DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss");
-            memberListParam.setActiveTime(activeTime);
+            memberPage.setActiveTime(activeTime);
         }
 
         UserInfo userInfo = TokenUtil.getUserInfo();
@@ -76,13 +76,13 @@ public class MerchantMemberController extends BaseController {
         }
 
         if (staffInfo.getMerchantId() != null && staffInfo.getMerchantId() > 0) {
-            memberListParam.setMerchantId(staffInfo.getMerchantId());
+            memberPage.setMerchantId(staffInfo.getMerchantId());
         }
         if (staffInfo.getStoreId() != null && staffInfo.getStoreId() > 0) {
-            memberListParam.setStoreId(staffInfo.getStoreId());
+            memberPage.setStoreId(staffInfo.getStoreId());
         }
 
-        PaginationResponse<UserDto> paginationResponse = memberService.queryMemberListByPagination(memberListParam);
+        PaginationResponse<UserDto> paginationResponse = memberService.queryMemberListByPagination(memberPage);
 
         // 会员等级列表
         Map<String, Object> param = new HashMap<>();
