@@ -363,11 +363,39 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
              if (orderInfo.getGoods() != null && orderInfo.getGoods().size() > 0) {
                  for (OrderGoodsDto goodsDto : orderInfo.getGoods()) {
                       String goodsName = goodsDto.getName();
+                      String tableCode = (orderInfo.getTableInfo() != null ? orderInfo.getTableInfo().getCode() : ""); // 为空时直接设为空字符串
+                      String remarkOrTime = (orderInfo.getRemark() != null ? orderInfo.getRemark() : orderInfo.getPayTime());
+                      String goodsSpec = "";
+                      if (goodsDto.getSpecList() != null && goodsDto.getSpecList().size() > 0) {
+                          for (GoodsSpecValueDto spec : goodsDto.getSpecList()) {
+                              if (StringUtil.isNotEmpty(spec.getSpecValue())) {
+                                  goodsSpec += spec.getSpecValue() + ",";
+                              }
+                          }
+                      }
                       printContent.append("<PAGE><SIZE>40,30</SIZE>");
-                      printContent.append("<TEXT x=\"9\" y=\"10\" w=\"1\" h=\"2\" r=\"0\">"+ "#" + (orderInfo.getTableInfo() != null ? orderInfo.getTableInfo().getCode() : "无桌码") +"</TEXT>");
-                      printContent.append("<TEXT x=\"60\" y=\"80\" w=\"2\" h=\"2\" r=\"0\">"+ goodsName +"</TEXT>");
-                      printContent.append("<TEXT x=\"9\" y=\"180\" w=\"1\" h=\"1\" r=\"0\">" + (orderInfo.getRemark() != null ? orderInfo.getRemark() : orderInfo.getPayTime()) + "</TEXT>");
-                      printContent.append("</PAGE");
+                      // 1.桌号
+                      if (tableCode != null && !tableCode.isEmpty()) {
+                          printContent.append("<TEXT x=\"9\" y=\"10\" font=\"9\" w=\"1\" h=\"2\" r=\"0\">#" + tableCode + "</TEXT>");
+                      }
+                      // 2.商品名称
+                      printContent.append("<TEXT x=\"60\" y=\"80\" font=\"9\" w=\"2\" h=\"2\" r=\"0\">" + goodsName + "</TEXT>");
+                      // 3.循环打印商品规格（每个规格一行）
+                      if (goodsSpec != null && !goodsSpec.isEmpty()) {
+                          String[] specs = goodsSpec.split("[,;，；]");
+                          int startY = 110; // 第一行规格的起始高度
+                          int lineHeight = 35; // 每一行规格之间的间距
+                          for (int i = 0; i < specs.length; i++) {
+                               int currentY = startY + (i * lineHeight);
+                               // 防溢出保护，超过 y=150 就不打印了
+                               if (currentY < 150) {
+                                   printContent.append("<TEXT x=\"60\" y=\"" + currentY + "\" font=\"9\" w=\"1\" h=\"1\" r=\"0\">" + specs[i] + "</TEXT>");
+                               }
+                          }
+                      }
+                      // 4. 备注或支付时间
+                      printContent.append("<TEXT x=\"9\" y=\"170\" font=\"9\" w=\"1\" h=\"1\" r=\"0\">" + remarkOrTime + "</TEXT>");
+                      printContent.append("</PAGE>");
                  }
              }
              printRequest.setContent(printContent.toString());
