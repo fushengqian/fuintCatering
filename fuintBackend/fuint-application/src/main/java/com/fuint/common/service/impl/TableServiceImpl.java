@@ -7,6 +7,7 @@ import com.fuint.common.dto.cashier.HangUpDto;
 import com.fuint.common.dto.cashier.TableDetail;
 import com.fuint.common.dto.cashier.TableDto;
 import com.fuint.common.dto.order.UserOrderDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.*;
 import com.fuint.common.param.TableParam;
 import com.fuint.common.param.TurnTableParam;
@@ -169,16 +170,16 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
      * 根据ID删除桌码
      *
      * @param id 桌码ID
-     * @param operator 操作人
+     * @param accountInfo 操作人
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "删除桌码")
-    public void deleteTable(Integer id, String operator) {
+    public void deleteTable(Integer id, AccountInfo accountInfo) throws BusinessCheckException {
         MtTable mtTable = queryTableById(id);
         if (null == mtTable) {
-            return;
+            throw new BusinessCheckException("该桌码不存在");
         }
         mtTable.setStatus(StatusEnum.DISABLE.getKey());
         mtTable.setUpdateTime(new Date());
@@ -189,16 +190,20 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
      * 修改桌码数据
      *
      * @param  mtTable
+     * @param  accountInfo
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @OperationServiceLog(description = "更新桌码")
-    public MtTable updateTable(MtTable mtTable) throws BusinessCheckException {
+    public MtTable updateTable(MtTable mtTable, AccountInfo accountInfo) throws BusinessCheckException {
         MtTable table = queryTableById(mtTable.getId());
         if (table == null) {
             throw new BusinessCheckException("该桌码状态异常");
+        }
+        if (!table.getMerchantId().equals(accountInfo.getMerchantId())) {
+            throw new BusinessCheckException("不同商户，无操作权限");
         }
         MtTable tableInfo = queryTableByCode(mtTable.getStoreId(), mtTable.getCode());
         if (tableInfo != null && !table.getId().equals(tableInfo.getId())) {

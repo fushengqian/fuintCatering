@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.common.dto.cashier.HangUpDto;
 import com.fuint.common.dto.cashier.TableDetail;
 import com.fuint.common.dto.cashier.TableDto;
+import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.param.TableParam;
 import com.fuint.common.param.TurnTableParam;
 import com.fuint.framework.pagination.PaginationRequest;
@@ -59,19 +60,20 @@ public interface TableService extends IService<MtTable> {
      * 根据ID删除桌码
      *
      * @param  id ID
-     * @param  operator 操作人
+     * @param  accountInfo 操作人
      * @throws BusinessCheckException
      * @return
      */
-    void deleteTable(Integer id, String operator) throws BusinessCheckException;
+    void deleteTable(Integer id, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 更新桌码
      * @param  mtTable
+     * @param  accountInfo
      * @throws BusinessCheckException
      * @return
      * */
-    MtTable updateTable(MtTable mtTable) throws BusinessCheckException;
+    MtTable updateTable(MtTable mtTable, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 根据条件搜索桌码

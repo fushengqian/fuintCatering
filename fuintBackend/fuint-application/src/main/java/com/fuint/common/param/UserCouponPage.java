@@ -5,13 +5,16 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 发券记录分页查询参数
+ * 会员卡券请求参数
  *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
 @Data
-public class SendLogPage extends PageParam implements Serializable {
+public class UserCouponPage extends PageParam implements Serializable {
+
+    @ApiModelProperty("会员卡券ID")
+    private Integer id;
 
     @ApiModelProperty("会员ID")
     private Integer userId;
@@ -19,12 +22,13 @@ public class SendLogPage extends PageParam implements Serializable {
     @ApiModelProperty("卡券ID")
     private Integer couponId;
 
+    @ApiModelProperty("核销码")
+    private String code;
+
     @ApiModelProperty("手机号")
     private String mobile;
 
-    @ApiModelProperty("批次号")
-    private String uuid;
-
-    @ApiModelProperty("状态")
+    @ApiModelProperty("状态，A正常；D作废")
     private String status;
+
 }

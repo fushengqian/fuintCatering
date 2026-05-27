@@ -5,6 +5,8 @@ import com.fuint.common.dto.common.ParamDto;
 import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.CouponTypeEnum;
 import com.fuint.common.enums.UserCouponStatusEnum;
+import com.fuint.common.param.SendLogPage;
+import com.fuint.common.param.UserCouponPage;
 import com.fuint.common.service.CouponService;
 import com.fuint.common.service.SendLogService;
 import com.fuint.common.service.StoreService;
@@ -173,9 +175,13 @@ public class BackendUserCouponController extends BaseController {
 
         // 发券记录，部分作废
         MtUserCoupon userCoupon = mtUserCouponMapper.selectById(id);
-        Map<String, Object> requestParams = new HashMap<>();
-        requestParams.put("uuid", userCoupon.getUuid());
-        PaginationResponse<MtSendLog> list = sendLogService.querySendLogListByPagination(new PaginationRequest(Constants.PAGE_NUMBER, Constants.MAX_ROWS, requestParams));
+
+        SendLogPage sendLogPage = new SendLogPage();
+        sendLogPage.setUuid(userCoupon.getUuid());
+        sendLogPage.setPage(Constants.PAGE_NUMBER);
+        sendLogPage.setPageSize(Constants.MAX_ROWS);
+
+        PaginationResponse<MtSendLog> list = sendLogService.querySendLogListByPagination(sendLogPage);
         if (list.getContent().size() > 0) {
             MtSendLog sendLog = list.getContent().get(0);
             if (sendLog.getStatus().equals(UserCouponStatusEnum.UNUSED.getKey())) {
@@ -199,37 +205,16 @@ public class BackendUserCouponController extends BaseController {
     @RequestMapping(value = "/exportList", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:userCoupon:index')")
-    public void exportList(HttpServletRequest request, HttpServletResponse response) {
-        String mobile = request.getParameter("mobile") == null ? "" : request.getParameter("mobile");
-        String userId = request.getParameter("userId") == null ? "" : request.getParameter("userId");
-        String couponId = request.getParameter("couponId") == null ? "" : request.getParameter("couponId");
-        String status = request.getParameter("status") == null ? "" : request.getParameter("status");
-        String userCouponId = request.getParameter("id") == null ? "" : request.getParameter("id");
-
+    public void exportList(HttpServletRequest request, HttpServletResponse response, @ModelAttribute UserCouponPage userCouponPage) {
         AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getParameter("token"));
         if (accountInfo == null) {
             logger.error("导出会员卡券失败：登录信息失效");
             return;
         }
 
-        Map<String, Object> searchParams = new HashMap<>();
-        if (StringUtil.isNotEmpty(userCouponId)) {
-            searchParams.put("userCouponId", userCouponId);
-        }
-        if (StringUtil.isNotEmpty(mobile)) {
-            searchParams.put("mobile", mobile);
-        }
-        if (StringUtil.isNotEmpty(userId)) {
-            searchParams.put("userId", userId);
-        }
-        if (StringUtil.isNotEmpty(couponId)) {
-            searchParams.put("couponId", couponId);
-        }
-        if (StringUtil.isNotEmpty(status)) {
-            searchParams.put("status", status);
-        }
-
-        PaginationResponse<MtUserCoupon> result = userCouponService.queryUserCouponListByPagination(new PaginationRequest(Constants.PAGE_NUMBER, Constants.MAX_ROWS, searchParams));
+        userCouponPage.setPage(1);
+        userCouponPage.setPageSize(Constants.MAX_ROWS);
+        PaginationResponse<MtUserCoupon> result = userCouponService.queryUserCouponListByPagination(userCouponPage);
 
         // excel标题
         String[] title = { "核销二维码", "卡券ID", "卡券名称", "会员手机号", "状态", "面额", "余额" };
@@ -249,23 +234,23 @@ public class BackendUserCouponController extends BaseController {
         }
 
         for (int i = 0; i < list.size(); i++) {
-             MtUserCoupon obj = list.get(i);
-             MtCoupon mtCoupon = couponService.queryCouponById(obj.getCouponId());
-             if (mtCoupon != null) {
-                 content[i][0] = objectConvertToString(obj.getCode());
-                 content[i][1] = objectConvertToString(obj.getCouponId());
-                 content[i][2] = objectConvertToString(mtCoupon.getName());
-                 content[i][3] = objectConvertToString(obj.getMobile());
-                 content[i][4] = UserCouponStatusEnum.getValue(obj.getStatus());
-                 content[i][5] = objectConvertToString(obj.getAmount() != null ? obj.getAmount().toString() : "0.00");
-                 content[i][6] = objectConvertToString(obj.getBalance() != null ? obj.getBalance().toString() : "0.00");
-             }
+            MtUserCoupon obj = list.get(i);
+            MtCoupon mtCoupon = couponService.queryCouponById(obj.getCouponId());
+            if (mtCoupon != null) {
+                content[i][0] = objectConvertToString(obj.getCode());
+                content[i][1] = objectConvertToString(obj.getCouponId());
+                content[i][2] = objectConvertToString(mtCoupon.getName());
+                content[i][3] = objectConvertToString(obj.getMobile());
+                content[i][4] = UserCouponStatusEnum.getValue(obj.getStatus());
+                content[i][5] = objectConvertToString(obj.getAmount() != null ? obj.getAmount().toString() : "0.00");
+                content[i][6] = objectConvertToString(obj.getBalance() != null ? obj.getBalance().toString() : "0.00");
+            }
         }
 
         // 创建HSSFWorkbook
         HSSFWorkbook wb = ExcelUtil.getHSSFWorkbook(sheetName, title, content, null);
         ExcelUtil.setResponseHeader(response, fileName, wb);
 
-        logger.info("导出会员卡券成功：accountName = {}", accountInfo.getAccountName());
+        logger.info("导出会员卡券成功：accountInfo = {}", accountInfo.getAccountName());
     }
 }

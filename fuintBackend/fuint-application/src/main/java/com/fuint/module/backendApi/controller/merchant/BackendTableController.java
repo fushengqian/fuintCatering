@@ -117,7 +117,7 @@ public class BackendTableController extends BaseController {
 
         mtTable.setOperator(accountInfo.getAccountName());
         mtTable.setStatus(params.getStatus());
-        tableService.updateTable(mtTable);
+        tableService.updateTable(mtTable, accountInfo);
 
         return getSuccessResult(true);
     }
@@ -158,7 +158,7 @@ public class BackendTableController extends BaseController {
         }
         if (StringUtil.isNotEmpty(id)) {
             mtTable.setId(Integer.parseInt(id));
-            tableService.updateTable(mtTable);
+            tableService.updateTable(mtTable, accountInfo);
         } else {
             tableService.addTable(mtTable);
         }
