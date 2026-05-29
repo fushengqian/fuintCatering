@@ -11,7 +11,7 @@ import com.fuint.repository.model.MtCommissionLog;
 
 /**
  * 分销提成记录业务接口
- * <p>
+ *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
@@ -28,7 +28,7 @@ public interface CommissionLogService extends IService<MtCommissionLog> {
     /**
      * 计算订单分销提成
      *
-     * @param orderId 订单ID
+     * @param  orderId 订单ID
      * @return
      */
     void calculateCommission(Integer orderId);
@@ -36,7 +36,7 @@ public interface CommissionLogService extends IService<MtCommissionLog> {
     /**
      * 根据ID获取记录信息
      *
-     * @param id 记录ID
+     * @param  id 记录ID
      * @return
      */
     CommissionLogDto queryCommissionLogById(Integer id);
@@ -45,9 +45,9 @@ public interface CommissionLogService extends IService<MtCommissionLog> {
      * 更新分销提成记录
      *
      * @param requestParam 请求参数
-     * @param accountInfo 登录账号信息
-     * @return
+     * @param accountInfo 操作人信息
      * @throws BusinessCheckException
+     * @return
      */
     void updateCommissionLog(CommissionLogRequest requestParam, AccountInfo accountInfo) throws BusinessCheckException;
 }
