@@ -308,6 +308,22 @@
                   return false;
               }
               
+              // 强制更新头像或昵称
+              if (result.data.needUpdateAvatar || result.data.needUpdateNickname) {
+                  let tips = [];
+                  if (result.data.needUpdateAvatar) tips.push('头像');
+                  if (result.data.needUpdateNickname) tips.push('昵称');
+                  uni.showModal({
+                      title: '提示',
+                      content: '请先完善您的' + tips.join('和'),
+                      showCancel: false,
+                      confirmText: '去完善',
+                      success: () => {
+                          app.$navTo('pages/user/setting')
+                      }
+                  });
+              }
+              
               app.gradeInfo = result.data.gradeInfo;
               app.memberGrade = result.data.memberGrade;
               app.gradeEndTime = result.data.gradeEndTime;

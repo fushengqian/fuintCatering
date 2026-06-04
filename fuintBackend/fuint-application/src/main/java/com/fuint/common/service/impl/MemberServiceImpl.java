@@ -522,6 +522,10 @@ public class MemberServiceImpl extends ServiceImpl<MtUserMapper, MtUser> impleme
         if (mtUser.getStoreId() == null || mtUser.getStoreId() <= 0) {
             mtUser.setStoreId(oldUserInfo.getStoreId());
         }
+        // 完善资料标记，如果未显式传入则使用旧值
+        if (StringUtil.isEmpty(mtUser.getProfileCompleted())) {
+            mtUser.setProfileCompleted(oldUserInfo.getProfileCompleted());
+        }
         Boolean result = updateById(mtUser);
         if (result && mtUser.getGradeId() != null) {
             // 修改了会员等级，开卡赠礼

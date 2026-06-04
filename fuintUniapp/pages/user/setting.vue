@@ -4,7 +4,7 @@
       <view class="info-item">
           <view class="contacts avatar-warp">
             <text class="name">头像</text>
-            <image class="avatar" @click="chooseImage()" :src="avatar"></image>
+            <image class="avatar" @click="showAvatarAction()" :src="avatar"></image>
           </view>
       </view>
       <view class="info-item">
@@ -60,6 +60,20 @@
         <view class="btn-item btn-item-out" @click="logout()">退出登录</view>
       </view>
     </view>
+
+    <!-- 头像选择弹窗 -->
+    <view class="avatar-action-mask" v-if="avatarActionVisible" @click="hideAvatarAction"></view>
+    <view class="avatar-action-sheet" v-if="avatarActionVisible">
+      <!-- #ifdef MP-WEIXIN -->
+      <button class="action-item action-wx" open-type="chooseAvatar" @chooseavatar="onChooseAvatar">
+        <image class="action-wx-avatar" :src="avatar" mode="aspectFill"></image>
+        <text class="action-title">用微信头像</text>
+      </button>
+      <!-- #endif -->
+      <view class="action-item" @click="chooseImage('album')">从相册选择</view>
+      <view class="action-item" @click="chooseImage('camera')">拍照</view>
+      <view class="action-item action-cancel" @click="hideAvatarAction">取消</view>
+    </view>
   </view>
 </template>
 
@@ -78,7 +92,9 @@
         openCardPara: null,
         code: "",
         nickname: "",
-        avatar: ""
+        avatar: "",
+        // 头像选择弹窗显示状态
+        avatarActionVisible: false
       }
     },
 
@@ -102,7 +118,7 @@
           .then(result => {
             app.userInfo = result.data.userInfo;
             if (result.data.openCardPara) {
-                app.openCardPara = result.data.openCardPara; 
+                app.openCardPara = result.data.openCardPara;
             }
             app.nickname = app.userInfo.name;
             app.avatar = app.userInfo.avatar;
@@ -158,14 +174,51 @@
          this.$navTo('pages/user/mobile');
          // #endif
       },
-      // 选择图片
-      chooseImage() {
+      // 显示头像选择弹窗
+      showAvatarAction() {
+        this.avatarActionVisible = true
+      },
+      // 隐藏头像选择弹窗
+      hideAvatarAction() {
+        this.avatarActionVisible = false
+      },
+      // 微信 open-type="chooseAvatar" 回调
+      onChooseAvatar(e) {
         const app = this
+        const avatarUrl = e.detail.avatarUrl
+        if (!avatarUrl) {
+          app.$error('获取微信头像失败')
+          return
+        }
+        app.avatarActionVisible = false
+        // 构造成 UploadApi.image 需要的格式上传
+        const tempFiles = [{ path: avatarUrl }]
+        UploadApi.image(tempFiles)
+          .then(files => {
+            if (files && files.length > 0) {
+              app.userInfo.avatar = files[0].fileName
+              app.avatar = files[0].domain + app.userInfo.avatar
+            }
+          })
+          .catch(() => {
+            app.$error('头像上传失败')
+          })
+      },
+      // 选择图片
+      chooseImage(sourceType) {
+        const app = this
+        app.avatarActionVisible = false
+        let sourceTypeArr = ['album', 'camera']
+        if (sourceType === 'album') {
+          sourceTypeArr = ['album']
+        } else if (sourceType === 'camera') {
+          sourceTypeArr = ['camera']
+        }
         // 选择图片
         uni.chooseImage({
           count: 1,
           sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+          sourceType: sourceTypeArr, // 可以指定来源是相册还是相机
           success({ tempFiles }) {
             const imageList = tempFiles;
             return new Promise((resolve, reject) => {
@@ -191,6 +244,16 @@
        */
       save() {
           const app = this
+          // 头像校验
+          if (!app.avatar) {
+              app.$error('请上传头像')
+              return
+          }
+          // 昵称校验
+          if (!app.nickname) {
+              app.$error('请填写称呼')
+              return
+          }
           app.isLoading = true
           UserApi.save({"name": app.nickname, "avatar": app.avatar, "sex": app.userInfo.sex, "birthday": app.userInfo.birthday})
             .then(result => {
@@ -262,6 +325,89 @@
     display: flex;
     justify-content: space-between;
     height: 48rpx;
+  }
+
+  // 头像选择弹窗遮罩
+  .avatar-action-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+  }
+
+  // 头像选择弹窗
+  .avatar-action-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 101;
+    background: #fff;
+    border-radius: 24rpx 24rpx 0 0;
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
+    animation: slideUp 0.2s ease-out;
+
+    .action-item {
+      height: 100rpx;
+      line-height: 100rpx;
+      text-align: center;
+      font-size: 30rpx;
+      color: #333;
+      border-bottom: 1rpx solid #f0f0f0;
+    }
+
+    .action-wx {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      height: 100rpx;
+      line-height: normal;
+      background: none;
+      border: none;
+      border-radius: 0;
+      border-bottom: 1rpx solid #f0f0f0;
+      font-size: 30rpx;
+      color: #333;
+      width: 100%;
+
+      // 重置 button 默认样式
+      &::after {
+        display: none;
+      }
+
+      .action-wx-avatar {
+        width: 60rpx;
+        height: 60rpx;
+        border-radius: 50%;
+        margin-right: 16rpx;
+      }
+
+      .action-title {
+        font-size: 30rpx;
+        color: #333;
+      }
+    }
+
+    .action-cancel {
+      border-top: 8rpx solid #f5f5f5;
+      border-bottom: none;
+      color: #999;
+      font-weight: 500;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
   }
 
   // 底部操作栏
