@@ -2,4 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fuint.repository.mapper.MtPointMapper">
 
+    <select id="getPointTotalRank" resultType="com.fuint.repository.bean.PointRankBean">
+        SELECT ID AS userId, NAME AS name, AVATAR AS avatar, POINT AS point
+        FROM mt_user
+        WHERE POINT > 0 AND STATUS = 'A' AND IS_STAFF = 'N'
+        <if test="merchantId != null and merchantId > 0">
+            AND MERCHANT_ID = #{merchantId}
+        </if>
+        ORDER BY POINT DESC
+        LIMIT 200
+    </select>
+
+    <select id="getPointPeriodRank" resultType="com.fuint.repository.bean.PointRankBean">
+        SELECT u.ID AS userId, u.NAME AS name, u.AVATAR AS avatar, SUM(p.AMOUNT) AS point
+        FROM mt_point p
+        INNER JOIN mt_user u ON p.USER_ID = u.ID
+        WHERE p.AMOUNT > 0  AND p.STATUS = 'A' AND u.STATUS = 'A' AND u.IS_STAFF = 'N'
+        <if test="merchantId != null and merchantId > 0">
+            AND u.MERCHANT_ID = #{merchantId}
+        </if>
+        <if test="startTime != null">
+            AND p.CREATE_TIME &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND p.CREATE_TIME &lt; #{endTime}
+        </if>
+        GROUP BY u.ID, u.NAME, u.AVATAR
+        HAVING SUM(p.AMOUNT) > 0
+        ORDER BY SUM(p.AMOUNT) DESC
+        LIMIT 200
+    </select>
+
 </mapper>

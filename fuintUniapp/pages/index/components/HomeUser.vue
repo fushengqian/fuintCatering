@@ -7,7 +7,12 @@
                 <view class="tip" v-if="!userInfo || !userInfo.id">为了向您提供更好的服务，请登录！</view>
                 <view class="tip" v-if="userInfo && userInfo.id">
                     <view>余额：<text>{{ userInfo.balance }}</text></view>
-                    <view>积分：<text>{{ userInfo.point }}</text></view>
+                    <view class="point-row">
+                        <text>积分：<text>{{ userInfo.point }}</text></text>
+                        <view class="rank-entry" @click="goRank">
+                            <text class="iconfont icon-huo"></text>排行
+                        </view>
+                    </view>
                 </view>
             </view>
             <view class="ur" v-if="!userInfo || !userInfo.id" @click="goLogin">登录</view>
@@ -32,6 +37,10 @@
             // 跳转会员码
             goMemberCode(userId) {
                 this.$navTo('pages/user/code', { userId: this.userInfo.id })
+            },
+            // 跳转积分排行榜
+            goRank() {
+                this.$navTo('pages/points/rank')
             },
         }
     }
@@ -71,6 +80,24 @@
                 font-size: 24rpx;
                 color: #666;
                 margin-top: 10rpx;
+                .point-row{
+                    display: flex;
+                    align-items: center;
+                    .rank-entry{
+                        margin-left: 16rpx;
+                        padding: 4rpx 16rpx;
+                        font-size: 20rpx;
+                        color: #fff;
+                        background-color: $fuint-theme;
+                        border-radius: 20rpx;
+                        display: flex;
+                        align-items: center;
+                        .iconfont{
+                            font-size: 22rpx;
+                            margin-right: 4rpx;
+                        }
+                    }
+                }
             }
         }
         .ur{

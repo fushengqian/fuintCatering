@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.member.PointDto;
+import com.fuint.common.dto.member.PointRankDto;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.enums.WxMessageEnum;
 import com.fuint.common.param.PointPage;
@@ -18,6 +19,7 @@ import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.mapper.MtPointMapper;
 import com.fuint.repository.mapper.MtUserMapper;
+import com.fuint.repository.bean.PointRankBean;
 import com.fuint.repository.model.MtPoint;
 import com.fuint.repository.model.MtUser;
 import com.fuint.utils.StringUtil;
@@ -281,5 +283,60 @@ public class PointServiceImpl extends ServiceImpl<MtPointMapper, MtPoint> implem
         mtPointMapper.insert(mtPoint);
 
         return true;
+    }
+
+    /**
+     * 获取积分排行榜
+     *
+     * @param merchantId 商户ID
+     * @param type 排行类型：total/month/week
+     * @return
+     */
+    @Override
+    public List<PointRankDto> getPointRankList(Integer merchantId, String type) {
+        List<PointRankBean> rankList;
+        Calendar calendar = Calendar.getInstance();
+
+        if ("month".equals(type)) {
+            // 当月1号0点
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            Date startTime = calendar.getTime();
+            // 下月1号0点
+            calendar.add(Calendar.MONTH, 1);
+            Date endTime = calendar.getTime();
+            rankList = mtPointMapper.getPointPeriodRank(merchantId, startTime, endTime);
+        } else if ("week".equals(type)) {
+            // 本周一0点
+            calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            Date startTime = calendar.getTime();
+            // 下周一0点
+            calendar.add(Calendar.DATE, 7);
+            Date endTime = calendar.getTime();
+            rankList = mtPointMapper.getPointPeriodRank(merchantId, startTime, endTime);
+        } else {
+            // 总排行
+            rankList = mtPointMapper.getPointTotalRank(merchantId);
+        }
+
+        List<PointRankDto> dataList = new ArrayList<>();
+        if (rankList != null && rankList.size() > 0) {
+            for (PointRankBean bean : rankList) {
+                PointRankDto dto = new PointRankDto();
+                dto.setUserId(bean.getUserId());
+                dto.setName(bean.getName());
+                dto.setAvatar(bean.getAvatar());
+                dto.setPoint(bean.getPoint());
+                dataList.add(dto);
+            }
+        }
+        return dataList;
     }
 }

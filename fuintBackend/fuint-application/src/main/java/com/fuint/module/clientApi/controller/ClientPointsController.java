@@ -1,10 +1,12 @@
 package com.fuint.module.clientApi.controller;
 
 import com.fuint.common.dto.member.PointDto;
+import com.fuint.common.dto.member.PointRankDto;
 import com.fuint.common.dto.member.UserInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.GivePointParam;
 import com.fuint.common.param.PointPage;
+import com.fuint.common.service.MerchantService;
 import com.fuint.common.service.PointService;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -15,6 +17,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 积分相关controller
@@ -32,6 +37,11 @@ public class ClientPointsController extends BaseController {
      * 积分服务接口
      */
     private PointService pointService;
+
+    /**
+     * 商户服务接口
+     */
+    private MerchantService merchantService;
 
     /**
      * 查询我的积分明细
@@ -66,5 +76,18 @@ public class ClientPointsController extends BaseController {
         } else {
             return getFailureResult(3008);
         }
+    }
+
+    /**
+     * 获取积分排行榜
+     */
+    @ApiOperation(value = "获取积分排行榜")
+    @RequestMapping(value = "/rank", method = RequestMethod.GET)
+    @CrossOrigin
+    public ResponseObject rank(HttpServletRequest request) {
+        String type = request.getParameter("type") == null ? "total" : request.getParameter("type");
+        Integer merchantId = merchantService.getMerchantId(request.getHeader("merchantNo"));
+        List<PointRankDto> rankList = pointService.getPointRankList(merchantId, type);
+        return getSuccessResult(rankList);
     }
 }

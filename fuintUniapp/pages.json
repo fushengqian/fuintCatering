@@ -186,6 +186,12 @@
       }
     },
     {
+      "path": "pages/points/rank",
+      "style": {
+        "navigationBarTitleText": "积分榜单"
+      }
+    },
+    {
       "path": "pages/give/index",
       "style": {
         "navigationBarTitleText": "转赠记录"
