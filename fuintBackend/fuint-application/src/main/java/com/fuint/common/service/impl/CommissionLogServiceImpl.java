@@ -137,6 +137,10 @@ public class CommissionLogServiceImpl extends ServiceImpl<MtCommissionLogMapper,
         if (storeId != null && storeId > 0) {
             lambdaQueryWrapper.eq(MtCommissionLog::getStoreId, storeId);
         }
+        Integer userId = commissionLogPage.getUserId();
+        if (userId != null && userId > 0) {
+            lambdaQueryWrapper.eq(MtCommissionLog::getUserId, userId);
+        }
         // 开始时间、结束时间
         String startTime = commissionLogPage.getStartTime();
         String endTime = commissionLogPage.getEndTime();
@@ -237,12 +241,19 @@ public class CommissionLogServiceImpl extends ServiceImpl<MtCommissionLogMapper,
     public void calculateCommission(Integer orderId) {
         if (orderId != null && orderId > 0) {
             MtOrder mtOrder = orderService.getById(orderId);
-            // 获取邀请关系
+            // 获取一级邀请关系
             Integer commissionUserId = mtCommissionRelationMapper.getCommissionUserId(mtOrder.getMerchantId(), mtOrder.getUserId());
             if (commissionUserId != null && commissionUserId > 0) {
                 mtOrder.setCommissionUserId(commissionUserId);
                 orderService.updateOrder(mtOrder);
             }
+            // 获取二级邀请关系
+            Integer secondLevelUserId = mtCommissionRelationMapper.getSecondLevelCommissionUserId(mtOrder.getMerchantId(), mtOrder.getUserId());
+
+            // 判断是否为散客订单
+            boolean isVisitorOrder = mtOrder.getStaffId() != null && mtOrder.getStaffId() > 0
+                    && YesOrNoEnum.YES.getKey().equals(mtOrder.getIsVisitor());
+
             // 商品订单佣金计算
             if (mtOrder != null && mtOrder.getType().equals(CommissionTypeEnum.GOODS.getKey())) {
                 Map<String, Object> params = new HashMap<>();
@@ -257,16 +268,23 @@ public class CommissionLogServiceImpl extends ServiceImpl<MtCommissionLogMapper,
                                   MtCommissionRule mtCommissionRule = mtCommissionRuleMapper.selectById(mtCommissionRuleItem.getRuleId());
                                   // 规则状态正常
                                   if (mtCommissionRule != null && mtCommissionRule.getStatus().equals(StatusEnum.ENABLED.getKey())) {
-                                     // 分佣金额计算，散客和会员佣金比例不同
-                                     BigDecimal rate = mtCommissionRuleItem.getMember();
-                                     if (mtOrder.getStaffId() != null && mtOrder.getStaffId() > 0 && mtOrder.getIsVisitor().equals(YesOrNoEnum.YES.getKey())) {
-                                         rate = mtCommissionRuleItem.getGuest();
-                                     }
                                      if (orderGoods.getNum() == null || orderGoods.getNum() < 1) {
                                          orderGoods.setNum(1d);
                                      }
+                                     // 一级分佣
+                                     BigDecimal rate = isVisitorOrder ? mtCommissionRuleItem.getGuest() : mtCommissionRuleItem.getMember();
                                      BigDecimal amount = orderGoods.getPrice().multiply(rate.divide(new BigDecimal("100"))).multiply(new BigDecimal(orderGoods.getNum()));
-                                     addCommissionLog(mtOrder, mtCommissionRule, amount, mtCommissionRuleItem, mtOrder.getCommissionUserId());
+                                     addCommissionLog(mtOrder, mtCommissionRule, amount, mtCommissionRuleItem, mtOrder.getCommissionUserId(), 1);
+
+                                     // 二级分佣（仅会员分销，且二级邀请关系存在）
+                                     if (secondLevelUserId != null && secondLevelUserId > 0
+                                             && CommissionTargetEnum.MEMBER.getKey().equals(mtCommissionRule.getTarget())) {
+                                         BigDecimal secondRate = isVisitorOrder ? mtCommissionRuleItem.getSubGuest() : mtCommissionRuleItem.getSubMember();
+                                         if (secondRate != null && secondRate.compareTo(BigDecimal.ZERO) > 0) {
+                                             BigDecimal secondAmount = orderGoods.getPrice().multiply(secondRate.divide(new BigDecimal("100"))).multiply(new BigDecimal(orderGoods.getNum()));
+                                             addCommissionLog(mtOrder, mtCommissionRule, secondAmount, mtCommissionRuleItem, secondLevelUserId, 2);
+                                         }
+                                     }
                                   }
                              }
                          }
@@ -280,13 +298,20 @@ public class CommissionLogServiceImpl extends ServiceImpl<MtCommissionLogMapper,
                 if (commissionRuleItemList != null && commissionRuleItemList.size() > 0) {
                     for (MtCommissionRuleItem mtCommissionRuleItem : commissionRuleItemList) {
                          MtCommissionRule mtCommissionRule = mtCommissionRuleMapper.selectById(mtCommissionRuleItem.getRuleId());
-                         // 分佣金额计算，散客和会员佣金比例不同
-                         BigDecimal rate = mtCommissionRuleItem.getMember();
-                         if (mtOrder.getStaffId() != null && mtOrder.getStaffId() > 0 && mtOrder.getIsVisitor().equals(YesOrNoEnum.YES.getKey())) {
-                             rate = mtCommissionRuleItem.getGuest();
-                         }
+                         // 一级分佣
+                         BigDecimal rate = isVisitorOrder ? mtCommissionRuleItem.getGuest() : mtCommissionRuleItem.getMember();
                          BigDecimal amount = mtOrder.getAmount().multiply(rate.divide(new BigDecimal("100")));
-                         addCommissionLog(mtOrder, mtCommissionRule, amount, mtCommissionRuleItem, mtOrder.getCommissionUserId());
+                         addCommissionLog(mtOrder, mtCommissionRule, amount, mtCommissionRuleItem, mtOrder.getCommissionUserId(), 1);
+
+                         // 二级分佣（仅会员分销，且二级邀请关系存在）
+                         if (secondLevelUserId != null && secondLevelUserId > 0
+                                 && CommissionTargetEnum.MEMBER.getKey().equals(mtCommissionRule.getTarget())) {
+                             BigDecimal secondRate = isVisitorOrder ? mtCommissionRuleItem.getSubGuest() : mtCommissionRuleItem.getSubMember();
+                             if (secondRate != null && secondRate.compareTo(BigDecimal.ZERO) > 0) {
+                                 BigDecimal secondAmount = mtOrder.getAmount().multiply(secondRate.divide(new BigDecimal("100")));
+                                 addCommissionLog(mtOrder, mtCommissionRule, secondAmount, mtCommissionRuleItem, secondLevelUserId, 2);
+                             }
+                         }
                     }
                 }
             }
@@ -297,13 +322,25 @@ public class CommissionLogServiceImpl extends ServiceImpl<MtCommissionLogMapper,
                 if (commissionRuleItemList != null && commissionRuleItemList.size() > 0) {
                     for (MtCommissionRuleItem mtCommissionRuleItem : commissionRuleItemList) {
                          MtCommissionRule mtCommissionRule = mtCommissionRuleMapper.selectById(mtCommissionRuleItem.getRuleId());
-                         // 分佣金额计算，散客和会员佣金比例不同
-                         BigDecimal rate = mtCommissionRuleItem.getMember();
-                         if (mtOrder.getStaffId() != null && mtOrder.getStaffId() > 0 && mtOrder.getIsVisitor().equals(YesOrNoEnum.YES.getKey())) {
-                             rate = mtCommissionRuleItem.getGuest();
-                         }
+                         // 一级分佣
+                         BigDecimal rate = isVisitorOrder ? mtCommissionRuleItem.getGuest() : mtCommissionRuleItem.getMember();
                          BigDecimal amount = mtOrder.getPayAmount().multiply(rate.divide(new BigDecimal("100")));
-                         addCommissionLog(mtOrder, mtCommissionRule, amount, mtCommissionRuleItem, mtOrder.getCommissionUserId());
+                         addCommissionLog(mtOrder, mtCommissionRule, amount, mtCommissionRuleItem, mtOrder.getCommissionUserId(), 1);
+
+                         // 二级分佣（仅会员分销，且二级邀请关系存在）
+                         if (secondLevelUserId != null && secondLevelUserId > 0
+                                 && CommissionTargetEnum.MEMBER.getKey().equals(mtCommissionRule.getTarget())) {
+                             BigDecimal secondRate = isVisitorOrder ? mtCommissionRuleItem.getSubGuest() : mtCommissionRuleItem.getSubMember();
+                             if (secondRate != null && secondRate.compareTo(BigDecimal.ZERO) > 0) {
+                                 BigDecimal secondAmount;
+                                 if (mtOrder.getPayAmount() != null) {
+                                     secondAmount = mtOrder.getPayAmount().multiply(secondRate.divide(new BigDecimal("100")));
+                                 } else {
+                                     secondAmount = mtOrder.getAmount().multiply(secondRate.divide(new BigDecimal("100")));
+                                 }
+                                 addCommissionLog(mtOrder, mtCommissionRule, secondAmount, mtCommissionRuleItem, secondLevelUserId, 2);
+                             }
+                         }
                     }
                 }
             }
@@ -338,7 +375,6 @@ public class CommissionLogServiceImpl extends ServiceImpl<MtCommissionLogMapper,
      * 更新分销提成记录
      *
      * @param requestParam 请求参数
-     * @param accountInfo 操作人信息
      * @return
      */
     @Override
@@ -349,6 +385,9 @@ public class CommissionLogServiceImpl extends ServiceImpl<MtCommissionLogMapper,
         if (mtCommissionLog == null) {
             logger.error("更新分销提成记录失败...");
             throw new BusinessCheckException("更新分销提成记录失败，该记录不存在");
+        }
+        if (accountInfo.getMerchantId() > 0 && !accountInfo.getMerchantId().equals(mtCommissionLog.getMerchantId())) {
+            throw new BusinessCheckException("不同商户，无操作权限");
         }
         if (requestParam.getAmount() != null) {
             mtCommissionLog.setAmount(new BigDecimal(requestParam.getAmount()));
@@ -375,16 +414,17 @@ public class CommissionLogServiceImpl extends ServiceImpl<MtCommissionLogMapper,
      * @param amount 分佣金额
      * @param mtCommissionRuleItem 分佣规则
      * @param userId 会员ID
+     * @param level 分佣等级（1=一级，2=二级）
      * @return
      * */
     @Transactional
     @OperationServiceLog(description = "新增分销提成记录")
-    public void addCommissionLog(MtOrder mtOrder, MtCommissionRule mtCommissionRule, BigDecimal amount, MtCommissionRuleItem mtCommissionRuleItem, Integer userId) {
+    public void addCommissionLog(MtOrder mtOrder, MtCommissionRule mtCommissionRule, BigDecimal amount, MtCommissionRuleItem mtCommissionRuleItem, Integer userId, Integer level) {
         if (amount.compareTo(BigDecimal.ZERO) > 0) {
             MtCommissionLog mtCommissionLog = new MtCommissionLog();
             mtCommissionLog.setType(mtOrder.getType());
             mtCommissionLog.setTarget(mtCommissionRule.getTarget());
-            mtCommissionLog.setLevel(0);
+            mtCommissionLog.setLevel(level);
             mtCommissionLog.setOrderId(mtOrder.getId());
             mtCommissionLog.setMerchantId(mtOrder.getMerchantId());
             mtCommissionLog.setStoreId(mtOrder.getStoreId());

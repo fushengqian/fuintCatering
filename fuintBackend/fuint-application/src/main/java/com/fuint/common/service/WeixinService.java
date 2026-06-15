@@ -102,7 +102,7 @@ public interface WeixinService {
      * @param sendTime 发送时间
      * @return
      * */
-    Boolean sendSubscribeMessage(Integer merchantId, Integer userId, String toUserOpenId, String key, String page, Map<String,Object> params, Date sendTime);
+    Boolean sendSubscribeMessage(Integer merchantId, Integer userId, String toUserOpenId, String key, String page, Map<String,Object> params, Date sendTime) throws BusinessCheckException;
 
     /**
      * 发送订阅消息
@@ -181,9 +181,10 @@ public interface WeixinService {
      *
      * @param merchantId 商户ID
      * @param path 页面路径
+     * @param query 页面参数
      * @return
      * */
-    String createMiniAppLink(Integer merchantId, String path);
+    String createMiniAppLink(Integer merchantId, String path, String query);
 
     /**
      * 上传小程序发货信息

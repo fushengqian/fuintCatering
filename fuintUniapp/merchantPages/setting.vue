@@ -30,8 +30,8 @@
           <text class="name">状态</text>
           <view class="value">
              <radio-group @change="statusChange">
-                <label class="radio"><radio value="false" color="#00acac" :checked="merchantInfo.status == 'false' ? true : false"/>营业中</label>
-                <label class="radio second"><radio value="true" color="#00acac" :checked="merchantInfo.status == 'true' ? true: false"/>已打烊</label>
+                <label class="radio"><radio value="false" color="#113a28" :checked="merchantInfo.status == 'false' ? true : false"/>营业中</label>
+                <label class="radio second"><radio value="true" color="#113a28" :checked="merchantInfo.status == 'true' ? true: false"/>已打烊</label>
              </radio-group>
           </view>
         </view>

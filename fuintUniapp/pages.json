@@ -383,7 +383,25 @@
                    "navigationBarTitleText": "储值卡详情",
                    "enablePullDownRefresh": true
                  }
-               }
+               },
+               {
+                  "path": "commission/statistics",
+                  "style": {
+                    "navigationBarTitleText": "佣金统计"
+                   }
+                },
+                {
+                  "path": "commission/invite",
+                  "style": {
+                     "navigationBarTitleText": "邀请明细"
+                   }
+                },
+                {
+                  "path": "commission/orders",
+                  "style": {
+                     "navigationBarTitleText": "佣金订单"
+                   }
+                }
           ]
         },
         {

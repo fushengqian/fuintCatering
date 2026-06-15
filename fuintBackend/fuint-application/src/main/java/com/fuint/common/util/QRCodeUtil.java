@@ -1,6 +1,5 @@
 package com.fuint.common.util;
 
-import com.google.zxing.client.j2se.MatrixToImageWriter;
 import org.apache.commons.lang.StringUtils;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
@@ -16,10 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 二维码生成工具类
@@ -41,30 +37,30 @@ public class QRCodeUtil {
      * @param resource     原图
      */
     public static boolean createQrCode(OutputStream outputStream, String content, int width, int height, String imageFormat, String resource) {
-        // 设置二维码纠错级别
-        HashMap<EncodeHintType, String> hints = new HashMap<EncodeHintType, String>();
+        //设置二维码纠错级别及编码
+        HashMap<EncodeHintType, Object> hints = new HashMap<>();
         hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
-        width = width + 200;
-        height = height + 200;
+        hints.put(EncodeHintType.MARGIN, 1);
         try {
-            // 创建比特矩阵(位矩阵)的QR码编码的字符串
+            //创建比特矩阵(位矩阵)的QR码编码的字符串
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix byteMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height, hints);
 
-            // 使BufferedImage勾画QRCode  (matrixWidth 是行二维码像素点)
+            // 使BufferedImage勾画QRCode
             int matrixWidth = byteMatrix.getWidth();
-            BufferedImage image = new BufferedImage(matrixWidth - 200, matrixWidth - 200, BufferedImage.TYPE_INT_RGB);
+            int matrixHeight = byteMatrix.getHeight();
+            BufferedImage image = new BufferedImage(matrixWidth, matrixHeight, BufferedImage.TYPE_INT_RGB);
 
             // 使用比特矩阵画并保存图像
             image.createGraphics();
             Graphics2D graphics = (Graphics2D) image.getGraphics();
             graphics.setColor(Color.WHITE);
-            graphics.fillRect(0, 0, matrixWidth, matrixWidth);
+            graphics.fillRect(0, 0, matrixWidth, matrixHeight);
             graphics.setColor(Color.BLACK);
             for (int i = 0; i < matrixWidth; i++) {
-                for (int j = 0; j < matrixWidth; j++) {
+                for (int j = 0; j < matrixHeight; j++) {
                     if (byteMatrix.get(i, j)) {
-                        graphics.fillRect(i - 100, j - 100, 1, 1);
+                        graphics.fillRect(i, j, 1, 1);
                     }
                 }
             }
@@ -88,40 +84,6 @@ public class QRCodeUtil {
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-        }
-        return false;
-    }
-
-    /**
-     * 生成条码
-     *
-     * @param content 条码内容
-     * @param width 宽度
-     * @param height 高度
-     * */
-    public static boolean createBarCode(OutputStream outputStream, String content, int width, int height) {
-        width = width + 200;
-        height = height + 200;
-        // 设置编码类型为 Code 128
-        BarcodeFormat barcodeFormat = BarcodeFormat.CODE_128;
-        // 设置编码参数，例如字符集等
-        Map<EncodeHintType, Object> encodeHints = new HashMap<>();
-        encodeHints.put(EncodeHintType.CHARACTER_SET, "UTF-8"); // 可以根据需要设置字符集
-        encodeHints.put(EncodeHintType.MARGIN, 1); // 设置边距大小，默认为10px
-        // 生成条码矩阵
-        try {
-            BitMatrix bitMatrix = new MultiFormatWriter().encode(content, barcodeFormat, width, height, encodeHints);
-
-            int matrixWidth = bitMatrix.getWidth();
-            BufferedImage image = new BufferedImage(matrixWidth - 200, matrixWidth - 200, BufferedImage.TYPE_INT_RGB);
-
-            return ImageIO.write(image, "PNG", outputStream);
-        } catch (WriterException e) {
-            System.err.println("Could not generate barcode, WriterException :: " + e.getMessage());
-            e.printStackTrace();
-        } catch (Exception e) {
-            System.err.println("Could not generate barcode due to other IOException :: " + e.getMessage());
-            e.printStackTrace();
         }
         return false;
     }

@@ -181,7 +181,7 @@
     { id: 'refund', name: '售后服务', icon: 'shouhou', type: 'link', url: 'pages/refund/index' },
     { id: 'setting', name: '个人信息', icon: 'shezhi1', type: 'link', url: 'pages/user/setting' },
     { id: 'book', name: '立即预约', icon: 'naozhong', type: 'link', url: 'subPages/book/index' },
-    { id: 'share', name: '邀请有礼', icon: 'fenxiang-post', type: 'link', url: 'pages/share/index' },
+    { id: 'commission', name: '分佣提成', icon: 'zijinmingxi', type: 'link', url: 'subPages/commission/statistics' },
   ]
 
   export default {

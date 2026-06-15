@@ -123,20 +123,4 @@ public class BackendCommonController extends BaseController {
 
         return getSuccessResult(result);
     }
-
-    /**
-     * 生成条形码
-     */
-    @ApiOperation(value = "生成条形码")
-    @RequestMapping(value = "/createBarCode", method = RequestMethod.POST)
-    @CrossOrigin
-    public ResponseObject createBarCode(@RequestBody QrParam qrParam) throws Exception {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        QRCodeUtil.createBarCode(out, qrParam.getContent(), 800, 800);
-
-        String barcode = new String(Base64Util.baseEncode(out.toByteArray()), "UTF-8");
-        barcode = "data:image/jpg;base64," + barcode;
-
-        return getSuccessResult(barcode);
-    }
 }

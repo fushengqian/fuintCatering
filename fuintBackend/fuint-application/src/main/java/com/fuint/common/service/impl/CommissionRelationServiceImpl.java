@@ -9,6 +9,7 @@ import com.fuint.common.param.CommissionRelationPage;
 import com.fuint.common.service.CommissionRelationService;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.MerchantService;
+import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.mapper.MtCommissionRelationMapper;
 import com.fuint.repository.model.MtCommissionRelation;
@@ -75,6 +76,10 @@ public class CommissionRelationServiceImpl extends ServiceImpl<MtCommissionRelat
         if (StringUtils.isNotBlank(subUserId)) {
             lambdaQueryWrapper.eq(MtCommissionRelation::getSubUserId, subUserId);
         }
+        Integer level = commissionRelationPage.getLevel();
+        if (level != null && level > 0) {
+            lambdaQueryWrapper.eq(MtCommissionRelation::getLevel, level);
+        }
         Integer merchantId = commissionRelationPage.getMerchantId();
         String merchantNo = commissionRelationPage.getMerchantNo();
         if (StringUtils.isNotBlank(merchantNo) && (merchantId == null || merchantId <= 0)) {
@@ -137,7 +142,7 @@ public class CommissionRelationServiceImpl extends ServiceImpl<MtCommissionRelat
         param.put("SUB_USER_ID", userInfo.getId());
         param.put("STATUS", StatusEnum.ENABLED.getKey());
         List<MtCommissionRelation> dataList = mtCommissionRelationMapper.selectByMap(param);
-        if (dataList == null || dataList.size() <= 0) {
+        if (dataList == null || dataList.size() == 0) {
             MtCommissionRelation mtCommissionRelation = new MtCommissionRelation();
             mtCommissionRelation.setCreateTime(new Date());
             mtCommissionRelation.setUpdateTime(new Date());

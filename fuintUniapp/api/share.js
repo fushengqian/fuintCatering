@@ -15,3 +15,8 @@ export const list = (param) => {
 export const getMiniAppLink = (param) => {
   return request.post(api.getMiniAppLink, param)
 }
+
+// 获取分享海报二维码
+export const getShareQrCode = (param) => {
+  return request.post('clientApi/share/getShareQrCode', param)
+}

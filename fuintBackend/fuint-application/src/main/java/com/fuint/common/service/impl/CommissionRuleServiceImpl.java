@@ -143,6 +143,8 @@ public class CommissionRuleServiceImpl extends ServiceImpl<MtCommissionRuleMappe
                     detailItem.setGoodsId(0);
                     detailItem.setMemberVal(commissionRule.getMemberVal());
                     detailItem.setVisitorVal(commissionRule.getVisitorVal());
+                    detailItem.setSubVisitorVal(commissionRule.getSubVisitorVal());
+                    detailItem.setSubMemberVal(commissionRule.getSubMemberVal());
                     detailList.add(detailItem);
                     commissionRule.setDetailList(detailList);
                 }
@@ -165,6 +167,8 @@ public class CommissionRuleServiceImpl extends ServiceImpl<MtCommissionRuleMappe
                      mtCommissionRuleItem.setTargetId(itemParam.getGoodsId());
                      mtCommissionRuleItem.setMember(itemParam.getMemberVal());
                      mtCommissionRuleItem.setGuest(itemParam.getVisitorVal());
+                     mtCommissionRuleItem.setSubMember(itemParam.getSubMemberVal());
+                     mtCommissionRuleItem.setSubGuest(itemParam.getSubVisitorVal());
                      mtCommissionRuleItemMapper.insert(mtCommissionRuleItem);
                 }
             }
@@ -210,6 +214,8 @@ public class CommissionRuleServiceImpl extends ServiceImpl<MtCommissionRuleMappe
                  commissionRuleItemDto.setMemberVal(item.getMember());
                  commissionRuleItemDto.setMethod(item.getMethod());
                  commissionRuleItemDto.setVisitorVal(item.getGuest());
+                 commissionRuleItemDto.setSubMemberVal(item.getSubMember());
+                 commissionRuleItemDto.setSubVisitorVal(item.getSubGuest());
                  detailList.add(commissionRuleItemDto);
             }
         }
@@ -223,6 +229,8 @@ public class CommissionRuleServiceImpl extends ServiceImpl<MtCommissionRuleMappe
             if (mtCommissionRuleItemList != null && mtCommissionRuleItemList.size() > 0) {
                 commissionRuleDto.setMemberVal(mtCommissionRuleItemList.get(0).getMember());
                 commissionRuleDto.setVisitorVal(mtCommissionRuleItemList.get(0).getGuest());
+                commissionRuleDto.setSubMemberVal(mtCommissionRuleItemList.get(0).getSubMember());
+                commissionRuleDto.setSubVisitorVal(mtCommissionRuleItemList.get(0).getSubGuest());
             }
         }
         List<Integer> storeIds = new ArrayList<>();
@@ -242,7 +250,6 @@ public class CommissionRuleServiceImpl extends ServiceImpl<MtCommissionRuleMappe
      * 更新分销提成规则
      *
      * @param  commissionRule 规则参数
-     * @param  accountInfo
      * @throws BusinessCheckException
      * @return
      */
@@ -255,8 +262,8 @@ public class CommissionRuleServiceImpl extends ServiceImpl<MtCommissionRuleMappe
             logger.error("更新分销提成规则失败...");
             throw new BusinessCheckException("该数据状态异常");
         }
-        if (!mtCommissionRule.getMerchantId().equals(accountInfo.getMerchantId())) {
-            throw new BusinessCheckException("您没有操作权限");
+        if (accountInfo.getMerchantId() > 0 && !accountInfo.getMerchantId().equals(mtCommissionRule.getMerchantId())) {
+            throw new BusinessCheckException("不同商户，无操作权限");
         }
         mtCommissionRule.setId(commissionRule.getId());
         if (commissionRule.getName() != null) {
@@ -297,6 +304,8 @@ public class CommissionRuleServiceImpl extends ServiceImpl<MtCommissionRuleMappe
                 detailItem.setGoodsId(0);
                 detailItem.setMemberVal(commissionRule.getMemberVal());
                 detailItem.setVisitorVal(commissionRule.getVisitorVal());
+                detailItem.setSubVisitorVal(commissionRule.getSubVisitorVal());
+                detailItem.setSubMemberVal(commissionRule.getSubMemberVal());
                 detailList.add(detailItem);
                 commissionRule.setDetailList(detailList);
             }
@@ -322,6 +331,8 @@ public class CommissionRuleServiceImpl extends ServiceImpl<MtCommissionRuleMappe
                 mtCommissionRuleItem.setTargetId(itemParam.getGoodsId());
                 mtCommissionRuleItem.setMember(itemParam.getMemberVal());
                 mtCommissionRuleItem.setGuest(itemParam.getVisitorVal());
+                mtCommissionRuleItem.setSubMember(itemParam.getSubMemberVal());
+                mtCommissionRuleItem.setSubGuest(itemParam.getSubVisitorVal());
                 // 判断是否已经存在，存在则更新
                 if (itemParam.getGoodsId() != null && itemParam.getGoodsId() >= 0) {
                     Map<String, Object> param = new HashMap();

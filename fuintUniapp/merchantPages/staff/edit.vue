@@ -18,8 +18,8 @@
           <text class="name">状态</text>
           <view class="value">
              <radio-group @change="statusChange">
-                <label class="radio"><radio value="A" color="#00acac" :checked="staffInfo.auditedStatus == 'A' ? true : false"/>启用</label>
-                <label class="radio second"><radio value="N" color="#00acac" :checked="staffInfo.auditedStatus == 'N' ? true: false"/>禁用</label>
+                <label class="radio"><radio value="A" color="#113a28" :checked="staffInfo.auditedStatus == 'A' ? true : false"/>启用</label>
+                <label class="radio second"><radio value="N" color="#113a28" :checked="staffInfo.auditedStatus == 'N' ? true: false"/>禁用</label>
              </radio-group>
           </view>
         </view>

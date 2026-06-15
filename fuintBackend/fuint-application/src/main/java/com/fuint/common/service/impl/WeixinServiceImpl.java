@@ -21,6 +21,8 @@ import com.fuint.common.util.RedisUtil;
 import com.fuint.common.vo.printer.OrderStatusType;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.ResponseObject;
+import com.fuint.repository.mapper.MtGoodsMapper;
+import com.fuint.repository.mapper.MtOrderGoodsMapper;
 import com.fuint.repository.mapper.MtUploadShippingLogMapper;
 import com.fuint.repository.model.*;
 import com.fuint.utils.QRCodeUtil;
@@ -70,6 +72,10 @@ public class WeixinServiceImpl implements WeixinService {
     private static final Logger logger = LoggerFactory.getLogger(WeixinServiceImpl.class);
 
     private MtUploadShippingLogMapper uploadShippingLogMapper;
+
+    private MtOrderGoodsMapper mtOrderGoodsMapper;
+
+    private MtGoodsMapper mtGoodsMapper;
 
     /**
      * 订单服务接口
@@ -196,6 +202,21 @@ public class WeixinServiceImpl implements WeixinService {
         reqData.put("fee_type", "CNY");
         reqData.put("total_fee", payAmount.toString());
         reqData.put("spbill_create_ip", ip);
+        if (orderInfo.getType() != null && orderInfo.getType().equals(OrderTypeEnum.GOODS.getKey())) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("ORDER_ID", orderInfo.getId());
+            params.put("STATUS", StatusEnum.ENABLED.getKey());
+            List<MtOrderGoods> goodsList = mtOrderGoodsMapper.selectByMap(params);
+            if (goodsList != null && goodsList.size() > 0) {
+                Integer goodsId = goodsList.get(0).getGoodsId();
+                if (goodsId != null && goodsId > 0) {
+                    MtGoods mtGoods = mtGoodsMapper.selectById(goodsId);
+                    if (mtGoods != null) {
+                        reqData.put("description", mtGoods.getName());
+                    }
+                }
+            }
+        }
 
         // JSAPI支付
         if (orderInfo.getPayType().equals(PayTypeEnum.JSAPI.getKey())) {
@@ -456,10 +477,11 @@ public class WeixinServiceImpl implements WeixinService {
      * @param page 跳转页面
      * @param params 发送参数
      * @param sendTime 发送时间
+     * @throws BusinessCheckException
      * @return
      * */
     @Override
-    public Boolean sendSubscribeMessage(Integer merchantId, Integer userId, String toUserOpenId, String key, String page, Map<String,Object> params, Date sendTime) {
+    public Boolean sendSubscribeMessage(Integer merchantId, Integer userId, String toUserOpenId, String key, String page, Map<String,Object> params, Date sendTime) throws BusinessCheckException {
         if (StringUtil.isEmpty(toUserOpenId) || StringUtil.isEmpty(key) || userId < 1) {
             return false;
         }
@@ -540,7 +562,11 @@ public class WeixinServiceImpl implements WeixinService {
     @Override
     public Boolean doSendSubscribeMessage(Integer merchantId, String reqDataJsonStr) {
         try {
-            String url = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + getAccessToken(merchantId, true,true);
+            String token = getAccessToken(merchantId, true,true);
+            if (StringUtil.isEmpty(token)) {
+                return false;
+            }
+            String url = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + token;
             String response = HttpRESTDataClient.requestPost(url, "application/json; charset=utf-8", reqDataJsonStr);
             logger.info("WeixinService sendSubscribeMessage response={}", response);
             JSONObject json = (JSONObject) JSONObject.parse(response);
@@ -624,7 +650,6 @@ public class WeixinServiceImpl implements WeixinService {
             BigDecimal refundFee = refundAmount.multiply(new BigDecimal("100"));
             Integer totalFeeInt = totalFee.intValue();
             Integer refundFeeInt = refundFee.intValue();
-
             if (refundFee.compareTo(totalFee) > 0) {
                 throw new BusinessCheckException("退款金额不能大于总金额");
             }
@@ -672,68 +697,85 @@ public class WeixinServiceImpl implements WeixinService {
      * */
     @Override
     public String createQrCode(Integer merchantId, String type, Integer id, String page, Integer width) throws BusinessCheckException {
-        try {
-            String accessToken = getAccessToken(merchantId, true,true);
-            if (StringUtil.isEmpty(accessToken)) {
-                throw new BusinessCheckException("生成二维码出错，请检查小程序配置");
-            }
-
-            String url = "https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=" + accessToken;
-            String reqDataJsonStr = "";
-
-            Map<String, Object> reqData = new HashMap<>();
-            reqData.put("access_token", accessToken);
-            reqData.put("path", page);
-            reqData.put("width", width);
-            reqDataJsonStr = JsonUtil.toJSONString(reqData);
-
-            JSONObject jsonParam = new JSONObject();
-            jsonParam.put("path", page);
-            jsonParam.put("width", width);
-
-            InputStream inputStream = HttpRESTDataClient.doWXPost(url, jsonParam);
-
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int n;
-            while (-1 != (n = inputStream.read(buffer))) {
-                output.write(buffer, 0, n);
-            }
-            byte[] bytes = output.toByteArray();
-            String resStr = output.toString();
-            logger.info("WechatService createStoreQrCode reqData：{},resStr:{}", reqDataJsonStr, resStr);
+        // 最多重试一次（token 过期刷新后重试）
+        for (int retry = 0; retry < 2; retry++) {
             try {
-                JSONObject res = JSON.parseObject(resStr);
-                String errCode = res.get("errcode").toString();
-                if (errCode.equals("40001")) {
-                    getAccessToken(merchantId, true, false);
+                String accessToken = getAccessToken(merchantId, true, retry == 0);
+                if (StringUtil.isEmpty(accessToken)) {
+                    throw new BusinessCheckException("生成二维码出错，请检查小程序配置");
                 }
+
+                String url = "https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=" + accessToken;
+
+                JSONObject jsonParam = new JSONObject();
+                jsonParam.put("path", page);
+                jsonParam.put("width", width);
+
+                Map<String, Object> reqData = new HashMap<>();
+                reqData.put("access_token", accessToken);
+                reqData.put("path", page);
+                reqData.put("width", width);
+                String reqDataJsonStr = JsonUtil.toJSONString(reqData);
+
+                InputStream inputStream = HttpRESTDataClient.doWXPost(url, jsonParam);
+
+                ByteArrayOutputStream output = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int n;
+                while (-1 != (n = inputStream.read(buffer))) {
+                    output.write(buffer, 0, n);
+                }
+                byte[] bytes = output.toByteArray();
+                String resStr = output.toString();
+                logger.info("WechatService createStoreQrCode reqData：{},resStr:{}", reqDataJsonStr, resStr);
+
+                // 尝试解析为 JSON（说明微信返回了错误）
+                try {
+                    JSONObject res = JSON.parseObject(resStr);
+                    String errCode = res.get("errcode") != null ? res.get("errcode").toString() : "";
+                    String errMsg = res.get("errmsg") != null ? res.get("errmsg").toString() : "";
+                    logger.error("微信生成二维码返回错误: errcode={}, errmsg={}, page={}", errCode, errMsg, page);
+
+                    // token 过期，刷新后重试
+                    if ("40001".equals(errCode) || "42001".equals(errCode)) {
+                        if (retry == 0) {
+                            getAccessToken(merchantId, true, false);
+                            continue;
+                        }
+                    }
+                    throw new BusinessCheckException("生成二维码出错: " + errMsg);
+                } catch (BusinessCheckException e) {
+                    throw e;
+                } catch (Exception e) {
+                    // JSON 解析失败，说明返回的是二进制图片数据，处理图片
+                    String pathRoot = env.getProperty("images.root");
+                    String baseImage = env.getProperty("images.path");
+
+                    String filePath = "Qr" + type + id + ".png";
+                    String path = pathRoot + baseImage + filePath;
+                    QRCodeUtil.saveQrCodeToLocal(bytes, path);
+
+                    // 上传阿里云oss
+                    String mode = env.getProperty("aliyun.oss.mode");
+                    if (mode.equals("1")) { // 检查是否开启上传
+                        String endpoint = env.getProperty("aliyun.oss.endpoint");
+                        String accessKeyId = env.getProperty("aliyun.oss.accessKeyId");
+                        String accessKeySecret = env.getProperty("aliyun.oss.accessKeySecret");
+                        String bucketName = env.getProperty("aliyun.oss.bucketName");
+                        String folder = env.getProperty("aliyun.oss.folder");
+                        OSS ossClient = AliyunOssUtil.getOSSClient(accessKeyId, accessKeySecret, endpoint);
+                        File ossFile = new File(path);
+                        return AliyunOssUtil.upload(ossClient, ossFile, bucketName, folder);
+                    } else {
+                        return baseImage + filePath;
+                    }
+                }
+            } catch (BusinessCheckException e) {
+                throw e;
             } catch (Exception e) {
-                String pathRoot = env.getProperty("images.root");
-                String baseImage = env.getProperty("images.path");
-
-                String filePath = "Qr" + type + id + ".png";
-                String path = pathRoot + baseImage + filePath;
-                QRCodeUtil.saveQrCodeToLocal(bytes, path);
-
-                // 上传阿里云oss
-                String mode = env.getProperty("aliyun.oss.mode");
-                if (mode.equals("1")) { // 检查是否开启上传
-                    String endpoint = env.getProperty("aliyun.oss.endpoint");
-                    String accessKeyId = env.getProperty("aliyun.oss.accessKeyId");
-                    String accessKeySecret = env.getProperty("aliyun.oss.accessKeySecret");
-                    String bucketName = env.getProperty("aliyun.oss.bucketName");
-                    String folder = env.getProperty("aliyun.oss.folder");
-                    OSS ossClient = AliyunOssUtil.getOSSClient(accessKeyId, accessKeySecret, endpoint);
-                    File ossFile = new File(path);
-                    return AliyunOssUtil.upload(ossClient, ossFile, bucketName, folder);
-                } else {
-                    return baseImage + filePath;
-                }
+                logger.error("生成店铺二维码出错啦：{}", e.getMessage());
+                throw new BusinessCheckException("生成二维码出错，请检查小程序配置.");
             }
-        } catch (Exception e) {
-            logger.error("生成店铺二维码出错啦：{}", e.getMessage());
-            throw new BusinessCheckException("生成二维码出错，请检查小程序配置.");
         }
 
         throw new BusinessCheckException("生成二维码出错，请稍后再试.");
@@ -750,7 +792,7 @@ public class WeixinServiceImpl implements WeixinService {
     public String createWxCard(Integer merchantId, String wxCardId) throws BusinessCheckException {
         String cardId = "";
         try {
-            MtSetting mtSetting = settingService.querySettingByName(merchantId, SettingTypeEnum.USER.getKey(),UserSettingEnum.WX_MEMBER_CARD.getKey());
+            MtSetting mtSetting = settingService.querySettingByName(merchantId, SettingTypeEnum.USER.getKey(), UserSettingEnum.WX_MEMBER_CARD.getKey());
             if (mtSetting == null) {
                 return cardId;
             }
@@ -966,20 +1008,23 @@ public class WeixinServiceImpl implements WeixinService {
      *
      * @param merchantId 商户ID
      * @param path 页面路径
+     * @param query 页面参数
      * @return
      * */
     @Override
-    public String createMiniAppLink(Integer merchantId, String path) {
+    public String createMiniAppLink(Integer merchantId, String path, String query) {
         String link = "";
         try {
-            String accessToken = getAccessToken(merchantId, true,true);
+            String accessToken = getAccessToken(merchantId, true, true);
             if (StringUtil.isEmpty(accessToken)) {
                 return "";
             }
-            String url = "https://api.weixin.qq.com/wxa/genwxashortlink?access_token=" + accessToken +"&";
+            String url = "https://api.weixin.qq.com/wxa/generate_urllink?access_token=" + accessToken;
 
             Map<String, Object> param = new HashMap<>();
-            param.put("page_url", path);
+            param.put("path", path);
+            param.put("query", query);
+            param.put("env_version", "release");
 
             String reqDataJsonStr = JsonUtil.toJSONString(param);
             String response = HttpRESTDataClient.requestPostBody(url, reqDataJsonStr);
@@ -987,7 +1032,7 @@ public class WeixinServiceImpl implements WeixinService {
             JSONObject data = (JSONObject) JSONObject.parse(response);
 
             if (data.get("errcode").toString().equals("0")) {
-                Object linkObject = data.get("link");
+                Object linkObject = data.get("url_link");
                 if (linkObject != null && StringUtil.isNotEmpty(linkObject.toString())) {
                     link = linkObject.toString();
                 }
@@ -1296,13 +1341,13 @@ public class WeixinServiceImpl implements WeixinService {
      * */
     private WxPayApiConfig getApiConfig(Integer storeId, String platform) {
         WxPayApiConfig apiConfig;
+
         String mchId = wxPayBean.getMchId();
         String apiV2 = wxPayBean.getApiV2();
         String certPath = wxPayBean.getCertPath();
         String appId = wxPayBean.getAppId();
 
         MtStore mtStore = storeService.queryStoreById(storeId);
-
         logger.info("微信支付店铺信息：{}", JsonUtil.toJSONString(mtStore));
         if (mtStore != null && StringUtil.isNotEmpty(mtStore.getWxApiV2()) && StringUtil.isNotEmpty(mtStore.getWxMchId())) {
             mchId = mtStore.getWxMchId();
