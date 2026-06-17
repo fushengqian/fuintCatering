@@ -65,10 +65,10 @@ public class DutyServiceImpl extends ServiceImpl<TDutyMapper, TDuty> implements 
         List<Long> roleIds = findDutiesByAccountId(accountId);
         if (roleIds.size() > 0) {
             for (Long roleId : roleIds) {
-                 if (!ids.contains(roleId)) {
-                     TDuty duty = getRoleById(roleId);
-                     result.add(duty);
-                 }
+                if (!ids.contains(roleId)) {
+                    TDuty duty = getRoleById(roleId);
+                    result.add(duty);
+                }
             }
         }
         return result;
