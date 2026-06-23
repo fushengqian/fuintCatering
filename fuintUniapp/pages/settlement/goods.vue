@@ -561,7 +561,7 @@
           .catch(err => {
             if (err.result) {
                 const errData = err.result.data;
-                if (errData.isCreated) {
+                if (errData && errData.isCreated) {
                     app.navToOrderResult(errData.orderInfo.id);
                     return false;
                 }

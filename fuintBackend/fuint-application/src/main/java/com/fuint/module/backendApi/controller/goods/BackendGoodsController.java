@@ -86,6 +86,11 @@ public class BackendGoodsController extends BaseController {
     private UploadService uploadService;
 
     /**
+     * 会员等级服务接口
+     */
+    private UserGradeService userGradeService;
+
+    /**
      * 分页查询商品列表
      */
     @ApiOperation(value = "分页查询商品列表")
@@ -261,9 +266,13 @@ public class BackendGoodsController extends BaseController {
         // 商品类型列表
         List<ParamDto> typeList = GoodsTypeEnum.getGoodsTypeList();
 
+        // 会员等级列表
+        List<MtUserGrade> gradeList = userGradeService.getMerchantGradeList(accountInfo.getMerchantId());
+
         result.put("typeList", typeList);
         result.put("storeId", storeId);
         result.put("storeList", storeList);
+        result.put("gradeList", gradeList);
 
         return getSuccessResult(result);
     }
@@ -298,6 +307,7 @@ public class BackendGoodsController extends BaseController {
         String salePoint = param.get("salePoint") == null ? "" : param.get("salePoint").toString();
         String canUsePoint = param.get("canUsePoint") == null ? "" : param.get("canUsePoint").toString();
         String isMemberDiscount = param.get("isMemberDiscount") == null ? "" : param.get("isMemberDiscount").toString();
+        String gradeIds = param.get("gradeIds") != null ? param.get("gradeIds").toString() : null;
         String platform = param.get("platform") == null ? "" : param.get("platform").toString();
         String isSingleSpec = param.get("isSingleSpec") == null ? "" : param.get("isSingleSpec").toString();
         Integer cateId = (param.get("cateId") == null || StringUtil.isEmpty(param.get("cateId").toString())) ? 0 : Integer.parseInt(param.get("cateId").toString());
@@ -485,6 +495,9 @@ public class BackendGoodsController extends BaseController {
         }
         if (StringUtil.isNotEmpty(isMemberDiscount)) {
             mtGoods.setIsMemberDiscount(isMemberDiscount);
+        }
+        if (gradeIds != null) {
+            mtGoods.setGradeIds(gradeIds);
         }
         if (images.size() > 0) {
             String imagesJson = JSONObject.toJSONString(images);

@@ -182,6 +182,23 @@ $http.dataFactory = async res => {
       errMsg: httpData.message,
       result: httpData
     })
+  }
+  // code非200时视为业务错误（如GlobalExceptionHandler返回201）
+  else if (httpData.code != 200) {
+    if (res.isPrompt) {
+      setTimeout(() => {
+        uni.showToast({
+          title: httpData.message || '系统异常，请稍后再试',
+          icon: "none",
+          duration: 2500
+        })
+      }, 10)
+    }
+    return Promise.reject({
+      statusCode: 0,
+      errMsg: httpData.message || '系统异常，请稍后再试',
+      result: httpData
+    })
   } else {
     // 返回正确的结果(then接受数据)
     return Promise.resolve(httpData)

@@ -335,7 +335,7 @@
                app.tableInfo = result.data.tableInfo;
                const showPeopleNum = result.data.peopleNum;
                let peopleNum = uni.getStorageSync('peopleNum');
-               if (!peopleNum && app.tableId > 0 && showPeopleNum == 'Y') {
+               if (!peopleNum && app.tableInfo != null && showPeopleNum == 'Y') {
                    app.peopleNumShow = true;
                }
            })
@@ -373,7 +373,8 @@
                 resolve(result);
             })
             .catch(err => {
-                console.log(err);
+                // 错误提示已由全局拦截器处理
+                reject(err);
             })
         })
       },

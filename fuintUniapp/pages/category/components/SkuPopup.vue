@@ -174,6 +174,8 @@
             setCartTotalNum(cartTotal);
             // 传递给父级
             app.$emit('addCart', cartTotal);
+          }).catch(() => {
+            // 错误提示已由全局拦截器处理
           })
       },
 
