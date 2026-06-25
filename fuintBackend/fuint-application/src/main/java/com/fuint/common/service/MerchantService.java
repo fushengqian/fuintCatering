@@ -33,10 +33,11 @@ public interface MerchantService extends IService<MtMerchant> {
      * 保存商户信息
      *
      * @param  mtMerchant
+     * @param  accountInfo
      * @throws BusinessCheckException
      * @return
      */
-    MtMerchant saveMerchant(MtMerchant mtMerchant) throws BusinessCheckException;
+    MtMerchant saveMerchant(MtMerchant mtMerchant, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
      * 根据ID获取商户信息
@@ -117,4 +118,11 @@ public interface MerchantService extends IService<MtMerchant> {
      * */
     MerchantSettingDto saveMerchantSetting(MerchantSettingParam params, AccountInfo accountInfo) throws BusinessCheckException;
 
+    /**
+     * 校验商户是否在有效期内
+     * 如果有效期未设置（开始/结束时间为空），视为永久有效
+     * @param merchantId 商户ID
+     * @throws BusinessCheckException 商户已过期时抛出
+     */
+    void checkMerchantValid(Integer merchantId) throws BusinessCheckException;
 }

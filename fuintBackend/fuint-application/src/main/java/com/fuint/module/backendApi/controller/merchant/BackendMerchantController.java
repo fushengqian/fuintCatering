@@ -163,9 +163,7 @@ public class BackendMerchantController extends BaseController {
             return getFailureResult(201, "抱歉，您没有添加商户的权限");
         }
 
-        mtMerchant.setOperator(accountInfo.getAccountName());
-        merchantService.saveMerchant(mtMerchant);
-
+        merchantService.saveMerchant(mtMerchant, accountInfo);
         return getSuccessResult(true);
     }
 

@@ -934,6 +934,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             throw new BusinessCheckException("抱歉，店铺已打烊！");
         }
 
+        // 校验商户是否已过期
+        merchantService.checkMerchantValid(merchantId);
+
         // 收银台通过手机号自动注册会员信息
         if ((userInfo == null || StringUtil.isEmpty(request.getHeader("Access-Token")))) {
             String mobile = param.getMobile() == null ? "" : param.getMobile();

@@ -123,13 +123,14 @@ public class MerchantServiceImpl extends ServiceImpl<MtMerchantMapper, MtMerchan
      * 保存商户信息
      *
      * @param  merchant 商户信息
+     * @param  accountInfo 操作人
      * @throws BusinessCheckException
      * @return
      */
     @Override
     @Transactional
     @OperationServiceLog(description = "保存商户信息")
-    public MtMerchant saveMerchant(MtMerchant merchant) throws BusinessCheckException {
+    public MtMerchant saveMerchant(MtMerchant merchant, AccountInfo accountInfo) throws BusinessCheckException {
         MtMerchant mtMerchant = queryMerchantByName(merchant.getName());
         if (mtMerchant != null) {
             if ((merchant.getId() != null && !merchant.getId().equals(mtMerchant.getId())) || (merchant.getId() == null || merchant.getId() <= 0)) {
@@ -170,7 +171,7 @@ public class MerchantServiceImpl extends ServiceImpl<MtMerchantMapper, MtMerchan
         mtMerchant.setName(merchant.getName());
         mtMerchant.setLogo(merchant.getLogo());
         mtMerchant.setContact(merchant.getContact());
-        mtMerchant.setOperator(merchant.getOperator());
+        mtMerchant.setOperator(accountInfo.getAccountName());
         mtMerchant.setUpdateTime(new Date());
         if (merchant.getId() == null) {
             mtMerchant.setCreateTime(new Date());
@@ -186,6 +187,13 @@ public class MerchantServiceImpl extends ServiceImpl<MtMerchantMapper, MtMerchan
         mtMerchant.setPhone(merchant.getPhone());
         mtMerchant.setAddress(merchant.getAddress());
         mtMerchant.setStatus(merchant.getStatus());
+        // 有效期：仅当传入非空值时才更新（平台管理员可设置，商户管理员不可修改）
+        if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
+            mtMerchant.setStartTime(merchant.getStartTime());
+        }
+        if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
+            mtMerchant.setEndTime(merchant.getEndTime());
+        }
 
         if (mtMerchant.getStatus() == null) {
             mtMerchant.setStatus(StatusEnum.ENABLED.getKey());
@@ -441,5 +449,38 @@ public class MerchantServiceImpl extends ServiceImpl<MtMerchantMapper, MtMerchan
             settingService.saveSetting(mtSetting);
         }
         return getMerchantSettingInfo(params.getMerchantId(), params.getStoreId());
+    }
+
+    /**
+     * 校验商户是否在有效期内
+     * 有效期为空则视为永久有效
+     *
+     * @param merchantId 商户ID
+     * @throws BusinessCheckException 商户已过期时抛出
+     */
+    @Override
+    public void checkMerchantValid(Integer merchantId) throws BusinessCheckException {
+        if (merchantId == null || merchantId <= 0) {
+            return;
+        }
+        MtMerchant merchant = queryMerchantById(merchantId);
+        if (merchant == null) {
+            return;
+        }
+        Date now = new Date();
+        Date startTime = merchant.getStartTime();
+        Date endTime = merchant.getEndTime();
+        // 有效期为空，视为永久有效
+        if (startTime == null && endTime == null) {
+            return;
+        }
+        // 未到开始时间
+        if (startTime != null && now.before(startTime)) {
+            throw new BusinessCheckException("商户使用权尚未生效");
+        }
+        // 已过结束时间
+        if (endTime != null && now.after(endTime)) {
+            throw new BusinessCheckException("商户使用权已过期");
+        }
     }
 }

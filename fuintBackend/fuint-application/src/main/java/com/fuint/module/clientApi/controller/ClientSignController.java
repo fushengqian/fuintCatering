@@ -85,13 +85,15 @@ public class ClientSignController extends BaseController {
     @RequestMapping(value = "/mpWxLogin", method = RequestMethod.POST)
     @ResponseBody
     @CrossOrigin
-    public ResponseObject mpWxLogin(HttpServletRequest request, @RequestBody Map<String, Object> param) {
+    public ResponseObject mpWxLogin(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
         String storeId = request.getHeader("storeId") == null ? "0" : request.getHeader("storeId");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String shareId = param.get("shareId") == null ? "0" : param.get("shareId").toString();
         JSONObject paramsObj = new JSONObject(param);
         logger.info("微信授权登录参数：{}", param);
         Integer merchantId = merchantService.getMerchantId(merchantNo);
+        // 校验商户是否已过期
+        merchantService.checkMerchantValid(merchantId);
         JSONObject userInfo = paramsObj.getJSONObject("userInfo");
         JSONObject loginInfo = weixinService.getWxProfile(merchantId, param.get("code").toString());
         if (loginInfo == null) {
@@ -144,7 +146,7 @@ public class ClientSignController extends BaseController {
     @RequestMapping(value = "/mpWxAuth", method = RequestMethod.POST)
     @ResponseBody
     @CrossOrigin
-    public ResponseObject mpWxAuth(HttpServletRequest request, @RequestBody Map<String, Object> param) {
+    public ResponseObject mpWxAuth(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String storeId = request.getHeader("storeId") == null ? "0" : request.getHeader("storeId");
         String shareId = param.get("shareId") == null ? "0" : param.get("shareId").toString();
@@ -154,7 +156,8 @@ public class ClientSignController extends BaseController {
         if (userInfo == null) {
             return getFailureResult(201, "微信公众号授权失败");
         }
-
+        // 校验商户是否已过期
+        merchantService.checkMerchantValid(merchantId);
         userInfo.put("storeId", storeId);
         userInfo.put("shareId", shareId);
         userInfo.put("platform", platform);
@@ -188,7 +191,7 @@ public class ClientSignController extends BaseController {
     @ApiOperation(value = "通过账号密码注册")
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @CrossOrigin
-    public ResponseObject register(HttpServletRequest request, @RequestBody Map<String, Object> param) {
+    public ResponseObject register(HttpServletRequest request, @RequestBody Map<String, Object> param) throws BusinessCheckException {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String account = param.get("account").toString();
         String password = param.get("password").toString();
@@ -198,6 +201,8 @@ public class ClientSignController extends BaseController {
         String shareId = param.get("shareId") == null ? "0" : param.get("shareId").toString();
         String userAgent = request.getHeader("user-agent") == null ? "" : request.getHeader("user-agent");
         Integer merchantId = merchantService.getMerchantId(merchantNo);
+        // 校验商户是否已过期
+        merchantService.checkMerchantValid(merchantId);
 
         if (StringUtil.isEmpty(account)) {
             return getFailureResult(201,"用户名不能为空");
@@ -277,6 +282,8 @@ public class ClientSignController extends BaseController {
         TokenDto dto = new TokenDto();
         MtUser mtUser = null;
         Integer merchantId = merchantService.getMerchantId(merchantNo);
+        // 校验商户是否已过期
+        merchantService.checkMerchantValid(merchantId);
         // 方式1：通过短信验证码登录
         if (StringUtil.isNotEmpty(mobile) && StringUtil.isNotEmpty(verifyCode)) {
             // 如果已经登录，免输入验证码

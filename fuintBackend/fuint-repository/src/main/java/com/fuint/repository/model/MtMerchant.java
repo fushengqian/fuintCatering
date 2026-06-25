@@ -1,8 +1,11 @@
 package com.fuint.repository.model;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -71,6 +74,16 @@ public class MtMerchant implements Serializable {
 
     @ApiModelProperty("更新时间")
     private Date updateTime;
+
+    @ApiModelProperty("有效期开始时间")
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date startTime;
+
+    @ApiModelProperty("有效期结束时间")
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date endTime;
 
     @ApiModelProperty("状态，A：有效/启用；D：无效")
     private String status;

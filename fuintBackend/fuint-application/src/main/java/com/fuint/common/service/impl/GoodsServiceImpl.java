@@ -208,7 +208,8 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
                 MtGoods::getStock,
                 MtGoods::getType,
                 MtGoods::getOperator,
-                MtGoods::getWeight);
+                MtGoods::getWeight,
+                MtGoods::getGradeIds);
         Page<MtGoods> pageHelper = PageHelper.startPage(param.getPage(), param.getPageSize());
         List<MtGoods> goodsList = mtGoodsMapper.selectList(lambdaQueryWrapper);
         List<GoodsDto> dataList = new ArrayList<>();
@@ -243,6 +244,7 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
             item.setUpdateTime(mtGoods.getUpdateTime());
             item.setStatus(mtGoods.getStatus());
             item.setOperator(mtGoods.getOperator());
+            item.setGradeIds(mtGoods.getGradeIds());
             dataList.add(item);
         }
 

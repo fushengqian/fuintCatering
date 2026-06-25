@@ -7,10 +7,7 @@ import com.fuint.common.dto.system.AccountDto;
 import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.AccountPage;
-import com.fuint.common.service.AccountService;
-import com.fuint.common.service.CaptchaService;
-import com.fuint.common.service.StaffService;
-import com.fuint.common.service.StoreService;
+import com.fuint.common.service.*;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -70,6 +67,11 @@ public class AccountServiceImpl extends ServiceImpl<TAccountMapper, TAccount> im
      * 验证码服务接口
      * */
     private CaptchaService captchaService;
+
+    /**
+     * 商户服务接口
+     * */
+    private MerchantService merchantService;
 
     /**
      * 分页查询账号列表
@@ -419,6 +421,9 @@ public class AccountServiceImpl extends ServiceImpl<TAccountMapper, TAccount> im
                     throw new BusinessCheckException("您的店铺已被禁用，请联系平台方");
                 }
             }
+
+            // 商户有效期校验
+            merchantService.checkMerchantValid(tAccount.getMerchantId());
 
             String token = TokenUtil.generateToken(userAgent, accountInfo);
             LoginResponse response = new LoginResponse();

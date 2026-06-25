@@ -176,6 +176,7 @@ public class ClientGoodsController extends BaseController {
         goodsDetailDto.setSort(goodsDto.getSort());
         goodsDetailDto.setCanUsePoint(goodsDto.getCanUsePoint());
         goodsDetailDto.setIsMemberDiscount(goodsDto.getIsMemberDiscount());
+        goodsDetailDto.setGradeIds(goodsDto.getGradeIds());
 
         List<String> images = JSONObject.parseArray(goodsDto.getImages(), String.class);
         List<String> imageList = new ArrayList<>();
