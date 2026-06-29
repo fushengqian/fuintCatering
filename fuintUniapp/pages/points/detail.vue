@@ -95,7 +95,7 @@
           .catch(() => app.mescroll.endErr())
       },
       toUsePoint() {
-         this.$navTo('subPages/coupon/list?type=C&needPoint=1')
+         this.$navTo('subPages/coupon/list?type=C')
       },
       toGive() {
           this.$navTo('pages/points/gift')

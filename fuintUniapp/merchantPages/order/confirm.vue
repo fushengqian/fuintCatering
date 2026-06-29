@@ -52,7 +52,20 @@
           const app = this;
           uni.scanCode({
               success: function(res) {
-                app.code = res.result;
+                const result = res.result;
+                // 尝试解析JSON格式的二维码内容
+                try {
+                  const qrData = JSON.parse(result);
+                  if (qrData.orderId && qrData.code) {
+                    app.orderId = qrData.orderId;
+                    app.code = qrData.code;
+                  } else {
+                    app.code = result;
+                  }
+                } catch (e) {
+                  // 非JSON格式，直接作为核销码
+                  app.code = result;
+                }
               }
           });
       },

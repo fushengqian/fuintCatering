@@ -8,6 +8,7 @@ const api = {
   cancel: 'clientApi/order/cancel',
   pay: 'clientApi/pay/doPay',
   receipt: 'clientApi/order/receipt',
+  verifyQrCode: 'clientApi/order/verifyQrCode',
 }
 
 // 当前用户待处理的订单数量
@@ -38,4 +39,9 @@ export function pay(orderId, payType, param) {
 // 确认收货
 export function receipt(orderId, data) {
   return request.get(api.receipt, { orderId, ...data })
+}
+
+// 生成核销二维码
+export function verifyQrCode(orderId, param) {
+  return request.get(api.verifyQrCode, { orderId, ...param })
 }
