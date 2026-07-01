@@ -8,6 +8,20 @@
           <HomeUser v-if="storeInfo" :userInfo="userInfo"/>
       </block>
       <block>
+          <view class="scan-entry" v-if="storeInfo" @click="onScanCode">
+              <view class="scan-icon">
+                  <text class="iconfont icon-qr-extract"></text>
+              </view>
+              <view class="scan-text">
+                  <view class="scan-title">扫码点餐</view>
+                  <view class="scan-desc">扫描桌码二维码，快速点餐</view>
+              </view>
+              <view class="scan-arrow">
+                  <text class="iconfont icon-xiangyoujiantou"></text>
+              </view>
+          </view>
+      </block>
+      <block>
           <HomeService v-if="storeInfo" :data="[]"/>
       </block>
       <block>
@@ -133,6 +147,141 @@
         },
         
         /**
+         * 扫码点餐
+         */
+        onScanCode() {
+            const app = this;
+            // #ifdef MP-WEIXIN
+            uni.scanCode({
+                scanType: ['qrCode'],
+                success(res) {
+                    app.handleScanResult(res.result);
+                },
+                fail(err) {
+                    if (err.errMsg !== 'scanCode:fail cancel') {
+                        uni.showToast({
+                            title: '扫码失败，请重试',
+                            icon: 'none'
+                        });
+                    }
+                }
+            });
+            // #endif
+            // #ifdef H5
+            const ua = navigator.userAgent.toLowerCase();
+            if (ua.indexOf('micromessenger') === -1) {
+                uni.showToast({ title: '请在微信中扫码', icon: 'none' });
+                return;
+            }
+            app.loadWxJsSdk(() => {
+                const url = window.location.href.split('#')[0];
+                // #ifdef H5
+                console.log('[扫码点餐] 请求JSSDK配置, url:', url);
+                // #endif
+                settingApi.jsSdkConfig(url).then(result => {
+                    // #ifdef H5
+                    console.log('[扫码点餐] JSSDK配置:', JSON.stringify(result));
+                    // #endif
+                    const config = result.data;
+                    if (!config || !config.appId) {
+                        uni.showToast({
+                            title: '公众号AppID未配置，请联系管理员',
+                            icon: 'none',
+                            duration: 3000
+                        });
+                        return;
+                    }
+                    wx.config({
+                        debug: false,
+                        appId: config.appId,
+                        timestamp: config.timestamp,
+                        nonceStr: config.nonceStr,
+                        signature: config.signature,
+                        jsApiList: ['scanQRCode']
+                    });
+                    wx.ready(() => {
+                        wx.scanQRCode({
+                            needResult: 1,
+                            scanType: ['qrCode'],
+                            success(res) {
+                                app.handleScanResult(res.resultStr);
+                            },
+                            fail() {
+                                uni.showToast({
+                                    title: '扫码失败，请重试',
+                                    icon: 'none'
+                                });
+                            }
+                        });
+                    });
+                    wx.error((err) => {
+                        // #ifdef H5
+                        console.log('[扫码点餐] wx.error:', JSON.stringify(err));
+                        // #endif
+                        uni.showToast({
+                            title: '微信配置失败，请重试',
+                            icon: 'none'
+                        });
+                    });
+                }).catch((err) => {
+                    // #ifdef H5
+                    console.log('[扫码点餐] 请求失败:', JSON.stringify(err));
+                    // #endif
+                    uni.showToast({
+                        title: '获取配置失败',
+                        icon: 'none'
+                    });
+                });
+            });
+            // #endif
+        },
+
+        /**
+         * 处理扫码结果（提取tableId）
+         */
+        handleScanResult(result) {
+            const app = this;
+            let tableId = 0;
+            if (/^\d+$/.test(result)) {
+                tableId = parseInt(result);
+            } else {
+                const match = result.match(/[?&]tableId=(\d+)/);
+                if (match) {
+                    tableId = parseInt(match[1]);
+                }
+            }
+            if (tableId > 0) {
+                uni.setStorageSync('tableId', tableId);
+                app.$navTo('pages/category/index', { tableId: tableId });
+            } else {
+                uni.showToast({
+                    title: '无效的桌码二维码',
+                    icon: 'none'
+                });
+            }
+        },
+
+        /**
+         * 动态加载微信JSSDK
+         */
+        loadWxJsSdk(callback) {
+            if (window.wx) {
+                callback();
+                return;
+            }
+            const script = document.createElement('script');
+            script.src = 'https://res.wx.qq.com/open/js/jweixin-1.6.0.js';
+            script.onload = callback;
+            script.onerror = () => {
+                uni.showToast({
+                    title: '加载微信SDK失败',
+                    icon: 'none'
+                });
+            };
+            document.head.appendChild(script);
+        },
+
+        /**
          * 获取默认店铺
          * */
          onGetStoreInfo() {
@@ -181,3 +330,57 @@
 
   }
 </script>
+<style lang="scss" scoped>
+    .scan-entry {
+        display: flex;
+        align-items: center;
+        margin: 0 10rpx 25rpx 10rpx;
+        padding: 30rpx;
+        background: linear-gradient(135deg, $fuint-theme, #ff9f7d);
+        border-radius: 16rpx;
+        box-shadow: 0 4rpx 16rpx rgba(255, 100, 50, 0.25);
+        
+        .scan-icon {
+            width: 80rpx;
+            height: 80rpx;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 24rpx;
+            flex-shrink: 0;
+            
+            .iconfont {
+                font-size: 44rpx;
+                color: #fff;
+            }
+        }
+        
+        .scan-text {
+            flex: 1;
+            
+            .scan-title {
+                font-size: 32rpx;
+                font-weight: bold;
+                color: #fff;
+            }
+            
+            .scan-desc {
+                font-size: 24rpx;
+                color: rgba(255, 255, 255, 0.8);
+                margin-top: 4rpx;
+            }
+        }
+        
+        .scan-arrow {
+            flex-shrink: 0;
+            margin-left: 16rpx;
+            
+            .iconfont {
+                font-size: 32rpx;
+                color: rgba(255, 255, 255, 0.6);
+            }
+        }
+    }
+</style>

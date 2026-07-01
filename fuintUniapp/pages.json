@@ -520,6 +520,24 @@
                   "style": {
                      "navigationBarTitleText": "数据统计"
                    }
+                },
+                {
+                  "path": "cate/list",
+                  "style": {
+                    "navigationBarTitleText": "商品分类"
+                  }
+                },
+                {
+                  "path": "goods/list",
+                  "style": {
+                    "navigationBarTitleText": "商品管理"
+                  }
+                },
+                {
+                  "path": "goods/add",
+                  "style": {
+                    "navigationBarTitleText": "新增商品"
+                  }
                 }
     ]
    }],

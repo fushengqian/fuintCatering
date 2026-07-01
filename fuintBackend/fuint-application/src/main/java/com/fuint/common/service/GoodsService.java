@@ -86,6 +86,17 @@ public interface GoodsService {
     void deleteGoods(Integer id, String operator) throws BusinessCheckException;
 
     /**
+     * 更新商品状态
+     *
+     * @param  id          商品ID
+     * @param  status      状态
+     * @param  accountInfo 操作人
+     * @throws BusinessCheckException
+     * @return
+     */
+    void updateStatus(Integer id, String status, AccountInfo accountInfo) throws BusinessCheckException;
+
+    /**
      * 获取店铺的商品列表
      *
      * @param storeId 店铺ID

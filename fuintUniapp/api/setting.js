@@ -6,6 +6,7 @@ const api = {
   system: 'clientApi/system/config',
   storeList: 'clientApi/store/list',
   storeDetail: 'clientApi/store/detail',
+  jsSdkConfig: 'clientApi/system/jsSdkConfig',
 }
 
 // 充值配置
@@ -26,4 +27,9 @@ export const storeList = (keyword) => {
 // 店铺详情
 export function storeDetail() {
   return request.get(api.storeDetail)
+}
+
+// 微信JSSDK配置
+export function jsSdkConfig(url) {
+  return request.post(api.jsSdkConfig, { url })
 }

@@ -135,6 +135,8 @@
     { id: 'refund', name: '售后订单', icon: 'shouhou', type: 'link', url: 'merchantPages/refund/index' },
     { id: 'setting', name: '商家设置', icon: 'shezhi1', type: 'link', url: 'merchantPages/setting' },
     { id: 'staff', name: '员工管理', icon: 'sy-yh', type: 'link', url: 'merchantPages/staff/index' },
+    { id: 'cate', name: '商品分类', icon: 'fenlei', type: 'link', url: 'merchantPages/cate/list' },
+    { id: 'goods', name: '商品管理', icon: 'menu-product', type: 'link', url: 'merchantPages/goods/list' },
   ]
 
   export default {

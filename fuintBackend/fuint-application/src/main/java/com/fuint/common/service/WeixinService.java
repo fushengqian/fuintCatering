@@ -194,4 +194,13 @@ public interface WeixinService {
      */
     void uploadShippingInfo(String orderSn) throws BusinessCheckException;
 
+    /**
+     * 获取微信公众号JSSDK配置
+     *
+     * @param merchantId 商户ID
+     * @param url 当前页面URL
+     * @return JSSDK配置参数（appId, timestamp, nonceStr, signature）
+     */
+    Map<String, String> getJsSdkConfig(Integer merchantId, String url);
+
 }

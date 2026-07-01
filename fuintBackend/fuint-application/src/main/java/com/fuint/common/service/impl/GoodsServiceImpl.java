@@ -601,6 +601,21 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
         mtGoodsMapper.updateById(cateInfo);
     }
 
+    @Override
+    public void updateStatus(Integer id, String status, AccountInfo accountInfo) throws BusinessCheckException {
+        MtGoods mtGoods = queryGoodsById(id);
+        if (null == mtGoods) {
+            throw new BusinessCheckException("该商品不存在");
+        }
+        if (accountInfo.getMerchantId() > 0 && !accountInfo.getMerchantId().equals(mtGoods.getMerchantId())) {
+            throw new BusinessCheckException("您没有操作权限");
+        }
+        mtGoods.setStatus(status);
+        mtGoods.setUpdateTime(new Date());
+        mtGoods.setOperator(accountInfo.getAccountName());
+        mtGoodsMapper.updateById(mtGoods);
+    }
+
     /**
      * 获取店铺的商品列表
      *

@@ -18,11 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
@@ -65,6 +61,11 @@ public class ClientSystemController extends BaseController {
      * 桌码服务接口
      */
     private TableService tableService;
+
+    /**
+     * 微信服务接口
+     */
+    private WeixinService weixinService;
 
     /**
      * 获取系统配置
@@ -192,5 +193,26 @@ public class ClientSystemController extends BaseController {
         result.put("peopleNum", peopleNum);
 
         return getSuccessResult(result);
+    }
+
+    /**
+     * 获取微信JSSDK配置（用于微信公众号内H5扫码等功能）
+     */
+    @ApiOperation(value = "获取微信JSSDK配置")
+    @RequestMapping(value = "/jsSdkConfig", method = RequestMethod.POST)
+    @CrossOrigin
+    public ResponseObject jsSdkConfig(HttpServletRequest request, @RequestBody Map<String, String> param) {
+        String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
+        Integer merchantId = merchantService.getMerchantId(merchantNo);
+        String url = param != null ? param.get("url") : null;
+        if (StringUtil.isEmpty(url)) {
+            url = request.getHeader("referer");
+        }
+        // 去掉URL中的#及其后面部分
+        if (url != null && url.contains("#")) {
+            url = url.substring(0, url.indexOf("#"));
+        }
+        Map<String, String> config = weixinService.getJsSdkConfig(merchantId, url);
+        return getSuccessResult(config);
     }
 }
