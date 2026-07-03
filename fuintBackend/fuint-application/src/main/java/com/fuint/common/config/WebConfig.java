@@ -103,7 +103,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/clientApi/sms/sendVerifyCode")
                 .excludePathPatterns("/clientApi/book/list")
                 .excludePathPatterns("/clientApi/book/detail")
-                .excludePathPatterns("/clientApi/book/cateList");
+                .excludePathPatterns("/clientApi/book/cateList")
+                .excludePathPatterns("/clientApi/system/config")
+                .excludePathPatterns("/clientApi/system/jsSdkConfig");
     }
 
     @Bean

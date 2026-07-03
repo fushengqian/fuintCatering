@@ -199,12 +199,12 @@ public class ClientSystemController extends BaseController {
      * 获取微信JSSDK配置（用于微信公众号内H5扫码等功能）
      */
     @ApiOperation(value = "获取微信JSSDK配置")
-    @RequestMapping(value = "/jsSdkConfig", method = RequestMethod.POST)
+    @RequestMapping(value = "/jsSdkConfig", method = RequestMethod.GET)
     @CrossOrigin
-    public ResponseObject jsSdkConfig(HttpServletRequest request, @RequestBody Map<String, String> param) {
+    public ResponseObject jsSdkConfig(HttpServletRequest request) {
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         Integer merchantId = merchantService.getMerchantId(merchantNo);
-        String url = param != null ? param.get("url") : null;
+        String url = request.getParameter("url");
         if (StringUtil.isEmpty(url)) {
             url = request.getHeader("referer");
         }

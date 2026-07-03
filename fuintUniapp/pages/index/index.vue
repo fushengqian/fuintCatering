@@ -45,6 +45,7 @@
   import * as Api from '@/api/page'
   import * as UserApi from '@/api/user'
   import MescrollCompMixin from "@/components/mescroll-uni/mixins/mescroll-comp.js";
+  import config from '@/config'
 
   const App = getApp()
   
@@ -66,7 +67,8 @@
         userInfo: {},
         isReflash: false,
         isLoading: false,
-        navigation: []
+        navigation: [],
+        wxSdkReady: false
       }
     },
 
@@ -81,6 +83,9 @@
       } else {
           this.getPageData();
       }
+      // #ifdef H5
+      this.preloadWxSdk();
+      // #endif
     },
 
     /**
@@ -178,20 +183,20 @@
                 // #ifdef H5
                 console.log('[扫码点餐] 请求JSSDK配置, url:', url);
                 // #endif
-                settingApi.jsSdkConfig(url).then(result => {
+                settingApi.jsSdkConfig(url).then(function(result) {
                     // #ifdef H5
-                    console.log('[扫码点餐] JSSDK配置:', JSON.stringify(result));
+                    console.log('[扫码点餐] JSSDK配置:', result);
                     // #endif
-                    const config = result.data;
+                    var config = result.data;
                     if (!config || !config.appId) {
-                        uni.showToast({
-                            title: '公众号AppID未配置，请联系管理员',
-                            icon: 'none',
-                            duration: 3000
-                        });
+                        uni.showToast({ title: '公众号AppID未配置', icon: 'none', duration: 3000 });
                         return;
                     }
-                    wx.config({
+                    if (!window.wx || typeof window.wx.config !== 'function') {
+                        uni.showToast({ title: '微信SDK未就绪', icon: 'none', duration: 3000 });
+                        return;
+                    }
+                    window.wx.config({
                         debug: false,
                         appId: config.appId,
                         timestamp: config.timestamp,
@@ -199,38 +204,25 @@
                         signature: config.signature,
                         jsApiList: ['scanQRCode']
                     });
-                    wx.ready(() => {
-                        wx.scanQRCode({
+                    window.wx.ready(function() {
+                        window.wx.scanQRCode({
                             needResult: 1,
                             scanType: ['qrCode'],
-                            success(res) {
+                            success: function(res) {
                                 app.handleScanResult(res.resultStr);
                             },
-                            fail() {
-                                uni.showToast({
-                                    title: '扫码失败，请重试',
-                                    icon: 'none'
-                                });
+                            fail: function() {
+                                uni.showToast({ title: '扫码失败，请重试', icon: 'none' });
                             }
                         });
                     });
-                    wx.error((err) => {
-                        // #ifdef H5
-                        console.log('[扫码点餐] wx.error:', JSON.stringify(err));
-                        // #endif
-                        uni.showToast({
-                            title: '微信配置失败，请重试',
-                            icon: 'none'
-                        });
+                    window.wx.error(function(err) {
+                        console.log('[扫码点餐] wx.error:', err);
+                        uni.showToast({ title: '微信配置失败，请重试', icon: 'none' });
                     });
-                }).catch((err) => {
-                    // #ifdef H5
-                    console.log('[扫码点餐] 请求失败:', JSON.stringify(err));
-                    // #endif
-                    uni.showToast({
-                        title: '获取配置失败',
-                        icon: 'none'
-                    });
+                }).catch(function(err) {
+                    console.log('[扫码点餐] 请求失败:', err);
+                    uni.showToast({ title: '获取配置失败', icon: 'none', duration: 2500 });
                 });
             });
             // #endif
@@ -262,23 +254,52 @@
         },
 
         /**
-         * 动态加载微信JSSDK
+         * 页面加载时预加载微信JSSDK
+         */
+        preloadWxSdk() {
+            var app = this;
+            var script = document.createElement('script');
+            script.src = 'https://res.wx.qq.com/open/js/jweixin-1.6.0.js';
+            script.onload = function() {
+                var retry = 0;
+                var timer = setInterval(function() {
+                    if (window.wx && typeof window.wx.config === 'function') {
+                        clearInterval(timer);
+                        app.wxSdkReady = true;
+                    } else if (++retry >= 30) {
+                        clearInterval(timer);
+                    }
+                }, 200);
+            };
+            script.onerror = function() {};
+            document.head.appendChild(script);
+        },
+
+        /**
+         * 确保微信JSSDK已就绪
          */
         loadWxJsSdk(callback) {
-            if (window.wx) {
+            var app = this;
+            if (app.wxSdkReady && window.wx && typeof window.wx.config === 'function') {
                 callback();
                 return;
             }
-            const script = document.createElement('script');
-            script.src = 'https://res.wx.qq.com/open/js/jweixin-1.6.0.js';
-            script.onload = callback;
-            script.onerror = () => {
-                uni.showToast({
-                    title: '加载微信SDK失败',
-                    icon: 'none'
-                });
-            };
-            document.head.appendChild(script);
+            // SDK尚未就绪，轮询等待（最多3秒）
+            var retry = 0;
+            var timer = setInterval(function() {
+                if (window.wx && typeof window.wx.config === 'function') {
+                    clearInterval(timer);
+                    app.wxSdkReady = true;
+                    callback();
+                } else if (++retry >= 15) {
+                    clearInterval(timer);
+                    uni.showToast({
+                        title: '请刷新页面后重试',
+                        icon: 'none',
+                        duration: 3000
+                    });
+                }
+            }, 200);
         },
 
         /**
@@ -309,7 +330,7 @@
     onShareAppMessage() {
       const app = this
       return {
-         title: "fuint点餐系统",
+         title: config.name,
          path: "/pages/index/index?" + app.$getShareUrlParams()
       }
     },
@@ -323,7 +344,7 @@
       const app = this
       const { page } = app
       return {
-        title: page.params.share_title,
+        title: config.name,
         path: "/pages/index/index?" + app.$getShareUrlParams()
       }
     }

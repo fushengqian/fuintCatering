@@ -31,5 +31,5 @@ export function storeDetail() {
 
 // 微信JSSDK配置
 export function jsSdkConfig(url) {
-  return request.post(api.jsSdkConfig, { url })
+  return request.get(api.jsSdkConfig, { url })
 }

@@ -30,7 +30,7 @@
         </view>
         <view class="cate-actions">
           <text class="action-btn action-edit" @click="onEdit(item)">编辑</text>
-          <text v-if="item.status === 'A'" class="action-btn action-disable" @click="onToggleStatus(item, 'D')">禁用</text>
+          <text v-if="item.status === 'A'" class="action-btn action-disable" @click="onToggleStatus(item, 'N')">禁用</text>
           <text v-else class="action-btn action-enable" @click="onToggleStatus(item, 'A')">启用</text>
           <text class="action-btn action-delete" @click="onDelete(item)">删除</text>
         </view>

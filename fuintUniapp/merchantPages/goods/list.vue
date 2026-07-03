@@ -66,7 +66,7 @@
         <!-- 操作按钮 -->
         <view class="goods-actions">
           <text class="action-btn action-edit" @click.stop="onEdit(item.id)">编辑</text>
-          <text v-if="item.status === 'A'" class="action-btn action-off" @click.stop="onToggleStatus(item, 'D')">下架</text>
+          <text v-if="item.status === 'A'" class="action-btn action-off" @click.stop="onToggleStatus(item, 'N')">下架</text>
           <text v-else class="action-btn action-on" @click.stop="onToggleStatus(item, 'A')">上架</text>
           <text class="action-btn action-delete" @click.stop="onDelete(item)">删除</text>
         </view>

@@ -114,8 +114,8 @@
               @click="formData.status = 'A'"
             >上架</view>
             <view
-              :class="['switch-item', formData.status === 'D' ? 'active' : '']"
-              @click="formData.status = 'D'"
+              :class="['switch-item', formData.status === 'N' ? 'active' : '']"
+              @click="formData.status = 'N'"
             >下架</view>
           </view>
         </view>
