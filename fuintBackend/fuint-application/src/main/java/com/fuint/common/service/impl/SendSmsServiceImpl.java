@@ -237,6 +237,10 @@ public class SendSmsServiceImpl implements SendSmsService {
                 e.printStackTrace();
             }
             logger.info("sendMessage outParams:{}", res);
+            logger.info("smsContent:{}", smsContent);
+            logger.info("SignName:{}", signName);
+            logger.info("TemplateCode:{}", templateInfo.getCode());
+            logger.info("TemplateParam:{}", paramJson);
             saveSendLog(merchantId, phoneNo, smsContent);
             flag = true;
         } catch (Exception e) {

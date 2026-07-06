@@ -13,9 +13,10 @@ import java.util.stream.Collectors;
  * CopyRight https://www.fuint.cn
  */
 public enum MerchantTypeEnum {
-    RESTAURANT("restaurant", "餐饮：餐厅、奶茶、酒店等"),
-    RETAIL("retail", "零售：超市、生鲜、卖场等"),
-    SERVICE("service", "服务：美容、足浴、汽车4s店等"),
+    RESTAURANT("restaurant", "餐厅"),
+    TEA_DRINK("teaDrink", "茶饮"),
+    HOT_POT("hotPot", "火锅"),
+    FAST_FOOD("fastFood", "快餐"),
     OTHER("other", "其他");
 
     private String key;

@@ -46,6 +46,13 @@
           </view>
       </view>
     </mescroll-body>
+    <!-- 领取入口 -->
+    <view class="footer-bar" @click="toReceiveMore">
+      <u-icon v-if="type == 'C'" name="coupon" size="28" color="#00acac"></u-icon>
+      <u-icon v-if="type == 'T'" name="clock" size="28" color="#00acac"></u-icon>
+      <u-icon v-if="type == 'P'" name="rmb-circle" size="28" color="#00acac"></u-icon>
+      <text>{{ type == 'C' ? '领券中心' : type == 'T' ? '领取计次卡' : '购买储值卡' }}</text>
+    </view>
   </view>
 </template>
 
@@ -55,9 +62,7 @@
   import { getEmptyPaginateObj, getMoreListData } from '@/utils/app'
   import * as MyCouponApi from '@/api/myCoupon'
   import { CouponTypeEnum } from '@/common/enum/coupon'
-  import Empty from '@/components/empty'
 
-  const color = ['red', 'blue', 'violet', 'yellow']
   const pageSize = 15
   const tabs = [{
     name: `未使用`,
@@ -72,16 +77,13 @@
 
   export default {
     components: {
-      MescrollBody,
-      Empty
+      MescrollBody
     },
     mixins: [MescrollMixin],
     data() {
       return {
         // 枚举类
         CouponTypeEnum,
-        // 颜色组
-        color,
         // 标签栏数据
         tabs,
         // 当前标签索引
@@ -92,8 +94,6 @@
         memberId: '',
         // 优惠券列表数据
         list: getEmptyPaginateObj(),
-        // 正在加载
-        isLoading: false,
         // 上拉加载配置
         upOption: {
           // 首次自动执行
@@ -144,9 +144,9 @@
       // 卡券详情
       onDetail(userCouponId, type) {
         const app = this
-        if (app.memberId) {
-            app.$navTo('pages/confirm/doConfirm?id='+userCouponId)
-            return false;
+          if (app.memberId) {
+              app.$navTo('pages/confirm/doConfirm', { id: userCouponId })
+              return false;
         }
         if (type === 'C') {
             app.$navTo(`subPages/coupon/detail`, { userCouponId });
@@ -155,6 +155,11 @@
         } else if(type === 'P') {
             app.$navTo(`subPages/prestore/detail`, { userCouponId });
         }
+      },
+      
+      // 前往领取入口
+      toReceiveMore() {
+          this.$navTo('subPages/coupon/list', { type: this.type })
       },
       
       /**
@@ -199,6 +204,22 @@
 </script>
 
 <style lang="scss" scoped>
+.footer-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18rpx 24rpx;
+  padding-bottom: calc(18rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1rpx solid #f0f0f0;
+  font-size: 28rpx;
+  color: $fuint-theme;
+  gap: 8rpx;
+}
 .goods-list {
   padding: 4rpx;
   box-sizing: border-box;

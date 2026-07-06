@@ -149,9 +149,6 @@ public class MerchantGoodsController extends BaseController {
         MtStaff staffInfo = getStaffInfo();
 
         String goodsId = param.get("goodsId") == null ? "0" : param.get("goodsId").toString();
-        if (StringUtil.isEmpty(goodsId)) {
-            goodsId = "0";
-        }
 
         String name = param.get("name") == null ? null : CommonUtil.replaceXSS(param.get("name").toString());
         String description = param.get("description") == null ? "" : param.get("description").toString();

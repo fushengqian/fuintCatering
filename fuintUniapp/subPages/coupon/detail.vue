@@ -206,61 +206,42 @@
               content: "需要"+app.detail.point+"积分兑换，您确定兑换吗?",
               success({ confirm }) {
                 if (confirm) {
-                    couponApi.receive({ 'couponId': couponId, 'receiveCode': app.receiveCode })
-                      .then(result => {
-                        app.receiveCode = '';
-                        // 显示提示
-                        if (parseInt(result.code) === 200) {
-                            app.detail.isReceive = true
-                            app.$success("兑换成功！")
-                            // #ifdef MP-WEIXIN
-                            MessageApi.getSubTemplate({keys: "couponArrival,couponConfirm"}).then(result => {
-                                const templateIds = result.data
-                                wx.requestSubscribeMessage({tmplIds: templateIds, 
-                                    success(res) {
-                                        console.log("调用成功！")
-                                    }, fail(res) {
-                                        console.log("调用失败:", res)
-                                    }, complete() {
-                                        // empty
-                                    }
-                                })
-                            })
-                            // #endif
-                        } else {
-                            app.$error(result.message)
-                        }
-                      })
+                    app.handleReceive(couponId, '兑换成功！')
                 }
               }
             });
         } else {
-            couponApi.receive({ 'couponId': couponId, 'receiveCode': app.receiveCode })
-              .then(result => {
-                app.receiveCode = '';
-                // 显示提示
-                if (parseInt(result.code) === 200) {
-                    app.detail.isReceive = true
-                    app.$success("领取成功！")
-                    // #ifdef MP-WEIXIN
-                    MessageApi.getSubTemplate({keys: "couponArrival,couponConfirm"}).then(result => {
-                        const templateIds = result.data
-                        wx.requestSubscribeMessage({tmplIds: templateIds, 
-                            success(res) {
-                                console.log("调用成功！")
-                            }, fail(res) {
-                                console.log("调用失败:", res)
-                            }, complete() {
-                                // empty
-                            }
-                        })
-                    })
-                    // #endif
-                } else {
-                    app.$error(result.message)
-                }
-            })
+            app.handleReceive(couponId, '领取成功！')
         }
+      },
+
+      // 执行领取请求
+      handleReceive(couponId, successMsg) {
+        const app = this
+        couponApi.receive({ 'couponId': couponId, 'receiveCode': app.receiveCode })
+          .then(result => {
+            app.receiveCode = '';
+            if (parseInt(result.code) === 200) {
+                app.detail.isReceive = true;
+                app.$success(successMsg)
+                // #ifdef MP-WEIXIN
+                MessageApi.getSubTemplate({keys: "couponArrival,couponConfirm"}).then(result => {
+                    const templateIds = result.data
+                    wx.requestSubscribeMessage({tmplIds: templateIds, 
+                        success(res) {
+                            console.log("调用成功！")
+                        }, fail(res) {
+                            console.log("调用失败:", res)
+                        }, complete() {
+                            // empty
+                        }
+                    })
+                })
+                // #endif
+            } else {
+                app.$error(result.message)
+            }
+          })
       },
       // 删除卡券
       remove() {
