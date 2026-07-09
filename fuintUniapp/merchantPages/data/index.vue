@@ -119,11 +119,11 @@
           <view class="chart-title">近七日订单数量</view>
           <view class="bar-chart">
             <view class="chart-y-axis">
-              <text v-for="n in 5" :key="n" class="y-label">{{ 10 - (n-1)*2 }}</text>
+              <text v-for="(label, n) in orderChartYLabels" :key="n" class="y-label">{{ label }}</text>
             </view>
             <view class="chart-content">
               <view class="grid-lines">
-                <view v-for="n in 5" :key="n" class="grid-line"></view>
+                <view v-for="n in orderChartYLabels.length" :key="n" class="grid-line"></view>
               </view>
               <view class="bars-wrapper">
                 <view
@@ -135,7 +135,7 @@
                     <text class="bar-value">{{ item.value }}</text>
                     <view
                       class="bar"
-                      :style="{ height: (item.value / 10 * 100) + '%' }"
+                      :style="{ height: (item.value / orderChartMaxValue * 100) + '%' }"
                     ></view>
                   </view>
                   <text class="bar-label">{{ item.label }}</text>
@@ -154,38 +154,31 @@
           <view class="chart-title">近七日会员活跃数</view>
           <view class="line-chart">
             <view class="chart-y-axis">
-              <text v-for="n in 7" :key="n" class="y-label">{{ 12 - (n-1)*2 }}</text>
+              <text
+                v-for="(label, n) in memberChartYLabels"
+                :key="n"
+                class="y-label"
+              >{{ label }}</text>
             </view>
             <view class="chart-content">
               <view class="grid-lines">
-                <view v-for="n in 7" :key="n" class="grid-line"></view>
+                <view
+                  v-for="n in memberChartYLabels.length"
+                  :key="n"
+                  class="grid-line"
+                ></view>
               </view>
               <view class="line-wrapper">
-                <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="line-svg">
-                  <polyline
-                    :points="memberChartPoints"
-                    fill="none"
-                    stroke="#52c41a"
-                    stroke-width="2"
-                  />
-                  <circle
-                    v-for="(point, index) in memberChartPointsArray"
-                    :key="index"
-                    :cx="point.x"
-                    :cy="point.y"
-                    r="2"
-                    fill="#52c41a"
-                  />
-                </svg>
-                <view class="line-points">
-                  <view
-                    v-for="(item, index) in memberChartData"
-                    :key="index"
-                    class="point-wrapper"
-                    :style="{ left: (index / (memberChartData.length - 1) * 100) + '%', bottom: (item.value / 12 * 100) + '%' }"
-                  >
-                    <text class="point-value">{{ item.value }}</text>
-                  </view>
+                <view
+                  v-for="(item, idx) in memberChartData"
+                  :key="'pt' + idx"
+                  class="dot-point"
+                  :style="{
+                    left: memberChartData.length === 1 ? '50%' : (idx / (memberChartData.length - 1) * 100) + '%',
+                    bottom: (item.value / (memberChartMaxValue || 1) * 100) + '%'
+                  }"
+                >
+                  <text class="dot-value">{{ item.value }}</text>
                 </view>
               </view>
               <view class="x-labels">
@@ -315,31 +308,34 @@ export default {
   },
 
   computed: {
-    // 计算折线图的点坐标
-    memberChartPoints() {
-      const points = []
-      const len = this.memberChartData.length
-      if (len === 0) return ''
-      const maxValue = Math.max(...this.memberChartData.map(item => item.value), 1)
-      this.memberChartData.forEach((item, index) => {
-        const x = (index / (len - 1)) * 100
-        const y = 100 - (item.value / maxValue * 100)
-        points.push(`${x},${y}`)
-      })
-      return points.join(' ')
+    // 订单图表最大值
+    orderChartMaxValue() {
+      if (this.orderChartData.length === 0) return 0
+      return this.calcNiceMax(Math.max(...this.orderChartData.map(item => item.value), 1))
     },
-    memberChartPointsArray() {
-      const points = []
-      const len = this.memberChartData.length
-      if (len === 0) return []
-      const maxValue = Math.max(...this.memberChartData.map(item => item.value), 1)
-      this.memberChartData.forEach((item, index) => {
-        const x = (index / (len - 1)) * 100
-        const y = 100 - (item.value / maxValue * 100)
-        points.push({ x, y })
-      })
-      return points
-    }
+    // 订单图表Y轴标签
+    orderChartYLabels() {
+      if (this.orderChartData.length === 0) return ['0']
+      const max = this.orderChartMaxValue
+      const step = max / 4
+      const labels = []
+      for (let i = 0; i <= 4; i++) labels.push(Math.round(i * step))
+      return labels
+    },
+    // 会员图表最大值
+    memberChartMaxValue() {
+      if (this.memberChartData.length === 0) return 0
+      return this.calcNiceMax(Math.max(...this.memberChartData.map(item => item.value), 1))
+    },
+    // 会员图表Y轴标签
+    memberChartYLabels() {
+      if (this.memberChartData.length === 0) return ['0']
+      const max = this.memberChartMaxValue
+      const step = max / 4
+      const labels = []
+      for (let i = 0; i <= 4; i++) labels.push(Math.round(i * step))
+      return labels
+    },
   },
 
   onLoad() {
@@ -537,11 +533,17 @@ export default {
       })
     },
 
-    // 格式化金额
-    formatAmount(amount) {
-      if (!amount) return '0.00'
-      if (typeof amount === 'string') return amount
-      return parseFloat(amount).toFixed(2)
+    // 计算合适的Y轴最大值
+    calcNiceMax(max) {
+      if (max <= 0) return 1
+      const magnitude = Math.pow(10, Math.floor(Math.log10(max)))
+      const residual = max / magnitude
+      let nice
+      if (residual <= 1.5) nice = 2 * magnitude
+      else if (residual <= 3.5) nice = 4 * magnitude
+      else if (residual <= 7.5) nice = 8 * magnitude
+      else nice = 10 * magnitude
+      return nice
     },
 
     // Tab切换
@@ -558,7 +560,14 @@ export default {
       this.getOverviewData()
       this.getChartData()
       this.getTopData()
-    }
+    },
+
+    // 格式化金额
+    formatAmount(amount) {
+      if (!amount) return '0.00'
+      if (typeof amount === 'string') return amount
+      return parseFloat(amount).toFixed(2)
+    },
   }
 }
 </script>
@@ -911,30 +920,28 @@ export default {
       position: relative;
       margin-bottom: 36rpx;
 
-      .line-svg {
+      .dot-point {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
+        transform: translate(-50%, 50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
 
-      .line-points {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        &::before {
+          content: '';
+          display: block;
+          width: 16rpx;
+          height: 16rpx;
+          background: #52c41a;
+          border-radius: 50%;
+          border: 3rpx solid #fff;
+          box-shadow: 0 0 0 4rpx rgba(82, 196, 26, 0.15);
+        }
 
-        .point-wrapper {
-          position: absolute;
-          transform: translateX(-50%);
-
-          .point-value {
-            font-size: 18rpx;
-            color: #52c41a;
-            margin-bottom: 4rpx;
-          }
+        .dot-value {
+          font-size: 20rpx;
+          color: #52c41a;
+          margin-top: 4rpx;
         }
       }
     }

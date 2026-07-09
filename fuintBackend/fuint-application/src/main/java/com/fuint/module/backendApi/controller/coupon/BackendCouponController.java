@@ -9,13 +9,13 @@ import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.CouponTypeEnum;
 import com.fuint.common.enums.CouponUseForEnum;
 import com.fuint.common.enums.StatusEnum;
+import com.fuint.common.param.CouponPage;
 import com.fuint.common.param.SendCouponParam;
 import com.fuint.common.service.*;
 import com.fuint.common.util.PhoneFormatCheckUtils;
 import com.fuint.common.util.SeqUtil;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
@@ -29,7 +29,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -87,47 +86,16 @@ public class BackendCouponController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:coupon:index')")
-    public ResponseObject list(HttpServletRequest request) throws BusinessCheckException {
-        Integer page = request.getParameter("page") == null ? Constants.PAGE_NUMBER : Integer.parseInt(request.getParameter("page"));
-        Integer pageSize = request.getParameter("pageSize") == null ? Constants.PAGE_SIZE : Integer.parseInt(request.getParameter("pageSize"));
-        Integer groupId = (request.getParameter("groupId") == null || StringUtil.isEmpty(request.getParameter("groupId"))) ? 0 : Integer.parseInt(request.getParameter("groupId"));
-        Integer couponId = (request.getParameter("id") == null || StringUtil.isEmpty(request.getParameter("id"))) ? 0 : Integer.parseInt(request.getParameter("id"));
-        String name = request.getParameter("name") == null ? "" : request.getParameter("name");
-        String type = request.getParameter("type") == null ? "" : request.getParameter("type");
-        String status = request.getParameter("status") == null ? "" : request.getParameter("status");
-
+    public ResponseObject list(@ModelAttribute CouponPage couponPage) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-
-        Map<String, Object> params = new HashMap<>();
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            params.put("merchantId", accountInfo.getMerchantId());
+            couponPage.setMerchantId(accountInfo.getMerchantId());
         }
         if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
-            params.put("storeId", accountInfo.getStoreId());
-        }
-        if (groupId > 0) {
-            params.put("groupId", groupId.toString());
-        }
-        if (couponId > 0) {
-            params.put("id", couponId.toString());
-        }
-        if (StringUtil.isNotEmpty(name)) {
-            params.put("name", name);
-        }
-        if (StringUtil.isNotEmpty(type)) {
-            params.put("type", type);
-        }
-        if (StringUtil.isNotEmpty(status)) {
-            params.put("status", status);
-        }
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            params.put("merchantId", accountInfo.getMerchantId());
-        }
-        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
-            params.put("storeId", accountInfo.getStoreId());
+            couponPage.setStoreId(accountInfo.getStoreId());
         }
 
-        PaginationResponse<MtCoupon> paginationResponse = couponService.queryCouponListByPagination(new PaginationRequest(page, pageSize, params));
+        PaginationResponse<MtCoupon> paginationResponse = couponService.queryCouponListByPagination(couponPage);
         List<MtCoupon> dataList = paginationResponse.getContent();
         List<MtCouponGroup> groupList = new ArrayList<>();
 
@@ -155,6 +123,7 @@ public class BackendCouponController extends BaseController {
         }
 
         Integer groupTotal = 0;
+        Integer groupId = couponPage.getGroupId();
         if (groupId > 0) {
             MtCouponGroup groupInfo = couponGroupService.queryCouponGroupById(groupId);
             groupTotal = groupInfo.getTotal();
@@ -214,20 +183,17 @@ public class BackendCouponController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:coupon:add')")
-    public ResponseObject saveCouponHandler(@RequestBody ReqCouponDto reqCouponDto) throws BusinessCheckException,ParseException {
+    public ResponseObject saveCouponHandler(@RequestBody ReqCouponDto reqCouponDto) throws BusinessCheckException, ParseException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         reqCouponDto.setOperator(accountInfo.getAccountName());
 
         // 同一分组内卡券名称不能重复
-        PaginationRequest requestSearch = new PaginationRequest();
-        requestSearch.setCurrentPage(Constants.PAGE_NUMBER);
-        requestSearch.setPageSize(Constants.PAGE_SIZE);
-        Map<String, Object> requestParams = new HashMap<>();
-        requestParams.put("name", reqCouponDto.getName());
-        requestParams.put("groupId", reqCouponDto.getGroupId().toString());
-        requestSearch.setSearchParams(requestParams);
-        PaginationResponse<MtCoupon> dataName = couponService.queryCouponListByPagination(requestSearch);
-
+        CouponPage couponPage = new CouponPage();
+        couponPage.setPage(Constants.PAGE_NUMBER);
+        couponPage.setPageSize(Constants.PAGE_SIZE);
+        couponPage.setName(reqCouponDto.getName());
+        couponPage.setGroupId(reqCouponDto.getGroupId());
+        PaginationResponse<MtCoupon> dataName = couponService.queryCouponListByPagination(couponPage);
         if (dataName.getContent().size() > 0 && reqCouponDto.getId() == null) {
             return getFailureResult(201, "卡券名称已存在，请修改");
         }

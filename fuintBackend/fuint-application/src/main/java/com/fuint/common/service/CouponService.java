@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.common.dto.coupon.ReqCouponDto;
 import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.param.CouponListParam;
+import com.fuint.common.param.CouponPage;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtCoupon;
@@ -26,10 +26,10 @@ public interface CouponService extends IService<MtCoupon> {
     /**
      * 分页查询卡券列表
      *
-     * @param paginationRequest
+     * @param couponPage
      * @return
      */
-    PaginationResponse<MtCoupon> queryCouponListByPagination(PaginationRequest paginationRequest);
+    PaginationResponse<MtCoupon> queryCouponListByPagination(CouponPage couponPage);
 
     /**
      * 保存卡券

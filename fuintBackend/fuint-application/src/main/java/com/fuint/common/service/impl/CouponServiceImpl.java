@@ -10,13 +10,13 @@ import com.fuint.common.dto.coupon.ReqSendLogDto;
 import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.*;
 import com.fuint.common.param.CouponListParam;
+import com.fuint.common.param.CouponPage;
 import com.fuint.common.service.*;
 import com.fuint.common.util.CommonUtil;
 import com.fuint.common.util.DateUtil;
 import com.fuint.common.util.SeqUtil;
 import com.fuint.framework.annoation.OperationServiceLog;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.bean.CouponNumBean;
@@ -122,44 +122,44 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
     /**
      * 分页查询券列表
      *
-     * @param paginationRequest
+     * @param couponPage
      * @return
      */
     @Override
-    public PaginationResponse<MtCoupon> queryCouponListByPagination(PaginationRequest paginationRequest) {
-        Page<MtCoupon> pageHelper = PageHelper.startPage(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
+    public PaginationResponse<MtCoupon> queryCouponListByPagination(CouponPage couponPage) {
+        Page<MtCoupon> pageHelper = PageHelper.startPage(couponPage.getPage(), couponPage.getPageSize());
         LambdaQueryWrapper<MtCoupon> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.ne(MtCoupon::getStatus, StatusEnum.DISABLE.getKey());
 
-        String name = paginationRequest.getSearchParams().get("name") == null ? "" : paginationRequest.getSearchParams().get("name").toString();
+        String name = couponPage.getName();
         if (StringUtils.isNotBlank(name)) {
             lambdaQueryWrapper.like(MtCoupon::getName, name);
         }
-        String status = paginationRequest.getSearchParams().get("status") == null ? "" : paginationRequest.getSearchParams().get("status").toString();
+        String status = couponPage.getStatus();
         if (StringUtils.isNotBlank(status)) {
             lambdaQueryWrapper.eq(MtCoupon::getStatus, status);
         }
-        String groupId = paginationRequest.getSearchParams().get("groupId") == null ? "" : paginationRequest.getSearchParams().get("groupId").toString();
-        if (StringUtils.isNotBlank(groupId)) {
+        Integer groupId = couponPage.getGroupId();
+        if (groupId != null) {
             lambdaQueryWrapper.eq(MtCoupon::getGroupId, groupId);
         }
-        String type = paginationRequest.getSearchParams().get("type") == null ? "" : paginationRequest.getSearchParams().get("type").toString();
+        String type = couponPage.getType();
         if (StringUtils.isNotBlank(type)) {
             lambdaQueryWrapper.eq(MtCoupon::getType, type);
         }
-        String merchantId = paginationRequest.getSearchParams().get("merchantId") == null ? "" : paginationRequest.getSearchParams().get("merchantId").toString();
-        if (StringUtils.isNotBlank(merchantId)) {
+        Integer merchantId = couponPage.getMerchantId();
+        if (merchantId != null) {
             lambdaQueryWrapper.eq(MtCoupon::getMerchantId, merchantId);
         }
-        String storeId = paginationRequest.getSearchParams().get("storeId") == null ? "" : paginationRequest.getSearchParams().get("storeId").toString();
-        if (StringUtils.isNotBlank(storeId)) {
+        Integer storeId = couponPage.getStoreId();
+        if (storeId != null) {
             lambdaQueryWrapper.eq(MtCoupon::getStoreId, storeId);
         }
 
         lambdaQueryWrapper.orderByDesc(MtCoupon::getUpdateTime);
         List<MtCoupon> dataList = mtCouponMapper.selectList(lambdaQueryWrapper);
 
-        PageRequest pageRequest = PageRequest.of(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
+        PageRequest pageRequest = PageRequest.of(couponPage.getPage(), couponPage.getPageSize());
         PageImpl pageImpl = new PageImpl(dataList, pageRequest, pageHelper.getTotal());
         PaginationResponse<MtCoupon> paginationResponse = new PaginationResponse(pageImpl, MtCoupon.class);
         paginationResponse.setTotalPages(pageHelper.getPages());

@@ -37,9 +37,8 @@ public class ClientUserInterceptor implements AsyncHandlerInterceptor {
 
         String accessToken = request.getHeader("Access-Token");
         String requestURI = request.getRequestURI();
-        boolean isSystemApi = requestURI.indexOf("/system/config") >= 0 || requestURI.indexOf("/system/jsSdkConfig") >= 0;
         if (StringUtils.isEmpty(accessToken)) {
-            if (!isSystemApi) {
+            if (requestURI.indexOf("/system/config") < 0) {
                 response.setHeader("Content-Type", "application/json;charset=UTF-8");
                 response.getOutputStream().print("{\"code\":1001,\"message\":\"" + PropertiesUtil
                         .getResponseErrorMessageByCode(Constants.HTTP_RESPONSE_CODE_NOLOGIN) + "\",\"data\":null}");
@@ -55,13 +54,13 @@ public class ClientUserInterceptor implements AsyncHandlerInterceptor {
             if (!StringUtils.isEmpty(loginInfo.getToken()) && loginInfo.getToken().equals(accessToken)) {
                 // 更新活跃时间
                 boolean isActive = memberService.updateActiveTime(loginInfo.getId());
-                if (!isActive && !isSystemApi) {
+                if (!isActive && requestURI.indexOf("/system/config") < 0) {
                     return false;
                 }
                 return true;
             }
         } else {
-            if (isSystemApi) {
+            if (requestURI.indexOf("/system/config") > 0) {
                 return true;
             }
         }
