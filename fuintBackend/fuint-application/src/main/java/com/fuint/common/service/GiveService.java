@@ -2,9 +2,9 @@ package com.fuint.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.common.dto.coupon.GiveDto;
+import com.fuint.common.param.GivePage;
 import com.fuint.common.param.GiveParam;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtGive;
@@ -24,10 +24,10 @@ public interface GiveService extends IService<MtGive> {
     /**
      * 分页查询列表
      *
-     * @param paginationRequest
+     * @param givePage
      * @return
      */
-    PaginationResponse<GiveDto> queryGiveListByPagination(PaginationRequest paginationRequest);
+    PaginationResponse<GiveDto> queryGiveListByPagination(GivePage givePage);
 
     /**
      * 转赠卡券

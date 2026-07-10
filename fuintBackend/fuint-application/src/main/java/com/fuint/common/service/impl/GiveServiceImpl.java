@@ -5,12 +5,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.coupon.GiveDto;
 import com.fuint.common.enums.StatusEnum;
+import com.fuint.common.param.GivePage;
 import com.fuint.common.param.GiveParam;
 import com.fuint.common.service.*;
 import com.fuint.common.util.CommonUtil;
 import com.fuint.common.util.DateUtil;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.mapper.MtGiveItemMapper;
@@ -80,45 +80,45 @@ public class GiveServiceImpl extends ServiceImpl<MtGiveMapper, MtGive> implement
     /**
      * 分页查询转赠列表
      *
-     * @param paginationRequest
+     * @param givePage
      * @return
      */
     @Override
-    public PaginationResponse<GiveDto> queryGiveListByPagination(PaginationRequest paginationRequest) {
-        Page<MtGive> pageHelper = PageHelper.startPage(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
+    public PaginationResponse<GiveDto> queryGiveListByPagination(GivePage givePage) {
+        Page<MtGive> pageHelper = PageHelper.startPage(givePage.getPage(), givePage.getPageSize());
         LambdaQueryWrapper<MtGive> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.ne(MtGive::getStatus, StatusEnum.DISABLE.getKey());
 
-        String status = paginationRequest.getSearchParams().get("status") == null ? "" : paginationRequest.getSearchParams().get("status").toString();
+        String status = givePage.getStatus();
         if (StringUtils.isNotBlank(status)) {
             lambdaQueryWrapper.eq(MtGive::getStatus, status);
         }
-        String merchantId = paginationRequest.getSearchParams().get("merchantId") == null ? "" : paginationRequest.getSearchParams().get("merchantId").toString();
-        if (StringUtils.isNotBlank(merchantId)) {
+        Integer merchantId = givePage.getMerchantId();
+        if (merchantId != null) {
             lambdaQueryWrapper.eq(MtGive::getMerchantId, merchantId);
         }
-        String storeId = paginationRequest.getSearchParams().get("storeId") == null ? "" : paginationRequest.getSearchParams().get("storeId").toString();
-        if (StringUtils.isNotBlank(storeId)) {
+        Integer storeId = givePage.getStoreId();
+        if (storeId != null) {
             lambdaQueryWrapper.eq(MtGive::getStoreId, storeId);
         }
-        String userId = paginationRequest.getSearchParams().get("userId") == null ? "" : paginationRequest.getSearchParams().get("userId").toString();
-        if (StringUtils.isNotBlank(userId)) {
+        Integer userId = givePage.getUserId();
+        if (userId != null) {
             lambdaQueryWrapper.eq(MtGive::getUserId, userId);
         }
-        String giveUserId = paginationRequest.getSearchParams().get("giveUserId") == null ? "" : paginationRequest.getSearchParams().get("giveUserId").toString();
-        if (StringUtils.isNotBlank(giveUserId)) {
+        Integer giveUserId = givePage.getGiveUserId();
+        if (giveUserId != null) {
             lambdaQueryWrapper.eq(MtGive::getGiveUserId, giveUserId);
         }
-        String couponId = paginationRequest.getSearchParams().get("couponId") == null ? "" : paginationRequest.getSearchParams().get("couponId").toString();
+        String couponId = givePage.getCouponId();
         if (StringUtils.isNotBlank(couponId)) {
             lambdaQueryWrapper.eq(MtGive::getCouponIds, couponId);
         }
-        String mobile = paginationRequest.getSearchParams().get("mobile") == null ? "" : paginationRequest.getSearchParams().get("mobile").toString();
+        String mobile = givePage.getMobile();
         if (StringUtils.isNotBlank(mobile)) {
             lambdaQueryWrapper.eq(MtGive::getMobile, mobile);
         }
-        String userMobile = paginationRequest.getSearchParams().get("userMobile") == null ? "" : paginationRequest.getSearchParams().get("userMobile").toString();
-        if (StringUtils.isNotBlank(mobile)) {
+        String userMobile = givePage.getUserMobile();
+        if (StringUtils.isNotBlank(userMobile)) {
             lambdaQueryWrapper.eq(MtGive::getUserMobile, userMobile);
         }
 
@@ -126,16 +126,16 @@ public class GiveServiceImpl extends ServiceImpl<MtGiveMapper, MtGive> implement
         List<MtGive> giveList = mtGiveMapper.selectList(lambdaQueryWrapper);
         List<GiveDto> dataList = new ArrayList<>();
         for (MtGive mtGive : giveList) {
-             GiveDto giveDto = new GiveDto();
-             BeanUtils.copyProperties(mtGive, giveDto);
-             giveDto.setCreateTime(DateUtil.formatDate(mtGive.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
-             giveDto.setUpdateTime(DateUtil.formatDate(mtGive.getUpdateTime(), "yyyy-MM-dd HH:mm:ss"));
-             giveDto.setMobile(CommonUtil.hidePhone(giveDto.getMobile()));
-             giveDto.setUserMobile(CommonUtil.hidePhone(giveDto.getUserMobile()));
-             dataList.add(giveDto);
+            GiveDto giveDto = new GiveDto();
+            BeanUtils.copyProperties(mtGive, giveDto);
+            giveDto.setCreateTime(DateUtil.formatDate(mtGive.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+            giveDto.setUpdateTime(DateUtil.formatDate(mtGive.getUpdateTime(), "yyyy-MM-dd HH:mm:ss"));
+            giveDto.setMobile(CommonUtil.hidePhone(giveDto.getMobile()));
+            giveDto.setUserMobile(CommonUtil.hidePhone(giveDto.getUserMobile()));
+            dataList.add(giveDto);
         }
 
-        PageRequest pageRequest = PageRequest.of(paginationRequest.getCurrentPage(), paginationRequest.getPageSize());
+        PageRequest pageRequest = PageRequest.of(givePage.getPage(), givePage.getPageSize());
         PageImpl pageImpl = new PageImpl(dataList, pageRequest, pageHelper.getTotal());
         PaginationResponse<GiveDto> paginationResponse = new PaginationResponse(pageImpl, GiveDto.class);
         paginationResponse.setTotalPages(pageHelper.getPages());
@@ -311,7 +311,6 @@ public class GiveServiceImpl extends ServiceImpl<MtGiveMapper, MtGive> implement
      * 根据ID获取转赠信息
      *
      * @param id ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override

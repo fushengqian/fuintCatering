@@ -102,9 +102,9 @@ public interface CouponService extends IService<MtCoupon> {
     /**
      * 核销卡券
      * @param userCouponId 用户券ID
-     * @param userId       核销会员ID
-     * @param storeId      店铺ID
-     * @param orderId      订单ID
+     * @param userId 核销会员ID
+     * @param storeId 店铺ID
+     * @param orderId 订单ID
      * @param amount 核销金额
      * @param remark 核销备注
      * @throws BusinessCheckException
@@ -115,7 +115,7 @@ public interface CouponService extends IService<MtCoupon> {
     /**
      * 根据券ID删除个人卡券
      *
-     * @param id       券ID
+     * @param id 会员卡券ID
      * @param accountInfo 操作人
      * @throws BusinessCheckException
      * @return
