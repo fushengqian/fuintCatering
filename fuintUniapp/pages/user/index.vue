@@ -28,19 +28,44 @@
         <view class="pay-qr" @click="toMemberCode(userInfo.id ? userInfo.id : 0)">
             <view class="qrcode iconfont icon-qr-extract"></view>
         </view>
-        <view class="amount-info" @click="toMemberWallet(userInfo.id ? userInfo.id : 0)">
-            <view class="amount-tip">余额（元）</view>
-            <view class="amount-num" v-if="isLogin">{{ userInfo.balance.toFixed(2) }}</view>
-            <view class="amount-num" v-if="!isLogin">0.00</view>
-            <view class="point-amount" @click="onTargetPoints">积分 {{ userInfo.point ? userInfo.point : 0 }}</view>
-        </view>
       </view>
       <view class="user-no">
         <view class="no" v-if="userInfo.userNo">会员号：{{ userInfo.userNo ? userInfo.userNo : '-'}}</view>
         <view class="recharge" @click="toRecharge(userInfo.id ? userInfo.id : 0)">储值有礼</view>
       </view>
     </view>
-    
+
+    <!-- 钱包余额 & 积分卡片 -->
+    <view class="asset-card">
+      <view class="asset-card-item" @click="toMemberWallet(userInfo.id ? userInfo.id : 0)">
+        <view class="asset-card-icon asset-card-icon--balance">
+          <text class="iconfont icon-qianbao"></text>
+        </view>
+        <view class="asset-card-info">
+          <view class="asset-card-label">
+            <text class="asset-card-label-dot asset-card-label-dot--balance"></text>
+            余额（元）
+          </view>
+          <view class="asset-card-value">{{ isLogin ? userInfo.balance.toFixed(2) : '0.00' }}</view>
+        </view>
+        <view class="asset-card-arrow iconfont icon-xiangyoujiantou"></view>
+      </view>
+      <view class="asset-card-divider"></view>
+      <view class="asset-card-item" @click="onTargetPoints">
+        <view class="asset-card-icon asset-card-icon--points">
+          <text class="iconfont icon-jifen"></text>
+        </view>
+        <view class="asset-card-info">
+          <view class="asset-card-label">
+            <text class="asset-card-label-dot asset-card-label-dot--points"></text>
+            我的积分
+          </view>
+          <view class="asset-card-value">{{ userInfo.point ? userInfo.point : 0 }}</view>
+        </view>
+        <view class="asset-card-arrow iconfont icon-xiangyoujiantou"></view>
+      </view>
+    </view>
+
     <!--会员升级 start-->
     <view class="member-update" v-if="memberGrade.length > 0">
         <view class="update-title">
@@ -473,7 +498,7 @@
   // 页面头部
   .main-header {
     background: url('~@/static/background/user-header.png') no-repeat;
-    height: 380rpx;
+    height: 350rpx;
     background-size: cover;
     overflow: hidden;
     display: block;
@@ -555,27 +580,6 @@
           font-size: 25rpx;
         }
       }
-      .amount-info {
-          margin-top: 80rpx;
-          margin-left: 70rpx;
-          color: #fff;
-          display: block;
-          float: left;
-          max-width: 120rpx;
-          .amount-tip {
-              font-size: 24rpx;
-          }
-          .amount-num {
-              margin-top: 10rpx;
-              font-weight: bold;
-              font-size: 48rpx;
-          }
-          .point-amount {
-              display: block;
-              margin-top: 2px;
-              width: 100px;
-          }
-      }
       .pay-qr {
           color:#ffffff;
           margin-top: 10rpx;
@@ -592,7 +596,7 @@
     .user-no {
         display: block;
         font-size: 25rpx;
-        margin: 110rpx 0rpx 0rpx 20rpx;
+        margin: 60rpx 0rpx 0rpx 20rpx;
         color: #ffffff;
         .no {
             float: left;
@@ -601,6 +605,102 @@
             float: right;
             margin-right: 20rpx;
         }
+    }
+  }
+
+  // 余额和积分卡片
+  .asset-card {
+    display: flex;
+    align-items: center;
+    margin: 10rpx 25rpx 10rpx 25rpx;
+    background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+    border-radius: 16rpx;
+    border: 1rpx solid rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04), 0 0 0 1rpx rgba(0, 172, 172, 0.06);
+    padding: 36rpx 0;
+    position: relative;
+    z-index: 2;
+
+    .asset-card-item {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20rpx;
+
+      .asset-card-icon {
+        width: 80rpx;
+        height: 80rpx;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20rpx;
+        flex-shrink: 0;
+
+        .iconfont {
+          font-size: 38rpx;
+          color: #fff;
+          line-height: 1;
+        }
+      }
+
+      .asset-card-icon--balance {
+        background: linear-gradient(135deg, #00acac, #00c9c9);
+      }
+
+      .asset-card-icon--points {
+        background: linear-gradient(135deg, #ff9500, #ffb340);
+      }
+
+      .asset-card-info {
+        display: flex;
+        flex-direction: column;
+
+        .asset-card-label {
+          font-size: 22rpx;
+          color: #999;
+          margin-bottom: 8rpx;
+          display: flex;
+          align-items: center;
+
+          .asset-card-label-dot {
+            display: inline-block;
+            width: 8rpx;
+            height: 8rpx;
+            border-radius: 50%;
+            margin-right: 8rpx;
+          }
+
+          .asset-card-label-dot--balance {
+            background: #00acac;
+          }
+
+          .asset-card-label-dot--points {
+            background: #ff9500;
+          }
+        }
+
+        .asset-card-value {
+          font-size: 42rpx;
+          font-weight: bold;
+          color: #333;
+          line-height: 1.2;
+        }
+      }
+
+      .asset-card-arrow {
+        font-size: 24rpx;
+        color: #ccc;
+        margin-left: 8rpx;
+        flex-shrink: 0;
+      }
+    }
+
+    .asset-card-divider {
+      width: 2rpx;
+      height: 60rpx;
+      background: #f0f0f0;
     }
   }
 

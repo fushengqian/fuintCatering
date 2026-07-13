@@ -171,7 +171,7 @@
               <view class="line-wrapper">
                 <view
                   v-for="(item, idx) in memberChartData"
-                  :key="'pt' + idx"
+                  :key="idx"
                   class="dot-point"
                   :style="{
                     left: memberChartData.length === 1 ? '50%' : (idx / (memberChartData.length - 1) * 100) + '%',
