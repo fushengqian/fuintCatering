@@ -61,7 +61,7 @@
               app.$error("请输入卡券名称或ID");
               return false;
           }
-          couponApi.search({ 'keyword': this.keyword })
+          couponApi.search({ 'keyword': this.keyword, 'sendWay': '' })
             .then(result => {
                 app.disabled = false;
                 if (result.data.coupon.content && result.data.coupon.content.length == 1) {

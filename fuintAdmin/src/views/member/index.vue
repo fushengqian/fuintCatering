@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" class="main-search" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <template v-if="showAdvanced">
       <el-form-item label="会员ID" prop="id">
         <el-input
           v-model="queryParams.id"
@@ -19,6 +20,7 @@
           @keyup.enter.native="handleQuery(false)"
         />
       </el-form-item>
+      </template>
       <el-form-item label="手机号" prop="mobile">
         <el-input
           v-model="queryParams.mobile"
@@ -37,6 +39,7 @@
           @keyup.enter.native="handleQuery(false)"
         />
       </el-form-item>
+      <template v-if="showAdvanced">
       <el-form-item label="会员等级" prop="gradeId">
         <el-select
           v-model="queryParams.gradeId"
@@ -65,6 +68,7 @@
           ></el-option>
         </el-select>
       </el-form-item>
+      </template>
       <el-form-item label="状态" prop="status">
         <el-select
           v-model="queryParams.status"
@@ -76,6 +80,7 @@
           <el-option key="N" label="禁用" value="N"/>
         </el-select>
       </el-form-item>
+      <template v-if="showAdvanced">
       <el-form-item label="注册时间">
         <el-date-picker
           v-model="queryParams.startTime"
@@ -103,9 +108,14 @@
           ></el-option>
         </el-select>
       </el-form-item>
+      </template>
       <el-form-item class="action">
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery(false)">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-link type="primary" :underline="false" style="margin-left:8px;margin-right:8px" @click="showAdvanced = !showAdvanced">
+          {{ showAdvanced ? '收起' : '展开' }}
+          <i :class="showAdvanced ? 'el-icon-arrow-up' : 'el-icon-arrow-down'"></i>
+        </el-link>
         <el-button
           type="primary"
           plain
@@ -117,7 +127,6 @@
       </el-form-item>
       <el-form-item>
         <el-button
-          type="warning"
           icon="el-icon-download"
           size="mini"
           @click="handleQuery(true)"
@@ -179,7 +188,7 @@
       </el-table-column>
       <el-table-column label="余额" align="center" prop="balance">
         <template slot-scope="scope">
-          <div><span style="color:red;">{{ scope.row.balance ? scope.row.balance.toFixed(2) : '0.00' }}</span></div>
+          <div><span style="color:red;white-space:nowrap">{{ scope.row.balance ? scope.row.balance.toFixed(2) : '0.00' }}</span></div>
           <el-button
             class="mini-btn"
             type="primary"
@@ -191,7 +200,7 @@
       </el-table-column>
       <el-table-column label="积分" align="center" prop="point">
         <template slot-scope="scope">
-          <div><span>{{ scope.row.point ? scope.row.point : '0.00' }}</span></div>
+          <div><span style="white-space:nowrap">{{ scope.row.point ? scope.row.point : '0.00' }}</span></div>
           <el-button
             class="mini-btn"
             type="primary"
@@ -455,6 +464,7 @@ export default {
       multiple: true,
       // 显示搜索条件
       showSearch: true,
+      showAdvanced: false,
       // 总条数
       total: 0,
       // 表格数据
@@ -583,6 +593,7 @@ export default {
       this.storeIds = [];
       this.queryParams.tagIds = '';
       this.tagIds = [];
+      this.showAdvanced = false;
       this.$refs.tables.sort(this.defaultSort.prop, this.defaultSort.order);
       this.handleQuery();
     },
