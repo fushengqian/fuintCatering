@@ -506,11 +506,10 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
         if (StringUtil.isNotEmpty(sendWay)) {
             lambdaQueryWrapper.eq(MtCoupon::getSendWay, sendWay);
         }
-        if (StringUtil.isNotEmpty(keyword)) {
-            lambdaQueryWrapper.and(wq -> wq
-                    .eq(MtCoupon::getId, keyword)
-                    .or()
-                    .like(MtCoupon::getName, keyword));
+        if (StringUtil.isNotEmpty(keyword) && CommonUtil.isNumeric(keyword)) {
+            lambdaQueryWrapper.eq(MtCoupon::getId, keyword);
+        } else if (StringUtil.isNotEmpty(keyword)) {
+            lambdaQueryWrapper.like(MtCoupon::getName, keyword);
         }
         if (StringUtil.isNotEmpty(type)) {
             lambdaQueryWrapper.eq(MtCoupon::getType, type);

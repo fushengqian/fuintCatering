@@ -124,9 +124,11 @@ public class BackendCouponController extends BaseController {
 
         Integer groupTotal = 0;
         Integer groupId = couponPage.getGroupId();
-        if (groupId > 0) {
+        if (groupId != null && groupId > 0) {
             MtCouponGroup groupInfo = couponGroupService.queryCouponGroupById(groupId);
-            groupTotal = groupInfo.getTotal();
+            if (groupInfo != null) {
+                groupTotal = groupInfo.getTotal();
+            }
         }
 
         // 卡券类型列表

@@ -16,7 +16,7 @@
     </view>
     <view class="number-wrapper">
         <view class="title">发放数量</view>
-        <u-number-box :min="1" :value="num"/>
+        <u-number-box :min="1" v-model="num"/>
     </view>
     <view class="main-form">
       <view class="footer">
