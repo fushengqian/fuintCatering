@@ -21,24 +21,27 @@
           <view class="login-tips">点击登录账号</view>
         </view>
       </view>
-    </view>
-    <view v-if="isLogin" class="user-app">
-      <view class="item">
-        <view class="tool" @click="scanCodeConfirm">
-             <view class="icon">
-               <image class="image" src="/static/icon/saoyisao.png" mode="scaleToFill"></image>
-           </view>
-             <view class="text">核销卡券</view>
+      <!-- 快捷操作 -->
+      <view v-if="isLogin" class="quick-actions">
+        <view class="quick-item" @click="scanCodeConfirm">
+          <view class="q-icon q-confirm">
+            <image class="q-icon-img" src="/static/icon/saoyisao.png" mode="aspectFit"></image>
+          </view>
+          <view class="q-text">
+            <text class="q-title">核销卡券</text>
+            <text class="q-desc">扫码核销优惠券/计次卡</text>
+          </view>
+        </view>
+        <view class="quick-item" @click="scanCodeCashier">
+          <view class="q-icon q-cashier">
+            <image class="q-icon-img" src="/static/icon/saoma.png" mode="aspectFit"></image>
+          </view>
+          <view class="q-text">
+            <text class="q-title">扫码收款</text>
+            <text class="q-desc">扫码向会员收取款项</text>
+          </view>
         </view>
       </view>
-        <view class="item">
-            <view class="tool" @click="scanCodeCashier">
-                <view class="icon">
-                    <image class="image" src="/static/icon/saoma.png" mode="scaleToFill"></image>
-                </view>
-                <view class="text">扫码收款</view>
-            </view>
-        </view>
     </view>
 
     <!-- 概述 -->
@@ -307,19 +310,12 @@
   // 页面头部
   .main-header {
     position: relative;
-    height: 210rpx;
-    background-size: 100% 100%;
-    overflow: hidden;
-    display: block;
-    align-items: center;
     background: $fuint-theme;
-    padding: 10rpx;
-    margin: 20rpx 20rpx 0rpx 20rpx;
-    border-top-left-radius: 8rpx;
-    border-top-right-radius: 8rpx;
+    padding: 10rpx 10rpx 30rpx 10rpx;
+    margin: 20rpx 20rpx;
+    border-radius: 12rpx;
     .user-info {
       display: block;
-      height: 100rpx;
       margin-top: 1rpx;
       text-align: center;
       width: 100%;
@@ -356,48 +352,61 @@
           }
       }
     }
-  }
-  .user-app {
-    display: flex;
-    height: 260rpx;
-    text-align: center;
-    color: #fff;
-    background: $fuint-theme;
-    margin: -5rpx 20rpx;
-    border-bottom-left-radius: 8rpx;
-    border-bottom-right-radius: 8rpx;
-    padding-bottom: 60rpx;
-    .item {
-        width: 50%;
-        height: 100%;
-        margin: 20rpx;
-        padding: 20rpx;
-        text-align: right;
-        .tool {
-            width: 280rpx;
-            clear: both;
-            padding: 20rpx;
-            border: 1rpx solid #fff;
-            border-radius: 30rpx;
-            text-align: center;
-            margin:0 auto;
-            .icon {
-                .image {
-                    height: 68rpx;
-                    width: 68rpx;
-                    font-weight: bold;
-                }
-            }
-            .text {
-                margin-top: 10rpx;
-                font-size: 30rpx;
-                text-align: center;
-                font-weight: bold;
-            }
+
+    .quick-actions {
+      display: flex;
+      margin-top: 30rpx;
+      padding-bottom: 10rpx;
+
+      .quick-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .q-icon {
+        width: 96rpx;
+        height: 96rpx;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .q-icon-img {
+          width: 52rpx;
+          height: 52rpx;
         }
+      }
+
+      .q-confirm {
+        background: #ffffff;
+      }
+
+      .q-cashier {
+        background: #ffffff;
+      }
+
+      .q-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 16rpx;
+
+        .q-title {
+          font-size: 28rpx;
+          color: #fff;
+          font-weight: 600;
+        }
+
+        .q-desc {
+          font-size: 22rpx;
+          color: rgba(255, 255, 255, 0.65);
+          margin-top: 4rpx;
+        }
+      }
     }
   }
-
   // 我的资产
   .my-asset {
     display: flex;
