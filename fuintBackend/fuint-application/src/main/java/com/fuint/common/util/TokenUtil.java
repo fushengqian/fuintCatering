@@ -161,7 +161,10 @@ public class TokenUtil {
      * @return
      * */
     public static boolean removeToken(String token) {
-        RedisUtil.remove(token);
+        if (StringUtil.isNotEmpty(token)) {
+            RedisUtil.remove(Constants.SESSION_USER + token);
+            RedisUtil.remove(Constants.SESSION_ADMIN_USER + token);
+        }
         AuthUserUtil.clean();
         return true;
     }
