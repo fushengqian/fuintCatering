@@ -115,4 +115,7 @@ public class MtUser implements Serializable {
 
     @ApiModelProperty("最后操作人")
     private String operator;
+
+    @ApiModelProperty("是否骑手：Y=是 N=否")
+    private String isRider;
 }

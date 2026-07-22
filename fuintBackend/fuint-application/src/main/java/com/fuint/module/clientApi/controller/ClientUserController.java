@@ -173,6 +173,10 @@ public class ClientUserController extends BaseController {
         outParams.put("isMerchant", isMerchant);
         outParams.put("openWxCard", openWxCard);
 
+        // 是否骑手
+        boolean isRider = mtUser != null && "Y".equals(mtUser.getIsRider());
+        outParams.put("isRider", isRider);
+
         // 是否需要强制更新头像或昵称
         boolean needUpdateAvatar = false;
         boolean needUpdateNickname = false;

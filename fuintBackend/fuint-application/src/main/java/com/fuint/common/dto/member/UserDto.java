@@ -95,6 +95,9 @@ public class UserDto implements Serializable {
     @ApiModelProperty("是否员工")
     private String isStaff;
 
+    @ApiModelProperty("是否骑手：Y=是 N=否")
+    private String isRider;
+
     @ApiModelProperty("创建时间")
     private Date createTime;
 

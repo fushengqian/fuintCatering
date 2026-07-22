@@ -167,6 +167,12 @@
               </view>
               <view class="item-name">商户管理</view>
           </view>
+          <view v-if="isRider == true" class="service-item" @click="handleService({'url': 'riderPages/index/index'})">
+            <view class="item-icon">
+              <text class="iconfont icon-huo"></text>
+            </view>
+            <view class="item-name">骑手配送</view>
+          </view>
         </block>
       </view>
     </view>
@@ -229,6 +235,7 @@
         userInfo: { id: 0, name: '', avatar: '', gradeId: 0, mobile: '', balance: 0 },
         gradeInfo: {},
         isMerchant: false,
+        isRider: false,
         gradeEndTime: '',
         // 账户资产
         assets: { prestore: '0', timer: '0', coupon: '0' },
@@ -352,7 +359,8 @@
               app.gradeInfo = result.data.gradeInfo;
               app.memberGrade = result.data.memberGrade;
               app.gradeEndTime = result.data.gradeEndTime;
-              app.isMerchant = result.data.isMerchant;              
+              app.isMerchant = result.data.isMerchant;
+              app.isRider = result.data.isRider;              
               resolve(app.userInfo);
               resolve(app.gradeInfo);
               resolve(isMerchant);

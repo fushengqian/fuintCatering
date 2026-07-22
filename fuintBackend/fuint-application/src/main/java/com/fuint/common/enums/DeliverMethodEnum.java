@@ -7,33 +7,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 订单状态枚举
+ * 配送方式枚举
  *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-public enum OrderStatusEnum {
-    CREATED("A", "待支付"),
-    PAID("B", "已支付"),
-    CANCEL("C", "已取消"),
-    DELIVERY("D", "待发货"),
-    DELIVERED("E", "已发货"),
-    RECEIVED("F", "已收货"),
-    DELETED("G", "已删除"),
-    REFUND("H", "已退款"),
-    COMPLETE("I", "已完成"),
-    // 骑手配送状态
-    WAITING_ACCEPT("J", "待接单"),
-    PREPARING("K", "备货中"),
-    WAITING_PICKUP("L", "待取货"),
-    DELIVERING("M", "配送中"),
-    RIDER_DELIVERED("N", "已送达");
+public enum DeliverMethodEnum {
+    SELF("self", "自取"),
+    EXPRESS("express", "快递配送"),
+    RIDER("rider", "骑手配送");
 
     private String key;
 
     private String value;
 
-    OrderStatusEnum(String key, String value) {
+    DeliverMethodEnum(String key, String value) {
         this.key = key;
         this.value = value;
     }
@@ -55,7 +43,7 @@ public enum OrderStatusEnum {
     }
 
     public static String getValue(String k) {
-        for (OrderStatusEnum c : OrderStatusEnum.values()) {
+        for (DeliverMethodEnum c : DeliverMethodEnum.values()) {
             if (c.getKey().equals(k)) {
                 return c.getValue();
             }
@@ -63,8 +51,8 @@ public enum OrderStatusEnum {
         return null;
     }
 
-    public static List<ParamDto> getOrderStatusList() {
-        return Arrays.stream(OrderStatusEnum.values())
+    public static List<ParamDto> getDeliverMethodList() {
+        return Arrays.stream(DeliverMethodEnum.values())
                 .map(status -> new ParamDto(status.getKey(), status.getValue(), status.getValue()))
                 .collect(Collectors.toList());
     }

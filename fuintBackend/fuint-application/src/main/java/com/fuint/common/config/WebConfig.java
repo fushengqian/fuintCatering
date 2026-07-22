@@ -106,6 +106,10 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/clientApi/book/cateList")
                 .excludePathPatterns("/clientApi/system/config")
                 .excludePathPatterns("/clientApi/system/jsSdkConfig");
+
+        // 骑手端拦截
+        registry.addInterceptor(portalUserInterceptor())
+                .addPathPatterns("/riderApi/**");
     }
 
     @Bean

@@ -3,6 +3,7 @@ package com.fuint.module.merchantApi.controller;
 import com.fuint.common.dto.member.UserInfo;
 import com.fuint.common.dto.order.OrderDto;
 import com.fuint.common.dto.order.UserOrderDto;
+import com.fuint.common.enums.OrderStatusEnum;
 import com.fuint.common.param.OrderConfirmParam;
 import com.fuint.common.param.OrderDetailParam;
 import com.fuint.common.param.OrderListParam;
@@ -22,6 +23,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 /**
  * 订单类controller
@@ -159,6 +162,45 @@ public class MerchantOrderController extends BaseController {
         orderDto.setVerifyCode(param.getCode());
         orderDto.setOperator(staffInfo.getRealName());
 
+        orderService.updateOrder(orderDto);
+
+        return getSuccessResult(true);
+    }
+
+    /**
+     * 商户标记备货完成（骑手配送订单）
+     */
+    @ApiOperation(value = "商户标记备货完成")
+    @RequestMapping(value = "/ready", method = RequestMethod.POST)
+    @CrossOrigin
+    public ResponseObject ready(@RequestBody OrderDetailParam param) throws BusinessCheckException {
+        UserInfo mtUser = TokenUtil.getUserInfo();
+
+        String orderId = param.getOrderId();
+        if (orderId == null || StringUtil.isEmpty(orderId)) {
+            return getFailureResult(201, "订单不能为空");
+        }
+
+        UserOrderDto orderInfo = orderService.getOrderById(Integer.parseInt(orderId));
+        if (orderInfo == null) {
+            return getFailureResult(201, "订单已不存在");
+        }
+
+        MtUser userInfo = memberService.queryMemberById(mtUser.getId());
+        MtStaff staffInfo = staffService.queryStaffByMobile(userInfo.getMobile());
+
+        if (staffInfo == null || (staffInfo.getStoreId() != null && staffInfo.getStoreId() > 0 && !staffInfo.getStoreId().equals(orderInfo.getStoreInfo().getId()))) {
+            return getFailureResult(1004);
+        }
+
+        if (!OrderStatusEnum.PREPARING.getKey().equals(orderInfo.getStatus())) {
+            return getFailureResult(201, "当前订单状态不允许标记备货完成");
+        }
+
+        OrderDto orderDto = new OrderDto();
+        orderDto.setId(orderInfo.getId());
+        orderDto.setStatus(OrderStatusEnum.WAITING_PICKUP.getKey());
+        orderDto.setOperator(staffInfo.getRealName());
         orderService.updateOrder(orderDto);
 
         return getSuccessResult(true);

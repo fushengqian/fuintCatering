@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fuint.repository.mapper.MtRiderOrderMapper">
+
+    <select id="findByRiderIdAndStatus" resultType="com.fuint.repository.model.MtRiderOrder">
+        SELECT * FROM mt_rider_order
+        WHERE RIDER_ID = #{riderId}
+        <if test="statusList != null and statusList.size() > 0">
+            AND STATUS IN
+            <foreach collection="statusList" item="status" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
+        ORDER BY CREATE_TIME DESC
+    </select>
+
+    <select id="findDeliveryStats" resultType="java.util.Map">
+        SELECT
+            COUNT(*) as deliveryCount,
+            COUNT(DISTINCT DATE(CREATE_TIME)) as workDays,
+            IFNULL(SUM(DELIVERY_FEE), 0) as totalIncome
+        FROM mt_rider_order
+        WHERE RIDER_ID = #{riderId}
+          AND STATUS IN ('M', 'N', 'F', 'I')
+          AND CREATE_TIME &gt;= #{beginTime}
+          AND CREATE_TIME &lt;= #{endTime}
+    </select>
+
+    <select id="findIncomeStats" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(DELIVERY_FEE), 0)
+        FROM mt_rider_order
+        WHERE RIDER_ID = #{riderId}
+          AND STATUS IN ('M', 'N', 'F', 'I')
+          AND CREATE_TIME &gt;= #{beginTime}
+          AND CREATE_TIME &lt;= #{endTime}
+    </select>
+
+    <select id="findDailyDeliveryCount" resultType="java.util.Map">
+        SELECT
+            DATE(CREATE_TIME) as date,
+            COUNT(*) as count
+        FROM mt_rider_order
+        WHERE RIDER_ID = #{riderId}
+          AND CREATE_TIME &gt;= #{beginTime}
+          AND CREATE_TIME &lt;= #{endTime}
+        GROUP BY DATE(CREATE_TIME)
+        ORDER BY date ASC
+    </select>
+
+    <select id="findDailyIncome" resultType="java.util.Map">
+        SELECT
+            DATE(CREATE_TIME) as date,
+            IFNULL(SUM(DELIVERY_FEE), 0) as income
+        FROM mt_rider_order
+        WHERE RIDER_ID = #{riderId}
+          AND STATUS IN ('M', 'N', 'F', 'I')
+          AND CREATE_TIME &gt;= #{beginTime}
+          AND CREATE_TIME &lt;= #{endTime}
+        GROUP BY DATE(CREATE_TIME)
+        ORDER BY date ASC
+    </select>
+
+</mapper>
