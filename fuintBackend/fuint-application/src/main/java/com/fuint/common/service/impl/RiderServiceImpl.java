@@ -1,7 +1,5 @@
 package com.fuint.common.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.rider.RiderDto;
 import com.fuint.common.service.RiderService;
@@ -16,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
 
 /**
  * 骑手服务实现类
@@ -36,7 +32,7 @@ public class RiderServiceImpl extends ServiceImpl<MtRiderMapper, MtRider> implem
     private MtUserMapper mtUserMapper;
 
     @Override
-    public RiderDto getRiderByUserId(Integer userId) throws BusinessCheckException {
+    public RiderDto getRiderByUserId(Integer userId) {
         MtRider rider = mtRiderMapper.findByUserId(userId);
         if (rider == null) {
             return null;
@@ -45,7 +41,7 @@ public class RiderServiceImpl extends ServiceImpl<MtRiderMapper, MtRider> implem
     }
 
     @Override
-    public RiderDto getRiderById(Integer riderId) throws BusinessCheckException {
+    public RiderDto getRiderById(Integer riderId) {
         MtRider rider = mtRiderMapper.selectById(riderId);
         if (rider == null) {
             return null;

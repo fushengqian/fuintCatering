@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
  * CopyRight https://www.fuint.cn
  */
 public enum DeliverMethodEnum {
-    SELF("self", "自取"),
     EXPRESS("express", "快递配送"),
     RIDER("rider", "骑手配送");
 

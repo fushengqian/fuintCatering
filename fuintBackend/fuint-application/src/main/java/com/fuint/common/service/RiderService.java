@@ -14,12 +14,12 @@ public interface RiderService {
     /**
      * 根据会员用户ID获取骑手信息
      */
-    RiderDto getRiderByUserId(Integer userId) throws BusinessCheckException;
+    RiderDto getRiderByUserId(Integer userId);
 
     /**
      * 根据骑手ID获取骑手信息
      */
-    RiderDto getRiderById(Integer riderId) throws BusinessCheckException;
+    RiderDto getRiderById(Integer riderId);
 
     /**
      * 判断会员是否为骑手

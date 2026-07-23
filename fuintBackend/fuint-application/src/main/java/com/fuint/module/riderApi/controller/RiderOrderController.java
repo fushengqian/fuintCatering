@@ -3,6 +3,7 @@ package com.fuint.module.riderApi.controller;
 import com.fuint.common.dto.member.UserInfo;
 import com.fuint.common.dto.rider.RiderDto;
 import com.fuint.common.dto.rider.RiderOrderDto;
+import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.RiderMyOrderParam;
 import com.fuint.common.param.RiderOrderSearchParam;
 import com.fuint.common.param.RiderOrderPoolParam;
@@ -136,7 +137,7 @@ public class RiderOrderController extends BaseController {
         if (rider == null) {
             throw new BusinessCheckException("非骑手身份，无法操作");
         }
-        if (!"A".equals(rider.getStatus())) {
+        if (!StatusEnum.ENABLED.getKey().equals(rider.getStatus())) {
             throw new BusinessCheckException("骑手状态异常");
         }
         return rider;

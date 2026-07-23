@@ -8,6 +8,7 @@ import com.fuint.common.dto.order.OrderUserDto;
 import com.fuint.common.dto.rider.RiderOrderDto;
 import com.fuint.common.dto.rider.RiderStatsDto;
 import com.fuint.common.enums.OrderStatusEnum;
+import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.RiderMyOrderParam;
 import com.fuint.common.param.RiderOrderSearchParam;
 import com.fuint.common.param.RiderOrderPoolParam;
@@ -62,6 +63,12 @@ public class RiderOrderServiceImpl extends ServiceImpl<MtRiderOrderMapper, MtRid
 
     private MtRiderMapper mtRiderMapper;
 
+    /**
+     * 获取待接单订单池
+     * @param param
+     * @param storeId
+     * @return
+     * */
     @Override
     public PaginationResponse getOrderPool(RiderOrderPoolParam param, Integer storeId) {
         LambdaQueryWrapper<MtOrder> wrapper = Wrappers.lambdaQuery();
@@ -89,6 +96,14 @@ public class RiderOrderServiceImpl extends ServiceImpl<MtRiderOrderMapper, MtRid
         return response;
     }
 
+    /**
+     * 骑手接单
+     * @param orderId
+     * @param riderId
+     * @param merchantId
+     * @return
+     * @throws BusinessCheckException
+     * */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public RiderOrderDto acceptOrder(Integer orderId, Integer riderId, Integer merchantId) throws BusinessCheckException {
@@ -101,7 +116,7 @@ public class RiderOrderServiceImpl extends ServiceImpl<MtRiderOrderMapper, MtRid
         }
 
         MtRider rider = mtRiderMapper.selectById(riderId);
-        if (rider == null || !"A".equals(rider.getStatus())) {
+        if (rider == null || !StatusEnum.ENABLED.getKey().equals(rider.getStatus())) {
             throw new BusinessCheckException("骑手状态异常");
         }
 
@@ -127,6 +142,12 @@ public class RiderOrderServiceImpl extends ServiceImpl<MtRiderOrderMapper, MtRid
         return convertToRiderOrderDto(order);
     }
 
+    /**
+     * 获取骑手的配送订单列表
+     * @param param
+     * @param riderId
+     * @return
+     * */
     @Override
     public PaginationResponse getMyOrders(RiderMyOrderParam param, Integer riderId) {
         String status = param.getStatus();
@@ -161,6 +182,12 @@ public class RiderOrderServiceImpl extends ServiceImpl<MtRiderOrderMapper, MtRid
         return response;
     }
 
+    /**
+     * 获取骑手订单详情
+     * @param orderId
+     * @return
+     * @throws BusinessCheckException
+     * */
     @Override
     public RiderOrderDto getOrderDetail(Integer orderId) throws BusinessCheckException {
         MtOrder order = mtOrderMapper.selectById(orderId);
@@ -170,6 +197,13 @@ public class RiderOrderServiceImpl extends ServiceImpl<MtRiderOrderMapper, MtRid
         return convertToRiderOrderDto(order);
     }
 
+    /**
+     * 骑手确认取货
+     * @param orderId
+     * @param riderId
+     * @return
+     * @throws BusinessCheckException
+     * */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public RiderOrderDto confirmPickup(Integer orderId, Integer riderId) throws BusinessCheckException {
@@ -203,6 +237,13 @@ public class RiderOrderServiceImpl extends ServiceImpl<MtRiderOrderMapper, MtRid
         return convertToRiderOrderDto(order);
     }
 
+    /**
+     * 骑手确认送达
+     * @param orderId
+     * @param riderId
+     * @return
+     * @throws BusinessCheckException
+     * */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public RiderOrderDto confirmDeliver(Integer orderId, Integer riderId) throws BusinessCheckException {
@@ -236,6 +277,12 @@ public class RiderOrderServiceImpl extends ServiceImpl<MtRiderOrderMapper, MtRid
         return convertToRiderOrderDto(order);
     }
 
+    /**
+     * 搜索已完成配送订单
+     * @param param
+     * @param riderId
+     * @return
+     * */
     @Override
     public PaginationResponse searchCompletedOrders(RiderOrderSearchParam param, Integer riderId) {
         com.github.pagehelper.Page pageHelper = com.github.pagehelper.PageHelper.startPage(
@@ -284,8 +331,7 @@ public class RiderOrderServiceImpl extends ServiceImpl<MtRiderOrderMapper, MtRid
             }
         }
 
-        Page<RiderOrderDto> pageImpl = new PageImpl<>(dtoList,
-                PageRequest.of(param.getPage() - 1, param.getPageSize()), pageHelper.getTotal());
+        Page<RiderOrderDto> pageImpl = new PageImpl<>(dtoList, PageRequest.of(param.getPage() - 1, param.getPageSize()), pageHelper.getTotal());
         PaginationResponse<RiderOrderDto> response = new PaginationResponse(pageImpl, RiderOrderDto.class);
         response.setTotalPages(pageHelper.getPages());
         response.setTotalElements(pageHelper.getTotal());
@@ -293,6 +339,12 @@ public class RiderOrderServiceImpl extends ServiceImpl<MtRiderOrderMapper, MtRid
         return response;
     }
 
+    /**
+     * 获取骑手统计信息
+     * @param riderId
+     * @param mode
+     * @return
+     * */
     @Override
     public RiderStatsDto getRiderStats(Integer riderId, String mode) {
         RiderStatsDto stats = new RiderStatsDto();
@@ -328,6 +380,11 @@ public class RiderOrderServiceImpl extends ServiceImpl<MtRiderOrderMapper, MtRid
         return stats;
     }
 
+    /**
+     * 获取今日概览数据
+     * @param riderId
+     * @return
+     * */
     @Override
     public Map<String, Object> getTodayOverview(Integer riderId) {
         Map<String, Object> result = new HashMap<>();

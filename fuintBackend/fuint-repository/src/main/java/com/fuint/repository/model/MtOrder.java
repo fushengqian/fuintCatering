@@ -138,7 +138,7 @@ public class MtOrder implements Serializable {
     @ApiModelProperty("分佣提成用户ID")
     private Integer commissionUserId;
 
-    @ApiModelProperty("配送方式：self=自取 express=快递 rider=骑手配送")
+    @ApiModelProperty("配送方式：express=快递 rider=骑手配送")
     private String deliverMethod;
 
     @ApiModelProperty("骑手ID")
