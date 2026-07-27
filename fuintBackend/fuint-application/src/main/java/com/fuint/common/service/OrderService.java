@@ -194,9 +194,10 @@ public interface OrderService extends IService<MtOrder> {
      * @param isUsePoint 是否使用积分抵扣
      * @param platform 平台 h5
      * @param orderMode 订单模式，自取或配送
+     * @param couponIds 多张卡券ID，逗号分隔
      * @return
      * */
-    Map<String, Object> calculateCartGoods(Integer merchantId, Integer userId, List<MtCart> cartList, Integer couponId, boolean isUsePoint, String platform, String orderMode);
+    Map<String, Object> calculateCartGoods(Integer merchantId, Integer userId, List<MtCart> cartList, Integer couponId, boolean isUsePoint, String platform, String orderMode, String couponIds);
 
     /**
      * 获取支付金额

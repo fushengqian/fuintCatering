@@ -13,7 +13,7 @@
    padding: 0 20rpx;
 
    .pay-item {
-     padding: 30rpx;
+     padding: 30rpx 30rpx 60rpx 30rpx;
      font-size: 30rpx;
      background: #fff;
      border: 1rpx solid $fuint-theme;
@@ -152,18 +152,29 @@
   width: 750rpx;
   background: #fff;
   box-sizing: border-box;
-  padding: 30rpx;
+  padding: 30rpx 30rpx 60rpx 30rpx;
   
-  .coupon__do_not {
-    .control {
-      width: 90%;
-      height: 82rpx;
-      margin-top: 30rpx;
-      margin-bottom: 1rpx;
-      color: #fff;
-      background: $fuint-theme;
-      border: 1rpx solid $fuint-theme;
+  .coupon__actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30rpx;
+    
+    .action-btn {
+      width: 48%;
+      height: 80rpx;
       border-radius: 8rpx;
+      color: #fff;
+    }
+    
+    .cancel-btn {
+      background: #fff;
+      border: 2rpx solid #ff5b57;
+      color: #ff5b57;
+    }
+    
+    .confirm-btn {
+      background: #ff5b57;
+      border: 1rpx solid #ff5b57;
     }
   }
   
@@ -185,6 +196,8 @@
     border-radius: 8rpx;
     color: #fff;
     height: 180rpx;
+    padding-left: 70rpx;
+    box-sizing: border-box;
   
     .coupon-type {
       position: absolute;
@@ -251,11 +264,13 @@
   
       .money {
         font-weight: bold;
-        font-size: 52rpx;
+        font-size: 38rpx;
+        text-align: left;
       }
   
       .pay-line {
         font-size: 22rpx;
+        text-align: left;
       }
     }
   
@@ -290,6 +305,57 @@
     }
   }
   
+  /* 选择指示器 */
+  .select-indicator {
+    position: absolute;
+    top: 50%;
+    left: 16rpx;
+    transform: translateY(-50%);
+    z-index: 20;
+  }
+  
+  .indicator-radio {
+    width: 38rpx;
+    height: 38rpx;
+    border-radius: 50%;
+    border: 3rpx solid rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &.checked {
+      border-color: #ff5b57;
+      background: #ff5b57;
+      
+      .radio-dot {
+        width: 14rpx;
+        height: 14rpx;
+        border-radius: 50%;
+        background: #fff;
+      }
+    }
+  }
+  
+  .indicator-checkbox {
+    width: 38rpx;
+    height: 38rpx;
+    border-radius: 6rpx;
+    border: 3rpx solid rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &.checked {
+      border-color: #ff5b57;
+      background: #ff5b57;
+      
+      .iconfont {
+        color: #fff;
+        font-size: 22rpx;
+      }
+    }
+  }
+
 }
 
 /* 积分抵扣 */

@@ -170,6 +170,18 @@
           <text>-￥{{ order.pointAmount.toFixed(2) }}</text>
         </view>
       </view>
+      <!-- 使用卡券信息 -->
+      <view v-if="order.couponInfoList && order.couponInfoList.length > 0" class="info-item coupon-used">
+        <view class="item-lable">使用卡券</view>
+        <view class="item-content">
+          <view class="coupon-used-list">
+            <view class="coupon-used-item" v-for="(coupon, idx) in order.couponInfoList" :key="idx">
+              <text class="coupon-name">{{ coupon.name }}</text>
+              <text class="coupon-amount">-￥{{ coupon.amount ? coupon.amount.toFixed(2) : '0.00' }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
       <view class="info-item" v-if="order.payStatus == 'B'">
         <view class="item-lable">支付方式</view>
         <view class="item-content">
@@ -849,6 +861,39 @@
         font-size: 26rpx;
         color: #333;
         text-align: right;
+      }
+    }
+
+    .coupon-used {
+      .item-lable {
+        align-self: flex-start;
+      }
+      .item-content {
+        text-align: left;
+      }
+      .coupon-used-list {
+        width: 100%;
+        .coupon-used-item {
+          display: flex;
+          justify-content: space-between;
+          padding: 8rpx 0;
+          border-bottom: 1rpx dashed #eee;
+          &:first-child {
+            padding-top: 0;
+          }
+          &:last-child {
+            border-bottom: none;
+          }
+          .coupon-name {
+            color: #666;
+            font-size: 24rpx;
+          }
+          .coupon-amount {
+            color: #ff5b57;
+            font-size: 24rpx;
+            font-weight: bold;
+          }
+        }
       }
     }
 

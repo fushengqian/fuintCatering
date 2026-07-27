@@ -336,7 +336,7 @@ public class ClientCartController extends BaseController {
         if (merchantId <= 0) {
             merchantId = mtUser.getMerchantId();
         }
-        result = orderService.calculateCartGoods(merchantId, mtUser.getId(), cartList, userCouponId, isUsePoint, platform, orderMode);
+        result = orderService.calculateCartGoods(merchantId, mtUser.getId(), cartList, userCouponId, isUsePoint, platform, orderMode, null);
 
         return getSuccessResult(result);
     }

@@ -542,65 +542,6 @@
                 }
     ]
    }],
-        {
-           "root": "riderPages",
-           "pages": [
-               {
-                 "path": "index/index",
-                 "style": {
-                   "navigationStyle": "custom"
-                 }
-               },
-               {
-                 "path": "order/pool",
-                 "style": {
-                   "navigationBarTitleText": "接单大厅"
-                 }
-               },
-               {
-                 "path": "order/detail",
-                 "style": {
-                   "navigationBarTitleText": "订单详情"
-                 }
-               },
-               {
-                 "path": "order/pickup",
-                 "style": {
-                   "navigationBarTitleText": "待取货"
-                 }
-               },
-               {
-                 "path": "order/delivering",
-                 "style": {
-                   "navigationBarTitleText": "配送中"
-                 }
-               },
-               {
-                 "path": "order/search",
-                 "style": {
-                   "navigationBarTitleText": "搜索订单"
-                 }
-               },
-               {
-                 "path": "stats/overview",
-                 "style": {
-                   "navigationBarTitleText": "配送统计"
-                 }
-               },
-               {
-                 "path": "stats/income",
-                 "style": {
-                   "navigationBarTitleText": "收入统计"
-                 }
-               },
-               {
-                 "path": "profile/index",
-                 "style": {
-                   "navigationBarTitleText": "个人信息"
-                 }
-               }
-           ]
-         }],
    "preloadRule": {
      "pages/index/index": {
         "network": "all",

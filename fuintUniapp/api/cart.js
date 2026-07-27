@@ -8,8 +8,8 @@ const api = {
 }
 
 // 购物车列表
-export const list = (cartIds, goodsId, skuId, buyNum, couponId, point, orderMode) => {
-  return request.post(api.list, { cartIds, goodsId, skuId, buyNum, couponId, point, orderMode })
+export const list = (cartIds, goodsId, skuId, buyNum, couponId, point, orderMode, couponIds) => {
+  return request.post(api.list, { cartIds, goodsId, skuId, buyNum, couponId, point, orderMode, couponIds })
 }
 
 // 更新购物车

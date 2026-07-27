@@ -96,7 +96,8 @@
         <text class="flex-five">使用卡券抵扣：</text>
         <view class="flex-five t-r">
           <view v-if="couponList.length > 0" @click="handleShowPopup()">
-            <text class="col-m" v-if="couponAmount">-￥{{ couponAmount }}</text>
+            <text class="col-m" v-if="selectCouponIds.length > 0">已选{{ selectCouponIds.length }}张储值卡</text>
+            <text class="col-m" v-else-if="couponAmount">-￥{{ couponAmount }}</text>
             <text class="col-m" v-else>可用卡券{{ couponList.length }}张</text>
             <text class="right-arrow iconfont icon-arrow-right"></text>
           </view>
@@ -189,12 +190,23 @@
             <view class="coupon__title f-30">选择卡券</view>
             <!-- 卡券列表 -->
             <view class="coupon-list">
-              <scroll-view :scroll-y="true" style="height: 565rpx;">
+              <scroll-view :scroll-y="true" style="height: 700rpx;">
                 <view class="coupon-item" v-for="(item, index) in couponList" :key="index">
                   <view class="item-wrapper"
                     v-if="item.status == 'A'"
-                    :class="[item.status == 'A' ? 'color-default': 'color-gray']"
+                    :class="[(item.status == 'A' ? 'color-default': 'color-gray'), isCouponSelected(item) ? 'selected' : '']"
                     @click="handleSelectCoupon(index)">
+                    <!-- 选择指示器 -->
+                    <view class="select-indicator">
+                      <!-- 储值卡：checkbox 多选 -->
+                      <view v-if="item.type == '储值卡'" :class="['indicator-checkbox', selectCouponIds.includes(item.userCouponId) ? 'checked' : '']">
+                        <text v-if="selectCouponIds.includes(item.userCouponId)" class="iconfont icon-duihao"></text>
+                      </view>
+                      <!-- 优惠券：radio 单选 -->
+                      <view v-else :class="['indicator-radio', selectCouponId == item.userCouponId ? 'checked' : '']">
+                        <view v-if="selectCouponId == item.userCouponId" class="radio-dot"></view>
+                      </view>
+                    </view>
                     <view class="coupon-type">{{ item.type }}</view>
                     <view class="tip dis-flex flex-dir-column flex-x-center">
                       <text class="money" v-if="item.content != '2'">￥{{ item.amount }}</text>
@@ -214,10 +226,13 @@
                 </view>
               </scroll-view>
             </view>
-            <!-- 不使用卡券 -->
-            <view class="coupon__do_not dis-flex flex-y-center flex-x-center">
-              <view class="control dis-flex flex-y-center flex-x-center" @click="handleNotUseCoupon()">
-                <text class="f-26">不使用卡券</text>
+            <!-- 底部操作 -->
+            <view class="coupon__actions dis-flex flex-x-between">
+              <view class="action-btn cancel-btn dis-flex flex-y-center flex-x-center" @click="handleNotUseCoupon()">
+                <text class="f-28">不使用卡券</text>
+              </view>
+              <view class="action-btn confirm-btn dis-flex flex-y-center flex-x-center" @click="confirmCouponSelection">
+                <text class="f-28">{{ confirmBtnText }}</text>
               </view>
             </view>
           </view>
@@ -308,6 +323,7 @@
         address: null,
         useCouponInfo: null,
         selectCouponId: 0,
+        selectCouponIds: [],
         myPoint: 0,
         usePoint: 0,
         couponAmount: 0,
@@ -327,6 +343,18 @@
         orderId: "",
         // 门店支付
         payOffLine: false
+      }
+    },
+
+    computed: {
+      confirmBtnText() {
+        if (this.selectCouponIds.length > 0) {
+          return `确认选择 (已选${this.selectCouponIds.length}张储值卡)`;
+        }
+        if (this.selectCouponId > 0) {
+          return '确认选择 (已选1张优惠券)';
+        }
+        return '确认选择';
       }
     },
 
@@ -370,7 +398,8 @@
           if (!app.orderMode) {
               orderMode = "express";
           }
-          CartApi.list(app.options.cartIds, app.options.goodsId, app.options.skuId, app.options.buyNum, app.selectCouponId, app.isUsePoints, orderMode)
+          const couponIds = app.selectCouponIds.length > 0 ? app.selectCouponIds.join(',') : '';
+          CartApi.list(app.options.cartIds, app.options.goodsId, app.options.skuId, app.options.buyNum, app.selectCouponId, app.isUsePoints, orderMode, couponIds)
             .then(result => {
               app.goodsCart = result.data.list;
               app.totalNum = result.data.totalNum;
@@ -415,17 +444,46 @@
       // 选择卡券
       handleSelectCoupon(index) {
           const app = this;
-          // 当前选择的卡券
           const couponItem = app.couponList[index];
-          // 记录选中的卡券id
           if (couponItem.status != 'A') {
               app.$error('该卡券不可用');
               return false;
           }
-          app.selectCouponId = couponItem.userCouponId;
-          // 重新获取购物车信息
+          // 储值卡：checkbox 多选
+          if (couponItem.type == '储值卡') {
+              const idx = app.selectCouponIds.indexOf(couponItem.userCouponId);
+              if (idx > -1) {
+                  app.selectCouponIds.splice(idx, 1);
+              } else {
+                  app.selectCouponIds.push(couponItem.userCouponId);
+              }
+              // 互斥：清空优惠券单选
+              app.selectCouponId = 0;
+          } else {
+              // 优惠券：radio 单选，再次点击取消选中
+              if (app.selectCouponId == couponItem.userCouponId) {
+                  app.selectCouponId = 0;
+              } else {
+                  app.selectCouponId = couponItem.userCouponId;
+              }
+              // 互斥：清空储值卡多选
+              app.selectCouponIds = [];
+          }
+          // 不关闭弹窗，等用户点击"确认选择"
+      },
+
+      // 判断卡券是否被选中
+      isCouponSelected(item) {
+          if (item.type == '储值卡') {
+              return this.selectCouponIds.includes(item.userCouponId);
+          }
+          return this.selectCouponId == item.userCouponId;
+      },
+
+      // 确认卡券选择
+      confirmCouponSelection() {
+          const app = this;
           app.getCartList();
-          // 隐藏卡券弹层
           app.showPopup = false;
       },
 
@@ -433,9 +491,8 @@
       handleNotUseCoupon() {
           const app = this;
           app.selectCouponId = 0;
-          // 重新获取购物车信息
+          app.selectCouponIds = [];
           app.getCartList();
-          // 隐藏卡券弹层
           app.showPopup = false;
       },
       
@@ -554,7 +611,8 @@
         // 就餐人数
         let peopleNum = uni.getStorageSync('peopleNum');
         // 请求api
-        SettlementApi.submit(0, "", "goods", app.remark, 0, app.usePoint, app.selectCouponId, app.options.cartIds, app.options.goodsId, app.options.skuId, app.options.buyNum, orderMode, payType, peopleNum)
+        const couponIds = app.selectCouponIds.length > 0 ? app.selectCouponIds.join(',') : '';
+        SettlementApi.submit(0, "", "goods", app.remark, 0, app.usePoint, app.selectCouponId, app.options.cartIds, app.options.goodsId, app.options.skuId, app.options.buyNum, orderMode, payType, peopleNum, couponIds)
           .then(result => {
               app.onSubmitCallback(result);
           })
@@ -647,4 +705,8 @@
 
 <style lang="scss" scoped>
   @import "./style.scss";
+  
+  .popup__coupon .coupon-item .item-wrapper.selected {
+    border: 2px solid #ff5b57;
+  }
 </style>

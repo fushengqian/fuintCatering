@@ -294,6 +294,13 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
         mtCoupon.setInRule(CommonUtil.replaceXSS(reqCouponDto.getInRule()));
         mtCoupon.setOutRule(CommonUtil.replaceXSS(reqCouponDto.getOutRule()));
         mtCoupon.setApplyGoods(reqCouponDto.getApplyGoods());
+
+        // 指定商品券必须关联适用商品
+        if (ApplyGoodsEnum.PARK_GOODS.getKey().equals(reqCouponDto.getApplyGoods())
+                && StringUtil.isEmpty(reqCouponDto.getGoodsIds())) {
+            throw new BusinessCheckException("指定商品券必须选择适用的商品");
+        }
+
         mtCoupon.setUseFor(reqCouponDto.getUseFor());
 
         if (null == reqCouponDto.getAmount()) {

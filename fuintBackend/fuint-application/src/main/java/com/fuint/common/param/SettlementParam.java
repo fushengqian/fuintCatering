@@ -36,6 +36,9 @@ public class SettlementParam implements Serializable {
     @ApiModelProperty(value="使用卡券ID", name="couponId")
     private Integer couponId;
 
+    @ApiModelProperty(value="使用卡券ID列表，逗号分隔（储值卡叠加使用）", name="couponIds")
+    private String couponIds;
+
     @ApiModelProperty(value="支付类型，CASH：现金支付，JSAPI：微信支付，MICROPAY：微信扫码支付，BALANCE：余额支付，ALISCAN：支付宝扫码", name="payType")
     private String payType;
 
@@ -74,5 +77,11 @@ public class SettlementParam implements Serializable {
 
     @ApiModelProperty(value="员工ID", name="staffId")
     private Integer staffId;
+
+    @ApiModelProperty(value="桌台", name="tableId")
+    private Integer tableId;
+
+    @ApiModelProperty(value="就餐人数", name="peopleNum")
+    private Integer peopleNum;
 
 }

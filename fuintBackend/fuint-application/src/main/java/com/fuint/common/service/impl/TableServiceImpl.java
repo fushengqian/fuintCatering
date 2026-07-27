@@ -297,7 +297,7 @@ public class TableServiceImpl extends ServiceImpl<MtTableMapper, MtTable> implem
             if (cartList.size() > 0) {
                 Integer userId = cartList.get(0).getUserId();
                 String isVisitor = cartList.get(0).getIsVisitor();
-                Map<String, Object> cartInfo = orderService.calculateCartGoods(tableParam.getMerchantId(), userId, cartList, 0, false, PlatformTypeEnum.PC.getCode(), OrderModeEnum.ONESELF.getKey());
+                Map<String, Object> cartInfo = orderService.calculateCartGoods(tableParam.getMerchantId(), userId, cartList, 0, false, PlatformTypeEnum.PC.getCode(), OrderModeEnum.ONESELF.getKey(), null);
                 hangUpDto.setNum(Double.parseDouble(cartInfo.get("totalNum").toString()));
                 hangUpDto.setAmount(new BigDecimal(cartInfo.get("totalPrice").toString()));
                 if (isVisitor.equals(YesOrNoEnum.NO.getKey())) {
