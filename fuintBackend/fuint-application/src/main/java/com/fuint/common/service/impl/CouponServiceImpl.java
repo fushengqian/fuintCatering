@@ -1207,8 +1207,8 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
     /**
      * 根据批次撤销卡券
      *
-     * @param  uuid       批次ID
-     * @param  accountInfo   操作人
+     * @param  uuid 批次ID
+     * @param  accountInfo 操作人
      * @throws BusinessCheckException
      * @return
      */
@@ -1226,12 +1226,10 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
         List<Integer> couponIds = new ArrayList<>();
         couponIds.add(0);
 
-        Date nowDate = new Date();
-
         for (int i = 0; i < couponIdList.size(); i++) {
             Integer couponId = couponIdList.get(i);
             MtCoupon couponInfo = queryCouponById(couponId);
-            if (couponInfo.getStatus().equals(StatusEnum.ENABLED.getKey()) && couponInfo.getEndTime().after(nowDate)) {
+            if (couponInfo.getStatus().equals(StatusEnum.ENABLED.getKey())) {
                 couponIds.add(couponId);
             }
         }

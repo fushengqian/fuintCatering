@@ -230,6 +230,7 @@ public class ClientCartController extends BaseController {
         Double buyNum = params.getBuyNum() == null ? 1.0 : params.getBuyNum();
         String cartIds = params.getCartIds() == null ? "" : params.getCartIds();
         Integer userCouponId = params.getCouponId() == null ? 0 : params.getCouponId();// 会员卡券ID
+        String couponIds = params.getCouponIds() == null ? "" : params.getCouponIds();// 多卡ID列表
         Integer userId = params.getUserId() == null ? 0 : params.getUserId(); // 会员ID
         String point = params.getPoint() == null ? "" : params.getPoint();
         String orderMode = params.getOrderMode() == null ? OrderModeEnum.ONESELF.getKey() : params.getOrderMode();
@@ -336,7 +337,7 @@ public class ClientCartController extends BaseController {
         if (merchantId <= 0) {
             merchantId = mtUser.getMerchantId();
         }
-        result = orderService.calculateCartGoods(merchantId, mtUser.getId(), cartList, userCouponId, isUsePoint, platform, orderMode, null);
+        result = orderService.calculateCartGoods(merchantId, mtUser.getId(), cartList, userCouponId, isUsePoint, platform, orderMode, couponIds);
 
         return getSuccessResult(result);
     }

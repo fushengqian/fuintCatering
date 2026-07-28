@@ -1047,6 +1047,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         orderDto.setPayAmount(new BigDecimal("0"));
         orderDto.setAmount(new BigDecimal("0"));
         orderDto.setCartIds(cartIds);
+        orderDto.setCouponIds(couponIds);
 
         // 储值卡的订单
         if (orderDto.getType().equals(OrderTypeEnum.PRESTORE.getKey())) {

@@ -189,6 +189,7 @@
   import * as MessageApi from '@/api/message'
   import { checkLogin, showMessage } from '@/utils/app'
   import Popup from './components/Popup'
+  import * as ServiceApi from '@/api/service'
 
   // 订单操作
   const orderNavbar = [
@@ -201,7 +202,7 @@
    * 我的服务
    * id: 标识; name: 标题名称; icon: 图标; type 类型(link和button); url: 跳转的链接
    */
-  const service = [
+  const defaultService = [
     { id: 'myCoupon', name: '卡券兑换', icon: 'youhuiquan', type: 'link', url: 'subPages/coupon/receive' },
     { id: 'coupon', name: '转赠记录', icon: 'lingquan', type: 'link', url: 'pages/give/index' },
     { id: 'points', name: '我的积分', icon: 'jifen', type: 'link', url: 'pages/points/detail' },
@@ -211,7 +212,7 @@
     { id: 'address', name: '收货地址', icon: 'shouhuodizhi', type: 'link', url: 'pages/address/index' },
     { id: 'refund', name: '售后服务', icon: 'shouhou', type: 'link', url: 'pages/refund/index' },
     { id: 'setting', name: '个人信息', icon: 'shezhi1', type: 'link', url: 'pages/user/setting' },
-    { id: 'book', name: '立即预约', icon: 'naozhong', type: 'link', url: 'subPages/book/index' },
+    { id: 'book2', name: '立即预约', icon: 'naozhong', type: 'link', url: 'subPages/book/index' },
     { id: 'commission', name: '分佣提成', icon: 'zijinmingxi', type: 'link', url: 'subPages/commission/statistics' },
   ]
 
@@ -240,7 +241,7 @@
         // 账户资产
         assets: { prestore: '0', timer: '0', coupon: '0' },
         // 我的服务
-        service,
+        service: [],
         // 订单操作
         orderNavbar,
         // 当前用户待处理的订单数量
@@ -290,14 +291,28 @@
       // 初始化我的服务数据
       initService() {
         const app = this
-        const newService = []
-        service.forEach(item => {
-          if (item.id === 'points') {
-            item.name = '我的积分'
-          }
-          newService.push(item)
-        })
-        app.service = newService
+        ServiceApi.list()
+          .then(result => {
+            if (result.data && result.data.serviceList && result.data.serviceList.length > 0) {
+              const newService = []
+              result.data.serviceList.forEach(item => {
+                newService.push({
+                  id: item.id || '',
+                  name: item.name,
+                  icon: item.icon,
+                  type: item.type,
+                  url: item.url || '',
+                  openType: item.openType || '',
+                })
+              })
+              app.service = newService
+            } else {
+              app.service = [...defaultService]
+            }
+          })
+          .catch(() => {
+            app.service = [...defaultService]
+          })
       },
 
       // 初始化订单操作数据
