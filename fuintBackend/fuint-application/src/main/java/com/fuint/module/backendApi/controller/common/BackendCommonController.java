@@ -88,6 +88,9 @@ public class BackendCommonController extends BaseController {
         if (type.equals(QrCodeEnum.COUPON.getKey())) {
             page = QrCodeEnum.COUPON.getPage() + "?" + QrCodeEnum.COUPON.getKey() + "Id=" + id;
         }
+        if (type.equals(QrCodeEnum.USER_COUPON.getKey())) {
+            page = QrCodeEnum.USER_COUPON.getPage() + "?id=" + id;
+        }
         if (type.equals(QrCodeEnum.STORE.getKey())) {
             MtStore mtStore = storeService.queryStoreById(id);
             if (mtStore != null) {

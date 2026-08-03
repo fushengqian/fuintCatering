@@ -575,8 +575,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             mtOrder.setUsePoint(Integer.parseInt(cartData.get("usePoint").toString()));
             mtOrder.setDiscount(new BigDecimal(cartData.get("couponAmount").toString()));
 
-            // 实付金额
-            BigDecimal payAmount = mtOrder.getAmount().subtract(mtOrder.getPointAmount()).subtract(mtOrder.getDiscount());
+            // 实付金额（先加上配送费，会员折扣在后面统一处理）
+            BigDecimal payAmount = mtOrder.getAmount().subtract(mtOrder.getPointAmount()).subtract(mtOrder.getDiscount()).add(mtOrder.getDeliveryFee());
             if (payAmount.compareTo(new BigDecimal("0")) > 0) {
                 mtOrder.setPayAmount(payAmount);
             } else {
@@ -758,9 +758,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                  }
             }
 
-            // 会员折扣
+            // 会员折扣（discount字段只记录卡券折扣，不叠加会员折扣，避免doSettle时重复计算）
             if (memberDiscount.compareTo(new BigDecimal("0")) > 0 && !userInfo.getIsStaff().equals(YesOrNoEnum.YES.getKey())) {
-                orderInfo.setDiscount(orderInfo.getDiscount().add(memberDiscount));
                 if (orderInfo.getPayAmount().subtract(memberDiscount).compareTo(new BigDecimal("0")) > 0) {
                     orderInfo.setPayAmount(orderInfo.getPayAmount().subtract(memberDiscount));
                 } else {
@@ -1260,8 +1259,10 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
 
             if (hasProcessed && totalCouponDiscount.compareTo(BigDecimal.ZERO) > 0) {
-                orderDto.setDiscount(orderInfo.getDiscount().add(totalCouponDiscount));
-                orderDto.setPayAmount(orderInfo.getPayAmount().subtract(totalCouponDiscount));
+                // discount字段只存卡券折扣，计算差额避免重复扣减
+                BigDecimal diff = totalCouponDiscount.subtract(orderInfo.getDiscount());
+                orderDto.setDiscount(totalCouponDiscount);
+                orderDto.setPayAmount(orderInfo.getPayAmount().subtract(diff));
                 updateOrder(orderDto);
             }
         }
@@ -1269,8 +1270,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         // 生成支付订单
         orderInfo = getOrderInfo(orderInfo.getId());
         String ip = CommonUtil.getIPFromHttpRequest(request);
-        BigDecimal realPayAmount = orderInfo.getAmount().subtract(new BigDecimal(orderInfo.getDiscount().toString())).subtract(new BigDecimal(orderInfo.getPointAmount().toString())).add(orderInfo.getDeliveryFee());
-        if (realPayAmount.compareTo(new BigDecimal("0")) < 0) {
+        BigDecimal realPayAmount = orderInfo.getPayAmount();
+        if (realPayAmount == null || realPayAmount.compareTo(new BigDecimal("0")) < 0) {
             realPayAmount = new BigDecimal("0");
         }
 
