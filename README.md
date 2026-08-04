@@ -36,13 +36,13 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系
 <p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/cashierV2.png" alt="提交订单"></p>
 
 前端使用技术<br>
-2.1 Vue2<br>
+2.1 Vue<br>
 2.2 Uniapp<br>
 2.3 Element UI
-2.4 Nodejs 14或16版本 
+2.4 Nodejs 18或20版本 
 
 后端使用技术<br>
-1.1 SpringBoot 2.5<br>
+1.1 SpringBoot 2.7+<br>
 1.2 Mybatis Plus<br>
 1.3 Maven<br>
 1.4 SpringSecurity<br>
@@ -57,7 +57,7 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系
 
 
 #### 安装步骤
-推荐软件环境版本：jdk 1.8、mysql 5.8
+推荐软件环境版本：jdk 1.8、jdk11、jdk17、mysql 5.7、mysql 5.8
 1. 导入db目录下的数据库文件。
 2. 修改config目录下的配置文件。
 3. 将工程打包，把jar包上传并执行。
