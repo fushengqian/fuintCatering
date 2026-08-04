@@ -671,7 +671,7 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
         }
         MtCoupon couponInfo = queryCouponById(couponId);
         MtUser userInfo = memberService.queryMemberById(userId);
-        if (!accountInfo.getMerchantId().equals(userInfo.getMerchantId()) || !accountInfo.getMerchantId().equals(couponInfo.getMerchantId())) {
+        if (accountInfo.getMerchantId() == null || !accountInfo.getMerchantId().equals(userInfo.getMerchantId()) || !accountInfo.getMerchantId().equals(couponInfo.getMerchantId())) {
             response.setMessage("卡券发放有误");
             response.setCode(201);
             return response;
@@ -1196,7 +1196,6 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
     /**
      * 根据ID获取用户卡券信息
      * @param  userCouponId 查询参数
-     * @throws BusinessCheckException
      * @return
      * */
     @Override
@@ -1209,7 +1208,6 @@ public class CouponServiceImpl extends ServiceImpl<MtCouponMapper, MtCoupon> imp
      *
      * @param  uuid 批次ID
      * @param  accountInfo 操作人
-     * @throws BusinessCheckException
      * @return
      */
     @Override
