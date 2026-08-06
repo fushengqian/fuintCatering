@@ -611,6 +611,21 @@ public class RefundServiceImpl extends ServiceImpl<MtRefundMapper, MtRefund> imp
             }
         }
 
+        // 回收购买商品附赠的卡券
+        LambdaQueryWrapper<MtUserCoupon> giftCouponWrapper = Wrappers.lambdaQuery();
+        giftCouponWrapper.eq(MtUserCoupon::getOrderId, orderInfo.getId());
+        List<MtUserCoupon> giftCouponList = mtUserCouponMapper.selectList(giftCouponWrapper);
+        if (giftCouponList != null && giftCouponList.size() > 0) {
+            for (MtUserCoupon giftCoupon : giftCouponList) {
+                if (giftCoupon.getStatus().equals(UserCouponStatusEnum.UNUSED.getKey())) {
+                    giftCoupon.setStatus(UserCouponStatusEnum.DISABLE.getKey());
+                    giftCoupon.setUpdateTime(new Date());
+                    giftCoupon.setOperator(refundDto.getOperator() == null ? "" : refundDto.getOperator());
+                    mtUserCouponMapper.updateById(giftCoupon);
+                }
+            }
+        }
+
         // 微信支付发起退款
         if (orderInfo.getPayType().equals(PayTypeEnum.JSAPI.getKey()) || orderInfo.getPayType().equals(PayTypeEnum.MICROPAY.getKey())) {
             weixinService.doRefund(orderInfo.getStoreInfo() != null ? orderInfo.getStoreInfo().getId() : 0, orderInfo.getOrderSn(), orderInfo.getPayAmount(), mtRefund.getAmount(), PlatformTypeEnum.MP_WEIXIN.getCode());
