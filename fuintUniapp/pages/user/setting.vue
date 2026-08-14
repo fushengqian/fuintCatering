@@ -70,8 +70,6 @@
         <text class="action-title">用微信头像</text>
       </button>
       <!-- #endif -->
-      <view class="action-item" @click="chooseImage('album')">从相册选择</view>
-      <view class="action-item" @click="chooseImage('camera')">拍照</view>
       <view class="action-item action-cancel" @click="hideAvatarAction">取消</view>
     </view>
   </view>
@@ -166,7 +164,6 @@
       // 修改密码
       changePassword() {
          this.$navTo('pages/user/password?hasPassword=' + this.userInfo.hasPassword);
-         console.log(this.userInfo.hasPassword);
       },
       // 修改手机号
       changeMobile() {
@@ -203,41 +200,6 @@
           .catch(() => {
             app.$error('头像上传失败')
           })
-      },
-      // 选择图片
-      chooseImage(sourceType) {
-        const app = this
-        app.avatarActionVisible = false
-        let sourceTypeArr = ['album', 'camera']
-        if (sourceType === 'album') {
-          sourceTypeArr = ['album']
-        } else if (sourceType === 'camera') {
-          sourceTypeArr = ['camera']
-        }
-        // 选择图片
-        uni.chooseImage({
-          count: 1,
-          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-          sourceType: sourceTypeArr, // 可以指定来源是相册还是相机
-          success({ tempFiles }) {
-            const imageList = tempFiles;
-            return new Promise((resolve, reject) => {
-              if (imageList.length > 0) {
-                  UploadApi.image(imageList)
-                      .then(files => {
-                          if (files && files.length > 0) {
-                              app.userInfo.avatar = files[0].fileName;
-                              app.avatar = files[0].domain + app.userInfo.avatar;
-                          }
-                          resolve(files)
-                      })
-                      .catch(err => reject(err))
-              } else {
-                resolve()
-              }
-            })
-          }
-        });
       },
       /**
        * 保存个人信息
@@ -375,7 +337,6 @@
       color: #333;
       width: 100%;
 
-      // 重置 button 默认样式
       &::after {
         display: none;
       }
