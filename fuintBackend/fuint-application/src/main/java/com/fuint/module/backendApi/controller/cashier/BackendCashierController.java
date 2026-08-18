@@ -84,6 +84,11 @@ public class BackendCashierController extends BaseController {
     private MemberService memberService;
 
     /**
+     * 会员等级服务接口
+     */
+    private UserGradeService userGradeService;
+
+    /**
      * 商户接口
      */
     private MerchantService merchantService;
@@ -436,5 +441,53 @@ public class BackendCashierController extends BaseController {
         }
         orderService.removeGoods(param);
         return getSuccessResult(true);
+    }
+
+    /**
+     * 获取会员可付费升级的等级列表
+     */
+    @ApiOperation(value = "获取会员可付费升级的等级列表")
+    @RequestMapping(value = "/gradeList/{userId}", method = RequestMethod.GET)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('cashier:index')")
+    public ResponseObject getUpgradeGradeList(HttpServletRequest request, @PathVariable("userId") Integer userId) throws BusinessCheckException {
+        String token = request.getHeader("Access-Token");
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+
+        if (accountInfo == null) {
+            return getFailureResult(1001);
+        }
+
+        MtUser userInfo = memberService.queryMemberById(userId);
+        if (userInfo == null) {
+            return getFailureResult(2000, "该会员信息不存在");
+        }
+
+        // 校验会员和店员是否同商户
+        if (!accountInfo.getMerchantId().equals(userInfo.getMerchantId())) {
+            return getFailureResult(2000, "该会员不属于当前商户");
+        }
+
+        // 获取可付费升级的等级列表
+        List<MtUserGrade> gradeList = userGradeService.getPayUserGradeList(accountInfo.getMerchantId(), userInfo);
+
+        // 获取当前等级信息
+        MtUserGrade currentGrade = null;
+        if (userInfo.getGradeId() != null && userInfo.getGradeId() > 0) {
+            currentGrade = userGradeService.queryUserGradeById(accountInfo.getMerchantId(), userInfo.getGradeId(), userInfo.getId());
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> memberInfo = new HashMap<>();
+        memberInfo.put("id", userInfo.getId());
+        memberInfo.put("name", userInfo.getName());
+        memberInfo.put("mobile", userInfo.getMobile());
+        memberInfo.put("avatar", userInfo.getAvatar());
+        memberInfo.put("currentGrade", currentGrade);
+        memberInfo.put("endTime", userInfo.getEndTime());
+        data.put("memberInfo", memberInfo);
+        data.put("gradeList", gradeList);
+
+        return getSuccessResult(data);
     }
 }
