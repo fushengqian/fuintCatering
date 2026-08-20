@@ -45,7 +45,15 @@ public class SecurityConfig {
                                 "/**/*.html",
                                 "/**/*.css",
                                 "/**/*.js",
-                                "/profile/**"
+                                "/profile/**",
+                                // Swagger接口文档
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v2/api-docs",
+                                "/v3/api-docs",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/favicon.ico"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
