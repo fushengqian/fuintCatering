@@ -117,8 +117,8 @@ public class BackendMemberGroupController extends BaseController {
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('member:group:index')")
-    public ResponseObject delete(HttpServletRequest request, @PathVariable("id") Integer id) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(request.getHeader("merchantNo"));
+    public ResponseObject delete(@PathVariable("id") Integer id) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         // 该分组已有会员，不允许删除
         Map<String, Object> searchParams = new HashMap<>();

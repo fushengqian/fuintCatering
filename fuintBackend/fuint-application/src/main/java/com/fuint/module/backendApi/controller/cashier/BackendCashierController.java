@@ -450,14 +450,8 @@ public class BackendCashierController extends BaseController {
     @RequestMapping(value = "/gradeList/{userId}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject getUpgradeGradeList(HttpServletRequest request, @PathVariable("userId") Integer userId) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
-
-        if (accountInfo == null) {
-            return getFailureResult(1001);
-        }
-
+    public ResponseObject getUpgradeGradeList(@PathVariable("userId") Integer userId) {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         MtUser userInfo = memberService.queryMemberById(userId);
         if (userInfo == null) {
             return getFailureResult(2000, "该会员信息不存在");
