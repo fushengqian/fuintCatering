@@ -115,7 +115,11 @@ public class MemberGroupServiceImpl extends ServiceImpl<MtUserGroupMapper, MtUse
      */
     @Override
     @OperationServiceLog(description = "新增会员分组")
-    public MtUserGroup addMemberGroup(MemberGroupDto memberGroupDto) {
+    public MtUserGroup addMemberGroup(MemberGroupDto memberGroupDto) throws BusinessCheckException {
+        if (memberGroupDto.getMerchantId() == null || memberGroupDto.getMerchantId() <= 0) {
+            throw new BusinessCheckException("平台方帐号无法执行该操作，请使用商户帐号操作");
+        }
+
         MtUserGroup userGroup = new MtUserGroup();
         Integer storeId = memberGroupDto.getStoreId() == null ? 0 : memberGroupDto.getStoreId();
         if (memberGroupDto.getMerchantId() == null || memberGroupDto.getMerchantId() <= 0) {
@@ -151,16 +155,16 @@ public class MemberGroupServiceImpl extends ServiceImpl<MtUserGroupMapper, MtUse
     /**
      * 根据ID删除会员分组
      *
-     * @param  id       分组ID
+     * @param  id 分组ID
      * @param  operator 操作人
      * @return
      */
     @Override
     @OperationServiceLog(description = "删除会员分组")
-    public void deleteMemberGroup(Integer id, String operator) {
+    public void deleteMemberGroup(Integer id, String operator) throws BusinessCheckException {
         MtUserGroup userGroup = queryMemberGroupById(id);
         if (null == userGroup) {
-            return;
+            throw new BusinessCheckException("该分组不存在");
         }
 
         userGroup.setStatus(StatusEnum.DISABLE.getKey());

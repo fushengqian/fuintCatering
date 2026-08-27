@@ -55,5 +55,5 @@ public interface MemberGroupService extends IService<MtUserGroup> {
      * @param  operator 操作人
      * @return
      */
-    void deleteMemberGroup(Integer id, String operator);
+    void deleteMemberGroup(Integer id, String operator) throws BusinessCheckException;
 }

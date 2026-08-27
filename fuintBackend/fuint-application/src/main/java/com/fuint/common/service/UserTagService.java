@@ -39,8 +39,8 @@ public interface UserTagService extends IService<MtUserTag> {
      * 添加标签
      *
      * @param mtUserTag 标签信息
-     * @return
      * @throws BusinessCheckException
+     * @return
      */
     MtUserTag addTag(MtUserTag mtUserTag) throws BusinessCheckException;
 

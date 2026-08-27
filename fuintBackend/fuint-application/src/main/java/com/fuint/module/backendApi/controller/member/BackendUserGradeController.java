@@ -166,12 +166,9 @@ public class BackendUserGradeController extends BaseController {
     @PreAuthorize("@pms.hasPermission('userGrade:index')")
     public ResponseObject info(@PathVariable("id") Integer id) throws BusinessCheckException {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-
         MtUserGrade userGradeInfo = userGradeService.queryUserGradeById(accountInfo.getMerchantId(), id, 0);
-
         Map<String, Object> result = new HashMap<>();
         result.put("userGradeInfo", userGradeInfo);
-
         return getSuccessResult(result);
     }
 }

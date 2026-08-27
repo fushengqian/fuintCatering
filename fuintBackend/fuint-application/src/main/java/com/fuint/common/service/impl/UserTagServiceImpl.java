@@ -81,7 +81,7 @@ public class UserTagServiceImpl extends ServiceImpl<MtUserTagMapper, MtUserTag> 
     public MtUserTag addTag(MtUserTag mtUserTag) throws BusinessCheckException {
         // 平台账号没有新增权限
         if (mtUserTag.getMerchantId() == null || mtUserTag.getMerchantId() <= 0) {
-            throw new BusinessCheckException("平台账号不能执行该操作");
+            throw new BusinessCheckException("平台账号不能执行该操作，请使用商户帐号操作");
         }
 
         // 校验名称是否重复

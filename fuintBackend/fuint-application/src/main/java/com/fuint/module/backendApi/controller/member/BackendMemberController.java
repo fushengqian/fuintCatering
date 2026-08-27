@@ -433,10 +433,7 @@ public class BackendMemberController extends BaseController {
             return getFailureResult(201, "会员不存在");
         }
         if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0 && !accountInfo.getMerchantId().equals(userInfo.getMerchantId())) {
-            return getFailureResult(201, "您没有操作权限");
-        }
-        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0 && !accountInfo.getStoreId().equals(userInfo.getStoreId())) {
-            return getFailureResult(201, "您没有操作权限");
+            return getFailureResult(201, "不同商户，您没有操作权限");
         }
 
         userInfo.setPassword(password);
