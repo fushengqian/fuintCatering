@@ -3,8 +3,8 @@ package com.fuint.common.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.common.dto.member.MemberGroupDto;
 import com.fuint.common.dto.member.UserGroupDto;
+import com.fuint.common.param.MemberGroupPage;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtUserGroup;
 
@@ -19,10 +19,10 @@ public interface MemberGroupService extends IService<MtUserGroup> {
     /**
      * 分页查询分组列表
      *
-     * @param paginationRequest
+     * @param memberGroupPage
      * @return
      */
-    PaginationResponse<UserGroupDto> queryMemberGroupListByPagination(PaginationRequest paginationRequest);
+    PaginationResponse<UserGroupDto> queryMemberGroupListByPagination(MemberGroupPage memberGroupPage);
 
     /**
      * 新增会员分组
