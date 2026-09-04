@@ -146,7 +146,7 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
         LambdaQueryWrapper<MtPage> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.eq(MtPage::getStatus, StatusEnum.ENABLED.getKey());
         lambdaQueryWrapper.eq(MtPage::getPageType, StringUtil.isBlank(pageType) ? "index" : pageType);
-        lambdaQueryWrapper.eq(MtPage::getIsDefault, "Y");
+        lambdaQueryWrapper.eq(MtPage::getIsDefault, YesOrNoEnum.YES);
         lambdaQueryWrapper.eq(MtPage::getStoreId, storeId == null ? 0 : storeId);
         if (merchantId != null && merchantId > 0) {
             lambdaQueryWrapper.eq(MtPage::getMerchantId, merchantId);
@@ -161,6 +161,7 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
 
     /**
      * 保存装修页面（新增或更新，组件全量覆盖）
+     *
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -210,10 +211,10 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
         } else {
             // 新增
             mtPage.setCreateTime(new Date());
-            if ("Y".equals(pageDto.getIsDefault())) {
+            if (YesOrNoEnum.YES.getKey().equals(pageDto.getIsDefault())) {
                 clearDefault(mtPage.getMerchantId(), mtPage.getStoreId(), mtPage.getPageType());
             } else if (isFirstPage(mtPage.getMerchantId(), mtPage.getStoreId(), mtPage.getPageType())) {
-                mtPage.setIsDefault("Y");
+                mtPage.setIsDefault(YesOrNoEnum.YES.getKey());
             }
             mtPageMapper.insert(mtPage);
         }
@@ -307,7 +308,7 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
      * 保存主题配置
      */
     @Override
-    public boolean saveTheme(ThemeDto themeDto, AccountInfo accountInfo) throws BusinessCheckException {
+    public boolean saveTheme(ThemeDto themeDto, AccountInfo accountInfo) {
         saveSetting(accountInfo, SettingTypeEnum.THEME.getKey(), themeDto);
         return true;
     }
@@ -323,7 +324,21 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
         }
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(value, new TypeReference<TabbarDto>() {});
+            TabbarDto dto = objectMapper.readValue(value, new TypeReference<TabbarDto>() {});
+            // 历史数据兜底：有导航项即视为启用，并归一化导航地址（page/ -> pages/）
+            if (dto != null && dto.getItems() != null && !dto.getItems().isEmpty()) {
+                dto.setEnabled(true);
+                for (Map<String, Object> item : dto.getItems()) {
+                    Object urlObj = item.get("url");
+                    if (urlObj != null && StringUtil.isNotBlank(urlObj.toString())) {
+                        String url = urlObj.toString().trim().replaceFirst("^/+", "");
+                        if (url.startsWith("page/")) {
+                            item.put("url", "pages/" + url.substring("page/".length()));
+                        }
+                    }
+                }
+            }
+            return dto;
         } catch (Exception e) {
             logger.error("解析底部导航配置失败", e);
             return null;
@@ -428,7 +443,7 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
         lambdaQueryWrapper.eq(MtPage::getMerchantId, merchantId == null ? 0 : merchantId);
         lambdaQueryWrapper.eq(MtPage::getStoreId, storeId == null ? 0 : storeId);
         lambdaQueryWrapper.eq(MtPage::getPageType, StringUtil.isBlank(pageType) ? "index" : pageType);
-        lambdaQueryWrapper.eq(MtPage::getIsDefault, "Y");
+        lambdaQueryWrapper.eq(MtPage::getIsDefault, YesOrNoEnum.YES.getKey());
         List<MtPage> pageList = mtPageMapper.selectList(lambdaQueryWrapper);
         for (MtPage mtPage : pageList) {
             mtPage.setIsDefault("N");
@@ -453,7 +468,14 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
      * 读取配置值
      */
     private String getSettingValue(Integer merchantId, Integer storeId, String type) {
-        MtSetting mtSetting = settingService.querySettingByName(merchantId, storeId == null ? 0 : storeId, type, type);
+        Integer mId = merchantId == null ? 0 : merchantId;
+        Integer sId = storeId == null ? 0 : storeId;
+        // 优先按商户维度查询
+        MtSetting mtSetting = settingService.querySettingByName(mId, sId, type, type);
+        // 商户维度无配置时，回退平台默认配置（MERCHANT_ID=0）
+        if (mtSetting == null && mId > 0) {
+            mtSetting = settingService.querySettingByName(0, sId, type, type);
+        }
         if (mtSetting != null) {
             return mtSetting.getValue();
         }
@@ -463,7 +485,7 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
     /**
      * 保存配置
      */
-    private void saveSetting(AccountInfo accountInfo, String type, Object data) throws BusinessCheckException {
+    private void saveSetting(AccountInfo accountInfo, String type, Object data) {
         MtSetting mtSetting = new MtSetting();
         mtSetting.setType(type);
         mtSetting.setName(type);
