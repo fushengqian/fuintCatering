@@ -118,6 +118,19 @@ public class BackendPageController extends BaseController {
     }
 
     /**
+     * 启用/停用装修页面
+     */
+    @ApiOperation(value = "启用/停用装修页面")
+    @RequestMapping(value = "/switchStatus/{id}", method = RequestMethod.POST)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('decorate:page')")
+    public ResponseObject switchStatus(@PathVariable("id") Integer id, @RequestParam("status") String status) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
+        pageDecorateService.switchStatus(id, status, accountInfo);
+        return getSuccessResult(true);
+    }
+
+    /**
      * 删除装修页面
      */
     @ApiOperation(value = "删除装修页面")

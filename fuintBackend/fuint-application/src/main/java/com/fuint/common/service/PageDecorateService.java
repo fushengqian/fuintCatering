@@ -73,6 +73,16 @@ public interface PageDecorateService extends IService<MtPage> {
     boolean setDefaultPage(Integer id, AccountInfo accountInfo) throws BusinessCheckException;
 
     /**
+     * 启用/停用装修页面
+     *
+     * @param id 页面ID
+     * @param status 状态：A启用 N停用
+     * @param accountInfo 操作人
+     * @return
+     */
+    boolean switchStatus(Integer id, String status, AccountInfo accountInfo) throws BusinessCheckException;
+
+    /**
      * 删除装修页面
      *
      * @param id 页面ID

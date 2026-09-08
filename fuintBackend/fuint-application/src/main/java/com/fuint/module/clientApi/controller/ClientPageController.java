@@ -79,6 +79,8 @@ public class ClientPageController extends BaseController {
         PageDecorationDto page = pageDecorateService.getDefaultPage(merchantId, storeId, "index");
 
         Map<String, Object> outParams = new HashMap();
+        // 图片上传根路径（装修组件/导航等保存的相对图片路径补全用，纯增量字段不影响原有结构）
+        outParams.put("imagePath", settingService.getUploadBasePath());
         if (page != null && page.getComponents() != null && page.getComponents().size() > 0) {
             outParams.put("page", page);
         } else {
