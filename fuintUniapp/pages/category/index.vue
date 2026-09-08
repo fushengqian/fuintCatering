@@ -119,6 +119,11 @@
     </view>
     
     <empty v-if="!list.length" :isLoading="isLoading" />
+    <!-- 自定义 tabBar 占位 -->
+    <view class="tabbar-safe-area"></view>
+    <!-- #ifdef H5 -->
+    <h5-tabbar ref="h5Tabbar"></h5-tabbar>
+    <!-- #endif -->
   </view>
 </template>
 
@@ -131,6 +136,10 @@
   import Empty from '@/components/empty'
   import SkuPopup from './components/SkuPopup'
   import Location from '@/components/page/location'
+  import { loadAndApplyTabbar } from '@/utils/tabbar'
+  // #ifdef H5
+  import H5Tabbar from '@/components/tabbar/index.vue'
+  // #endif
 
   const App = getApp()
 
@@ -139,7 +148,10 @@
       Search,
       SkuPopup,
       Empty,
-      Location
+      Location,
+      // #ifdef H5
+      H5Tabbar
+      // #endif
     },
     data() {
       return {
@@ -187,6 +199,17 @@
 
     onShow() {
       const app = this;
+      // 拉取 tabBar 装修配置（缓存优先），自定义 tabBar 实例可能尚未就绪会自动重试
+      loadAndApplyTabbar(this)
+      // #ifdef H5
+      this.$refs.h5Tabbar && this.$refs.h5Tabbar.refresh()
+      // #endif
+      // #ifdef MP-WEIXIN
+      // 微信注入的 getTabBar 挂在原生页面实例上，uni-app 需经 $scope 访问
+      const host = this.$scope || this
+      const tb = typeof host.getTabBar === 'function' && host.getTabBar()
+      tb && tb.syncSelected && tb.syncSelected()
+      // #endif
       app.getPageData();
       app.onGetStoreInfo();
       uni.getLocation({

@@ -1,5 +1,8 @@
 {
   "tabBar": {
+    // #ifdef MP-WEIXIN
+    "custom": true,
+    // #endif
     "color": "#000000",
     "selectedColor": "#ff0000",
     "borderStyle": "black",

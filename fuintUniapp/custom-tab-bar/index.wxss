@@ -1,0 +1,31 @@
+.fuint-tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  display: flex;
+  box-sizing: content-box;
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -2rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.fuint-tabbar__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.fuint-tabbar__icon {
+  width: 44rpx;
+  height: 44rpx;
+}
+
+.fuint-tabbar__text {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  line-height: 1.2;
+}

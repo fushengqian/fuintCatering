@@ -1,0 +1,13 @@
+<view class="fuint-tabbar" wx:if="{{visible}}" style="background-color: {{bgColor}}; height: {{barHeight}}px;">
+  <view
+    class="fuint-tabbar__item"
+    wx:for="{{list}}"
+    wx:key="text"
+    data-index="{{index}}"
+    data-path="{{item.pagePath}}"
+    bindtap="switchTab"
+  >
+    <image wx:if="{{showIcon && (selected === index ? (item.selectedIcon || item.icon) : item.icon)}}" class="fuint-tabbar__icon" src="{{selected === index ? (item.selectedIcon || item.icon) : item.icon}}" mode="aspectFit" />
+    <text wx:if="{{showText}}" class="fuint-tabbar__text" style="color: {{selected === index ? selectedColor : textColor}};">{{item.text}}</text>
+  </view>
+</view>

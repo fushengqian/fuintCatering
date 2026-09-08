@@ -7,10 +7,7 @@
             <text class="store">
                <text class="name">{{ storeInfo.name }}</text>
                <text class="switch" v-if="storeInfo.single == 'N'">[切换店铺]</text>
-               <text class="address" v-if="storeInfo.address"><text class="location-icon iconfont icon-dingwei"></text>{{ storeInfo.address }}</text>
-            </text>
-            <text class="table" v-if="tableInfo">
-                <text class="code">桌码 : {{ tableInfo.code ? tableInfo.code : '-' }}</text>
+               <text class="address"><text class="location-icon iconfont icon-dingwei"></text>{{ storeInfo.address }}</text>
             </text>
           </view>
         </view>
@@ -27,8 +24,7 @@
      */
     props: {
       itemStyle: Object,
-      storeInfo: Object,
-      tableInfo: Object
+      storeInfo: Object
     },
 
     /**
@@ -49,24 +45,13 @@
 
 <style lang="scss" scoped>
 .main-loc {
-  height: 90rpx;
-  /* #ifdef H5 */
-  height: 100rpx;
-  /* #endif */
   color: #ffffff;
   .diy-location {
     background: linear-gradient(to bottom, $fuint-theme, $fuint-theme);
-    padding: 3rpx 10rpx 10rpx 10rpx;
-    /* #ifdef H5 */
-    padding-top: 15rpx;
-    /* #endif */
-    position: fixed;
-    z-index: 99999;
-    width: 100%;
+    padding: 3rpx 20rpx 16rpx 20rpx;
   }
 
   .inner {
-    height: 82rpx;
     overflow: hidden;
     &.radius {
       border-radius: 10rpx;
@@ -82,8 +67,6 @@
   }
   
   .store {
-      height: 120rpx;
-      float: left;
       .name {
           font-size: 32rpx;
           font-weight: bold;
@@ -95,7 +78,7 @@
           color: #ffffff;
       }
       .address {
-          clear: bold;
+          clear: both;
           display: block;
           margin-top: 2rpx;
           font-size: 23rpx;
@@ -108,15 +91,6 @@
             font-weight: bold;
           }
       }
-  }
-  .table {
-      height: 100rpx;
-      line-height: 100rpx;
-      float: right;
-      margin-right: 10rpx;
-      display: block;
-      color: #ffffff;
-      font-size: 20rpx;
   }
 }
   

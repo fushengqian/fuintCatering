@@ -1,8 +1,8 @@
 <template>
   <!-- 搜索框 -->
-  <view class="diy-search">
+  <view class="diy-search" :style="{ background: itemStyle.background || '#ffffff' }">
     <view class="inner" :class="itemStyle.searchStyle" @click="onTargetSearch">
-      <view class="search-input" :style="{ textAlign: itemStyle.textAlign }">
+      <view class="search-input" :style="{ textAlign: itemStyle.textAlign || 'center' }">
         <text class="search-icon iconfont icon-sousuo"></text>
         <text> {{ params.placeholder }}</text>
       </view>
@@ -42,33 +42,38 @@
 </script>
 
 <style lang="scss" scoped>
+  // 与微店页 @/components/search 保持一致的尺寸和背景色
   .diy-search {
-    background: $fuint-theme;
-    padding: 20rpx 20rpx;
-    font-size: 26rpx;
+    padding: 0rpx 10rpx 10rpx 10rpx;
+    font-size: 28rpx;
   }
 
   .inner {
-    height: 60rpx;
-    background: $fuint-theme;
+    height: 82rpx;
+    background: #f5f5f5;
+    border: solid 2rpx #ffffff;
+    border-radius: 100rpx;
     overflow: hidden;
 
     &.radius {
       border-radius: 10rpx;
     }
 
-    &.round {
-      border-radius: 60rpx;
+    &.square {
+      border-radius: 8rpx;
     }
   }
 
   .search-input {
-    height: 60rpx;
-    line-height: 60rpx;
-    color: #999;
-    padding: 0 20rpx;
-    background: $fuint-theme;
+    height: 82rpx;
+    line-height: 82rpx;
+    color: #6d6d6d;
+    padding: 0 24rpx;
+    background: transparent;
     .search-icon {
+      float: left;
+      font-size: 30rpx;
+      font-weight: bold;
       margin-right: 8rpx;
     }
   }

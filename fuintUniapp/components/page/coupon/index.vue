@@ -1,78 +1,45 @@
 <template>
   <!-- 卡券组 -->
-  <view class="diy-goods" :style="{ background: itemStyle.background }">
-    <view class="goods-list" :class="[`display__${itemStyle.display}`, `column__${itemStyle.column}`]">
-      <scroll-view :scroll-x="itemStyle.display === 'slide'">
-        <view class="goods-item" v-for="(dataItem, index) in dataList" :key="index" @click="onTargetCoupon(dataItem.id, dataItem.type, dataItem.userCouponId)">
-          <!-- 单列卡券 -->
-          <block>
-            <view class="dis-flex">
-              <!-- 卡券图片 -->
-              <view class="goods-item_left">
-                <image class="image" :src="dataItem.image"></image>
-              </view>
-              <view class="goods-item_right">
-                <!-- 卡券名称 -->
-                <view class="goods-name twolist-hidden">
-                  <text>{{ dataItem.name }}</text>
-                </view>
-                <view class="goods-item_desc">
-                  <!-- 卡券卖点 -->
-                  <view class="desc-selling_point dis-flex">
-                    <text class="onelist-hidden">{{ dataItem.sellingPoint }}</text>
-                  </view>
-                  <view class="coupon-attr">
-                      <view class="attr-l">
-                          <!-- 参与人数 -->
-                          <view class="desc-goods_sales dis-flex">
-                            <text v-if="dataItem.type === 'C'">已领取{{ dataItem.gotNum }}，剩余{{ dataItem.leftNum }}</text>
-                            <text v-if="dataItem.type === 'P'">已预存{{ dataItem.gotNum }}，剩余{{ dataItem.leftNum }}</text>
-                            <text v-if="dataItem.type === 'T'">已领取{{ dataItem.gotNum }}</text>
-                          </view>
-                          <!-- 卡券面额 -->
-                          <view v-if="dataItem.amount > 0" class="desc_footer">
-                            <text class="price_x">¥{{ dataItem.amount }}</text>
-                          </view>
-                      </view>
-                      <view class="attr-r">
-                          <!--领券按钮-->
-                          <view class="receive" v-if="dataItem.type === 'C' && dataItem.isReceive === false">
-                              <text>立即领取</text>
-                          </view>
-                          <view class="receive state" v-if="dataItem.type === 'C' && dataItem.isReceive === true">
-                              <text>已领取</text>
-                          </view>
-                          <view class="receive" v-if="dataItem.type === 'P' && dataItem.isReceive === false">
-                              <text>立即预存</text>
-                          </view>
-                          <view v-if="dataItem.type === 'T' && dataItem.isReceive === false" class="receive">
-                              <text>领取次卡</text>
-                          </view>
-                          <view v-if="dataItem.type === 'T' && dataItem.isReceive === true" class="receive state">
-                              <text>已领取</text>
-                          </view>
-                      </view>
-                  </view>
-                </view>
-              </view>
-            </view>
-          </block>
+  <view class="diy-coupon" :style="couponWrapStyle">
+    <view v-if="itemStyle.title" class="coupon-title" :style="{ color: titleColor }">
+      <text class="txt">{{ itemStyle.title }}</text>
+    </view>
+    <view class="coupon-list">
+      <view
+        class="coupon-card"
+        v-for="(dataItem, index) in dataList"
+        :key="index"
+        :style="couponCardStyle"
+        @click="onTargetCoupon(dataItem.id, dataItem.type, dataItem.userCouponId)"
+      >
+        <view class="coupon-notch coupon-notch-left" :style="{ background: wrapBg }"></view>
+        <view class="coupon-notch coupon-notch-right" :style="{ background: wrapBg }"></view>
+        <view class="coupon-left">
+          <view class="coupon-amount">
+            <text v-if="dataItem.type === 'ZK' && dataItem.discount > 0">{{ dataItem.discount }}折</text>
+            <text v-else>¥{{ dataItem.amount || 0 }}</text>
+          </view>
+          <view class="coupon-threshold">
+            <text v-if="dataItem.minSendAmount > 0">满{{ dataItem.minSendAmount }}可用</text>
+            <text v-else>无门槛</text>
+          </view>
+          <view class="coupon-scope">{{ scopeText(dataItem) }}</view>
         </view>
-      </scroll-view>
+        <view class="coupon-right">
+          <view class="coupon-btn" :class="{ state: dataItem.isReceive }" :style="couponBtnStyle">
+            <text>{{ btnText(dataItem) }}</text>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
 
 <script>
-  import * as couponApi from '@/api/coupon'
-  import * as pageApi from '@/api/page'
+  import { getThemePrimary } from '@/utils/theme'
+
   export default {
     name: "Coupon",
-    
-    /**
-     * 组件的属性列表
-     * 用于组件自定义设置
-     */
     props: {
       itemIndex: String,
       itemStyle: Object,
@@ -80,215 +47,179 @@
       dataList: Array
     },
 
-    /**
-     * 组件的方法列表
-     * 更新属性和数据的方法与更新页面数据的方法类似
-     */
+    computed: {
+      primary() {
+        const p = getThemePrimary()
+        // 主题未拉取或后台未配置时，使用项目默认青色兜底，避免纯白卡片
+        return p && p !== '#ffffff' ? p : '#1abc9c'
+      },
+      // 外层背景优先使用后台配置；未配置或配置为白色/旧默认值时使用浅青色，与设计图/后台预览默认一致
+      wrapBg() {
+        const bg = this.itemStyle.background
+        if (!bg || bg === '#ffffff' || bg === '#1890ff') {
+          return '#e0f7fa'
+        }
+        return bg
+      },
+      // 卡片背景/标题色优先使用后台配置的文字色；未配置或配置为旧默认/白色时使用主题色
+      themeColor() {
+        const c = this.itemStyle.color
+        if (!c || c === '#ffffff' || c === '#1890ff') {
+          return this.primary
+        }
+        return c
+      },
+      titleColor() {
+        // 外层背景为主题色时标题用白色，保证可读
+        return this.wrapBg === this.primary ? '#ffffff' : this.themeColor
+      },
+      borderRadius() {
+        const r = this.itemStyle.borderRadius
+        return r === undefined || r === null || r === '' ? 16 : Number(r) * 2
+      },
+      // 注意：小程序端 :style 绑定对象会被序列化成 [object Object] 导致样式失效，
+      // 因此统一返回 style 字符串（与 utils/theme.js buildThemeVars 的做法一致）
+      couponWrapStyle() {
+        return `background: ${this.wrapBg};`
+      },
+      couponCardStyle() {
+        return `background: ${this.themeColor}; color: #ffffff; border-radius: ${this.borderRadius}rpx;`
+      },
+      couponBtnStyle() {
+        return `background: #ffffff; color: ${this.themeColor};`
+      }
+    },
+
     methods: {
-      /**
-       * 卡券详情页
-       */
+      scopeText(item) {
+        // 兼容 applyGoods/useFor 字段，默认与后台预览保持一致
+        if (item.applyGoods === 'allGoods' || item.useFor === 'allGoods') {
+          return '全场通用'
+        }
+        return '指定商品可用'
+      },
+      btnText(item) {
+        if (item.isReceive) {
+          if (item.type === 'P') return '已预存'
+          if (item.type === 'T') return '已领次卡'
+          return '已领取'
+        }
+        if (item.type === 'P') return '立即预存'
+        if (item.type === 'T') return '领取次卡'
+        return '立即领取'
+      },
       onTargetCoupon(couponId, type, userCouponId) {
-          if (type === 'P') {
-              this.$navTo(`subPages/prestore/buy`, { couponId })
-          } else {
-              if (type === 'C') {
-                    this.$navTo(`subPages/coupon/detail`, { couponId: couponId, userCouponId: userCouponId })
-              } else if(type === 'T') {
-                  this.$navTo(`subPages/timer/detail`, { couponId: couponId, userCouponId: userCouponId })
-              }
-         }
+        if (type === 'P') {
+          this.$navTo(`subPages/prestore/buy`, { couponId })
+        } else {
+          if (type === 'C') {
+            this.$navTo(`subPages/coupon/detail`, { couponId, userCouponId })
+          } else if (type === 'T') {
+            this.$navTo(`subPages/timer/detail`, { couponId, userCouponId })
+          }
+        }
       }
     }
   }
 </script>
 
 <style lang="scss" scoped>
-  .diy-goods {
-    .goods-list {
-      padding: 4rpx;
-      box-sizing: border-box;
+  .diy-coupon {
+    margin: 0 20rpx 20rpx 20rpx;
+    padding: 20rpx 16rpx;
+    border: 1rpx solid #e6e6e6;
+    border-radius: 20rpx;
+    box-sizing: border-box;
+  }
 
-      .goods-item {
-        box-sizing: border-box;
-        padding: 6rpx;
+  .coupon-title {
+    font-size: 30rpx;
+    font-weight: bold;
+    padding: 10rpx 8rpx;
+    .txt {
+      border-left: solid currentColor 10rpx;
+      padding-left: 10rpx;
+    }
+  }
 
-        .goods-image {
-          position: relative;
-          width: 80rpx;
-          height: 63rpx;
-          border-radius: 5rpx;
-          padding-bottom: 100%;
-          overflow: hidden;
-          background: #fff;
+  .coupon-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -6rpx;
+  }
 
-          &:after {
-            content: '';
-            display: block;
-            margin-top: 100%;
-          }
+  .coupon-card {
+    box-sizing: border-box;
+    width: calc(50% - 12rpx);
+    margin: 6rpx;
+    padding: 20rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 160rpx;
+    position: relative;
 
-          .image {
-            position: absolute;
-            width: 80rpx;
-            height: 63rpx;
-            border-radius: 5rpx;
-            top: 0;
-            left: 0;
-            -o-object-fit: cover;
-            object-fit: cover;
-          }
-        }
+    .coupon-notch {
+      position: absolute;
+      top: 50%;
+      width: 24rpx;
+      height: 24rpx;
+      border-radius: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
 
-        .detail {
-          padding: 8rpx;
-          background: #fff;
+    .coupon-notch-left {
+      left: -12rpx;
+    }
 
-          .goods-name {
-            height: 64rpx;
-            line-height: 1.3;
-            white-space: normal;
-            color: #484848;
-            font-size: 26rpx;
-          }
+    .coupon-notch-right {
+      right: -12rpx;
+    }
+  }
 
-          .detail-price {
-            .goods-price {
-              margin-right: 8rpx;
-            }
+  .coupon-left {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 
-            .line-price {
-              text-decoration: line-through;
-            }
-          }
-        }
-      }
+  .coupon-amount {
+    font-size: 40rpx;
+    font-weight: bold;
+    line-height: 1.2;
+  }
 
-      &.display__slide {
-        white-space: nowrap;
-        font-size: 0;
+  .coupon-threshold {
+    font-size: 24rpx;
+    margin-top: 8rpx;
+    opacity: 0.9;
+  }
 
-        .goods-item {
-          display: inline-block;
-        }
-      }
+  .coupon-scope {
+    font-size: 20rpx;
+    margin-top: 8rpx;
+    opacity: 0.75;
+  }
 
-      &.display__list {
-        .goods-item {
-          float: left;
-        }
-      }
+  .coupon-right {
+    flex-shrink: 0;
+    margin-left: 16rpx;
+  }
 
-      &.column__2 {
-        .goods-item {
-          width: 50%;
-        }
-      }
-
-      &.column__3 {
-        .goods-item {
-          width: 33.33333%;
-        }
-      }
-
-      &.column__1 {
-        .goods-item {
-          width: 100%;
-          height: 240rpx;
-          margin-bottom: 12rpx;
-          padding: 20rpx;
-          box-sizing: border-box;
-          background: #fff;
-          line-height: 1.6;
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-        }
-
-        .goods-item_left {
-          display: flex;
-          width: 35%;
-          background: #fff;
-          align-items: center;
-
-          .image {
-            display: block;
-            margin-top: 20rpx;
-            width: 200rpx;
-            height: 157rpx;
-            border-radius: 6rpx;
-          }
-        }
-
-        .goods-item_right {
-          position: relative;
-          width: 65%;
-          .goods-name {
-            margin-top: 20rpx;
-            height: 40rpx;
-            line-height: 1.0;
-            white-space: normal;
-            color: #484848;
-            font-size: 30rpx;
-          }
-        }
-
-        .goods-item_desc {
-          margin-top: 0rpx;
-          .coupon-attr {
-             .attr-l {
-                 float:left;
-                 width: 70%;
-             }
-             .attr-r {
-                 margin-top:20rpx;
-                 float:left;
-             }
-          }
-        }
-
-        .desc-selling_point {
-          width: 400rpx;
-          font-size: 24rpx;
-          color: #e49a3d;
-        }
-        .receive {
-          height: 46rpx;
-          width: 128rpx;
-          line-height: 46rpx;
-          text-align: center;
-          border: 1px solid #f8df00;
-          border-radius: 5rpx;
-          color: #f86d48;
-          background: #f8df98;
-          font-size: 22rpx;
-          &.state {
-            border: none;
-            color: #cccccc;
-            background: #F5F5F5;
-          }
-        }
-
-        .desc-goods_sales {
-          color: #999;
-          font-size: 24rpx;
-        }
-
-        .desc_footer {
-          font-size: 24rpx;
-
-          .price_x {
-            margin-right: 16rpx;
-            color: #f03c3c;
-            font-size: 30rpx;
-          }
-
-          .price_y {
-            text-decoration: line-through;
-          }
-        }
-      }
+  .coupon-btn {
+    height: 48rpx;
+    line-height: 48rpx;
+    padding: 0 22rpx;
+    font-size: 22rpx;
+    border-radius: 26rpx;
+    text-align: center;
+    white-space: nowrap;
+    &.state {
+      background: rgba(0, 0, 0, 0.1) !important;
+      color: rgba(255, 255, 255, 0.8) !important;
     }
   }
 </style>

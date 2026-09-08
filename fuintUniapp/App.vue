@@ -1,4 +1,6 @@
 <script>
+  import { loadTheme, getTheme, getThemePrimary, isLightColor } from '@/utils/theme'
+
   export default {
 
     /**
@@ -14,12 +16,37 @@
     onLaunch(options) {
       // 小程序主动更新
       this.updateManager()
+      // 先用本地缓存主题同步设置导航栏, 保证首帧不是 pages.json 默认色
+      this.applyNavigationBarColor(getTheme())
+      // 预加载主题配置(force=true: 忽略本地缓存, 启动时直接拉取后台最新主题并写缓存,
+      // 避免页面先用默认色渲染、接口返回后再切换造成的闪烁)
+      loadTheme(true).then(theme => {
+        this.applyNavigationBarColor(theme)
+      })
       if (options.query.spm) {
           uni.setStorageSync('shareId', options.query.spm);
       }
     },
 
     methods: {
+
+      /**
+       * 同步设置顶部导航栏颜色
+       */
+      applyNavigationBarColor(theme) {
+        // #ifdef MP-WEIXIN
+        const c = (theme && theme.colors) || {}
+        const bg = c.primary || getThemePrimary()
+        try {
+          uni.setNavigationBarColor({
+            // 导航栏背景为浅色(含白色兜底)时使用黑色文字, 否则白色文字
+            frontColor: isLightColor(bg) ? '#000000' : '#ffffff',
+            backgroundColor: bg,
+            animation: { duration: 0, timingFunc: 'linear' }
+          })
+        } catch (e) {}
+        // #endif
+      },
 
       /**
        * 小程序主动更新

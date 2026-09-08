@@ -368,7 +368,7 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
      * 保存主题配置
      */
     @Override
-    public boolean saveTheme(ThemeDto themeDto, AccountInfo accountInfo) {
+    public boolean saveTheme(ThemeDto themeDto, AccountInfo accountInfo) throws BusinessCheckException {
         saveSetting(accountInfo, SettingTypeEnum.THEME.getKey(), themeDto);
         return true;
     }
@@ -608,7 +608,7 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
     /**
      * 保存配置
      */
-    private void saveSetting(AccountInfo accountInfo, String type, Object data) {
+    private void saveSetting(AccountInfo accountInfo, String type, Object data) throws BusinessCheckException {
         MtSetting mtSetting = new MtSetting();
         mtSetting.setType(type);
         mtSetting.setName(type);

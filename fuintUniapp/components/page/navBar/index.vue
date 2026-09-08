@@ -1,15 +1,15 @@
-<template>
-  <!-- 导航组 -->
-  <view class="diy-navBar" :style="{ background: itemStyle.background, color: itemStyle.textColor }">
-    <view class="data-list" :class="[`avg-sm-${itemStyle.rowsNum}`]">
-      <view class="item-nav" v-for="(dataItem, index) in dataList" :key="index">
-        <view class="nav-to" @click="onLink(dataItem.linkUrl)">
+daohang<template>
+  <!-- 导航宫格 -->
+  <view class="diy-navBar" :style="navBarStyle">
+    <view class="data-list" :class="listClass">
+      <view class="item-nav" v-for="(dataItem, index) in renderList" :key="index" :style="itemWidth">
+        <view class="nav-to" :class="itemClass" :style="itemBoxStyle" @click="onLink(dataItem.url)">
           <view class="item-image">
-            <image class="image" mode="widthFix" :src="dataItem.imgUrl"></image>
+            <image class="image" mode="aspectFill" :src="dataItem.iconUrl"></image>
           </view>
-          <view class="item-text onelist-hidden">
-             <view class="text">{{ dataItem.text }}</view>
-             <view class="tip">{{ dataItem.tip }}</view>
+          <view class="item-text">
+            <view class="text" :style="textStyle">{{ dataItem.name }}</view>
+            <view v-if="showTip(dataItem)" class="tip" :style="tipStyle">{{ dataItem.subtitle }}</view>
           </view>
         </view>
       </view>
@@ -20,12 +20,10 @@
 <script>
   import mixin from '../mixin'
 
+  const rpxRatio = 2; // 后台样式数值按 px，小程序按 750rpx 设计稿换算
+
   export default {
     name: "NavBar",
-    /**
-     * 组件的属性列表
-     * 用于组件自定义设置
-     */
     props: {
       itemIndex: String,
       itemStyle: Object,
@@ -35,81 +33,184 @@
 
     mixins: [mixin],
 
-    /**
-     * 组件的方法列表
-     * 更新属性和数据的方法与更新页面数据的方法类似
-     */
-    methods: {
-        onLink(linkObj) {
-            this.$navTo(linkObj)
+    computed: {
+      // 注意：小程序端 :style 绑定对象会被序列化成 [object Object] 导致样式失效，统一返回 style 字符串
+      navBarStyle() {
+        const style = this.itemStyle || {}
+        return `background: ${style.background || '#ffffff'}; color: ${style.textColor || '#333333'};`
+      },
+      layout() {
+        return (this.itemStyle && this.itemStyle.layout) || 'grid'
+      },
+      iconPosition() {
+        return (this.itemStyle && this.itemStyle.iconPosition) || (this.layout === 'card' ? 'left' : 'top')
+      },
+      rowsNum() {
+        const num = parseInt(this.itemStyle && this.itemStyle.rowsNum, 10)
+        return num > 0 ? num : 4
+      },
+      lineNum() {
+        const num = parseInt(this.itemStyle && this.itemStyle.lineNum, 10)
+        return num > 0 ? num : 2
+      },
+      listClass() {
+        return [
+          `layout-${this.layout}`,
+          `icon-${this.iconPosition}`
+        ]
+      },
+      itemClass() {
+        return {
+          'nav-card': this.layout === 'card',
+          'nav-left': this.iconPosition === 'left'
         }
-    }
+      },
+      itemWidth() {
+        return `width: ${(100 / this.rowsNum).toFixed(4)}%;`
+      },
+      itemBoxStyle() {
+        const style = this.itemStyle || {}
+        const parts = []
+        if (style.itemBg) parts.push(`background: ${style.itemBg}`)
+        if (style.itemBorder) parts.push(`border: 1rpx solid ${style.itemBorder}`)
+        if (style.itemRadius !== undefined && style.itemRadius !== '') {
+          parts.push(`border-radius: ${parseInt(style.itemRadius, 10) * rpxRatio}rpx`)
+        }
+        // 后台 itemHeight(px) = 数据项高度，覆盖默认 min-height
+        if (style.itemHeight !== undefined && style.itemHeight !== '') {
+          parts.push(`min-height: ${parseInt(style.itemHeight, 10) * rpxRatio}rpx`)
+        }
+        return parts.join('; ') + (parts.length ? ';' : '')
+      },
+      textStyle() {
+        const style = this.itemStyle || {}
+        const parts = []
+        if (style.fontSize) parts.push(`font-size: ${parseInt(style.fontSize, 10) * rpxRatio}rpx`)
+        if (style.fontWeight) parts.push(`font-weight: ${style.fontWeight}`)
+        return parts.join('; ') + (parts.length ? ';' : '')
+      },
+      tipStyle() {
+        const style = this.itemStyle || {}
+        const parts = []
+        if (style.subColor) parts.push(`color: ${style.subColor}`)
+        return parts.join('; ') + (parts.length ? ';' : '')
+      },
+      renderList() {
+        const max = this.rowsNum * this.lineNum
+        return (this.dataList || []).slice(0, max)
+      }
+    },
 
+    methods: {
+      showTip(item) {
+        const t = item && item.subtitle
+        if (!t) return false
+        // 过滤纯数字角标，只显示文字副标题
+        const s = String(t).trim()
+        return s !== '' && isNaN(Number(s))
+      },
+      onLink(linkObj) {
+        this.$navTo(linkObj)
+      }
+    }
   }
 </script>
 
 <style lang="scss" scoped>
-  .diy-navBar .data-list::after {
-    clear: both;
-    content: " ";
-    display: table;
+  .diy-navBar {
+    margin: 20rpx 20rpx;
+    padding: 6rpx;
+    background: #ffffff;
+    border: 1rpx solid #e6e6e6;
+    border-radius: 20rpx;
+    box-sizing: border-box;
+  }
+
+  .data-list {
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .item-nav {
-    float: left;
-    margin: 10rpx 0px 5rpx 0px;
+    box-sizing: border-box;
+    padding: 10rpx;
+  }
+
+  .nav-to {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 140rpx;
+    box-sizing: border-box;
+    padding: 16rpx 8rpx;
+    border-radius: 12rpx;
+    overflow: hidden;
+  }
+
+  .item-image {
+    width: 80rpx;
+    height: 80rpx;
+    margin-bottom: 10rpx;
+    .image {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .item-text {
     text-align: center;
-    background: #ffffff;
-    padding: 2rpx;
-    color: #666666;
-    .nav-to {
-        border: 2rpx solid $fuint-theme;
-        margin: 0rpx 2px 0px 2px;
-        padding: 38rpx 10rpx 10rpx 10rpx;
-        border-radius: 8rpx;
-        background: #ffffff;
-        height: 150rpx;
+    overflow: hidden;
+    .text {
+      font-size: 24rpx;
+      line-height: 1.4;
+      color: inherit;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
-
-    .item-text {
-      text-align: left;
-      padding-left: 20rpx;
-      .text {
-          font-size: 32rpx;
-      }
-      .tip {
-          font-size: 22rpx;
-          margin-top: 8rpx;
-          color: #999;
-      }
+    .tip {
+      font-size: 20rpx;
+      line-height: 1.3;
+      margin-top: 4rpx;
+      opacity: 0.8;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
-
-    .item-image {
-      margin-bottom: 4px;
-      font-size: 0;
-      margin-left: 30rpx;
-      width: 88rpx;
-      height: 88rpx;
-      float: left;
-    }
-
-    .item-image .image {
-      width: 80rpx;
-      height: 80rpx;
-    }
-
   }
 
-  /* 分列布局 */
-  .diy-navBar .avg-sm-3>.item-nav {
-    width: 33.33333333%;
+  /* 图标在左（或卡片布局） */
+  .icon-left .nav-to,
+  .layout-card .nav-to {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 20rpx;
+    min-height: 120rpx;
   }
 
-  .diy-navBar .avg-sm-4>.item-nav {
-    width: 25%;
+  .layout-card .nav-to {
+    background: linear-gradient(to bottom, #ffffff, #f5f5f5);
+    border: 1rpx solid #e5e5e5;
   }
 
-  .diy-navBar .avg-sm-2>.item-nav {
-    width: 50%;
+  .icon-left .item-image,
+  .layout-card .item-image {
+    width: 72rpx;
+    height: 72rpx;
+    margin-bottom: 0;
+    margin-right: 16rpx;
+  }
+
+  .icon-left .item-text,
+  .layout-card .item-text {
+    text-align: left;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* 分列宽度（不再依赖 avg-sm-N 类） */
+  .diy-navBar .data-list::after {
+    display: none;
   }
 </style>

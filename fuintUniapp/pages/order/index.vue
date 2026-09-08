@@ -69,6 +69,11 @@
         </view>
       </view>
     </mescroll-body>
+    <!-- 自定义 tabBar 占位 -->
+    <view class="tabbar-safe-area"></view>
+    <!-- #ifdef H5 -->
+    <h5-tabbar ref="h5Tabbar"></h5-tabbar>
+    <!-- #endif -->
   </view>
 
 </template>
