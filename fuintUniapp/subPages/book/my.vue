@@ -1,5 +1,5 @@
 <template>
-  <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ use: false }" :up="upOption" @up="upCallback">
+  <mescroll-body class="container" ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ use: false }" :up="upOption" @up="upCallback" :style="themeVars">
 
     <!-- 分类列表tab -->
     <view class="tabs-wrapper">

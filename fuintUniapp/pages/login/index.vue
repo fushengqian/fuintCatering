@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container" :style="themeVars">
     <MpWeixin v-if="isShowUserInfo" @passwordLogin="passwordLogin" @success="onGetUserInfoSuccess" />
     <Main v-else :isParty="isExistUserInfo" :partyData="partyData" />
   </div>

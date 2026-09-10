@@ -1,10 +1,10 @@
-daohang<template>
+<template>
   <!-- 导航宫格 -->
   <view class="diy-navBar" :style="navBarStyle">
     <view class="data-list" :class="listClass">
       <view class="item-nav" v-for="(dataItem, index) in renderList" :key="index" :style="itemWidth">
         <view class="nav-to" :class="itemClass" :style="itemBoxStyle" @click="onLink(dataItem.url)">
-          <view class="item-image">
+          <view class="item-image" :style="iconStyle">
             <image class="image" mode="aspectFill" :src="dataItem.iconUrl"></image>
           </view>
           <view class="item-text">
@@ -37,7 +37,7 @@ daohang<template>
       // 注意：小程序端 :style 绑定对象会被序列化成 [object Object] 导致样式失效，统一返回 style 字符串
       navBarStyle() {
         const style = this.itemStyle || {}
-        return `background: ${style.background || '#ffffff'}; color: ${style.textColor || '#333333'};`
+        return `background: ${style.background || '#ffffff'}; color: ${style.textColor || '#333333'}; margin: ${this.resolveMargin(style)};`
       },
       layout() {
         return (this.itemStyle && this.itemStyle.layout) || 'grid'
@@ -67,6 +67,13 @@ daohang<template>
       },
       itemWidth() {
         return `width: ${(100 / this.rowsNum).toFixed(4)}%;`
+      },
+      // 图标大小：后台 iconSize(px) 换算为 rpx，未设置时沿用 CSS 默认值
+      iconStyle() {
+        const style = this.itemStyle || {}
+        const size = parseInt(style.iconSize, 10)
+        if (!(size > 0)) return ''
+        return `width: ${size * rpxRatio}rpx; height: ${size * rpxRatio}rpx;`
       },
       itemBoxStyle() {
         const style = this.itemStyle || {}
@@ -102,6 +109,16 @@ daohang<template>
     },
 
     methods: {
+      // 外边距：优先取四方向设置，兼容旧的单值 margin，默认 10px（对应原有 20rpx）
+      resolveMargin(style) {
+        const s = style || {}
+        const fallback = s.margin === undefined ? 10 : s.margin
+        const top = s.marginTop === undefined ? fallback : s.marginTop
+        const right = s.marginRight === undefined ? fallback : s.marginRight
+        const bottom = s.marginBottom === undefined ? fallback : s.marginBottom
+        const left = s.marginLeft === undefined ? fallback : s.marginLeft
+        return `${top}px ${right}px ${bottom}px ${left}px`
+      },
       showTip(item) {
         const t = item && item.subtitle
         if (!t) return false

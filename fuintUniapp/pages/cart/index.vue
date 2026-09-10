@@ -1,5 +1,5 @@
 <template>
-  <view class="container">
+  <view class="container" :style="themeVars">
     <!-- 页面顶部 -->
     <view v-if="list.length" class="head-info">
       <view class="cart-total">
@@ -488,7 +488,7 @@
         color: #fff;
       }
 
-      // 立即购买按钮
+      // 立即下单按钮
       .btn-main {
         background: linear-gradient(to right, $fuint-theme, $fuint-theme);
         color: #fff;

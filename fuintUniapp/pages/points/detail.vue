@@ -1,5 +1,5 @@
 <template>
-  <view class="container">
+  <view class="container" :style="themeVars">
     <view class="my-point">
         <view class="my-tip"><text class="iconfont icon-jifen"></text>我的积分余额</view>
         <view class="my-account">{{ userInfo.point ? userInfo.point : 0 }}</view>

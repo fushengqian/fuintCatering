@@ -2,7 +2,7 @@
   <view class="container" :style="themeVars">
       <empty v-if="!storeInfo" :isLoading="isLoading" tips="数据加载中..."></empty>
       <!-- 页面装修模式：后台配置默认装修页(components>0)时，整体替换为装修渲染 -->
-      <Page v-if="storeInfo && pageItems.length > 0" :items="pageItems" :imagePath="imagePath" :storeInfo="storeInfo"/>
+      <Page v-if="storeInfo && pageItems.length > 0" :items="pageItems" :imagePath="imagePath" :storeInfo="storeInfo" :userInfo="userInfo"/>
       <!-- 默认点餐布局（未装修时保留原有首页，兼容现网） -->
       <block v-else>
           <HomeBanner v-if="storeInfo" :banners="banner"/>
@@ -46,6 +46,7 @@
   import MescrollCompMixin from "@/components/mescroll-uni/mixins/mescroll-comp.js";
   import config from '@/config'
   import { loadAndApplyTabbar } from '@/utils/tabbar'
+  import { preloadWxSdk, scanTableCode } from '@/utils/scanOrder'
   // #ifdef H5
   import H5Tabbar from '@/components/tabbar/index.vue'
   // #endif
@@ -75,7 +76,6 @@
         isReflash: false,
         isLoading: false,
         navigation: [],
-        wxSdkReady: false,
         // 页面装修组件列表（后台装修页面配置，有值时首页整体切换为装修渲染）
         pageItems: [],
         // 上传图片根路径（后端 home 接口返回），用于补全装修组件数据中的相对图片路径
@@ -101,7 +101,7 @@
           this.getPageData();
       }
       // #ifdef H5
-      this.preloadWxSdk();
+      preloadWxSdk();
       // #endif
     },
 
@@ -200,151 +200,7 @@
          * 扫码点餐
          */
         onScanCode() {
-            const app = this;
-            // #ifdef MP-WEIXIN
-            uni.scanCode({
-                scanType: ['qrCode'],
-                success(res) {
-                    app.handleScanResult(res.result);
-                },
-                fail(err) {
-                    if (err.errMsg !== 'scanCode:fail cancel') {
-                        uni.showToast({
-                            title: '扫码失败，请重试',
-                            icon: 'none'
-                        });
-                    }
-                }
-            });
-            // #endif
-            // #ifdef H5
-            const ua = navigator.userAgent.toLowerCase();
-            if (ua.indexOf('micromessenger') === -1) {
-                uni.showToast({ title: '请在微信中扫码', icon: 'none' });
-                return;
-            }
-            app.loadWxJsSdk(() => {
-                const url = window.location.href.split('#')[0];
-                // #ifdef H5
-                console.log('[扫码点餐] 请求JSSDK配置, url:', url);
-                // #endif
-                settingApi.jsSdkConfig(url).then(function(result) {
-                    // #ifdef H5
-                    console.log('[扫码点餐] JSSDK配置:', result);
-                    // #endif
-                    var config = result.data;
-                    if (!config || !config.appId) {
-                        uni.showToast({ title: '公众号AppID未配置', icon: 'none', duration: 3000 });
-                        return;
-                    }
-                    if (!window.wx || typeof window.wx.config !== 'function') {
-                        uni.showToast({ title: '微信SDK未就绪', icon: 'none', duration: 3000 });
-                        return;
-                    }
-                    window.wx.config({
-                        debug: false,
-                        appId: config.appId,
-                        timestamp: config.timestamp,
-                        nonceStr: config.nonceStr,
-                        signature: config.signature,
-                        jsApiList: ['scanQRCode']
-                    });
-                    window.wx.ready(function() {
-                        window.wx.scanQRCode({
-                            needResult: 1,
-                            scanType: ['qrCode'],
-                            success: function(res) {
-                                app.handleScanResult(res.resultStr);
-                            },
-                            fail: function() {
-                                uni.showToast({ title: '扫码失败，请重试', icon: 'none' });
-                            }
-                        });
-                    });
-                    window.wx.error(function(err) {
-                        console.log('[扫码点餐] wx.error:', err);
-                        uni.showToast({ title: '微信配置失败，请重试', icon: 'none' });
-                    });
-                }).catch(function(err) {
-                    console.log('[扫码点餐] 请求失败:', err);
-                    uni.showToast({ title: '获取配置失败', icon: 'none', duration: 2500 });
-                });
-            });
-            // #endif
-        },
-
-        /**
-         * 处理扫码结果（提取tableId）
-         */
-        handleScanResult(result) {
-            const app = this;
-            let tableId = 0;
-            if (/^\d+$/.test(result)) {
-                tableId = parseInt(result);
-            } else {
-                const match = result.match(/[?&]tableId=(\d+)/);
-                if (match) {
-                    tableId = parseInt(match[1]);
-                }
-            }
-            if (tableId > 0) {
-                uni.setStorageSync('tableId', tableId);
-                app.$navTo('pages/category/index', { tableId: tableId });
-            } else {
-                uni.showToast({
-                    title: '无效的桌码二维码',
-                    icon: 'none'
-                });
-            }
-        },
-
-        /**
-         * 页面加载时预加载微信JSSDK
-         */
-        preloadWxSdk() {
-            var app = this;
-            var script = document.createElement('script');
-            script.src = 'https://res.wx.qq.com/open/js/jweixin-1.6.0.js';
-            script.onload = function() {
-                var retry = 0;
-                var timer = setInterval(function() {
-                    if (window.wx && typeof window.wx.config === 'function') {
-                        clearInterval(timer);
-                        app.wxSdkReady = true;
-                    } else if (++retry >= 30) {
-                        clearInterval(timer);
-                    }
-                }, 200);
-            };
-            script.onerror = function() {};
-            document.head.appendChild(script);
-        },
-
-        /**
-         * 确保微信JSSDK已就绪
-         */
-        loadWxJsSdk(callback) {
-            var app = this;
-            if (app.wxSdkReady && window.wx && typeof window.wx.config === 'function') {
-                callback();
-                return;
-            }
-            // SDK尚未就绪，轮询等待（最多3秒）
-            var retry = 0;
-            var timer = setInterval(function() {
-                if (window.wx && typeof window.wx.config === 'function') {
-                    clearInterval(timer);
-                    app.wxSdkReady = true;
-                    callback();
-                } else if (++retry >= 15) {
-                    clearInterval(timer);
-                    uni.showToast({
-                        title: '请刷新页面后重试',
-                        icon: 'none',
-                        duration: 3000
-                    });
-                }
-            }, 200);
+            scanTableCode(this)
         },
 
         /**

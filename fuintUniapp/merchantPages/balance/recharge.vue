@@ -1,5 +1,5 @@
 <template>
-  <view class="container" v-if="userInfo.id">
+  <view class="container" v-if="userInfo.id" :style="themeVars">
     <view class="account-panel dis-flex flex-y-center">
       <view class="panel-lable">
         <text>账户余额</text>

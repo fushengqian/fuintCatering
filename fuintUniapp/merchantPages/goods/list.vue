@@ -1,6 +1,6 @@
 <template>
-  <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ native: true }" @down="downCallback"
-    :up="upOption" @up="upCallback">
+  <mescroll-body class="container" ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ native: true }" @down="downCallback"
+    :up="upOption" @up="upCallback" :style="themeVars">
 
     <!-- 页面标题栏 -->
     <view class="page-header">

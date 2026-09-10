@@ -1,5 +1,5 @@
 <template>
-  <view class="diy-banner" :style="{ height: `${imgHeights[imgCurrent]}rpx` }">
+  <view class="diy-banner" :class="{ 'has-custom-height': hasCustomHeight }" :style="bannerStyle">
     <!-- 图片轮播 -->
     <swiper :autoplay="autoplay" class="swiper-box" :duration="duration" :circular="true" :interval="itemStyle.interval * 1000"
       @change="_bindChange">
@@ -50,9 +50,32 @@
       }
     },
 
+    computed: {
+      /**
+       * 后台装修是否配置了固定高度
+       * 后台 style.height 单位为 px（与 blank/video 组件一致）
+       */
+      hasCustomHeight() {
+        const h = this.itemStyle && this.itemStyle.height
+        return h !== undefined && h !== '' && Number(h) > 0
+      },
+
+      /**
+       * 轮播容器高度（返回 style 字符串，避免小程序端 :style 绑对象变 [object Object]）
+       * - 后台配置了高度：按配置值固定渲染
+       * - 未配置：回退为按图片真实宽高比自适应（原有逻辑）
+       */
+      bannerStyle() {
+        if (this.hasCustomHeight) {
+          return `height: ${parseInt(this.itemStyle.height, 10)}px;`
+        }
+        return `height: ${this.imgHeights[this.imgCurrent] || 0}rpx;`
+      }
+    },
+
     /**
      * 组件的方法列表
-     * 更新属性和数据的方法与更新页面数据的方法类似
+     * 更新属性和数据的方法与页面数据的方法类似
      */
     methods: {
         onLink(linkObj) {
@@ -91,10 +114,14 @@
   .diy-banner {
     position: relative;
     max-height: 400rpx;
+    // 后台配置了固定高度时，解除默认高度上限，避免设置的高度被裁剪
+    &.has-custom-height {
+      max-height: none;
+    }
     // swiper组件
     .swiper-box {
       height: 100%;
-      padding: 0rpx 20rpx 0rpx 20rpx;
+      padding: 0;
       max-width: 750rpx;
       max-height: 450rpx;
       .slide-image {
@@ -102,15 +129,18 @@
         height: 100%;
         margin: 0 auto;
         display: block;
-        border-radius: 10rpx;
       }
+    }
+    // 配置固定高度时同步解除 swiper 的高度上限
+    &.has-custom-height .swiper-box {
+      max-height: none;
     }
     
     /* 指示点 */
     .indicator-dots {
       width: 100%;
       height: 28rpx;
-      padding: 0 20rpx;
+      padding: 0;
       position: absolute;
       left: 0;
       right: 0;
@@ -134,8 +164,9 @@
         }
       }
 
-      // 圆形
-      &.round .dots-item {
+      // 圆形（round 为标准类名，circle 兼容后台历史数据）
+      &.round .dots-item,
+      &.circle .dots-item {
         width: 16rpx;
         height: 16rpx;
         border-radius: 20rpx;

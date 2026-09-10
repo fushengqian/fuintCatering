@@ -12,8 +12,9 @@
  * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
  */
 
-/* 颜色变量 */
-$fuint-theme: #113a28;
+/* 颜色变量：默认读取主题 CSS 变量 --theme-primary（由 utils/theme.buildThemeVars 在页面根节点注入），
+   兼容尚未注入 CSS 变量时的回退色，避免主题未拉到时整页样式崩坏 */
+$fuint-theme: var(--theme-primary, #113a28);
 
 /* 行为相关颜色 */
 $uni-color-primary: #007aff;

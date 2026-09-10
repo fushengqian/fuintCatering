@@ -1,5 +1,5 @@
 <template>
-  <view class="container">
+  <view class="container" :style="themeVars">
     <view class="search-wrapper">
       <view class="search-input">
         <view class="search-input-wrapper">

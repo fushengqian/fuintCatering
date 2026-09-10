@@ -17,7 +17,8 @@ import {
   loadTheme,
   buildThemeVars,
   getThemePrimary,
-  isLightColor
+  isLightColor,
+  applyThemeVarsToPage
 } from './utils/theme'
 import { loadAndApplyTabbar } from './utils/tabbar'
 
@@ -44,6 +45,13 @@ Vue.mixin({
       // 供模板内原生控件(radio/u-icon/第三方组件等)绑定主题色
       themeColor: getThemePrimary()
     }
+  },
+  onLoad() {
+    // 页面创建后立即把主题色 CSS 变量 setProperty 到根节点,
+    // 让 100+ 处 $fuint-theme / var(--theme-primary) 在首次渲染前就拿到主色,
+    // 避免走 fallback #113a28(uni-app 编译到小程序时 inline style 里的 --xxx 会被丢弃,
+    // selectorQuery 直接 setProperty 绕开编译层)
+    applyThemeVarsToPage(this)
   },
   onShow() {
     const route = (getCurrentPages().slice(-1)[0] || {}).route || ''
@@ -72,6 +80,8 @@ Vue.mixin({
         })
       } catch (e) {}
       // #endif
+      // 主题更新后再次 setProperty 到页面根节点, 保证换色即时生效
+      applyThemeVarsToPage(this, theme)
     })
   }
 })

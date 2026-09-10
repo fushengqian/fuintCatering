@@ -1,5 +1,5 @@
 <template>
-    <view class="content">
+    <view class="content container" :style="themeVars">
         <view class="top-v" v-show="storeInfo"><text class="storeName">预约【{{ storeInfo.name }}】</text><text class="moreStore" @click="toMoreStore">切换门店</text></view>
         
         <view class="info-v">

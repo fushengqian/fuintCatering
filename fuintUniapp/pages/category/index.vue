@@ -1,29 +1,35 @@
 <template>
-  <view class="container">
-    <!--店铺切换-->
-    <Location v-if="storeInfo" :storeInfo="storeInfo" :tableInfo="tableInfo"/>
-    
-    <!-- 搜索框 -->
-    <Search tips="请输入搜索关键字..." @event="$navTo('pages/search/index')" />
+  <view class="container dining-container" :style="[diningStyle, themeVars]">
+    <!-- 顶部吸顶区：把 Location 和 Search 包到一起整体吸顶，避免之前两个组件
+         各自 sticky/fixed(top:0) 在视口同一位置重叠 → 后渲染的 fixed 搜索盖住门店 -->
+    <view class="dining-header">
+      <!--店铺切换-->
+      <Location v-if="storeInfo" :storeInfo="storeInfo" :tableInfo="tableInfo"/>
+
+      <!-- 搜索框 -->
+      <Search tips="请输入搜索关键字..." @event="$navTo('pages/search/index')" />
+    </view>
 
     <view class="cate-content dis-flex" v-if="list.length > 0">
-      <!-- 左侧 分类 -->
-      <scroll-view class="cate-left f-28" scroll-y :show-scrollbar="false" :enhanced="true" :style="{ height: `${scrollHeight}px` }">
+      <!-- 左侧 分类：固定列，不参与任何滚动 -->
+      <view class="cate-left f-28">
           <view v-for="(item, index) in list" :key="index">
-              <text class="cart-badge" v-if="item.total">{{ item.total }}</text>
               <view class="type-nav" :class="{ selected: curIndex == index }" @click="handleSelectNav(index)">
+                  <!-- 已加购数量徽章：移入 .type-nav 内，相对分类 cell(position:relative) 右上角定位，
+                       之前放在 .type-nav 外会一路向上找到 page，导致徽章飘到视口右上角 -->
+                  <text class="cart-badge" v-if="item.total">{{ item.total }}</text>
                   <image class="logo" lazy-load :lazy-load-margin="0" :src="item.logo ? item.logo : '/static/empty-02.png'"></image>
                   <view class="name">{{ item.name }}</view>
               </view>
           </view>
-      </scroll-view>
+      </view>
 
       <!-- 右侧 商品 -->
       <scroll-view 
         class="cate-right b-f" 
         :scroll-top="scrollTop" 
         :scroll-y="true" 
-        :style="{ height: `${scrollHeight}px` }"
+        :style="{ height: '100%' }"
         @scroll="handleScroll"
         scroll-with-animation
         :scroll-into-view="scrollIntoView"
@@ -52,13 +58,18 @@
                           <text class="price">￥{{ item.price ? item.price : 0 }}</text>
                           <view class="cart">
                               <view v-if="item.isSingleSpec === 'Y'" class="singleSpec">
-                                  <view class="ii do-minus" v-if="item.buyNum" @click="onSaveCart(item.id, '-')"></view>
+                                  <view class="ii do-minus" v-if="item.buyNum" :style="{ background: themeColor, borderColor: themeColor }" @click="onSaveCart(item.id, '-')">
+                                    <view class="minus-bar"></view>
+                                  </view>
                                   <view class="ii num" v-if="item.buyNum">{{ (item.buyNum != undefined) ? item.buyNum : 0 }}</view>
-                                  <view class="ii do-add" v-if="item.stock > 0" @click="onSaveCart(item.id, '+')"></view>
+                                  <view class="ii do-add" v-if="item.stock > 0" :style="{ background: themeColor, borderColor: themeColor }" @click="onSaveCart(item.id, '+')">
+                                    <view class="add-bar-h"></view>
+                                    <view class="add-bar-v"></view>
+                                  </view>
                               </view>
                               <view v-if="item.isSingleSpec === 'N'" class="multiSpec">
                                   <text class="num-badge" v-if="item.buyNum">{{ item.buyNum }}</text>
-                                  <view class="select-spec" @click="onShowSkuPopup(2, item.id)">选规格</view>
+                                  <view class="select-spec" :style="{ background: themeColor, borderColor: themeColor }" @click="onShowSkuPopup(2, item.id)">选规格</view>
                               </view>
                           </view>
                       </view>
@@ -106,21 +117,22 @@
     </u-popup>
     <!-- 就餐人数对话框 end -->
     
-    <view class="flow-fixed-footer b-f m-top10">
+    <view class="flow-fixed-footer b-f m-top10" :style="{ paddingBottom: 'calc(' + tabbarHeight + 'px + env(safe-area-inset-bottom))' }">
       <view class="dis-flex chackout-box">
         <view class="chackout-left pl-12">
           <view class="col-amount-do">总金额：<text class="amount">￥{{ totalPrice.toFixed(2) }}</text></view>
           <view class="col-amount-view">共计：{{ totalNum }} 件</view>
         </view>
         <view class="chackout-right" @click="doSubmit()">
-          <view class="flow-btn f-32">去结算</view>
+          <view class="flow-btn f-32" :style="{ background: 'linear-gradient(to right,' + themeColor + ',' + themeColor + ')' }">去结算</view>
         </view>
       </view>
     </view>
     
     <empty v-if="!list.length" :isLoading="isLoading" />
-    <!-- 自定义 tabBar 占位 -->
-    <view class="tabbar-safe-area"></view>
+    <!-- 自定义 tabBar 占位：本页 .dining-container 已用 :style 精确让位 footer(footer 内部已含 tabBar 预留 padding-bottom)，
+         此处高度置 0 避免重复占位挤压 .cate-content 产生底部红框 -->
+    <view class="tabbar-safe-area" style="height: 0;"></view>
     <!-- #ifdef H5 -->
     <h5-tabbar ref="h5Tabbar"></h5-tabbar>
     <!-- #endif -->
@@ -183,7 +195,23 @@
         // 防抖计时器
         scrollTimer: null,
         // 是否正在手动切换分类
-        isManualSelect: false
+        isManualSelect: false,
+        // 自定义 tabBar 高度（装修后台可配，默认 50），结算栏需紧贴其顶部
+        tabbarHeight: 50
+      }
+    },
+
+    computed: {
+      diningStyle() {
+        // 动态计算 .dining-container 高度 = viewport - footer 真实总高
+        // footer 真实总高 ≈ 内容(padding-top 8rpx + .chackout-left 98rpx ≈ 55.5px)
+        //                  + padding-bottom(tabbarHeight 动态 40~80px + env(safe))
+        // 用 :style 而非 CSS calc：响应 tabbarHeight 异步装修配置变化(默认50, 实际40~80)
+        // 使 .dining-container 底部 = footer 内容顶部，从根上避免 .cta-content 与 fixed footer 重叠
+        return {
+          height: `calc(100vh - 55px - ${this.tabbarHeight}px - env(safe-area-inset-bottom))`,
+          minHeight: `calc(100vh - 55px - ${this.tabbarHeight}px - env(safe-area-inset-bottom))`
+        }
       }
     },
 
@@ -201,6 +229,8 @@
       const app = this;
       // 拉取 tabBar 装修配置（缓存优先），自定义 tabBar 实例可能尚未就绪会自动重试
       loadAndApplyTabbar(this)
+      // 结算栏需紧贴 tabBar 顶部，同步装修配置里的 tabBar 高度
+      app.syncTabbarHeight();
       // #ifdef H5
       this.$refs.h5Tabbar && this.$refs.h5Tabbar.refresh()
       // #endif
@@ -381,6 +411,26 @@
         })
       },
 
+      // 结算栏要贴在自定义 tabBar 顶部，而 tabBar 高度由装修配置决定(默认50px)，
+      // 配置为异步拉取，这里读缓存并轮询重试，避免两者高度不一致产生空隙
+      syncTabbarHeight() {
+        const app = this
+        let times = 0
+        const apply = () => {
+          const cfg = uni.getStorageSync('tabbar')
+          const height = cfg && cfg.style && Number(cfg.style.height)
+          if (!height) return false
+          // 与自定义 tabBar 组件保持一致的高度区间
+          app.tabbarHeight = Math.max(40, Math.min(height, 80))
+          return true
+        }
+        if (apply()) return
+        const timer = setInterval(() => {
+          times++
+          if (apply() || times >= 10) clearInterval(timer)
+        }, 300)
+      },
+
       // 一级分类：选中分类
       handleSelectNav(index) {
         this.isManualSelect = true;
@@ -465,20 +515,81 @@
 <style>
   page {
     background: #fff;
+    /* 禁止页面层滚动，避免滚动事件把左侧分类列顶出可见区 */
+    height: 100%;
+    overflow: hidden;
   }
 </style>
 <style lang="scss" scoped>
+  /* 堂食点单页根容器：启用 flex 列布局让 .cate-content 占满中部剩余空间，
+     scroll-view 通过 height:100% 自适应高度，避免最后一个商品被底部结算栏遮挡 */
+  .dining-container {
+    /* 高度由 :style 动态绑定(响应 tabbarHeight 装修配置异步下发 40~80px)，
+       = calc(100vh - 55px - tabbarHeight - env(safe))，
+       使 .dining-container 底部 = footer 内容顶部，从根上避免 .cta-content 与 fixed footer 重叠 */
+    display: flex;
+    flex-direction: column;
+  }
+  /* 顶部吸顶容器：统一收纳门店定位 + 搜索框。
+     - 子组件自身的 .main-loc(sticky) 与 .search-wrapper(fixed) 都设在 top:0，
+       各自吸顶会在视口同一位置重叠，后渲染的 fixed 搜索(z-index:999999) 会盖住门店。
+       改为由本容器统一 sticky，子组件内部定位降级为 static，避免嵌套定位冲突 */
+  .dining-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #fff;
+    /* 子组件降级：避免自身 sticky/fixed 与父 sticky 冲突。
+       注意两点：
+       1) 这里已嵌套在 .dining-header 内部，不能再重复写 .dining-header，
+          否则编译成 `.dining-header .dining-header .xxx` 永远匹配不到，
+          导致 Search 的 .search-wrapper 仍是 position:fixed 脱离文档流，
+          浮在顶部盖住第一个分类标题和第一个商品；
+       2) Location / Search 是子组件，父组件 scoped 样式需用 ::v-deep 穿透，
+          才能作用到子组件内部的 class */
+    ::v-deep .main-loc {
+      position: static;
+    }
+    ::v-deep .search-wrapper {
+      position: static;
+      width: auto;
+      z-index: auto;
+      background: transparent;
+    }
+  }
   .cate-content {
     background: #fff;
-    margin-top: 118rpx;
-    /* #ifdef H5 */
-    margin-top: 124rpx;
-    /* #endif */
+    /* 顶部空间由 .dining-header 吸顶区自然撑出，不再需要 margin-top 给 fixed 搜索留位 */
+    /* footer(.flow-fixed-footer) 是 position:fixed 脱离文档流，flex 不会为它预留空间；
+       用 margin-bottom 压缩 .cta-content 高度，让其底部落在 footer 顶部上方 4rpx 处，
+       配合 .cate-wrapper 的 flex + 最后组 margin-top:auto，使最后一个商品（含 +号按钮）
+       紧贴 footer 顶部且不会被 footer 的 1px border-top 切到。
+       用 margin-bottom 而非 padding-bottom：margin 区在 .cta-content box 之外（page 白背景），
+       不会像 padding 那样把 .cate-content 白色背景延伸成"挡板"；
+       且 4rpx 间隙与上方/下方同为白背景，无视觉边界。 */
+    margin-bottom: 4rpx; /* .dining-container 已用 calc 让位 footer，这里只留 4rpx 保险防 footer border 切到 +号 */
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
   .cate-wrapper {
     padding: 0 20rpx 20rpx 20rpx;
     box-sizing: border-box;
     overflow: hidden;
+    /* flex 列布局 + 最小高度 = scroll-view 高度：
+       - 内容足够时，最后一组自然在底部，滚到底时最后商品贴结算栏顶部
+       - 内容不足时，.cate-wrapper 撑满 scroll-view 高度，
+         最后一组通过 margin-top:auto 吸收剩余空间推到底，
+         使最后商品紧贴 scroll-view 底部（即结算栏顶部），消除"白色挡板" */
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+  /* 最后一组 margin-top:auto：吸收剩余空间将该组推到底部，
+     使该组末尾的最后一个商品始终紧贴 scroll-view 底部（= 结算栏顶部），
+     消除内容不足时 footer 上方出现"白色挡板"的视觉 */
+  .cate-wrapper > .cate-section:last-child {
+    margin-top: auto;
   }
   /* 分类内容 */
   .cate-content {
@@ -492,21 +603,24 @@
     color: #444;
     height: 100%;
     background: #f8f8f8;
-    margin-bottom: 120rpx;
+    /* 解耦：滚动不传导到父级/右侧，仅响应竖向手势 */
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
     overflow: hidden;
     &::-webkit-scrollbar {
         display: none !important;
         width: 0 !important;
         height: 0 !important;
     }
+    /* 分类 cell"已加购数量"徽章：已移入 .type-nav 内，随分类 cell 右上角定位，不再飘到 page 视口右上角 */
     .cart-badge {
       position: absolute;
-      right: 1rpx;
-      margin-top: 10rpx;
-      margin-right: 5rpx;
+      top: 6rpx;
+      right: 6rpx;
       font-size: 18rpx;
       background: #fa5151;
-      z-index: 999;
+      z-index: 11;
       text-align: center;
       line-height: 28rpx;
       color: #ffffff;
@@ -518,10 +632,11 @@
   .cate-right {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    margin-bottom: 80rpx;
   }
 
   .cate-right-cont {
@@ -678,17 +793,33 @@
                 width: 60rpx;
                 cursor: pointer;
             }
-            .do-add {
-                background: url('~@/static/icon/add.png') no-repeat;
-                background-size: 100% 100%;
-                width: 45rpx;
-                height: 45rpx;
-            }
+            .do-add,
             .do-minus {
-                background-image: url('~@/static/icon/minus.png');
-                background-size: 100% 100%;
                 width: 45rpx;
                 height: 45rpx;
+                border-radius: 50%;
+                background: $fuint-theme;
+                border: 1rpx solid $fuint-theme;
+                position: relative;
+                box-sizing: border-box;
+            }
+            .do-add .add-bar-h,
+            .do-add .add-bar-v,
+            .do-minus .minus-bar {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                background: #ffffff;
+                transform: translate(-50%, -50%);
+            }
+            .do-add .add-bar-h,
+            .do-minus .minus-bar {
+                width: 18rpx;
+                height: 2rpx;
+            }
+            .do-add .add-bar-v {
+                width: 2rpx;
+                height: 18rpx;
             }
             .multiSpec {
                 .num-badge {
@@ -725,7 +856,13 @@
   // 底部操作栏
   .flow-fixed-footer {
     position: fixed;
-    bottom: var(--window-bottom);
+    // 小程序端 var(--window-bottom) 不生效(被编译为 0)，结算栏会落在底部的自定义
+    // tabBar(z-index:999) 下方被盖住；这里固定贴底，再用 padding-bottom 把内容顶到
+    // tabBar 之上(tabBar 高度由装修配置决定，模板里动态下发)，底边与 tabBar 顶边
+    // 无缝贴合，不会出现间隙
+    bottom: 0;
+    padding-bottom: calc(50px + constant(safe-area-inset-bottom));
+    padding-bottom: calc(50px + env(safe-area-inset-bottom));
     width: 100%;
     background: #fff;
     border-top: 1px solid #eee;

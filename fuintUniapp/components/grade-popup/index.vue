@@ -37,7 +37,7 @@
         </view>
       </view>
       <view class="btn-wrapper">
-        <view class="sure" @click="buyNow">立即购买</view>
+        <view class="sure" @click="buyNow">立即下单</view>
       </view>
       <!-- 页面结束 -->
     </view>
@@ -159,7 +159,7 @@
       moveHandle() {
         //禁止父元素滑动
       },
-      // 立即购买
+      // 立即下单
       buyNow() {
          this.prePay();
       },

@@ -28,7 +28,7 @@
                 <view class="desc_footer">
                   <text v-if="showFields.includes('goodsPrice')" class="price_x">¥{{ dataItem.price ? dataItem.price : '0.00' }}</text>
                   <text class="price_y col-9" v-if="showFields.includes('linePrice') && dataItem.linePrice > 0">¥{{ dataItem.linePrice }}</text>
-                  <view class="buy-now">去购买</view>
+                  <view class="buy-now">去下单</view>
                 </view>
               </view>
             </view>

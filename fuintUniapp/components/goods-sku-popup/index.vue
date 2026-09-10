@@ -154,7 +154,7 @@
         Type: String,
         default: "默认"
       },
-      // 模式 1:都显示  2:只显示购物车 3:只显示立即购买 4:显示缺货按钮 默认 1
+      // 模式 1:都显示  2:只显示购物车 3:只显示立即下单 4:显示缺货按钮 默认 1
       mode: {
         Type: Number,
         default: 1
@@ -199,17 +199,17 @@
         Type: String,
         default: "#fe560a"
       },
-      // 立即购买按钮的文字
+      // 立即下单按钮的文字
       buyNowText: {
         Type: String,
-        default: "立即购买"
+        default: "立即下单"
       },
-      // 立即购买按钮的字体颜色
+      // 立即下单按钮的字体颜色
       buyNowColor: {
         Type: String,
         default: "#ffffff"
       },
-      // 立即购买按钮的背景颜色
+      // 立即下单按钮的背景颜色
       buyNowBackgroundColor: {
         Type: String,
        default: "linear-gradient(to right, $fuint-theme, $fuint-theme)"
@@ -498,7 +498,7 @@
           }
         });
       },
-      // 立即购买
+      // 立即下单
       buyNow() {
         that.checkSelectComplete({
           success: function(selectShop) {

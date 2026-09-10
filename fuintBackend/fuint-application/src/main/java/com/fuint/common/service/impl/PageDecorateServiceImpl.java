@@ -146,6 +146,14 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
         if (pageDto == null && merchantId != null && merchantId > 0) {
             pageDto = getDefaultPageByMerchant(merchantId, pageType);
         }
+        // 4. 最后兜底平台级默认装修（MERCHANT_ID=0）：平台管理员配置的默认页对所有商户生效，
+        //    避免商户端因 merchantId 不等于 0 而永远读不到装修配置（表现为小程序回落默认布局）
+        if (pageDto == null && (merchantId == null || merchantId != 0)) {
+            pageDto = getDefaultPageByStore(0, storeId, pageType);
+            if (pageDto == null && storeId != null && storeId > 0) {
+                pageDto = getDefaultPageByStore(0, 0, pageType);
+            }
+        }
         return pageDto;
     }
 
@@ -156,11 +164,11 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
         LambdaQueryWrapper<MtPage> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.eq(MtPage::getStatus, StatusEnum.ENABLED.getKey());
         lambdaQueryWrapper.eq(MtPage::getPageType, StringUtil.isBlank(pageType) ? "index" : pageType);
-        lambdaQueryWrapper.eq(MtPage::getIsDefault, YesOrNoEnum.YES);
+        lambdaQueryWrapper.eq(MtPage::getIsDefault, YesOrNoEnum.YES.getKey());
         lambdaQueryWrapper.eq(MtPage::getStoreId, storeId == null ? 0 : storeId);
-        if (merchantId != null && merchantId > 0) {
-            lambdaQueryWrapper.eq(MtPage::getMerchantId, merchantId);
-        }
+        // 严格按商户维度匹配：merchantId 为空视为平台级(MERCHANT_ID=0)，
+        // 避免平台级兜底查询时带入其它商户的默认页
+        lambdaQueryWrapper.eq(MtPage::getMerchantId, merchantId == null ? 0 : merchantId);
         lambdaQueryWrapper.orderByDesc(MtPage::getUpdateTime);
         lambdaQueryWrapper.last("limit 1");
         MtPage mtPage = mtPageMapper.selectOne(lambdaQueryWrapper);

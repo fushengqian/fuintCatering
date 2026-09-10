@@ -1,7 +1,7 @@
 <template>
   <!-- 定位店铺 -->
   <view class="main-loc">
-      <view v-if="storeInfo.name" class="diy-location">
+      <view v-if="storeInfo.name" class="diy-location" :style="{ background: 'linear-gradient(to bottom,' + themeColor + ',' + themeColor + ')' }">
         <view class="inner" @click="onTargetLocation">
           <view class="location-input">
             <text class="store">
@@ -46,6 +46,11 @@
 <style lang="scss" scoped>
 .main-loc {
   color: #ffffff;
+  // 始终吸顶：在页面或父容器滚动时固定在顶部，不会随分类/商品列表一起滚走
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
   .diy-location {
     background: linear-gradient(to bottom, $fuint-theme, $fuint-theme);
     padding: 3rpx 20rpx 16rpx 20rpx;

@@ -62,6 +62,52 @@ export function buildThemeVars(theme) {
 }
 
 /**
+ * 把主题色 CSS 变量直接 setProperty 到页面根节点 (.container) 与 H5 的 documentElement。
+ *
+ * 背景：:style="themeVars" 把 "--theme-primary: #xxx" 写入 inline style 在 H5 端正常，
+ * 但编译到微信小程序时，inline style 里的 CSS 自定义属性会被丢弃，导致
+ * var(--theme-primary) 走 fallback (#113a28)，页面元素不跟随主题。
+ * 通过 selectorQuery 拿到页面根 wx 节点并直接 style.setProperty 写入，
+ * 绕开 uni-app 编译层过滤，让 100+ 处 $fuint-theme / var(--theme-primary) 真正拿到主色。
+ *
+ * - H5：applyH5Theme 已把变量注入 documentElement，所有页面自动继承
+ * - 微信小程序：找到 .container 节点逐个 setProperty
+ */
+export function applyThemeVarsToPage(pageRef, theme) {
+  const t = theme || getTheme()
+  const c = Object.assign({}, DEFAULT_THEME.colors, (t && t.colors) || {})
+  // #ifdef H5
+  applyH5Theme(t)
+  // #endif
+  // #ifdef MP-WEIXIN
+  try {
+    const query = uni.createSelectorQuery().in(pageRef)
+    // 兼容 .container (含 .dining-container / .container p-bottom 等复合 class);
+    // 少数根是 div / mescroll-uni / mescroll-body / .content 等的页面已统一加 class="container" 纯标记
+    // (项目无 .container 全局样式, 加类无副作用)
+    query.selectAll('.container').fields({ node: true, size: false })
+    query.exec(res => {
+      const list = res && res[0]
+      if (Array.isArray(list)) {
+        list.forEach(node => {
+          if (node && node.style && typeof node.style.setProperty === 'function') {
+            node.style.setProperty('--theme-primary', c.primary)
+            node.style.setProperty('--theme-secondary', c.secondary)
+            node.style.setProperty('--theme-text', c.text)
+            node.style.setProperty('--theme-bg', c.bg)
+            node.style.setProperty('--theme-price', c.price)
+            // 同步给 SCSS 编译出的 $fuint-theme (uni.scss: var(--theme-primary, #113a28))
+            // 提供 --fuint-theme 直接命中, 即使 --theme-primary 被某些作用域隔离
+            node.style.setProperty('--fuint-theme', c.primary)
+          }
+        })
+      }
+    })
+  } catch (e) {}
+  // #endif
+}
+
+/**
  * 读取当前主题的 primary 色（用于组件如 tabbar 选中色等无 CSS 变量场景的兜底）
  */
 export function getThemePrimary() {

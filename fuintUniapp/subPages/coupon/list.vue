@@ -1,6 +1,6 @@
 <template>
-  <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ native: true }" @down="downCallback"
-    :up="upOption" @up="upCallback">
+  <mescroll-body class="container" ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ native: true }" @down="downCallback"
+    :up="upOption" @up="upCallback" :style="themeVars">
 
     <!-- 排序标签 -->
     <view class="store-sort">

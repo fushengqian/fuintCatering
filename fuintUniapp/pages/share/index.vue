@@ -326,7 +326,7 @@
   }
 
   .header-bg {
-    background: linear-gradient(135deg, #113a28, #2ab075);
+    background: linear-gradient(135deg, $fuint-theme, #2ab075);
     padding: 40rpx 30rpx;
     position: relative;
     overflow: hidden;
@@ -454,7 +454,7 @@
           background: none;
         }
         .iconfont {
-          color: #113a28;
+          color: $fuint-theme;
           font-size: 56rpx;
         }
       }

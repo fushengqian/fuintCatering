@@ -1,5 +1,5 @@
 <template>
-  <view v-if="!isLoading" class="container">
+  <view v-if="!isLoading" class="container" :style="themeVars">
 
     <view class="header">
       <!-- 订单状态 -->

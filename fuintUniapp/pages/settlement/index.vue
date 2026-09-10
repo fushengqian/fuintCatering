@@ -1,5 +1,5 @@
 <template>
-  <view class="container p-bottom">
+  <view class="container p-bottom" :style="themeVars">
     <!-- 清单列表 -->
     <view class="m-top20">
       <view v-for="(item, index) in storeRule" :key="index" class="checkout_list">

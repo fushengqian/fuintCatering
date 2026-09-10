@@ -1,5 +1,5 @@
 <template>
-  <view class="container">
+  <view class="container" :style="themeVars">
     <view class="info-list">
       <view class="info-item">
           <view class="contacts avatar-warp">
@@ -36,8 +36,8 @@
           <text class="name">性别</text>
           <view class="value">
              <radio-group @change="genderChange">
-                <label class="radio"><radio value="1" color="#113a28" :checked="userInfo.sex == '1' ? true : false"/>男</label>
-                <label class="radio second"><radio value="0" color="#113a28" :checked="userInfo.sex == '0' ? true: false"/>女</label>
+                <label class="radio"><radio value="1" :color="themeColor" :checked="userInfo.sex == '1' ? true : false"/>男</label>
+                <label class="radio second"><radio value="0" :color="themeColor" :checked="userInfo.sex == '0' ? true: false"/>女</label>
              </radio-group>
           </view>
         </view>

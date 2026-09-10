@@ -1,5 +1,5 @@
 <template>
-  <view v-show="!isLoading" class="container">
+  <view v-show="!isLoading" class="container" :style="themeVars">
     <!-- 商品图片轮播 -->
     <SlideImage v-if="!isLoading" :images="goods.images" />
 
@@ -103,7 +103,7 @@
               <text>加入购物车</text>
             </view>
             <view class="btn-item btn-item-main" @click="onShowSkuPopup(3)">
-              <text>立即购买</text>
+              <text>立即下单</text>
             </view>
           </view>
         </view>
@@ -144,7 +144,7 @@
         cartTotal: 0,
         // 显示/隐藏SKU弹窗
         showSkuPopup: false,
-        // 模式 1:都显示 2:只显示购物车 3:只显示立即购买
+        // 模式 1:都显示 2:只显示购物车 3:只显示立即下单
         skuMode: 1
       }
     },
@@ -213,7 +213,7 @@
 
       /**
        * 显示/隐藏SKU弹窗
-       * @param {skuMode} 模式 1:都显示 2:只显示购物车 3:只显示立即购买
+       * @param {skuMode} 模式 1:都显示 2:只显示购物车 3:只显示立即下单
        */
       onShowSkuPopup(skuMode = 1) {
         this.skuMode = skuMode;

@@ -59,6 +59,20 @@
       <block v-if="item.type === 'coupon'">
         <Coupon :itemStyle="item.style" :params="item.params" :dataList="item.dataList" />
       </block>
+      <!-- 会员信息 -->
+      <block v-if="item.type === 'memberInfo'">
+        <MemberInfo :itemStyle="item.style" :params="item.params" :userInfo="userInfo" />
+      </block>
+      <!-- 扫码点餐 -->
+      <block v-if="item.type === 'scanOrder'">
+        <ScanOrder :itemStyle="item.style" :params="item.params" />
+      </block>
+      <!-- 点餐服务：客户端复用 pages/index/components/HomeService.vue，
+           该组件内部已 hardcode 堂食自提/配送到家两个入口（核心业务，不需后台配置数据），
+           这里只透传 itemStyle/params，组件内部不消费也不报错 -->
+      <block v-if="item.type === 'homeService'">
+        <HomeService :itemStyle="item.style" :params="item.params" :data="item.dataList" />
+      </block>
     </block>
   </view>
 </template>
@@ -76,6 +90,9 @@
   import RichText from './richText'
   import Coupon from './coupon'
   import Location from './location'
+  import MemberInfo from './memberInfo'
+  import ScanOrder from './scanOrder'
+  import HomeService from '@/pages/index/components/HomeService.vue'
 
   export default {
     name: "Page",
@@ -91,7 +108,10 @@
       Blank,
       RichText,
       Coupon,
-      Location
+      Location,
+      MemberInfo,
+      ScanOrder,
+      HomeService
     },
     /**
      * 组件的属性列表
@@ -111,6 +131,13 @@
       storeInfo: {
         type: Object,
         default: null
+      },
+      // 当前登录会员信息（会员信息组件渲染用）
+      userInfo: {
+        type: Object,
+        default () {
+          return {}
+        }
       },
       // 上传图片根路径（后端 home 接口返回），用于补全装修组件数据中的相对图片路径
       imagePath: {
@@ -308,6 +335,22 @@
             if (!style.title) {
               style.title = '领券中心'
             }
+            break
+          case 'memberInfo':
+            // 会员信息：问候语取自后台 data.greeting，头像/余额/积分由客户端 userInfo 渲染
+            params.greeting = (data && data.greeting) ? data.greeting : 'Hi，你好！'
+            break
+          case 'scanOrder':
+            // 扫码点餐：title/subtitle/url 在 params 中，组件已做默认值兜底
+            break
+          case 'homeService':
+            // 点餐服务：客户端复用 pages/index/components/HomeService.vue。
+            // 两入口（堂食自提/配送到家）的图标与名称由后台 data 配置，映射到 params 供组件消费；
+            // 留空时不赋值，组件回退内置默认值（默认图标是客户端本地静态图，不能走 normalizeImage 拼前缀）
+            if (data.oneselfIcon) params.oneselfIcon = this.normalizeImage(data.oneselfIcon)
+            if (data.oneselfName) params.oneselfName = data.oneselfName
+            if (data.expressIcon) params.expressIcon = this.normalizeImage(data.expressIcon)
+            if (data.expressName) params.expressName = data.expressName
             break
           case 'window':
           case 'guide':

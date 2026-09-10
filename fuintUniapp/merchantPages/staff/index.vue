@@ -1,6 +1,6 @@
 <template>
   <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ native: true }" @down="downCallback"
-    :up="upOption" @up="upCallback">
+    :up="upOption" @up="upCallback" :style="themeVars">
     
     <view class="search-wrapper">
       <view class="search-input">

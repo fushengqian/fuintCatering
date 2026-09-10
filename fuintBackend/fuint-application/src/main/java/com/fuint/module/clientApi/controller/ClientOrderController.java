@@ -23,10 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 订单类controller
@@ -55,6 +52,12 @@ public class ClientOrderController extends BaseController {
     @CrossOrigin
     public ResponseObject list(@RequestBody OrderListParam orderListParam) throws BusinessCheckException {
         UserInfo userInfo = TokenUtil.getUserInfo();
+        if (userInfo == null) {
+            PaginationResponse empty = new PaginationResponse();
+            empty.setContent(Collections.emptyList());
+            empty.setTotalElements(0);
+            return getSuccessResult(empty);
+        }
         orderListParam.setUserId(userInfo.getId());
         PaginationResponse orderData = orderService.getUserOrderList(orderListParam);
         return getSuccessResult(orderData);

@@ -26,7 +26,7 @@
         Type: Boolean,
         default: false
       },
-      // 模式 1:都显示 2:只显示购物车 3:只显示立即购买
+      // 模式 1:都显示 2:只显示购物车 3:只显示立即下单
       skuMode: {
         type: Number,
         default: 1
@@ -183,7 +183,7 @@
           })
       },
 
-      // 立即购买
+      // 立即下单
       buyNow(selectShop) {
         // 跳转到订单结算页
         this.$navTo('pages/settlement/goods', {

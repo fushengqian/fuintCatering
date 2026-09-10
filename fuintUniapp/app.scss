@@ -4,6 +4,16 @@
 page {
   background: #fafafa;
 }
+
+/* 自定义 tabBar 占位：原生 custom tabBar 渲染在独立层不会让页面自动收缩，
+   这里为 .tabbar-safe-area 预留与 tabBar 等高的高度，避免最底部内容被遮住。
+   高度 = tabBar 默认 50px + iPhone 底部安全区距离 */
+.tabbar-safe-area {
+  height: calc(50px + constant(safe-area-inset-bottom));
+  height: calc(50px + env(safe-area-inset-bottom));
+  flex-shrink: 0;
+}
+
 uni-modal {
   z-index: 99999999999999 !important;
 }

@@ -1,5 +1,5 @@
 <template>
-  <view class="container">
+  <view class="container" :style="themeVars">
     <view class="form">
       <!-- 手机号 -->
       <view class="form-item">

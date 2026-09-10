@@ -1,6 +1,6 @@
 <template>
-  <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ native: true }" @down="downCallback"
-    :up="upOption" @up="upCallback">
+  <mescroll-body class="container" ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ native: true }" @down="downCallback"
+    :up="upOption" @up="upCallback" :style="themeVars">
     <!-- 页面头部 -->
     <view class="header">
       <search class="search" :tips="options.search ? options.search : '搜索商品'" @event="handleSearch" />
@@ -63,7 +63,7 @@
                   <view class="attr-r">
                       <!--购买按钮-->
                       <view class="receive">
-                        <text>去购买</text>
+                        <text>去下单</text>
                       </view>
                   </view>
               </view>

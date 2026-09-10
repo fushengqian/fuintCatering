@@ -1,5 +1,5 @@
 <template>
-  <view class="container">    
+  <view class="container" :style="themeVars">
     <view class="info-item" v-if="hasPassword == 'Y'">
       <view class="contacts">
         <text class="name">旧密码：</text>

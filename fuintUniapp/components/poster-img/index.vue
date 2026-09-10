@@ -43,6 +43,7 @@
   import store from '@/store'
   import config from '@/config'
   import { getShareQrCode } from '@/api/share'
+  import { getThemePrimary } from '@/utils/theme'
 
   export default {
     name: 'PosterImg',
@@ -244,7 +245,7 @@
         const ch = app.canvasHeight / pr
 
         // 背景色
-        ctx.setFillStyle('#113a28')
+        ctx.setFillStyle(this.themeColor || getThemePrimary())
         ctx.fillRect(0, 0, cw, ch)
 
         // 顶部白色装饰圆
@@ -274,7 +275,7 @@
         ctx.fillRect(cardX, cardY, cardW, cardH)
 
         // 卡片顶部装饰条
-        ctx.setFillStyle('#113a28')
+        ctx.setFillStyle(this.themeColor || getThemePrimary())
         ctx.fillRect(cardX, cardY, cardW, 6 * scale)
 
         // 应用名称
@@ -285,7 +286,7 @@
         ctx.fillText(appName, cw / 2, cardY + 45 * scale)
 
         // subtitle
-        ctx.setFillStyle('#113a28')
+        ctx.setFillStyle(this.themeColor || getThemePrimary())
         ctx.setFontSize(16 * scale)
         ctx.fillText('邀请你一起加入', cw / 2, cardY + 75 * scale)
 
@@ -356,7 +357,7 @@
 
           // 底部提示（在二维码下方）
           const bottomTextY = qrY + qrSize + 25 * scale
-          ctx.setFillStyle('#113a28')
+          ctx.setFillStyle(this.themeColor || getThemePrimary())
           ctx.setFontSize(14 * scale)
           // #ifdef H5
           ctx.fillText('长按/扫码识别 立即加入', cw / 2, bottomTextY)
@@ -374,7 +375,7 @@
         } else {
           // 无二维码时，保留原有文字底部
           const bottomY = cardY + cardH - 40 * scale
-          ctx.setFillStyle('#113a28')
+          ctx.setFillStyle(this.themeColor || getThemePrimary())
           ctx.setFontSize(14 * scale)
           // #ifdef H5
           ctx.fillText('长按/扫码识别 立即加入', cw / 2, bottomY)
@@ -549,7 +550,7 @@
 
   .save-btn {
     flex: 1;
-    background: linear-gradient(135deg, #113a28, #2ab075);
+    background: linear-gradient(135deg, $fuint-theme, #2ab075);
     color: #fff;
     max-width: 280rpx;
   }

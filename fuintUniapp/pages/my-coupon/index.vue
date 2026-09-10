@@ -1,5 +1,5 @@
 <template>
-  <view class="container">
+  <view class="container" :style="themeVars">
     <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ use: true }" @down="downCallback" :up="upOption"
       @up="upCallback">
 

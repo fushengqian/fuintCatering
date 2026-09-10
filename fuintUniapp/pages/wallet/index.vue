@@ -1,5 +1,5 @@
 <template>
-  <view class="container" v-if="!isLoading">
+  <view class="container" v-if="!isLoading" :style="themeVars">
     <view class="space-upper">
       <view class="wallet-account">
         <view class="wallet-account_balance">
