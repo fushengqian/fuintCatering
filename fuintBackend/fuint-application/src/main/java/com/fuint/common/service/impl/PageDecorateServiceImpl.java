@@ -396,6 +396,7 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
             // 历史数据兜底：有导航项即视为启用，并归一化导航地址（page/ -> pages/）
             if (dto != null && dto.getItems() != null && !dto.getItems().isEmpty()) {
                 dto.setEnabled(true);
+                dto.setImagePath(settingService.getUploadBasePath());
                 for (Map<String, Object> item : dto.getItems()) {
                     Object urlObj = item.get("url");
                     if (urlObj != null && StringUtil.isNotBlank(urlObj.toString())) {

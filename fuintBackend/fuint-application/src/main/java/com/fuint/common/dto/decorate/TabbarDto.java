@@ -28,4 +28,8 @@ public class TabbarDto implements Serializable {
 
     @ApiModelProperty("导航项列表")
     private List<Map<String, Object>> items;
+
+    @ApiModelProperty("图片目录")
+    private String imagePath;
+
 }
