@@ -21,22 +21,49 @@ const DEFAULT_THEME = {
 // 因此页面 onShow 期间只需在缓存超时后兜底刷新, 避免每个页面反复请求导致换色闪烁)
 const CACHE_DURATION = 60 * 60 * 1000
 
+// 主题缓存按"商户+门店"分片:
+// 不同门店可配置不同主题,若所有门店共用一个缓存 key,扫码切换到新门店后
+// 仍会命中上一家门店的主题(1 小时内),表现为"门店数据换了但配色没换"。
+// 分片后换店即换 key,缓存自然失效并重新拉取新门店主题。
+function themeScope() {
+  const merchantNo = uni.getStorageSync('merchantNo') || ''
+  const storeId = uni.getStorageSync('storeId') || 0
+  return merchantNo + '_' + storeId
+}
+
+function themeKey() {
+  return 'theme_' + themeScope()
+}
+
+function themeTimeKey() {
+  return 'theme_time_' + themeScope()
+}
+
 let loadingPromise = null
+// 正在进行中的主题请求所属的门店分片
+let loadingScope = ''
 
 /**
  * 读取缓存的主题配置
  */
 export function getTheme() {
-  const theme = uni.getStorageSync('theme')
+  // 兼容升级前旧的全局缓存 key,避免首次分片时回落到白色兜底造成闪白
+  const theme = uni.getStorageSync(themeKey()) || uni.getStorageSync('theme')
   return theme && theme.colors ? theme : DEFAULT_THEME
 }
 
 /**
  * 缓存主题配置
  */
-export function setTheme(theme) {
+export function setTheme(theme, scope) {
+  // scope 为请求发起时的门店分片:切店期间旧门店的请求返回时,
+  // 若按当前 storeId 计算 key,会把旧门店主题写入新门店的缓存
+  const s = scope || themeScope()
+  uni.setStorageSync('theme_' + s, theme)
+  uni.setStorageSync('theme_time_' + s, Date.now())
+  // 原生自定义 tabBar 组件不参与编译、无法引用分片 key，
+  // 这里额外同步一份"当前生效主题"供其读取
   uni.setStorageSync('theme', theme)
-  uni.setStorageSync('theme_time', Date.now())
 }
 
 /**
@@ -150,33 +177,47 @@ function applyH5Theme(theme) {
  * 加载主题配置(带缓存,force 为 true 时强制刷新)
  */
 export function loadTheme(force) {
+  const scope = themeScope()
   if (!force) {
-    const time = uni.getStorageSync('theme_time')
+    const time = uni.getStorageSync(themeTimeKey())
     if (time && Date.now() - time < CACHE_DURATION) {
       const cached = getTheme()
       applyH5Theme(cached)
       return Promise.resolve(cached)
     }
   }
-  // 防止并发重复请求
-  if (!loadingPromise) {
+  // 防止并发重复请求:并发锁按门店分片判断。
+  // 切店时 storeId 会在请求进行中被改写,若复用上一家门店正在进行的请求,
+  // 其返回结果会被写入新门店的缓存(并应用到页面),导致换店后配色仍是旧门店的
+  if (!loadingPromise || loadingScope !== scope) {
+    const requestScope = scope
+    loadingScope = scope
     loadingPromise = themeApi.theme()
       .then(res => {
         const theme = res.data || {}
         if (!theme.colors) {
           theme.colors = DEFAULT_THEME.colors
         }
-        setTheme(theme)
-        applyH5Theme(theme)
+        setTheme(theme, requestScope)
+        // 门店已发生切换时不再应用,避免旧门店结果覆盖新门店配色
+        if (loadingScope === requestScope) {
+          applyH5Theme(theme)
+        }
         return theme
       })
       .catch(() => {
         const theme = getTheme()
-        applyH5Theme(theme)
+        if (loadingScope === requestScope) {
+          applyH5Theme(theme)
+        }
         return theme
       })
       .finally(() => {
-        loadingPromise = null
+        // 只清理本次发起的请求,避免后继门店的请求被误清
+        if (loadingScope === requestScope) {
+          loadingPromise = null
+          loadingScope = ''
+        }
       })
   }
   return loadingPromise

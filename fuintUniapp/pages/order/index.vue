@@ -92,6 +92,9 @@
   import { getEmptyPaginateObj, getMoreListData } from '@/utils/app'
   import * as OrderApi from '@/api/order'
   import { wxPayment } from '@/utils/app'
+  // #ifdef H5
+  import H5Tabbar from '@/components/tabbar/index.vue'
+  // #endif
 
   // 每页记录数量
   const pageSize = 15
@@ -113,7 +116,10 @@
 
   export default {
     components: {
-      MescrollBody
+      MescrollBody,
+      // #ifdef H5
+      H5Tabbar
+      // #endif
     },
     mixins: [MescrollMixin],
     data() {

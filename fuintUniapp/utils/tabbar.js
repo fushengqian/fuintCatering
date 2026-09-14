@@ -70,17 +70,40 @@ export function normalizeConfig(config, imagePath) {
 // 缓存有效期（毫秒），防止后台修改配置后客户端长期读取旧缓存
 const CACHE_TTL = 5 * 60 * 1000
 
+// 缓存按"商户+门店"分片:不同商户/门店可配置不同的底部导航,
+// 共用一个缓存会导致切换门店后沿用上一家的导航
+function tabbarScope() {
+  const merchantNo = uni.getStorageSync('merchantNo') || ''
+  const storeId = uni.getStorageSync('storeId') || 0
+  return merchantNo + '_' + storeId
+}
+
+function tabbarCacheKey() {
+  return 'tabbar_' + tabbarScope()
+}
+
+// 读取缓存;兼容升级前直接存归一化结果的全局 key。ignoreTTL 用于请求失败时兜底
+function readTabbarCache(ignoreTTL) {
+  const cached = uni.getStorageSync(tabbarCacheKey()) || uni.getStorageSync('tabbar')
+  if (!cached) return null
+  // 新结构为 { raw, imagePath, _ts }，旧结构直接是归一化后的配置
+  const raw = cached.raw || cached
+  if (!(raw && raw.items && raw.items.length)) return null
+  if (!ignoreTTL && Date.now() - (cached._ts || 0) >= CACHE_TTL) return null
+  return { raw, imagePath: cached.imagePath || '' }
+}
+
 // 加载 tabBar 配置并应用到当前页面（自定义 tabBar 实例可能尚未就绪，自动重试）
-export function loadAndApplyTabbar(page) {
+// force=true 时忽略本地缓存直接拉取，用于切换门店后刷新门店相关的 tabBar 配置
+export function loadAndApplyTabbar(page, force = false) {
   // #ifndef MP-WEIXIN
   // H5 等平台没有微信自定义 tabBar（getTabBar）机制，由页面内自定义组件渲染
-  return loadTabbar().then(() => {})
+  return loadTabbar(force).then(() => {})
   // #endif
   // #ifdef MP-WEIXIN
   console.log('[tabbar] loadAndApplyTabbar start')
-  return loadTabbar().then(config => {
+  return loadTabbar(force).then(config => {
     console.log('[tabbar] loadAndApplyTabbar config:', config)
-    if (!config) return
     const tryApply = (times) => {
       // 微信注入的 getTabBar 挂在原生页面实例上，uni-app 需经 $scope 访问
       const host = page.$scope || page
@@ -88,8 +111,15 @@ export function loadAndApplyTabbar(page) {
         const tabBar = host.getTabBar()
         console.log('[tabbar] getTabBar try #' + times, tabBar)
         if (tabBar && typeof tabBar.applyConfig === 'function') {
-          console.log('[tabbar] calling applyConfig')
-          tabBar.applyConfig(config)
+          // 有装修配置直接应用;确认后台无配置(或请求失败)时回退默认 tab,
+          // 否则未装修商家的底部导航会一直空着
+          if (config && config.items && config.items.length) {
+            console.log('[tabbar] calling applyConfig')
+            tabBar.applyConfig(config)
+          } else {
+            console.log('[tabbar] no config, fallback default')
+            tabBar.applyDefault()
+          }
           return
         }
       }
@@ -109,11 +139,10 @@ export function loadAndApplyTabbar(page) {
 export function loadTabbar(force = false) {
   return new Promise((resolve) => {
     if (!force) {
-      const cached = uni.getStorageSync('tabbar')
-      const isValid = cached && cached.items && cached.items.length && Date.now() - (cached._ts || 0) < CACHE_TTL
-      console.log('[tabbar] loadTabbar cache check:', { isValid, cached })
-      if (isValid) {
-        resolve(normalizeConfig(cached))
+      const cache = readTabbarCache()
+      console.log('[tabbar] loadTabbar cache check:', cache)
+      if (cache) {
+        resolve(normalizeConfig(cache.raw, cache.imagePath))
         return
       }
     }
@@ -131,23 +160,27 @@ export function loadTabbar(force = false) {
         const hasItems = !!(tabbar && tabbar.items && tabbar.items.length)
         const config = normalizeConfig(tabbar, imagePath)
         if (hasItems) {
+          // 分片缓存存原始配置:归一化结果会把 selectedColor 固化成写入时的主题色,
+          // 存原始数据可让每次读取都按当前主题重新计算
+          uni.setStorageSync(tabbarCacheKey(), { raw: tabbar, imagePath, _ts: Date.now() })
+          // 原生自定义 tabBar 组件不参与编译、无法引用分片 key,
+          // 同步一份归一化后的快照供其 attached 时读取
           uni.setStorageSync('tabbar', { ...config, _ts: Date.now() })
           console.log('[tabbar] cache written')
         } else {
-          uni.removeStorageSync('tabbar')
+          uni.removeStorageSync(tabbarCacheKey())
+          // 记录"后台确认无装修配置":下次组件 attached 时可直接回退默认 tab,
+          // 否则未装修商家每次冷启动都要等接口返回才有底部导航
+          uni.setStorageSync('tabbar', { _empty: true, _ts: Date.now() })
           console.log('[tabbar] cache removed (no items)')
         }
         resolve(config)
       })
       .catch(err => {
         console.error('loadTabbar error:', err)
-        // 请求失败时回退缓存，无缓存则不渲染（不填充兜底数据）
-        const cached = uni.getStorageSync('tabbar')
-        if (cached && cached.items && cached.items.length) {
-          resolve(normalizeConfig(cached))
-        } else {
-          resolve(null)
-        }
+        // 请求失败时回退缓存（忽略有效期），无缓存则不渲染（不填充兜底数据）
+        const cache = readTabbarCache(true)
+        resolve(cache ? normalizeConfig(cache.raw, cache.imagePath) : null)
       })
   })
 }

@@ -64,25 +64,37 @@ Vue.mixin({
       tb && tb.syncSelected && tb.syncSelected()
     }
     // #endif
-    loadTheme().then(theme => {
-      this.themeVars = buildThemeVars(theme)
-      // 微信小程序运行时设置顶部导航栏颜色，覆盖 pages.json 中的静态值
-      // #ifdef MP-WEIXIN
-      const c = (theme && theme.colors) || {}
-      const primary = c.primary || getThemePrimary()
-      this.themeColor = primary
-      try {
-        uni.setNavigationBarColor({
-          // 背景为浅色(含白色兜底)时使用黑色文字, 否则白色文字
-          frontColor: isLightColor(primary) ? '#000000' : '#ffffff',
-          backgroundColor: primary,
-          animation: { duration: 0, timingFunc: 'linear' }
-        })
-      } catch (e) {}
-      // #endif
-      // 主题更新后再次 setProperty 到页面根节点, 保证换色即时生效
-      applyThemeVarsToPage(this, theme)
-    })
+    this.refreshTheme()
+  },
+  methods: {
+    /**
+     * 加载并应用主题到当前页
+     * force=true 时忽略缓存强制拉取：主题由后端按 merchantId+storeId 下发，
+     * 而 merchantNo 是在 systemConfig 返回后才更新的，
+     * 切换商户/门店必须用新的 merchantNo 重新请求，否则拿到的仍是上一家商户的配色
+     */
+    refreshTheme(force) {
+      return loadTheme(force).then(theme => {
+        this.themeVars = buildThemeVars(theme)
+        // 微信小程序运行时设置顶部导航栏颜色，覆盖 pages.json 中的静态值
+        // #ifdef MP-WEIXIN
+        const c = (theme && theme.colors) || {}
+        const primary = c.primary || getThemePrimary()
+        this.themeColor = primary
+        try {
+          uni.setNavigationBarColor({
+            // 背景为浅色(含白色兜底)时使用黑色文字, 否则白色文字
+            frontColor: isLightColor(primary) ? '#000000' : '#ffffff',
+            backgroundColor: primary,
+            animation: { duration: 0, timingFunc: 'linear' }
+          })
+        } catch (e) {}
+        // #endif
+        // 主题更新后再次 setProperty 到页面根节点, 保证换色即时生效
+        applyThemeVarsToPage(this, theme)
+        return theme
+      })
+    }
   }
 })
 

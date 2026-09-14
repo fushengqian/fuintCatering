@@ -14,6 +14,15 @@ page {
   flex-shrink: 0;
 }
 
+/* #ifdef H5 */
+/* H5 端使用自定义 tabbar 完全替代原生 tabBar,避免装修配置与默认 tabBar 同时出现 */
+.uni-tabbar,
+.uni-tabbar-bottom,
+uni-tabbar {
+  display: none !important;
+}
+/* #endif */
+
 uni-modal {
   z-index: 99999999999999 !important;
 }

@@ -65,14 +65,20 @@
       this.load()
     },
     methods: {
-      async load() {
+      async load(force) {
         let config = null
         try {
-          config = await loadTabbar()
+          config = await loadTabbar(force)
         } catch (e) {
           config = null
         }
-        this.apply(config)
+        // H5 端无装修配置时回退默认 tab,与小程序行为保持一致,
+        // 避免原生 tabBar 与自定义组件交替出现
+        if (!config || !config.items || !config.items.length) {
+          this.applyDefault()
+        } else {
+          this.apply(config)
+        }
       },
       apply(config) {
         // 后端无配置/无有效导航项时不渲染（不填充任何兜底数据）
@@ -100,10 +106,27 @@
         this.barHeight = Math.max(40, Math.min(Number(style.height) || 50, 80))
         this.setSelected()
       },
+      applyDefault() {
+        // H5 端无装修配置时回退 pages.json 默认 tab,保证各 tab 页导航一致
+        this.items = [
+          { name: '首页', path: 'pages/index/index', icon: '/static/tabbar/home.png', selectedIcon: '/static/tabbar/home-active.png' },
+          { name: '点单', path: 'pages/category/index', icon: '/static/tabbar/cart.png', selectedIcon: '/static/tabbar/cart-active.png' },
+          { name: '订单', path: 'pages/order/index', icon: '/static/tabbar/shop.png', selectedIcon: '/static/tabbar/shop-active.png' },
+          { name: '我的', path: 'pages/user/index', icon: '/static/tabbar/user.png', selectedIcon: '/static/tabbar/user-active.png' }
+        ]
+        this.visible = true
+        this.bgColor = '#ffffff'
+        this.textColor = '#999999'
+        this.selectedColor = getThemePrimary()
+        this.barHeight = 50
+        this.setSelected()
+      },
       // 页面 onShow 时调用：tab 切换后刷新选中态；首次未渲染时补拉取
-      refresh() {
-        if (!this.visible && !this.items.length) {
-          this.load()
+      refresh(force) {
+        // force 用于切换门店:已渲染时也必须重新拉取,
+        // 否则只会同步选中态,底部导航会一直沿用上一家门店的配置
+        if (force || !this.visible || !this.items.length) {
+          this.load(force)
         } else {
           this.syncSelected()
         }

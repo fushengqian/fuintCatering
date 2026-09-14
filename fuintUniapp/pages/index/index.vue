@@ -46,6 +46,7 @@
   import MescrollCompMixin from "@/components/mescroll-uni/mixins/mescroll-comp.js";
   import config from '@/config'
   import { loadAndApplyTabbar } from '@/utils/tabbar'
+  import { loadTheme } from '@/utils/theme'
   import { preloadWxSdk, scanTableCode } from '@/utils/scanOrder'
   // #ifdef H5
   import H5Tabbar from '@/components/tabbar/index.vue'
@@ -85,18 +86,37 @@
         // 页面装修数据请求进行中标识（防止重复请求）
         pageLoading: false,
         // 门店信息请求进行中标识（防止重复请求）
-        storeFetching: false
+        storeFetching: false,
+        // 链接显式指定的门店ID（扫码切店场景），用于判断指定门店是否可用
+        requestedStoreId: 0,
+        // 切换门店后需强制刷新 tabBar 配置（绕过本地 5 分钟缓存）
+        tabbarForce: false
       }
     },
 
     /**
      * 生命周期函数--监听页面加载
      */
-    onLoad({ storeId }) {
+    onLoad({ storeId, tableId }) {
       storeId = storeId ? parseInt(storeId) : 0;
+      tableId = tableId ? parseInt(tableId) : 0;
       if (storeId > 0) {
+          const prevStoreId = parseInt(uni.getStorageSync('storeId') || 0);
+          // 记录链接显式指定的门店，后端在其不可用时回退到其他门店，前端据此提示
+          this.requestedStoreId = storeId;
           uni.setStorageSync('storeId', storeId);
           uni.setStorageSync("reflashHomeData", true);
+          if (prevStoreId !== storeId) {
+              // 切换门店：清除上一家门店残留的桌码，避免下单挂到别的门店的桌上
+              // （tableId 写入后无清理时机，会长期留存；后端也已改为 storeId 优先）
+              if (tableId <= 0) {
+                  uni.removeStorageSync('tableId');
+              }
+              // 门店相关的主题/tabBar 缓存按门店分片，换店后强制刷新
+              this.tabbarForce = true;
+              // 立即拉取新门店主题（此时 header 已带新 storeId），后续 onShow 会复用该请求
+              loadTheme(true);
+          }
       } else {
           this.getPageData();
       }
@@ -111,7 +131,9 @@
     onShow() {
       const app = this;
       // 拉取 tabBar 装修配置（缓存优先），自定义 tabBar 实例可能尚未就绪会自动重试
-      loadAndApplyTabbar(this)
+      // 切换门店后强制刷新，避免沿用上一家门店的缓存配置
+      loadAndApplyTabbar(this, this.tabbarForce)
+      this.tabbarForce = false
       // #ifdef H5
       this.$refs.h5Tabbar && this.$refs.h5Tabbar.refresh()
       // #endif
@@ -212,12 +234,42 @@
                 return;
             }
             app.storeFetching = true;
+            const prevMerchantNo = uni.getStorageSync('merchantNo') || '';
+            const prevStoreId = parseInt(uni.getStorageSync('storeId') || 0);
             settingApi.systemConfig()
              .then(result => {
                  app.storeInfo = result.data.storeInfo;
+                 // 扫码指定的门店不存在或已停用时，后端已回退到其他门店
+                 // （跨商户切店属于正常场景，不在此列）
+                 if (result.data.storeUnavailable && app.requestedStoreId > 0) {
+                     // 置空避免 onShow 重复触发时反复提示
+                     app.requestedStoreId = 0;
+                     uni.showToast({
+                         title: '该门店暂不可用，已为您切换到其他门店',
+                         icon: 'none',
+                         duration: 3000
+                     });
+                 }
                  if (app.storeInfo) {
+                     const merchantNo = app.storeInfo.merchantNo || '';
+                     // 首次进入时无历史商户/门店，不算切换，无需重复拉取
+                     const isFirst = !prevMerchantNo && prevStoreId <= 0;
+                     const switched = !isFirst && (merchantNo !== prevMerchantNo || app.storeInfo.id !== prevStoreId);
                      uni.setStorageSync("storeId", app.storeInfo.id);
-                     uni.setStorageSync("merchantNo", app.storeInfo.merchantNo);
+                     uni.setStorageSync("merchantNo", merchantNo);
+                     if (switched) {
+                         // 商户或门店已变更（跨商户切店、或指定门店不可用被回退）：
+                         // 主题与 tabBar 均由后端按 merchantId+storeId 下发，
+                         // 必须在 merchantNo 生效后重新拉取，否则仍是上一家的配色
+                         // 主题先行刷新：tabBar 的选中色依赖当前主题色，
+                         // 否则会用上一家门店的配色渲染导航
+                         app.refreshTheme(true).then(() => {
+                             loadAndApplyTabbar(app, true);
+                             // #ifdef H5
+                             app.$refs.h5Tabbar && app.$refs.h5Tabbar.refresh(true);
+                             // #endif
+                         });
+                     }
                      // 判断是否需要更新页面
                      let isReflash = uni.getStorageSync("reflashHomeData");
                      app.isReflash = isReflash;

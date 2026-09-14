@@ -1,5 +1,6 @@
 <script>
   import { loadTheme, getTheme, getThemePrimary, isLightColor } from '@/utils/theme'
+  import { loadTabbar } from '@/utils/tabbar'
 
   export default {
 
@@ -23,6 +24,9 @@
       loadTheme(true).then(theme => {
         this.applyNavigationBarColor(theme)
       })
+      // 预取底部导航(缓存优先):让自定义 tabBar 组件 attached 时就能读到配置直接渲染,
+      // 避免无缓存时先隐藏、等接口返回才出现
+      loadTabbar()
       if (options.query.spm) {
           uni.setStorageSync('shareId', options.query.spm);
       }

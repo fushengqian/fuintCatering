@@ -57,9 +57,10 @@ Component({
     const theme = wx.getStorageSync('theme')
     const primary = (theme && theme.colors && theme.colors.primary) || '#ff0000'
     return {
-      // 后端未返回有效配置前先按默认 tab 渲染，避免导航栏消失
-      visible: true,
-      list: DEFAULT_LIST,
+      // 拿到有效配置前不渲染:先按默认 tab 渲染会在装修配置到达后被再次替换,
+      // 表现为底部导航先闪一下默认图标。确认后台无配置后才回退默认 tab
+      visible: false,
+      list: [],
       selected: 0,
       // 类型: iconText / image / text
       showIcon: true,
@@ -82,11 +83,15 @@ Component({
       // 优先使用页面缓存的最新配置(图标地址已在 utils/tabbar.js 中补全)
       const config = wx.getStorageSync('tabbar') || null
       console.log('[custom-tabbar] attached, cache config:', config)
+      // 有缓存才立即渲染;无缓存时保持隐藏,由各 tab 页请求到配置后 applyConfig 推送,
+      // 否则会先渲染默认 tab、再被装修配置替换,产生闪动
       if (config && config.items && config.items.length) {
         this.applyConfig(config)
-      } else {
+      } else if (config && config._empty) {
+        // 上次已确认后台无装修配置,直接回退默认 tab,不必等接口返回
         this.applyDefault()
       }
+      // 其余情况(首次安装等)保持隐藏,由各 tab 页请求到配置后推送
       this.syncSelected()
     }
   },
@@ -107,6 +112,12 @@ Component({
     // 应用后台装修配置；无有效配置时回退默认 tab
     applyConfig(config) {
       console.log('[custom-tabbar] applyConfig start, config:', config)
+      // 每次应用配置都重新读取当前主题色:切换门店后主题已刷新,
+      // 沿用 attached 时读到的会是上一家门店的配色
+      const t = wx.getStorageSync('theme')
+      if (t && t.colors && t.colors.primary) {
+        this.data._themePrimary = t.colors.primary
+      }
       if (!config || !config.items || !config.items.length) {
         console.log('[custom-tabbar] applyConfig fallback default: no items')
         this.applyDefault()

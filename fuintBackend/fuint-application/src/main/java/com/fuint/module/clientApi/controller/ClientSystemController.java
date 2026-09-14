@@ -77,6 +77,8 @@ public class ClientSystemController extends BaseController {
         String platform = request.getHeader("platform");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
         String storeId = request.getHeader("storeId") == null ? "" : request.getHeader("storeId");
+        // 记录请求中显式指定的门店(被桌码兜底覆盖之前),用于判断该门店是否真的可用
+        String requestStoreId = storeId;
         String latitude = request.getHeader("latitude") == null ? "" : request.getHeader("latitude");
         String longitude = request.getHeader("longitude") == null ? "" : request.getHeader("longitude");
         String tableId =  request.getHeader("tableId") == null ? "" : request.getHeader("tableId");
@@ -101,11 +103,15 @@ public class ClientSystemController extends BaseController {
             }
         }
 
-        // 扫码下单
-        if (StringUtil.isNotEmpty(tableId)) {
-            MtTable mtTable = tableService.queryTableById(Integer.parseInt(tableId));
-            if (mtTable != null && mtTable.getStoreId() != null) {
-                storeId = mtTable.getStoreId().toString();
+        // 扫码下单:桌码所属店铺仅作为兜底,优先级低于显式指定的 storeId。
+        // 客户端 tableId 写入后无清理时机,会长期缓存在本地;若其优先级高于 storeId,
+        // 扫码切店(URL 带 storeId)会被历史桌码所属店铺覆盖,导致切换门店始终不生效
+        if (StringUtil.isEmpty(storeId) || "0".equals(storeId)) {
+            if (StringUtil.isNotEmpty(tableId)) {
+                MtTable mtTable = tableService.queryTableById(Integer.parseInt(tableId));
+                if (mtTable != null && mtTable.getStoreId() != null) {
+                    storeId = mtTable.getStoreId().toString();
+                }
             }
         }
 
@@ -135,11 +141,31 @@ public class ClientSystemController extends BaseController {
             mtStore = storeService.getDefaultStore(merchantNo);
         }
 
+        // 显式指定了门店但该门店不存在或已停用时,标记给前端提示:
+        // 此时已静默回退到最近门店或系统默认门店,不提示会让用户误以为已进入目标门店。
+        // 注意:不同门店本就可能属于不同商户,跨商户切店是正常场景
+        // (门店所属商户会随 storeInfo.merchantNo 回传并由前端更新),不视为不可用
+        boolean storeUnavailable = false;
+        if (StringUtil.isNotEmpty(requestStoreId) && !"0".equals(requestStoreId)) {
+            try {
+                MtStore requestStore = storeService.queryStoreById(Integer.parseInt(requestStoreId));
+                if (requestStore == null || !requestStore.getStatus().equals(StatusEnum.ENABLED.getKey())) {
+                    storeUnavailable = true;
+                }
+            } catch (Exception e) {
+                storeUnavailable = true;
+            }
+        }
+
         // 完善会员的店铺信息
-        if (mtUser != null && (mtUser.getStoreId() == null || mtUser.getStoreId() < 1)) {
-            mtUser.setStoreId(mtStore.getId());
-            mtUser.setUpdateTime(new Date());
-            memberService.updateMember(mtUser, false);
+        if (mtUser != null && mtStore != null && (mtUser.getStoreId() == null || mtUser.getStoreId() < 1)) {
+            // 门店须与会员同属一个商户:跨商户切店时 mtStore 是其它商户的门店,
+            // 直接写入会把会员绑定到别的商户的门店下
+            if (mtStore.getMerchantId() != null && mtStore.getMerchantId().equals(mtUser.getMerchantId())) {
+                mtUser.setStoreId(mtStore.getId());
+                mtUser.setUpdateTime(new Date());
+                memberService.updateMember(mtUser, false);
+            }
         }
 
         StoreInfo storeInfo = new StoreInfo();
@@ -191,6 +217,8 @@ public class ClientSystemController extends BaseController {
         result.put("tableInfo", tableInfo);
         result.put("payFirst", payFirst);
         result.put("peopleNum", peopleNum);
+        // 指定的门店是否不可用(前端据此提示用户已切换到其他门店)
+        result.put("storeUnavailable", storeUnavailable);
 
         return getSuccessResult(result);
     }
