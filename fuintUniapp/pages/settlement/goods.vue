@@ -265,7 +265,7 @@
                   </view>
                 </view>
               </view>
-              <!-- 前台支付 -->
+              <!-- 到店支付 -->
               <view class="pay-item dis-flex flex-x-between" v-if="payOffLine" @click="doSubmitOrder(PayTypeEnum.STORE.value)">
                   <view class="item-left dis-flex flex-y-center">
                     <view class="item-left_icon balance">

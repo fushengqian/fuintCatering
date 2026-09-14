@@ -10,7 +10,7 @@ public enum OrderSettingEnum {
     DELIVERY_FEE("deliveryFee", "订单配送费用"),
     DELIVERY_MIN_AMOUNT("deliveryMinAmount", "订单起送金额"),
     IS_CLOSE("isClose", "关闭交易功能"),
-    PAY_OFF_LINE("payOffLine", "开启前台支付功能"),
+    PAY_OFF_LINE("payOffLine", "开启到店支付功能"),
     PAY_FIRST("payFirst", "门店支付模式"),
     DELIVERY_RANGE("deliveryRange", "配送范围"),
     PEOPLE_NUM("peopleNum", "就餐人数");
