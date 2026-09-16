@@ -117,7 +117,7 @@
     </u-popup>
     <!-- 就餐人数对话框 end -->
     
-    <view class="flow-fixed-footer b-f m-top10" :style="{ paddingBottom: 'calc(' + tabbarHeight + 'px + env(safe-area-inset-bottom))' }">
+    <view class="flow-fixed-footer b-f" :style="{ paddingBottom: 'calc(' + tabbarHeight + 'px + env(safe-area-inset-bottom))' }">
       <view class="dis-flex chackout-box">
         <view class="chackout-left pl-12">
           <view class="col-amount-do">总金额：<text class="amount">￥{{ totalPrice.toFixed(2) }}</text></view>

@@ -48,7 +48,7 @@
     </view>
 
     <!-- 提交订单 -->
-    <view class="flow-fixed-footer b-f m-top10">
+    <view class="flow-fixed-footer b-f">
       <view class="dis-flex chackout-box">
           <view class="col-amount-do">应付金额：
             <text class="pay-amount">￥{{ totalAmount ? totalAmount.toFixed(2) : '0.00' }}</text>
