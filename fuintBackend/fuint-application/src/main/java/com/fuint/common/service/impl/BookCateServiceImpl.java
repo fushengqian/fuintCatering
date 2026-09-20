@@ -103,7 +103,8 @@ public class BookCateServiceImpl extends ServiceImpl<MtBookCateMapper, MtBookCat
     /**
      * 添加预约分类
      *
-     * @param mtBookCate 分类信息
+     * @param  mtBookCate 分类信息
+     * @throws BusinessCheckException
      * @return
      */
     @Override

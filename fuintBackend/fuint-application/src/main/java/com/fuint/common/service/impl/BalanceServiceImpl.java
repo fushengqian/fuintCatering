@@ -107,12 +107,11 @@ public class BalanceServiceImpl extends ServiceImpl<MtBalanceMapper, MtBalance> 
         Integer merchantId = balancePage.getMerchantId();
         if (merchantId != null) {
             lambdaQueryWrapper.eq(MtBalance::getMerchantId, merchantId);
+        } else {
+            merchantId = 0;
         }
         String userNo = balancePage.getUserNo();
         if (StringUtil.isNotEmpty(userNo)) {
-            if (merchantId == null) {
-                merchantId = 0;
-            }
             MtUser userInfo = memberService.queryMemberByUserNo(merchantId, userNo);
             if (userInfo != null) {
                 lambdaQueryWrapper.eq(MtBalance::getUserId, userInfo.getId());
@@ -164,6 +163,7 @@ public class BalanceServiceImpl extends ServiceImpl<MtBalanceMapper, MtBalance> 
      * @param  mtBalance
      * @param  updateBalance
      * @throws BusinessCheckException
+     * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

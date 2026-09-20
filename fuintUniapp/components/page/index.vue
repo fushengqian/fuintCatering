@@ -314,7 +314,7 @@
               obj.name = c.name || ''
               obj.type = c.type || 'C'
               obj.amount = c.amount || 0
-              obj.discount = c.discount || 0
+              obj.content = c.content || 0
               obj.minSendAmount = c.minSendAmount || 0
               obj.gotNum = c.gotNum || 0
               obj.leftNum = c.leftNum || 0

@@ -40,7 +40,7 @@
       <block v-for="(item, index) in userAssetsItems" :key="index">
         <view class="asset-card-item" @click="onUserAsset(item)">
           <view class="asset-card-icon">
-            <text class="iconfont" :class="iconClass(item.icon)" :style="{ color: 'var(--theme-primary)' }"></text>
+            <text class="iconfont" :class="item.iconCls" :style="{ color: 'var(--theme-primary)' }"></text>
           </view>
           <view class="asset-card-value">{{ assetValue(item) }}</view>
           <view class="asset-card-label">{{ item.name }}</view>
@@ -79,7 +79,7 @@
     <view class="order-navbar" v-if="compVisible('orderEntry')" :style="{ order: compOrder('orderEntry') }">
       <view class="order-navbar-item" v-for="(item, index) in orderItems" :key="index" @click="onTargetOrder(item)">
         <view class="item-icon">
-          <text class="iconfont" :class="iconClass(item.icon)"></text>
+          <text class="iconfont" :class="item.iconCls"></text>
         </view>
         <view class="item-name">{{ item.name }}</view>
         <text class="order-badge" v-if="item.count > 0">{{ item.count }}</text>
@@ -104,17 +104,17 @@
     <view class="my-service" v-if="compVisible('serviceGrid')" :style="{ order: compOrder('serviceGrid') }">
       <view class="service-title">{{ serviceTitle }}</view>
       <view class="service-content clearfix" :class="'service-col-' + serviceColumns">
-        <block v-for="(item, index) in service" :key="index">
+        <block v-for="(item, index) in serviceItems" :key="index">
           <view v-if="item.type == 'link'" class="service-item" @click="handleService(item)">
             <view class="item-icon">
-              <text class="iconfont" :class="iconClass(item.icon)"></text>
+              <text class="iconfont" :class="item.iconCls"></text>
             </view>
             <view class="item-name">{{ item.name }}</view>
           </view>
           <view v-if="item.type == 'button' && $platform == 'MP-WEIXIN'" class="service-item">
             <button class="btn-normal" :open-type="item.openType">
               <view class="item-icon">
-                <text class="iconfont" :class="iconClass(item.icon)"></text>
+                <text class="iconfont" :class="item.iconCls"></text>
               </view>
               <view class="item-name">{{ item.name }}</view>
             </button>
@@ -727,6 +727,15 @@
         return { background: 'var(--theme-primary)' }
       },
 
+      // 我的服务列表（预生成 iconfont 类名：小程序端 :class 绑定不支持函数调用）
+      serviceItems() {
+        const app = this
+        return (app.service || []).map(item => ({
+          ...item,
+          iconCls: app.iconClass(item.icon)
+        }))
+      },
+
       // 我的资产列表
       userAssetsItems() {
         const comp = this.getComp('userAssets')
@@ -741,6 +750,7 @@
           const target = defaultItems.find(d => d.name === name)
           return {
             ...item,
+            iconCls: this.iconClass(item.icon),
             url: item.url || item.link || (target ? target.url : '')
           }
         })
@@ -761,6 +771,7 @@
             id: key,
             name: item.name,
             icon: item.icon,
+            iconCls: app.iconClass(item.icon),
             count: app.isLogin ? (app.todoCounts[key] || 0) : 0
           }
         })

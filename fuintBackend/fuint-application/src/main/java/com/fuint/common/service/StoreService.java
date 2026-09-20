@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.fuint.common.dto.merchant.StoreDto;
 import com.fuint.common.dto.merchant.StoreInfo;
 import com.fuint.common.dto.system.AccountInfo;
+import com.fuint.common.param.StorePage;
 import com.fuint.framework.exception.BusinessCheckException;
-import com.fuint.framework.pagination.PaginationRequest;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.repository.model.MtStore;
 
@@ -23,10 +23,10 @@ public interface StoreService extends IService<MtStore> {
     /**
      * 分页查询店铺列表
      *
-     * @param paginationRequest
+     * @param storePage 分页请求参数
      * @return
      */
-    PaginationResponse<StoreDto> queryStoreListByPagination(PaginationRequest paginationRequest);
+    PaginationResponse<StoreDto> queryStoreListByPagination(StorePage storePage);
 
     /**
      * 保存店铺信息

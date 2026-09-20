@@ -109,7 +109,7 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
         if (action.equals("+") || action.equals("=") && reqDto.getNum() > 0) {
             MtGoods mtGoods = mtGoodsMapper.selectById(reqDto.getGoodsId());
             Map<String, Object> param = new HashMap<>();
-            param.put("status", StatusEnum.ENABLED.getKey());
+            param.put("STATUS", StatusEnum.ENABLED.getKey());
             param.put("USER_ID", reqDto.getUserId());
             param.put("GOODS_ID", reqDto.getGoodsId());
             param.put("MERCHANT_ID", reqDto.getMerchantId());
@@ -230,7 +230,6 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
      * 删除购物车
      *
      * @param  cartIds 购物车ID
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -241,10 +240,10 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
            return;
         }
         for (int i = 0; i < ids.length; i++) {
-            MtCart mtCart = mtCartMapper.selectById(Integer.parseInt(ids[i].trim()));
-            if (mtCart != null) {
-                mtCartMapper.deleteById(mtCart.getId());
-            }
+             MtCart mtCart = mtCartMapper.selectById(Integer.parseInt(ids[i].trim()));
+             if (mtCart != null) {
+                 mtCartMapper.deleteById(mtCart.getId());
+             }
         }
     }
 
@@ -284,7 +283,7 @@ public class CartServiceImpl extends ServiceImpl<MtCartMapper, MtCart> implement
     /**
      * 清空会员购物车
      *
-     * @param userId 会员ID
+     * @param  userId 会员ID
      * @throws BusinessCheckException
      * @return
      */

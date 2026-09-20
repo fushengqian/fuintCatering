@@ -1,9 +1,6 @@
 <template>
   <!-- 卡券组 -->
   <view class="diy-coupon" :style="couponWrapStyle">
-    <view v-if="itemStyle.title" class="coupon-title" :style="{ color: titleColor }">
-      <text class="txt">{{ itemStyle.title }}</text>
-    </view>
     <view class="coupon-list">
       <view
         class="coupon-card"
@@ -16,8 +13,7 @@
         <view class="coupon-notch coupon-notch-right" :style="{ background: wrapBg }"></view>
         <view class="coupon-left">
           <view class="coupon-amount">
-            <text v-if="dataItem.type === 'ZK' && dataItem.discount > 0">{{ dataItem.discount }}折</text>
-            <text v-else>¥{{ dataItem.amount || 0 }}</text>
+            <text>{{ amountText(dataItem) }}</text>
           </view>
           <view class="coupon-threshold">
             <text v-if="dataItem.minSendAmount > 0">满{{ dataItem.minSendAmount }}可用</text>
@@ -61,17 +57,14 @@
         }
         return bg
       },
-      // 卡片背景/标题色优先使用后台配置的文字色；未配置或配置为旧默认/白色时使用主题色
-      themeColor() {
+      // 卡片背景色优先使用后台配置的文字色；未配置或配置为旧默认/白色时使用主题色
+      // 注意：不能命名为 themeColor，main.js 的全局 mixin 已在 data 中注入该字段
+      cardColor() {
         const c = this.itemStyle.color
         if (!c || c === '#ffffff' || c === '#1890ff') {
           return this.primary
         }
         return c
-      },
-      titleColor() {
-        // 外层背景为主题色时标题用白色，保证可读
-        return this.wrapBg === this.primary ? '#ffffff' : this.themeColor
       },
       borderRadius() {
         const r = this.itemStyle.borderRadius
@@ -83,10 +76,10 @@
         return `background: ${this.wrapBg};`
       },
       couponCardStyle() {
-        return `background: ${this.themeColor}; color: #ffffff; border-radius: ${this.borderRadius}rpx;`
+        return `background: ${this.cardColor}; color: #ffffff; border-radius: ${this.borderRadius}rpx;`
       },
       couponBtnStyle() {
-        return `background: #ffffff; color: ${this.themeColor};`
+        return `background: #ffffff; color: ${this.cardColor};`
       }
     },
 
@@ -97,6 +90,14 @@
           return '全场通用'
         }
         return '指定商品可用'
+      },
+      // 券面额展示：储值卡/计次卡显示类型名；折扣券(content=2)显示折扣，其余显示金额
+      amountText(item) {
+        if (item.type === 'P') return '储值卡'
+        if (item.type === 'T') return '计次卡'
+        // 折扣券 amount 存的是 ×10 的值，如 85 表示 8.5 折
+        if (Number(item.content) === 2) return (Number(item.amount || 0) / 10).toFixed(2) + '折'
+        return '¥' + (item.amount || 0)
       },
       btnText(item) {
         if (item.isReceive) {
@@ -130,16 +131,6 @@
     border: 1rpx solid #e6e6e6;
     border-radius: 20rpx;
     box-sizing: border-box;
-  }
-
-  .coupon-title {
-    font-size: 30rpx;
-    font-weight: bold;
-    padding: 10rpx 8rpx;
-    .txt {
-      border-left: solid currentColor 10rpx;
-      padding-left: 10rpx;
-    }
   }
 
   .coupon-list {

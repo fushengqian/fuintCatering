@@ -36,7 +36,7 @@
           <image class="close-item" :src="closeImage"></image>
         </view>
       </view>
-      <view class="btn-wrapper">
+      <view class="btn-wrapper" :style="btnBottomStyle">
         <view class="sure" @click="buyNow">立即下单</view>
       </view>
       <!-- 页面结束 -->
@@ -75,7 +75,7 @@
               <image class="close-item" :src="closeImage"></image>
             </view>
           </view>
-          <view class="btn-wrapper">
+          <view class="btn-wrapper" :style="btnBottomStyle">
             <view class="sure" @click="doBuy">确认支付</view>
           </view>
           <!-- 页面结束 -->
@@ -90,6 +90,7 @@
   import * as SettlementApi from '@/api/settlement'
   import PayTypeEnum from '@/common/enum/order/PayType'
   import { wxPayment } from '@/utils/app'
+  import { loadTabbar } from '@/utils/tabbar'
   
   var that; // 当前页面对象
   var vk; // 自定义函数集
@@ -130,13 +131,58 @@
         isShowPay: false, // true 显示 false 隐藏
         useCoupon: true,  // 是否使用卡券
         useCouponInfo: { amount: 0, id: '' }, // 使用的卡券
-        couponInfo: null // 可用卡券
+        couponInfo: null, // 可用卡券
+        bottomOffset: 0 // 底部按钮距视口底部的偏移(px)，用于避让底部 tabBar
       };
+    },
+    computed: {
+      // 需要避让 tabBar 时用实测值覆盖样式表中的默认间距；否则沿用默认值
+      btnBottomStyle() {
+        return this.bottomOffset > 0 ? { marginBottom: this.bottomOffset + 'px' } : {};
+      }
     },
     mounted() {
       that = this;
+      // 计算底部按钮位置，避免「立即购买」被 tabBar 遮挡
+      this.initBtnBottomOffset();
     },
     methods: {
+      // 底部按钮避让 tabBar：小程序端自定义 tabBar 属于原生层级，弹窗 z-index 再高也盖不住它，
+      // 只能把按钮抬到 tabBar 上方；H5 端 tabBar 为页面内组件，同样避让以保持观感
+      initBtnBottomOffset() {
+        const app = this;
+        // 后台未配置时按 tabBar 默认高度 50px 避让，保证按钮不贴底
+        let barHeight = 50;
+        const apply = () => {
+          // tabBar 高度 + 底部安全区，再留 12px 间距
+          app.bottomOffset = barHeight + app.getSafeAreaBottom() + 12;
+          console.log('[grade-popup] bottomOffset:', app.bottomOffset);
+        };
+        loadTabbar()
+          .then(config => {
+            const valid = config && config.enabled !== false && config.items && config.items.length;
+            if (valid) {
+              barHeight = Math.max(40, Math.min(Number((config.style && config.style.height) || 50), 80));
+            }
+            apply();
+          })
+          .catch(() => apply());
+      },
+      // 底部安全区高度(px)
+      getSafeAreaBottom() {
+        try {
+          const info = uni.getSystemInfoSync();
+          if (info.safeAreaInsets && typeof info.safeAreaInsets.bottom === 'number') {
+            return info.safeAreaInsets.bottom;
+          }
+          if (info.safeArea && typeof info.screenHeight === 'number') {
+            return Math.max(0, info.screenHeight - info.safeArea.bottom);
+          }
+        } catch (e) {
+          // 忽略：获取不到安全区时按 0 处理
+        }
+        return 0;
+      },
       async open() {
         that.complete = true;
         that.$emit("open", true);
@@ -443,7 +489,9 @@
         justify-content: space-between;
         padding: 0 26rpx;
         box-sizing: border-box;
-        margin-bottom: 120rpx;
+        // 兜底：JS 未算出精确避让值时，按 tabBar 配置高度上限(80px) + 安全区预留，保证按钮露在 tabBar 之上
+        margin-bottom: calc(160rpx + constant(safe-area-inset-bottom));
+        margin-bottom: calc(160rpx + env(safe-area-inset-bottom));
         .layer-btn {
           width: 335rpx;
           height: 76rpx;
