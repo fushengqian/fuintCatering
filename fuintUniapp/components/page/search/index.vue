@@ -1,8 +1,8 @@
 <template>
   <!-- 搜索框 -->
-  <view class="diy-search" :style="{ background: itemStyle.background || '#ffffff' }">
-    <view class="inner" :class="itemStyle.searchStyle" @click="onTargetSearch">
-      <view class="search-input" :style="{ textAlign: itemStyle.textAlign || 'center' }">
+  <view class="diy-search" :style="boxStyle">
+    <view class="inner" :class="itemStyle.searchStyle" :style="inputBoxStyle" @click="onTargetSearch">
+      <view class="search-input" :style="inputTextStyle">
         <text class="search-icon iconfont icon-sousuo"></text>
         <text> {{ params.placeholder }}</text>
       </view>
@@ -21,6 +21,52 @@
       itemIndex: String,
       itemStyle: Object,
       params: Object
+    },
+
+    computed: {
+      // 组件整体：仅背景色，间距沿用样式表中的默认 padding
+      boxStyle() {
+        const style = this.itemStyle || {}
+        return `background: ${style.background || '#ffffff'};`
+      },
+      // 后台数值按 px 配置，这里按 750 设计稿换算后交给 uni 转成运行时 px。
+      // 说明：动态 style 字符串中直接写 rpx 只在小程序端生效（H5 端编译期不会转换），改用 px 可两端一致
+      inputHeight() {
+        const height = parseInt(this.itemStyle && this.itemStyle.height, 10)
+        if (isNaN(height) || height <= 0) return ''
+        return `${uni.upx2px(height * 2)}px`
+      },
+      inputRadius() {
+        const radius = parseInt(this.itemStyle && this.itemStyle.inputRadius, 10)
+        if (isNaN(radius) || radius < 0) return ''
+        return `${uni.upx2px(radius * 2)}px`
+      },
+      // 输入框边框：边框色必填，粗细为 0 时表示无边框；未配置时沿用样式表中的默认边框
+      inputBorder() {
+        const style = this.itemStyle || {}
+        const width = parseInt(style.borderWidth, 10)
+        if (isNaN(width) || width < 0 || !style.borderColor) return ''
+        return `${uni.upx2px(width * 2)}px ${style.borderStyle || 'solid'} ${style.borderColor}`
+      },
+      // 输入框外框：背景色 + 高度 + 圆角 + 边框，未配置时沿用样式表中的默认值
+      inputBoxStyle() {
+        const parts = []
+        if (this.itemStyle && this.itemStyle.inputBg) parts.push(`background: ${this.itemStyle.inputBg}`)
+        if (this.inputHeight) parts.push(`height: ${this.inputHeight}`)
+        if (this.inputRadius) parts.push(`border-radius: ${this.inputRadius}`)
+        if (this.inputBorder) parts.push(`border: ${this.inputBorder}`)
+        return parts.join('; ') + (parts.length ? ';' : '')
+      },
+      // 输入区域：高度与行高跟随输入框，保证文字垂直居中；未配置高度时仅输出对齐方式
+      inputTextStyle() {
+        const style = this.itemStyle || {}
+        const parts = [`text-align: ${style.textAlign || 'center'}`]
+        if (this.inputHeight) {
+          parts.push(`height: ${this.inputHeight}`)
+          parts.push(`line-height: ${this.inputHeight}`)
+        }
+        return parts.join('; ') + ';'
+      }
     },
 
     /**
