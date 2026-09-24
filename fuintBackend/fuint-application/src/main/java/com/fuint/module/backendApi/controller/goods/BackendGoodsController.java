@@ -306,6 +306,10 @@ public class BackendGoodsController extends BaseController {
         Double initSale = param.get("initSale") == null ? 0 : Double.parseDouble(param.get("initSale").toString());
         String salePoint = param.get("salePoint") == null ? "" : param.get("salePoint").toString();
         String canUsePoint = param.get("canUsePoint") == null ? "" : param.get("canUsePoint").toString();
+        String isPointGoods = param.get("isPointGoods") == null ? "" : param.get("isPointGoods").toString();
+        // 参数未提交时保持 null，避免基础信息/详情 tab 保存时把扩展信息里的积分配置覆盖成 0
+        Integer pointPrice = (param.get("pointPrice") == null || StringUtil.isEmpty(param.get("pointPrice").toString())) ? null : new BigDecimal(param.get("pointPrice").toString()).intValue();
+        Integer exchangeLimit = (param.get("exchangeLimit") == null || StringUtil.isEmpty(param.get("exchangeLimit").toString())) ? null : new BigDecimal(param.get("exchangeLimit").toString()).intValue();
         String isMemberDiscount = param.get("isMemberDiscount") == null ? "" : param.get("isMemberDiscount").toString();
         String gradeIds = param.get("gradeIds") != null ? param.get("gradeIds").toString() : null;
         String platform = param.get("platform") == null ? "" : param.get("platform").toString();
@@ -493,6 +497,16 @@ public class BackendGoodsController extends BaseController {
         }
         if (StringUtil.isNotEmpty(canUsePoint)) {
             mtGoods.setCanUsePoint(canUsePoint);
+        }
+        if (StringUtil.isNotEmpty(isPointGoods)) {
+            mtGoods.setIsPointGoods(isPointGoods);
+        }
+        // 仅在扩展信息 tab 提交了该字段时才写入，避免其它 tab 保存时覆盖
+        if (pointPrice != null) {
+            mtGoods.setPointPrice(pointPrice);
+        }
+        if (exchangeLimit != null) {
+            mtGoods.setExchangeLimit(exchangeLimit);
         }
         if (StringUtil.isNotEmpty(isMemberDiscount)) {
             mtGoods.setIsMemberDiscount(isMemberDiscount);

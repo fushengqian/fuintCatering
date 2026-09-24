@@ -146,6 +146,15 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
                 lambdaQueryWrapper.gt(MtGoods::getPrice, 0);
             }
         }
+        // 积分商品过滤：Y 只查积分兑换商品，N 只查非积分商品，空代表不过滤（后台需要查看全部商品）
+        String pointGoods = param.getPointGoods();
+        if (StringUtils.isNotBlank(pointGoods)) {
+            if (pointGoods.equals(YesOrNoEnum.YES.getKey())) {
+                lambdaQueryWrapper.eq(MtGoods::getIsPointGoods, YesOrNoEnum.YES.getKey());
+            } else if (pointGoods.equals(YesOrNoEnum.NO.getKey())) {
+                lambdaQueryWrapper.and(qw -> qw.ne(MtGoods::getIsPointGoods, YesOrNoEnum.YES.getKey()).or().isNull(MtGoods::getIsPointGoods));
+            }
+        }
         String platform = param.getPlatform();
         if (StringUtils.isNotBlank(platform)) {
             if (platform.equals(PlatformTypeEnum.H5.getCode()) || platform.equals(PlatformTypeEnum.MP_WEIXIN.getCode())) {
@@ -209,7 +218,10 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
                 MtGoods::getType,
                 MtGoods::getOperator,
                 MtGoods::getWeight,
-                MtGoods::getGradeIds);
+                MtGoods::getGradeIds,
+                MtGoods::getIsPointGoods,
+                MtGoods::getPointPrice,
+                MtGoods::getExchangeLimit);
         Page<MtGoods> pageHelper = PageHelper.startPage(param.getPage(), param.getPageSize());
         List<MtGoods> goodsList = mtGoodsMapper.selectList(lambdaQueryWrapper);
         List<GoodsDto> dataList = new ArrayList<>();
@@ -222,6 +234,9 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
             GoodsDto item = new GoodsDto();
             item.setId(mtGoods.getId());
             item.setInitSale(mtGoods.getInitSale());
+            item.setIsPointGoods(mtGoods.getIsPointGoods());
+            item.setPointPrice(mtGoods.getPointPrice());
+            item.setExchangeLimit(mtGoods.getExchangeLimit());
             if (StringUtil.isNotEmpty(mtGoods.getLogo())) {
                 item.setLogo(basePath + mtGoods.getLogo());
             }
@@ -374,6 +389,16 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
         }
         if (StringUtil.isNotEmpty(reqDto.getCanUsePoint())) {
             mtGoods.setCanUsePoint(reqDto.getCanUsePoint());
+        }
+        // 积分兑换商品标记与数值：未提交的字段保持原值，避免被其它 tab 的保存覆盖
+        if (StringUtil.isNotEmpty(reqDto.getIsPointGoods())) {
+            mtGoods.setIsPointGoods(reqDto.getIsPointGoods());
+        }
+        if (reqDto.getPointPrice() != null) {
+            mtGoods.setPointPrice(reqDto.getPointPrice());
+        }
+        if (reqDto.getExchangeLimit() != null) {
+            mtGoods.setExchangeLimit(reqDto.getExchangeLimit());
         }
         if (StringUtil.isNotEmpty(reqDto.getIsMemberDiscount())) {
             mtGoods.setIsMemberDiscount(reqDto.getIsMemberDiscount());
