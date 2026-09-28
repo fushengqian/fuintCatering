@@ -149,7 +149,7 @@
       <view class="info-item">
         <view class="item-lable">订单金额</view>
         <view class="item-content">
-          <text>￥{{(order.amount.toFixed(2))}}</text>
+          <text>￥{{ order.amount ? Number(order.amount).toFixed(2) : '0.00' }}</text>
         </view>
       </view>
       <view v-if="order.discount > 0" class="info-item">
@@ -164,10 +164,17 @@
           <text>+￥{{ order.deliveryFee.toFixed(2) }}</text>
         </view>
       </view>
-      <view v-if="order.pointAmount > 0" class="info-item">
+      <!-- 积分兑换订单：显示消耗积分 -->
+      <view v-if="order.type == 'exchange'" class="info-item">
+        <view class="item-lable">兑换消耗积分</view>
+        <view class="item-content">
+          <text>{{ order.usePoint ? order.usePoint : 0 }} 积分</text>
+        </view>
+      </view>
+      <view v-if="order.pointAmount && Number(order.pointAmount) > 0" class="info-item">
         <view class="item-lable">积分抵扣</view>
         <view class="item-content">
-          <text>-￥{{ order.pointAmount.toFixed(2) }}</text>
+          <text>-￥{{ Number(order.pointAmount).toFixed(2) }}</text>
         </view>
       </view>
       <!-- 使用卡券信息 -->

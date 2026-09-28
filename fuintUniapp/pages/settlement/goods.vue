@@ -77,7 +77,8 @@
              <!-- 商品数量和单价 -->
             <view class="flow-list-cont dis-flex flex-x-between flex-y-center">
               <text class="small"> x {{ item.num }} </text>
-              <text class="flow-cont">￥{{ item.goodsInfo.price }} </text>
+              <text class="flow-cont" v-if="isPointExchange">{{ item.goodsInfo.pointPrice }} 积分</text>
+              <text class="flow-cont" v-else>￥{{ item.goodsInfo.price }} </text>
             </view>
           </view>
         </view>
@@ -91,8 +92,8 @@
     <!-- 订单折扣 -->
     <view class="flow-all-money b-f m-top20">
       <view class="detail-title">费用明细</view>
-      <!-- 卡券 -->
-      <view class="flow-all-list dis-flex">
+      <!-- 卡券（积分兑换不参与卡券抵扣） -->
+      <view class="flow-all-list dis-flex" v-if="!isPointExchange">
         <text class="flex-five">使用卡券抵扣：</text>
         <view class="flex-five t-r">
           <view v-if="couponList.length > 0" @click="handleShowPopup()">
@@ -105,7 +106,17 @@
         </view>
       </view>
       <!-- 积分抵扣 -->
-      <view class="points flow-all-list dis-flex flex-y-center" v-if="usePoint > 0">
+      <!-- 积分兑换：兑换消耗积分 -->
+      <view class="points flow-all-list dis-flex flex-y-center" v-if="isPointExchange">
+        <view class="flow-list-left">
+          <text class="title">兑换消耗积分：</text>
+        </view>
+        <view class="flow-list-right">
+          <text class="points-money col-m">{{ exchangePoint }} 积分</text>
+          <text class="my-point" style="font-size:24rpx;color:#999;margin-left:20rpx;">（可用 {{ myPoint }} 积分）</text>
+        </view>
+      </view>
+      <view class="points flow-all-list dis-flex flex-y-center" v-if="usePoint > 0 && !isPointExchange">
         <view class="block-left flex-five" @click="handleShowPoints()">
           <text class="title">使用{{ usePoint }}积分抵扣：</text>
           <text class="iconfont icon-help"></text>
@@ -115,8 +126,8 @@
           <u-switch v-model="isUsePoints" size="48" :active-color="themeColor" @change="getCartList()"></u-switch>
         </view>
       </view>
-      <!-- 会员折扣 -->
-      <view class="points flow-all-list dis-flex flex-y-center">
+      <!-- 会员折扣（积分兑换不参与） -->
+      <view class="points flow-all-list dis-flex flex-y-center" v-if="!isPointExchange">
           <view class="block-left flex-five">
             <text class="title">会员支付折扣：</text>
           </view>
@@ -135,8 +146,8 @@
       </view>
     </view>
 
-    <!-- 支付方式 -->
-    <view class="pay-method flow-all-money b-f m-top20">
+    <!-- 支付方式（积分兑换无需支付） -->
+    <view class="pay-method flow-all-money b-f m-top20" v-if="!isPointExchange">
       <view class="flow-all-list dis-flex">
         <text class="flex-five">支付方式</text>
       </view>
@@ -167,12 +178,16 @@
     <view class="flow-fixed-footer b-f">
       <view class="dis-flex chackout-box">
         <view class="chackout-left pl-12">
-          <view class="col-amount-do">支付金额：
+          <view class="col-amount-do" v-if="!isPointExchange">支付金额：
               <text class="pay-amount">￥{{ payPrice ? payPrice.toFixed(2) : '0.00' }}</text>
+          </view>
+          <view class="col-amount-do" v-else>
+            兑换消耗：<text class="pay-amount">{{ exchangePoint }} 积分</text>
+            <text v-if="deliveryFee > 0" class="pay-amount" style="margin-left:16rpx;">+运费￥{{ deliveryFee }}</text>
           </view>
         </view>
         <view class="chackout-right" @click="onSubmitOrder()">
-          <view class="flow-btn f-32" :class="{ disabled }">提交订单</view>
+          <view class="flow-btn f-32" :class="{ disabled }">{{ (isPointExchange && !deliveryFee) ? '确认兑换' : '提交订单' }}</view>
         </view>
       </view>
     </view>
@@ -325,6 +340,9 @@
         selectCouponId: 0,
         selectCouponIds: [],
         myPoint: 0,
+        // 积分兑换：是否兑换订单、兑换所需积分
+        isPointExchange: false,
+        exchangePoint: 0,
         usePoint: 0,
         couponAmount: 0,
         usePointAmount: 0.00,
@@ -408,6 +426,12 @@
               app.couponList = result.data.couponList;
               app.useCouponInfo = result.data.useCouponInfo;
               app.usePoint = result.data.usePoint;
+              // 积分兑换商品：以兑换所需积分为准
+              app.exchangePoint = result.data.exchangePoint ? result.data.exchangePoint : 0;
+              if (app.exchangePoint > 0) {
+                  app.isPointExchange = true;
+                  app.usePoint = app.exchangePoint;
+              }
               app.myPoint = result.data.myPoint;
               app.deliveryFee = result.data.deliveryFee;
               if (app.usePoint < 1) {
@@ -612,7 +636,11 @@
         let peopleNum = uni.getStorageSync('peopleNum');
         // 请求api
         const couponIds = app.selectCouponIds.length > 0 ? app.selectCouponIds.join(',') : '';
-        SettlementApi.submit(0, "", "goods", app.remark, 0, app.usePoint, app.selectCouponId, app.options.cartIds, app.options.goodsId, app.options.skuId, app.options.buyNum, orderMode, payType, peopleNum, couponIds)
+        // 请求api：积分兑换走 exchange 订单类型；无需付运费时用 POINT（直接扣积分），
+        // 若选择物流配送且需支付运费，则沿用所选支付方式（如微信支付）支付运费
+        const orderType = app.isPointExchange ? "exchange" : "goods";
+        const submitPayType = (app.isPointExchange && !(app.deliveryFee > 0)) ? "POINT" : payType;
+        SettlementApi.submit(0, "", orderType, app.remark, 0, app.usePoint, app.selectCouponId, app.options.cartIds, app.options.goodsId, app.options.skuId, app.options.buyNum, orderMode, submitPayType, peopleNum, couponIds)
           .then(result => {
               app.onSubmitCallback(result);
           })
@@ -630,6 +658,14 @@
 
       // 订单提交成功后回调
       onSubmitCallback(result) {
+        // 积分兑换：应付金额为0（无需支付运费）时直接跳转订单结果页
+        const cbOrderInfo = result.data.orderInfo || {};
+        const cbNeedPay = cbOrderInfo.payAmount && Number(cbOrderInfo.payAmount) > 0;
+        if (!cbNeedPay && (result.data.payType == 'POINT' || cbOrderInfo.type == 'exchange')) {
+            this.$success('兑换成功');
+            this.navToOrderResult(cbOrderInfo.id, '兑换成功');
+            return;
+        }
         const app = this;
         if (result.code != '200' && !result.data) {
             if (result.message) {

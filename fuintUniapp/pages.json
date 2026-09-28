@@ -183,6 +183,12 @@
       }
     },
     {
+      "path": "pages/points/goods",
+      "style": {
+        "navigationBarTitleText": "积分兑换"
+      }
+    },
+    {
       "path": "pages/points/gift",
       "style": {
         "navigationBarTitleText": "积分转赠"

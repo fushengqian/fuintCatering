@@ -7,19 +7,37 @@
     <view v-if="!isLoading" class="goods-info m-top20">
       <!-- 价格、销量 -->
       <view class="info-item info-item__top dis-flex flex-x-between flex-y-end">
-        <view class="block-left dis-flex flex-y-end">
-          <!-- 商品售价 -->
-          <text class="floor-price__samll">￥</text>
-          <text class="floor-price">{{ goods.price }}</text>
-          <!-- 划线价 -->
-          <text class="original-price">￥{{ goods.linePrice }}</text>
-        </view>
-        <view class="block-right dis-flex">
-          <!-- 销量 -->
-          <view class="goods-sales">
-            <text>已销售{{ goods.initSale }}</text>
+        <!-- 积分兑换商品：展示兑换所需积分 -->
+        <block v-if="isPointGoods">
+          <view class="block-left dis-flex flex-y-end">
+            <text class="floor-price">{{ goods.pointPrice }}</text>
+            <text class="floor-price__samll" style="margin-left:8rpx;">积分</text>
           </view>
-        </view>
+          <view class="block-right dis-flex">
+            <view class="goods-sales">
+              <text>已兑换{{ goods.initSale }}</text>
+            </view>
+          </view>
+        </block>
+        <block v-else>
+          <view class="block-left dis-flex flex-y-end">
+            <!-- 商品售价 -->
+            <text class="floor-price__samll">￥</text>
+            <text class="floor-price">{{ goods.price }}</text>
+            <!-- 划线价 -->
+            <text class="original-price">￥{{ goods.linePrice }}</text>
+          </view>
+          <view class="block-right dis-flex">
+            <!-- 销量 -->
+            <view class="goods-sales">
+              <text>已销售{{ goods.initSale }}</text>
+            </view>
+          </view>
+        </block>
+      </view>
+      <!-- 积分兑换商品：限购提示 -->
+      <view class="info-item" v-if="isPointGoods && goods.exchangeLimit > 0" style="font-size:24rpx;color:#fa2209;">
+        <text>该商品每人限兑{{ goods.exchangeLimit }}件</text>
       </view>
       <!-- 标题、分享 -->
       <view class="info-item info-item__name dis-flex flex-y-center">
@@ -99,12 +117,19 @@
         <!-- 操作按钮 -->
         <view class="foo-item-btn">
           <view class="btn-wrapper">
-            <view class="btn-item btn-item-deputy" @click="onShowSkuPopup(2)">
-              <text>加入购物车</text>
-            </view>
-            <view class="btn-item btn-item-main" @click="onShowSkuPopup(3)">
-              <text>立即下单</text>
-            </view>
+            <block v-if="isPointGoods">
+              <view class="btn-item btn-item-main" @click="onShowSkuPopup(3)">
+                <text>立即兑换</text>
+              </view>
+            </block>
+            <block v-else>
+              <view class="btn-item btn-item-deputy" @click="onShowSkuPopup(2)">
+                <text>加入购物车</text>
+              </view>
+              <view class="btn-item btn-item-main" @click="onShowSkuPopup(3)">
+                <text>立即下单</text>
+              </view>
+            </block>
           </view>
         </view>
       </view>
@@ -131,6 +156,13 @@
       Shortcut,
       SlideImage,
       SkuPopup,
+    },
+
+    computed: {
+      // 是否积分兑换商品：是则展示积分数、隐藏现金购买入口
+      isPointGoods() {
+        return this.goods && this.goods.isPointGoods === 'Y'
+      }
     },
     data() {
       return {

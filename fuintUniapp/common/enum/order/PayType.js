@@ -12,4 +12,5 @@ export default new Enum([
   { key: 'STORE', name: '到店支付', value: 'STORE' },
   { key: 'MICROPAY', name: '微信扫码支付', value: 'MICROPAY' },
   { key: 'ALISCAN', name: '支付宝支付', value: 'ALISCAN' },
+  { key: 'POINT', name: '积分兑换', value: 'POINT' },
 ])
