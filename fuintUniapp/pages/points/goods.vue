@@ -189,11 +189,11 @@
       .point-num {
         font-size: 40rpx;
         font-weight: bold;
-        color: #fa2209;
+        color: #fa5151;
       }
       .point-unit {
         font-size: 24rpx;
-        color: #fa2209;
+        color: #fa5151;
         margin-left: 6rpx;
       }
     }

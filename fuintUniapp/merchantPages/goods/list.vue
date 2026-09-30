@@ -389,7 +389,7 @@
       margin-bottom: 8rpx;
 
       .price_x {
-        color: #f03c3c;
+        color: #fa5151;
         font-size: 34rpx;
         font-weight: bold;
         margin-right: 10rpx;

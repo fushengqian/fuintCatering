@@ -438,7 +438,7 @@
 
       .price_x {
         margin-right: 16rpx;
-        color: #f03c3c;
+        color: #fa5151;
         font-size: 30rpx;
       }
 

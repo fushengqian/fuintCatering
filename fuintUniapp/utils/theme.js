@@ -12,7 +12,7 @@ const DEFAULT_THEME = {
     secondary: '#e0f4f4',
     text: '#333333',
     bg: '#f5f5f5',
-    price: '#f03c3c'
+    price: '#fa5151'
   }
 }
 

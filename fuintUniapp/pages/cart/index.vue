@@ -401,7 +401,7 @@
 
           .value {
             font-size: 32rpx;
-            color: #f03c3c;
+            color: #fa5151;
             font-weight: bold;
           }
         }
@@ -464,7 +464,7 @@
 
         .value {
           font-size: 36rpx;
-          color: #f03c3c;
+          color: #fa5151;
           font-weight: bold;
         }
       }

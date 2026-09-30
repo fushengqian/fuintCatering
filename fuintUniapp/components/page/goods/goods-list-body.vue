@@ -172,7 +172,7 @@
             margin-right: 8rpx;
             font-size: 34rpx;
             font-weight: bold;
-            color: var(--theme-price) !important;
+            color: var(--theme-price, #fa5151) !important;
           }
 
           .line-price {
@@ -305,7 +305,7 @@
 
         .price_x {
           margin-right: 16rpx;
-          color: var(--theme-price);
+          color: var(--theme-price, #fa5151);
           font-size: 33rpx;
           font-weight: bold;
         }

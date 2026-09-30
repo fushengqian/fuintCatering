@@ -777,7 +777,7 @@
         height: 50rpx;
         .price {
             margin-top: 20rpx;
-            color: #f03c3c;
+            color: #fa5151;
             float: left;
             font-size: 32rpx;
             font-weight: bold;
@@ -881,7 +881,7 @@
           margin-top: 5rpx;
           margin-bottom:5rpx;
           .amount {
-              color: #f03c3c;
+              color: #fa5151;
               font-weight: bold;
           }
         }

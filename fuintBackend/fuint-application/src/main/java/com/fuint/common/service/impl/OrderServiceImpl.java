@@ -41,6 +41,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import weixin.popular.util.JsonUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -1086,7 +1088,28 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         // 积分兑换订单：后端按商品重算所需积分（防止前端篡改），并校验库存、积分余额与限购
         boolean isPointExchange = PayTypeEnum.POINT.getKey().equals(payType) || OrderTypeEnum.EXCHANGE.getKey().equals(type);
         if (isPointExchange) {
-            MtGoods exchangeGoods = goodsService.queryGoodsById(goodsId);
+            Integer exchangeGoodsId = goodsId;
+            // 购物车模式进入结算时页面可能未传商品ID，根据购物车记录找到积分商品
+            if ((exchangeGoodsId == null || exchangeGoodsId <= 0) && StringUtil.isNotEmpty(cartIds)) {
+                String[] ids = cartIds.split(",");
+                List<Integer> idList = new ArrayList<>();
+                for (String id : ids) {
+                    if (StringUtil.isNotEmpty(id)) {
+                        idList.add(Integer.parseInt(id));
+                    }
+                }
+                if (idList.size() > 0) {
+                    List<MtCart> carts = mtCartMapper.selectBatchIds(idList);
+                    for (MtCart cart : carts) {
+                        MtGoods goods = goodsService.queryGoodsById(cart.getGoodsId());
+                        if (goods != null && YesOrNoEnum.YES.getKey().equals(goods.getIsPointGoods())) {
+                            exchangeGoodsId = goods.getId();
+                            break;
+                        }
+                    }
+                }
+            }
+            MtGoods exchangeGoods = goodsService.queryGoodsById(exchangeGoodsId);
             if (exchangeGoods == null || !YesOrNoEnum.YES.getKey().equals(exchangeGoods.getIsPointGoods())) {
                 throw new BusinessCheckException("该商品不支持积分兑换");
             }
@@ -1101,7 +1124,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             usePoint = new BigDecimal(pointPrice).multiply(new BigDecimal(num)).intValue();
             Integer limit = exchangeGoods.getExchangeLimit() == null ? 0 : exchangeGoods.getExchangeLimit();
             if (limit > 0 && userInfo != null && userInfo.getId() != null) {
-                int exchangedNum = queryExchangeNum(userInfo.getId(), goodsId);
+                int exchangedNum = queryExchangeNum(userInfo.getId(), exchangeGoodsId);
                 if ((exchangedNum + num) > limit) {
                     throw new BusinessCheckException("该商品每人限兑" + limit + "件，你已兑换" + exchangedNum + "件");
                 }
@@ -1190,8 +1213,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
         }
 
-        // 使用积分抵扣
-        if (usePoint > 0) {
+        // 使用积分抵扣（积分兑换订单的积分是兑换商品的对价，不能再当现金抵扣，否则会吃掉运费）
+        if (usePoint > 0 && !isPointExchange) {
             List<MtSetting> settingList = settingService.getSettingList(merchantId, SettingTypeEnum.POINT.getKey());
             String canUsedAsMoney = YesOrNoEnum.FALSE.getKey();
             String exchangeNeedPoint = "0";
@@ -1386,7 +1409,15 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             } else  if (payType.equals(PayTypeEnum.STORE.getKey()) || !payFirst) {
                 // 门店支付或先用餐后支付，就不做任何操作
             } else if (payType.equals(PayTypeEnum.BALANCE.getKey())) {
-                // 余额支付
+                // 余额支付：实际支付方式为余额，需同步订单 payType。
+                // 积分兑换订单的 payType 会被记为 POINT，不纠正会导致后续按"积分支付"处理（如误返积分）
+                if (!PayTypeEnum.BALANCE.getKey().equals(orderInfo.getPayType())) {
+                    OrderDto payTypeDto = new OrderDto();
+                    payTypeDto.setId(orderInfo.getId());
+                    payTypeDto.setPayType(PayTypeEnum.BALANCE.getKey());
+                    updateOrder(payTypeDto);
+                    orderInfo.setPayType(PayTypeEnum.BALANCE.getKey());
+                }
                 MtBalance balance = new MtBalance();
                 balance.setMobile(userInfo.getMobile());
                 balance.setOrderSn(orderInfo.getOrderSn());
@@ -1873,7 +1904,10 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         // 处理消费返积分，查询返1积分所需消费金额
         MtSetting setting = settingService.querySettingByName(mtOrder.getMerchantId(), SettingTypeEnum.POINT.getKey(), PointSettingEnum.POINT_NEED_CONSUME.getKey());
-        if (setting != null && !orderInfo.getPayType().equals(PayTypeEnum.BALANCE.getKey()) && orderInfo.getIsVisitor().equals(YesOrNoEnum.NO.getKey())) {
+        // 积分兑换订单不返积分：兑换本身已消耗会员积分，即便运费是用微信/余额支付的也不再返
+        boolean isPointExchangeOrder = PayTypeEnum.POINT.getKey().equals(orderInfo.getPayType())
+                || OrderTypeEnum.EXCHANGE.getKey().equals(orderInfo.getType());
+        if (setting != null && !isPointExchangeOrder && !orderInfo.getPayType().equals(PayTypeEnum.BALANCE.getKey()) && orderInfo.getIsVisitor().equals(YesOrNoEnum.NO.getKey())) {
             String needPayAmount = setting.getValue();
             Integer needPayAmountInt = Math.round(Integer.parseInt(needPayAmount));
             Double pointNum = 0d;
@@ -1951,6 +1985,30 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
         }
 
+        // 打印订单与短信通知涉及外部 HTTP 调用，放到事务提交之后执行。
+        // 否则外部调用会把事务拉长，长时间占用 mt_user 行锁，导致其它请求 Lock wait timeout
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    printOrderAndSendSms(orderInfo, mtOrder);
+                }
+            });
+        } else {
+            printOrderAndSendSms(orderInfo, mtOrder);
+        }
+
+        return true;
+    }
+
+    /**
+     * 打印订单并给商家发送通知短信
+     * 说明：包含外部 HTTP 调用，必须在事务提交之后执行，避免长事务占用行锁
+     *
+     * @param orderInfo 订单信息
+     * @param mtOrder 订单实体
+     */
+    private void printOrderAndSendSms(UserOrderDto orderInfo, MtOrder mtOrder) {
         try {
             // 打印订单
             printerService.printOrderAndLabel(orderInfo, true,false, true, null);
@@ -1967,8 +2025,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         } catch (Exception e) {
             logger.info("打印订单或给商家发送短信出错啦，message = {}", e.getMessage());
         }
-
-        return true;
     }
 
     /**

@@ -421,6 +421,77 @@ public class BackendOrderController extends BaseController {
     }
 
     /**
+     * 快递100配置详情
+     */
+    @ApiOperation(value = "快递100配置详情")
+    @RequestMapping(value = "/expressSetting", method = RequestMethod.GET)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('order:setting')")
+    public ResponseObject expressSetting() throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
+
+        List<MtSetting> settingList = settingService.getSettingList(accountInfo.getMerchantId(), SettingTypeEnum.KUAIDI100.getKey());
+        Map<String, Object> result = new HashMap();
+        String customer = "";
+        String secretKey = "";
+        String enable = StatusEnum.ENABLED.getKey();
+
+        for (MtSetting setting : settingList) {
+            if (setting.getName().equals(Kuaidi100SettingEnum.CUSTOMER.getKey())) {
+                customer = setting.getValue();
+            } else if (setting.getName().equals(Kuaidi100SettingEnum.SECRET_KEY.getKey())) {
+                secretKey = setting.getValue();
+            } else if (setting.getName().equals(Kuaidi100SettingEnum.ENABLE.getKey())) {
+                enable = setting.getValue();
+            }
+        }
+
+        result.put("customer", customer);
+        result.put("secretKey", secretKey);
+        result.put("enable", enable);
+
+        return getSuccessResult(result);
+    }
+
+    /**
+     * 保存快递100配置
+     */
+    @ApiOperation(value = "保存快递100配置")
+    @RequestMapping(value = "/saveExpressSetting", method = RequestMethod.POST)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('order:setting')")
+    public ResponseObject saveExpressSetting(@RequestBody Map<String, Object> param) throws BusinessCheckException {
+        String customer = param.get("customer") != null ? param.get("customer").toString() : "";
+        String secretKey = param.get("secretKey") != null ? param.get("secretKey").toString() : "";
+        String enable = param.get("enable") != null ? param.get("enable").toString() : StatusEnum.ENABLED.getKey();
+
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
+        Kuaidi100SettingEnum[] settingList = Kuaidi100SettingEnum.values();
+        for (Kuaidi100SettingEnum setting : settingList) {
+            MtSetting info = new MtSetting();
+            info.setType(SettingTypeEnum.KUAIDI100.getKey());
+            info.setName(setting.getKey());
+            if (setting.getKey().equals(Kuaidi100SettingEnum.CUSTOMER.getKey())) {
+                info.setValue(customer);
+            } else if (setting.getKey().equals(Kuaidi100SettingEnum.SECRET_KEY.getKey())) {
+                info.setValue(secretKey);
+            } else if (setting.getKey().equals(Kuaidi100SettingEnum.ENABLE.getKey())) {
+                info.setValue(enable);
+            }
+            info.setMerchantId(accountInfo.getMerchantId());
+            info.setStoreId(accountInfo.getStoreId());
+            info.setDescription(setting.getValue());
+            info.setStatus(StatusEnum.ENABLED.getKey());
+            info.setOperator(accountInfo.getAccountName());
+            info.setUpdateTime(new Date());
+
+            settingService.saveSetting(info);
+        }
+
+        return getSuccessResult(true);
+    }
+
+    /**
      * 导出订单
      */
     @ApiOperation(value = "导出订单")

@@ -83,6 +83,21 @@
     </view>
 
     <!-- 商品列表 -->
+    <!-- 快递配送：物流信息入口 -->
+    <view v-if="showExpressEntry" class="express-entry i-card" @click="handleViewExpress">
+      <view class="entry-left">
+        <text class="entry-title">物流信息</text>
+        <text class="entry-desc" v-if="order.expressInfo && order.expressInfo.expressNo">
+          {{ order.expressInfo.expressCompany }} {{ order.expressInfo.expressNo }}
+        </text>
+        <text class="entry-desc" v-else>查看配送进度</text>
+      </view>
+      <view class="entry-right">
+        <text class="entry-status">{{ expressInfo && expressInfo.stateText ? expressInfo.stateText : '查看物流' }}</text>
+        <text class="entry-arrow iconfont icon-xiangyoujiantou"></text>
+      </view>
+    </view>
+
     <view class="goods-list i-card" v-if="order.goods.length > 0">
       <view class="goods-item" v-for="(goods, idx) in order.goods" :key="idx">
         <view class="goods-main" v-if="goods.num > 0" @click="handleTargetGoods(goods.goodsId, goods.type)">
@@ -289,6 +304,50 @@
       </view>
     </u-popup>
 
+    <!-- 物流信息弹窗 -->
+    <u-popup v-model="showExpressPopup" mode="bottom" border-radius="20" :closeable="true" @close="showExpressPopup = false">
+      <view class="express-popup">
+        <view class="popup-title">物流详情</view>
+        <view class="express-loading" v-if="expressLoading">
+          <text>正在查询物流信息...</text>
+        </view>
+        <block v-else-if="expressInfo">
+          <view class="express-brief">
+            <view class="brief-row">
+              <text class="brief-label">物流公司</text>
+              <text class="brief-value">{{ expressInfo.expressCompany }}</text>
+            </view>
+            <view class="brief-row">
+              <text class="brief-label">物流单号</text>
+              <text class="brief-value">{{ expressInfo.expressNo }}</text>
+              <text class="brief-copy" @click="handleCopy(expressInfo.expressNo)">复制</text>
+            </view>
+            <view class="brief-row" v-if="expressInfo.expressTime">
+              <text class="brief-label">发货时间</text>
+              <text class="brief-value">{{ expressInfo.expressTime }}</text>
+            </view>
+            <view class="brief-row">
+              <text class="brief-label">物流状态</text>
+              <text class="brief-value brief-status">{{ expressInfo.stateText }}</text>
+            </view>
+          </view>
+          <view class="express-timeline" v-if="expressInfo.traceList && expressInfo.traceList.length > 0">
+            <view class="timeline-item" v-for="(item, idx) in expressInfo.traceList" :key="idx"
+              :class="{ 'timeline-item--current': idx === 0 }">
+              <view class="timeline-dot"></view>
+              <view class="timeline-body">
+                <text class="timeline-text">{{ item.context }}</text>
+                <text class="timeline-time">{{ item.time || item.ftime }}</text>
+              </view>
+            </view>
+          </view>
+          <view class="express-empty" v-else>
+            <text>暂无物流轨迹，请稍后再试</text>
+          </view>
+        </block>
+      </view>
+    </u-popup>
+
     <!-- 快捷导航 -->
     <shortcut/>
   </view>
@@ -338,7 +397,32 @@
         verifyCode: '',
         // 刷新页面
         reflash: false,
+        // 物流信息弹窗
+        showExpressPopup: false,
+        expressLoading: false,
+        expressInfo: null,
 		payFirst: uni.getStorageSync("payFirst") ? uni.getStorageSync("payFirst") : 'Y'
+      }
+    },
+
+    computed: {
+
+      // 是否展示物流信息入口：配送订单 + 已发货 + 已填写物流单号
+      showExpressEntry() {
+        const order = this.order || {}
+        if (order.orderMode !== 'express') {
+          return false
+        }
+        if (!order.expressInfo || !order.expressInfo.expressNo) {
+          return false
+        }
+        // 商家自送没有第三方物流轨迹
+        if (order.expressInfo.expressCode === 'SELF') {
+          return false
+        }
+        // 待支付、已支付、待发货状态还没有物流轨迹
+        const noTraceStatus = [OrderStatusEnum.CREATED.value, OrderStatusEnum.PAID.value, OrderStatusEnum.DELIVERY.value]
+        return !noTraceStatus.includes(order.status)
       }
     },
 
@@ -376,6 +460,23 @@
                 && !app.order.tableInfo && !['C', 'H', 'G'].includes(app.order.status)) {
               app.getVerifyQrCode()
             }
+          })
+      },
+
+      // 查看物流信息
+      handleViewExpress() {
+        const app = this
+        app.showExpressPopup = true
+        app.expressLoading = true
+        OrderApi.express(app.orderId)
+          .then(result => {
+            app.expressInfo = result.data
+          })
+          .catch(() => {
+            app.showExpressPopup = false
+          })
+          .finally(() => {
+            app.expressLoading = false
           })
       },
 
@@ -711,6 +812,160 @@
       margin-left: 16rpx;
       // color: #777;
       font-size: 26rpx;
+    }
+  }
+
+  // 物流入口
+  .express-entry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20rpx;
+
+    .entry-left {
+      flex: 1;
+      overflow: hidden;
+
+      .entry-title {
+        font-size: 28rpx;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .entry-desc {
+        display: block;
+        margin-top: 8rpx;
+        font-size: 24rpx;
+        color: #999;
+      }
+    }
+
+    .entry-right {
+      display: flex;
+      align-items: center;
+
+      .entry-status {
+        font-size: 24rpx;
+        color: #ff6000;
+      }
+
+      .entry-arrow {
+        margin-left: 10rpx;
+        font-size: 24rpx;
+        color: #c1c1c1;
+      }
+    }
+  }
+
+  // 物流详情弹窗
+  .express-popup {
+    max-height: 900rpx;
+    padding: 30rpx 30rpx 40rpx;
+    overflow-y: auto;
+
+    .popup-title {
+      margin-bottom: 24rpx;
+      font-size: 32rpx;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+    }
+
+    .express-loading,
+    .express-empty {
+      padding: 60rpx 0;
+      font-size: 26rpx;
+      color: #999;
+      text-align: center;
+    }
+
+    .express-brief {
+      padding: 20rpx 24rpx;
+      background: #f8f8f8;
+      border-radius: 16rpx;
+
+      .brief-row {
+        display: flex;
+        align-items: center;
+        font-size: 26rpx;
+        line-height: 48rpx;
+
+        .brief-label {
+          width: 130rpx;
+          color: #999;
+        }
+
+        .brief-value {
+          flex: 1;
+          color: #333;
+        }
+
+        .brief-status {
+          color: #ff6000;
+        }
+
+        .brief-copy {
+          margin-left: 16rpx;
+          padding: 2rpx 16rpx;
+          font-size: 22rpx;
+          color: #666;
+          border: 1rpx solid #c1c1c1;
+          border-radius: 16rpx;
+        }
+      }
+    }
+
+    .express-timeline {
+      margin-top: 30rpx;
+      padding-left: 10rpx;
+
+      .timeline-item {
+        position: relative;
+        padding: 0 0 32rpx 32rpx;
+        border-left: 2rpx solid #e8e8e8;
+
+        &:last-child {
+          padding-bottom: 0;
+          border-left-color: transparent;
+        }
+
+        .timeline-dot {
+          position: absolute;
+          left: -9rpx;
+          top: 8rpx;
+          width: 16rpx;
+          height: 16rpx;
+          border-radius: 50%;
+          background: #dcdcdc;
+        }
+
+        .timeline-body {
+          .timeline-text {
+            display: block;
+            font-size: 26rpx;
+            color: #666;
+            line-height: 40rpx;
+          }
+
+          .timeline-time {
+            display: block;
+            margin-top: 6rpx;
+            font-size: 22rpx;
+            color: #b0b0b0;
+          }
+        }
+
+        &.timeline-item--current {
+          .timeline-dot {
+            background: #ff6000;
+            box-shadow: 0 0 0 6rpx rgba(255, 96, 0, 0.12);
+          }
+
+          .timeline-text {
+            color: #333;
+          }
+        }
+      }
     }
   }
 

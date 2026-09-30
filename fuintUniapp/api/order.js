@@ -9,6 +9,7 @@ const api = {
   pay: 'clientApi/pay/doPay',
   receipt: 'clientApi/order/receipt',
   verifyQrCode: 'clientApi/order/verifyQrCode',
+  express: 'clientApi/order/express',
 }
 
 // 当前用户待处理的订单数量
@@ -44,4 +45,9 @@ export function receipt(orderId, data) {
 // 生成核销二维码
 export function verifyQrCode(orderId, param) {
   return request.get(api.verifyQrCode, { orderId, ...param })
+}
+
+// 查询订单物流信息
+export function express(orderId, param) {
+  return request.get(api.express, { orderId, ...param })
 }
