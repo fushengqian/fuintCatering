@@ -2,20 +2,21 @@ package com.fuint.module.backendApi.controller.cashier;
 
 import com.fuint.common.Constants;
 import com.fuint.common.dto.cashier.HangUpDto;
-import com.fuint.common.dto.cashier.TableDetail;
 import com.fuint.common.dto.goods.GoodsDto;
 import com.fuint.common.dto.goods.GoodsSkuDto;
 import com.fuint.common.dto.goods.GoodsSpecChildDto;
 import com.fuint.common.dto.goods.GoodsSpecItemDto;
+import com.fuint.common.dto.recharge.RechargeRuleDto;
 import com.fuint.common.dto.system.AccountInfo;
+import com.fuint.common.enums.BalanceSettingEnum;
+import com.fuint.common.enums.OrderModeEnum;
 import com.fuint.common.enums.PlatformTypeEnum;
+import com.fuint.common.enums.SettingTypeEnum;
 import com.fuint.common.enums.StatusEnum;
-import com.fuint.common.enums.TableUseStatusEnum;
 import com.fuint.common.enums.YesOrNoEnum;
-import com.fuint.common.param.RemoveGoodsParam;
-import com.fuint.common.param.TableParam;
-import com.fuint.common.param.TurnTableParam;
+import com.fuint.common.param.RechargeParam;
 import com.fuint.common.service.*;
+import com.fuint.common.util.DateUtil;
 import com.fuint.common.util.PhoneFormatCheckUtils;
 import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
@@ -31,6 +32,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +61,11 @@ public class BackendCashierController extends BaseController {
     private CartService cartService;
 
     /**
+     * 订单服务接口
+     * */
+    private OrderService orderService;
+
+    /**
      * 商品服务接口
      */
     private GoodsService goodsService;
@@ -67,11 +74,6 @@ public class BackendCashierController extends BaseController {
      * 店铺服务接口
      */
     private StoreService storeService;
-
-    /**
-     * 订单服务接口
-     * */
-    private OrderService orderService;
 
     /**
      * 系统设置服务接口
@@ -94,9 +96,9 @@ public class BackendCashierController extends BaseController {
     private MerchantService merchantService;
 
     /**
-     * 桌码服务接口
-     */
-    private TableService tableService;
+     * 员工服务接口
+     * */
+    private StaffService staffService;
 
     /**
      * 收银台初始化
@@ -111,7 +113,7 @@ public class BackendCashierController extends BaseController {
         Integer cateId = request.getParameter("cateId") == null ? 0 : Integer.parseInt(request.getParameter("cateId"));
 
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        Integer storeId = (accountInfo.getStoreId() == null || accountInfo.getStoreId() < 1) ? 0 : accountInfo.getStoreId();
+        Integer storeId = accountInfo.getStoreId() == null ? 0 : accountInfo.getStoreId();
         MtStore storeInfo = null;
         if (storeId == null || storeId < 1) {
             MtMerchant mtMerchant = merchantService.queryMerchantById(accountInfo.getMerchantId());
@@ -121,9 +123,11 @@ public class BackendCashierController extends BaseController {
         } else {
             storeInfo = storeService.queryStoreById(storeId);
         }
+
         if (storeInfo == null && (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0)) {
             storeInfo = storeService.getDefaultStore(null);
         }
+
         if (storeInfo != null) {
             storeId = storeInfo.getId();
         }
@@ -134,10 +138,12 @@ public class BackendCashierController extends BaseController {
 
         List<MtGoodsCate> cateList = cateService.getCateList(accountInfo.getMerchantId(), storeId, null, StatusEnum.ENABLED.getKey());
         Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, "", PlatformTypeEnum.PC.getCode(), cateId, page, pageSize);
+        MtStaff staffInfo = staffService.queryStaffById(accountInfo.getStaffId());
 
         Map<String, Object> result = new HashMap<>();
         result.put("imagePath", settingService.getUploadBasePath());
         result.put("storeInfo", storeInfo);
+        result.put("staffInfo", staffInfo);
         result.put("memberInfo", memberInfo);
         result.put("accountInfo", accountInfo);
         result.put("goodsList", goodsData.get("goodsList"));
@@ -160,7 +166,7 @@ public class BackendCashierController extends BaseController {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         Integer storeId = accountInfo.getStoreId();
 
-        if (storeId == null || storeId < 1) {
+        if (storeId == null || storeId <= 0) {
             MtMerchant mtMerchant = merchantService.queryMerchantById(accountInfo.getMerchantId());
             if (mtMerchant != null) {
                 MtStore storeInfo = storeService.getDefaultStore(mtMerchant.getNo());
@@ -170,7 +176,7 @@ public class BackendCashierController extends BaseController {
             }
         }
 
-        Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, keyword, PlatformTypeEnum.PC.getCode(), 0, 1, 100);
+        Map<String, Object> goodsData = goodsService.getStoreGoodsList(storeId, keyword, "",0,1, 100);
         return getSuccessResult(goodsData.get("goodsList"));
     }
 
@@ -205,21 +211,21 @@ public class BackendCashierController extends BaseController {
 
             for (int i = 0; i < specNameArr.size(); i++) {
                 GoodsSpecItemDto item = new GoodsSpecItemDto();
-                List<GoodsSpecChildDto> childList = new ArrayList<>();
+                List<GoodsSpecChildDto> child = new ArrayList<>();
                 Integer specId = specIdArr.get(i) == null ? (i + 1) : specIdArr.get(i);
                 String name = specNameArr.get(i);
                 for (MtGoodsSpec mtGoodsSpec : goodsInfo.getSpecList()) {
                     if (mtGoodsSpec.getName().equals(name)) {
-                        GoodsSpecChildDto child = new GoodsSpecChildDto();
-                        child.setId(mtGoodsSpec.getId());
-                        child.setName(mtGoodsSpec.getValue());
-                        child.setChecked(true);
-                        childList.add(child);
+                        GoodsSpecChildDto e = new GoodsSpecChildDto();
+                        e.setId(mtGoodsSpec.getId());
+                        e.setName(mtGoodsSpec.getValue());
+                        e.setChecked(true);
+                        child.add(e);
                     }
                 }
                 item.setId(specId);
                 item.setName(name);
-                item.setChild(childList);
+                item.setChild(child);
                 specArr.add(item);
             }
 
@@ -254,13 +260,12 @@ public class BackendCashierController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
     public ResponseObject getMemberInfo(@RequestBody Map<String, Object> param) {
-        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         String keyword = param.get("keyword") == null ? "" : param.get("keyword").toString();
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (StringUtil.isEmpty(keyword)) {
             return getFailureResult(201);
         }
-
-        MtUser userInfo = null;
+        MtUser userInfo;
         // 优先通过手机号、会员号、用户名查询，查不到再进行模糊匹配查找
         if (PhoneFormatCheckUtils.isChinaPhoneLegal(keyword)) {
             userInfo = memberService.queryMemberByMobile(accountInfo.getMerchantId(), keyword);
@@ -274,12 +279,6 @@ public class BackendCashierController extends BaseController {
             List<MtUser> userList = memberService.searchMembers(accountInfo.getMerchantId(), keyword);
             if (userList != null && userList.size() > 0) {
                 userInfo = userList.get(0);
-            }
-        }
-
-        if (userInfo != null && accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            if (!accountInfo.getMerchantId().equals(userInfo.getMerchantId())) {
-                return getFailureResult(1004);
             }
         }
 
@@ -297,12 +296,13 @@ public class BackendCashierController extends BaseController {
     @PreAuthorize("@pms.hasPermission('cashier:index')")
     public ResponseObject getMemberInfoById(@PathVariable("userId") String userId) {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
+
         if (StringUtil.isEmpty(userId)) {
             return getFailureResult(201);
         }
 
         MtUser userInfo = memberService.queryMemberById(Integer.parseInt(userId));
-        if (userInfo != null && accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0 && !accountInfo.getMerchantId().equals(userInfo.getMerchantId())) {
+        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0 && userInfo != null && !accountInfo.getMerchantId().equals(userInfo.getMerchantId())) {
             return getFailureResult(1004);
         }
 
@@ -319,10 +319,11 @@ public class BackendCashierController extends BaseController {
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
     public ResponseObject doHangUp(@RequestBody Map<String, Object> param) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         String cartIds = param.get("cartIds") == null ? "" : param.get("cartIds").toString();
-        String tableId = param.get("tableId") == null ? "" : param.get("tableId").toString();
+        String hangNo = param.get("hangNo") == null ? "" : param.get("hangNo").toString();
         String userId = param.get("userId") == null ? "" : param.get("userId").toString();
+
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
             return getFailureResult(201, "平台账号不能执行该操作");
@@ -337,7 +338,7 @@ public class BackendCashierController extends BaseController {
             String[] ids = cartIds.split(",");
             if (ids.length > 0) {
                 for (int i = 0; i < ids.length; i++) {
-                     cartService.setTableId(Integer.parseInt(ids[i]), Integer.parseInt(tableId), isVisitor);
+                     cartService.setHangNo(Integer.parseInt(ids[i]), hangNo, isVisitor);
                 }
             }
         }
@@ -352,95 +353,39 @@ public class BackendCashierController extends BaseController {
     @RequestMapping(value = "/getHangUpList", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject getHangUpList(TableParam tableParam) throws BusinessCheckException {
+    public ResponseObject getHangUpList() {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            tableParam.setMerchantId(accountInfo.getMerchantId());
-        }
-        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
-            tableParam.setStoreId(accountInfo.getStoreId());
-        }
-        List<HangUpDto> tableList = tableService.getHangUpList(tableParam);
-        return getSuccessResult(tableList);
-    }
 
-    /**
-     * 获取桌台列表
-     */
-    @ApiOperation(value = "获取桌台列表")
-    @RequestMapping(value = "/getTableList", method = RequestMethod.GET)
-    @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject getTableList(TableParam tableParam) {
-        AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
-            tableParam.setMerchantId(accountInfo.getMerchantId());
-        }
-        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
-            tableParam.setStoreId(accountInfo.getStoreId());
-        }
-        return getSuccessResult(tableService.getTableList(tableParam));
-    }
+        List<HangUpDto> dataList = new ArrayList<>();
 
-    /**
-     * 获取桌台详情
-     */
-    @ApiOperation(value = "获取桌台详情")
-    @RequestMapping(value = "/getTableDetail/{tableId}", method = RequestMethod.GET)
-    @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject getTableDetail(@PathVariable("tableId") Integer tableId) {
-        TableDetail tableDetail = tableService.getTableDetail(tableId);
-        return getSuccessResult(tableDetail);
-    }
-
-    /**
-     * 清空桌台
-     */
-    @ApiOperation(value = "清空桌台")
-    @RequestMapping(value = "/cleanTable/{tableId}", method = RequestMethod.GET)
-    @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject cleanTable(@PathVariable("tableId") Integer tableId) {
-        if (tableId == null || tableId <= 0) {
-            return getFailureResult(201);
+        for (int i = 0; i < 20; i++) {
+             String hangNo = "#0" + (i+1);
+             Map<String, Object> param = new HashMap<>();
+             param.put("hangNo", hangNo);
+             param.put("merchantId", accountInfo.getMerchantId());
+             param.put("storeId", accountInfo.getStoreId());
+             List<MtCart> cartList = cartService.queryCartListByParams(param);
+             HangUpDto dto = new HangUpDto();
+             dto.setIsEmpty(true);
+             if (cartList.size() > 0) {
+                 Integer userId = cartList.get(0).getUserId();
+                 String isVisitor = cartList.get(0).getIsVisitor();
+                 Map<String, Object> cartInfo = orderService.calculateCartGoods(accountInfo.getMerchantId(), userId, cartList, 0, false, PlatformTypeEnum.PC.getCode(), OrderModeEnum.ONESELF.getKey(), "");
+                 dto.setNum(Double.parseDouble(cartInfo.get("totalNum").toString()));
+                 dto.setAmount(new BigDecimal(cartInfo.get("totalPrice").toString()));
+                 if (isVisitor.equals(YesOrNoEnum.NO.getKey())) {
+                     MtUser userInfo = memberService.queryMemberById(userId);
+                     dto.setMemberInfo(userInfo);
+                 }
+                 String dateTime = DateUtil.formatDate(cartList.get(0).getUpdateTime(), "yyyy-MM-dd HH:mm:ss");
+                 dto.setDateTime(dateTime);
+                 dto.setIsEmpty(false);
+             }
+             dto.setHangNo(hangNo);
+             dataList.add(dto);
         }
-        cartService.removeCartByTableId(tableId);
-        orderService.removeTakenTableId(tableId);
-        tableService.updateUseStatus(tableId, TableUseStatusEnum.AVAILABLE.getKey(), null);
-        return getSuccessResult(true);
-    }
 
-    /**
-     * 桌台转台
-     */
-    @ApiOperation(value = "桌台转台")
-    @RequestMapping(value = "/turnTable", method = RequestMethod.POST)
-    @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject turnTable(@RequestBody TurnTableParam param) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
-            return getFailureResult(201, "平台账号不能执行该操作");
-        }
-        tableService.turnTable(param);
-        return getSuccessResult(true);
-    }
-
-    /**
-     * 取消商品
-     */
-    @ApiOperation(value = "取消商品")
-    @RequestMapping(value = "/removeGoods", method = RequestMethod.POST)
-    @CrossOrigin
-    @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject removeGoods(@RequestBody RemoveGoodsParam param) throws BusinessCheckException {
-        AccountInfo accountInfo = TokenUtil.getAccountInfo();
-        if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
-            return getFailureResult(201, "平台账号不能执行该操作");
-        }
-        orderService.removeGoods(param);
-        return getSuccessResult(true);
+        return getSuccessResult(dataList);
     }
 
     /**
@@ -450,8 +395,14 @@ public class BackendCashierController extends BaseController {
     @RequestMapping(value = "/gradeList/{userId}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('cashier:index')")
-    public ResponseObject getUpgradeGradeList(@PathVariable("userId") Integer userId) {
-        AccountInfo accountInfo = TokenUtil.getAccountInfo();
+    public ResponseObject getUpgradeGradeList(HttpServletRequest request, @PathVariable("userId") Integer userId) throws BusinessCheckException {
+        String token = request.getHeader("Access-Token");
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+
+        if (accountInfo == null) {
+            return getFailureResult(1001);
+        }
+
         MtUser userInfo = memberService.queryMemberById(userId);
         if (userInfo == null) {
             return getFailureResult(2000, "该会员信息不存在");
@@ -483,5 +434,88 @@ public class BackendCashierController extends BaseController {
         data.put("gradeList", gradeList);
 
         return getSuccessResult(data);
+    }
+
+    /**
+     * 获取会员充值方案
+     */
+    @ApiOperation(value = "获取会员充值方案")
+    @RequestMapping(value = "/rechargeSetting", method = RequestMethod.GET)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('cashier:index')")
+    public ResponseObject rechargeSetting() {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
+        if (accountInfo == null) {
+            return getFailureResult(1001);
+        }
+
+        List<MtSetting> settingList = settingService.getSettingList(accountInfo.getMerchantId(), SettingTypeEnum.BALANCE.getKey());
+        List<RechargeRuleDto> ruleList = new ArrayList<>();
+        String status = StatusEnum.DISABLE.getKey();
+        String remark = "";
+        for (MtSetting setting : settingList) {
+            if (setting.getName().equals(BalanceSettingEnum.RECHARGE_RULE.getKey())) {
+                status = setting.getStatus();
+                if (StatusEnum.ENABLED.getKey().equals(setting.getStatus()) && StringUtil.isNotEmpty(setting.getValue())) {
+                    String[] items = setting.getValue().split(",");
+                    for (String value : items) {
+                        String[] el = value.split("_");
+                        if (el.length >= 2) {
+                            RechargeRuleDto ruleDto = new RechargeRuleDto();
+                            ruleDto.setRechargeAmount(el[0]);
+                            ruleDto.setGiveAmount(el[1]);
+                            if (el.length >= 3) {
+                                ruleDto.setGiveCouponIds(el[2]);
+                            }
+                            ruleList.add(ruleDto);
+                        }
+                    }
+                }
+            } else if (setting.getName().equals(BalanceSettingEnum.RECHARGE_REMARK.getKey())) {
+                remark = setting.getValue();
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("ruleList", ruleList);
+        result.put("status", status);
+        result.put("remark", remark);
+
+        return getSuccessResult(result);
+    }
+
+    /**
+     * 收银台提交会员充值订单
+     */
+    @ApiOperation(value = "提交会员充值订单")
+    @RequestMapping(value = "/doRecharge", method = RequestMethod.POST)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('cashier:index')")
+    public ResponseObject doRecharge(HttpServletRequest request, @RequestBody RechargeParam rechargeParam) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
+        if (accountInfo == null || accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
+            return getFailureResult(201, "平台账号不能执行该操作");
+        }
+
+        Integer memberId = rechargeParam.getMemberId() == null ? 0 : rechargeParam.getMemberId();
+        if (memberId <= 0) {
+            return getFailureResult(201, "请先选择要充值的会员");
+        }
+
+        MtUser memberInfo = memberService.queryMemberById(memberId);
+        if (memberInfo == null) {
+            return getFailureResult(201, "该会员信息不存在");
+        }
+        if (!accountInfo.getMerchantId().equals(memberInfo.getMerchantId())) {
+            return getFailureResult(201, "该会员不属于当前商户");
+        }
+
+        // 生成充值订单，返回后由收银台发起支付（扫码枪收款等）
+        MtOrder mtOrder = orderService.doRecharge(request, rechargeParam);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("orderInfo", mtOrder);
+
+        return getSuccessResult(result);
     }
 }

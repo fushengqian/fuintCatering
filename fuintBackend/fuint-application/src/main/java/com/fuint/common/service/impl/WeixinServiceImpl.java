@@ -354,10 +354,11 @@ public class WeixinServiceImpl implements WeixinService {
      *
      * @param merchantId 商户ID
      * @param code 微信返回编码
+     * @throws BusinessCheckException
      * @return
      * */
     @Override
-    public JSONObject getWxProfile(Integer merchantId, String code) {
+    public JSONObject getWxProfile(Integer merchantId, String code) throws BusinessCheckException {
         String wxAppId = env.getProperty("wxpay.appId");
         String wxAppSecret = env.getProperty("wxpay.appSecret");
 
@@ -391,10 +392,11 @@ public class WeixinServiceImpl implements WeixinService {
      *
      * @param merchantId 商户ID
      * @param code 微信返回编码
+     * @throws BusinessCheckException
      * @return
      * */
     @Override
-    public JSONObject getWxOpenId(Integer merchantId, String code) {
+    public JSONObject getWxOpenId(Integer merchantId, String code) throws BusinessCheckException {
         String wxAppId = env.getProperty("weixin.official.appId");
         String wxAppSecret = env.getProperty("weixin.official.appSecret");
 
@@ -1392,85 +1394,5 @@ public class WeixinServiceImpl implements WeixinService {
         WxPayApiConfigKit.setThreadLocalWxPayApiConfig(apiConfig);
 
         return apiConfig;
-    }
-
-    /**
-     * 获取微信公众号JSSDK的jsapi_ticket
-     */
-    private String getJsApiTicket(Integer merchantId) {
-        String ticketKey = "FUINT_JSAPI_TICKET_MP";
-        if (merchantId != null && merchantId > 0) {
-            ticketKey = ticketKey + "_" + merchantId;
-        }
-        String ticket = RedisUtil.get(ticketKey);
-        if (StringUtil.isNotEmpty(ticket)) {
-            return ticket;
-        }
-
-        String accessToken = getAccessToken(merchantId, false, true);
-        if (StringUtil.isEmpty(accessToken)) {
-            logger.error("获取jsapi_ticket失败：accessToken为空");
-            return null;
-        }
-        String url = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi";
-        try {
-            String response = HttpRESTDataClient.requestGet(url);
-            JSONObject json = (JSONObject) JSONObject.parse(response);
-            if (json != null && json.getInteger("errcode") == 0) {
-                ticket = json.getString("ticket");
-                Integer expiresIn = json.getInteger("expires_in");
-                RedisUtil.set(ticketKey, ticket, expiresIn - 200);
-                return ticket;
-            }
-        } catch (Exception e) {
-            logger.error("获取jsapi_ticket异常", e);
-        }
-        return null;
-    }
-
-    @Override
-    public Map<String, String> getJsSdkConfig(Integer merchantId, String url) {
-        Map<String, String> config = new HashMap<>();
-
-        String appId = env.getProperty("weixin.official.appId");
-        if (merchantId != null && merchantId > 0) {
-            MtMerchant mtMerchant = merchantService.queryMerchantById(merchantId);
-            if (mtMerchant != null && StringUtil.isNotEmpty(mtMerchant.getWxOfficialAppId())) {
-                appId = mtMerchant.getWxOfficialAppId();
-            }
-        }
-
-        String jsApiTicket = getJsApiTicket(merchantId);
-        if (StringUtil.isEmpty(jsApiTicket) || StringUtil.isEmpty(appId)) {
-            return config;
-        }
-
-        String nonceStr = WxPayKit.generateStr();
-        String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
-
-        String signStr = "jsapi_ticket=" + jsApiTicket + "&noncestr=" + nonceStr + "&timestamp=" + timestamp + "&url=" + url;
-        String signature = "";
-        try {
-            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-1");
-            byte[] hash = digest.digest(signStr.getBytes("UTF-8"));
-            StringBuilder hexStr = new StringBuilder();
-            for (byte b : hash) {
-                String hex = Integer.toHexString(b & 0xFF);
-                if (hex.length() == 1) {
-                    hexStr.append("0");
-                }
-                hexStr.append(hex);
-            }
-            signature = hexStr.toString();
-        } catch (Exception e) {
-            logger.error("生成JSSDK签名异常", e);
-        }
-
-        config.put("appId", appId);
-        config.put("timestamp", timestamp);
-        config.put("nonceStr", nonceStr);
-        config.put("signature", signature);
-
-        return config;
     }
 }

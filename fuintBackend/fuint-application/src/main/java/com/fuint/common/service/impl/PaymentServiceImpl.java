@@ -56,6 +56,11 @@ public class PaymentServiceImpl implements PaymentService {
     private AlipayService alipayService;
 
     /**
+     * 云闪付服务接口
+     * */
+    private UnionPayService unionPayService;
+
+    /**
      * 会员服务接口
      * */
     private MemberService memberService;
@@ -101,6 +106,9 @@ public class PaymentServiceImpl implements PaymentService {
         if (orderInfo.getPayType().equals(PayTypeEnum.ALISCAN.getKey())) {
             // 支付宝支付
             responseObject = alipayService.createPrepayOrder(userInfo, orderInfo, payAmount, authCode, giveAmount, ip, platform);
+        } else if (orderInfo.getPayType().equals(PayTypeEnum.UNIONPAY.getKey())) {
+            // 云闪付支付
+            responseObject = unionPayService.createPrepayOrder(userInfo, orderInfo, payAmount, authCode, giveAmount, ip, platform);
         } else {
             // 微信支付
             responseObject = weixinService.createPrepayOrder(userInfo, orderInfo, payAmount, authCode, giveAmount, ip, platform, isWechat);
@@ -138,43 +146,7 @@ public class PaymentServiceImpl implements PaymentService {
             userCouponService.preStore(param);
         }
 
-        // 充值订单
-        if (orderInfo.getType().equals(OrderTypeEnum.RECHARGE.getKey())) {
-            // 余额支付
-            MtBalance mtBalance = new MtBalance();
-            OrderUserDto userDto = orderInfo.getUserInfo();
-            if (userDto.getMobile() != null && StringUtil.isNotEmpty(userDto.getMobile())) {
-                mtBalance.setMobile(userDto.getMobile());
-            }
-            mtBalance.setOrderSn(orderInfo.getOrderSn());
-            mtBalance.setUserId(orderInfo.getUserId());
-            mtBalance.setMerchantId(orderInfo.getMerchantId());
-            String param = orderInfo.getParam();
-            if (StringUtil.isNotEmpty(param)) {
-                String params[] = param.split("_");
-                if (params.length >= 2) {
-                    BigDecimal amount = new BigDecimal(params[0]).add(new BigDecimal(params[1]));
-                    mtBalance.setAmount(amount);
-                    balanceService.addBalance(mtBalance, true);
-                }
-                // 充值赠送卡券
-                if (params.length == 3) {
-                    try {
-                        String[] couponIds = params[2].split("\\|");
-                        if (couponIds != null && couponIds.length > 0) {
-                            for (int i = 0; i < couponIds.length; i++) {
-                                ResponseObject result = couponService.sendCoupon(Integer.parseInt(couponIds[i]), orderInfo.getUserId(), 1, true, null, null);
-                                if (!result.getCode().equals(200)) {
-                                    logger.error("充值赠送卡券失败：", result.getMessage());
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                        logger.error("sendCoupon error", e);
-                    }
-                }
-            }
-        }
+        // 充值订单的余额入账统一在 orderService.setOrderPayed 中处理，避免与支付回调重复入账
 
         logger.info("PaymentService paymentCallback Success orderSn {}", orderInfo.getOrderSn());
         return true;
@@ -189,12 +161,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> doPay(HttpServletRequest request) throws BusinessCheckException {
+        String token = request.getHeader("Access-Token");
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
         String isWechat = request.getHeader("isWechat") == null ? "" : request.getHeader("isWechat");
         String payType = request.getParameter("payType") == null ? PayTypeEnum.JSAPI.getKey() : request.getParameter("payType");
         String cashierPayAmount = request.getParameter("cashierPayAmount") == null ? "" : request.getParameter("cashierPayAmount"); // 收银台实付金额
         String cashierDiscountAmount = request.getParameter("cashierDiscountAmount") == null ? "" : request.getParameter("cashierDiscountAmount"); // 收银台优惠金额
-        UserInfo loginInfo = TokenUtil.getUserInfo();
+        UserInfo loginInfo = TokenUtil.getUserInfoByToken(token);
         String orderId = request.getParameter("orderId");
         String userId = request.getParameter("userId");
         String authCode = request.getParameter("authCode");
@@ -224,7 +197,7 @@ public class PaymentServiceImpl implements PaymentService {
         orderInfo = orderService.updateOrder(orderInfo);
 
         // 收银员操作
-        AccountInfo accountInfo = TokenUtil.getAccountInfo();
+        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
         if (loginInfo == null && accountInfo != null) {
             // 游客订单绑定到会员
             if (orderInfo.getIsVisitor().equals(YesOrNoEnum.YES.getKey()) && StringUtil.isNotEmpty(userId)) {
