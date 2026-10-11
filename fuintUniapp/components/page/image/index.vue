@@ -63,7 +63,9 @@
 <style lang="scss" scoped>
   .diy-imageSingle {
     margin: 0 20rpx 20rpx 20rpx;
-    padding: 20rpx;
+    // 图片组件不留内边距：后台装修预览里图片是通栏展示的，端上多出这 20rpx
+    // 会让图片四周空出一圈、和预览效果对不上
+    padding: 0;
     border: 1rpx solid #e6e6e6;
     border-radius: 20rpx;
     box-sizing: border-box;

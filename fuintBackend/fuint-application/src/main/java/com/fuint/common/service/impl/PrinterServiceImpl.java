@@ -55,6 +55,12 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
 
     private static final Logger logger = LoggerFactory.getLogger(PrinterServiceImpl.class);
 
+    /**
+     * 云打印纸宽：统一按 58mm 排版（32字节/行），80mm 打印机同样可打，只是内容偏窄留白
+     * 若整店换成 80mm 打印机，改为 NoteFormatter.PAPER_WIDTH_80 即可
+     */
+    private static final Integer PRINT_PAPER_WIDTH = NoteFormatter.PAPER_WIDTH_58;
+
     private MtPrinterMapper mtPrinterMapper;
 
     /**
@@ -220,7 +226,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             printContent.append("<BR>");
 
             // 分割线
-            printContent.append(StringUtils.repeat("-", 32)).append("<BR>");
+            printContent.append(StringUtils.repeat("-", NoteFormatter.getRowByteLength(PRINT_PAPER_WIDTH))).append("<BR>");
 
             // 订单ID、单号、桌码
             printContent.append("<L>订单ID：").append(orderInfo.getId()).append("</L>");
@@ -240,15 +246,12 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             printContent.append("<L>").append("支付状态：").append(payStatus).append("<BR></L>");
 
             // 分割线
-            printContent.append(StringUtils.repeat("-", 32)).append("<BR>");
+            printContent.append(StringUtils.repeat("-", NoteFormatter.getRowByteLength(PRINT_PAPER_WIDTH))).append("<BR>");
 
-            printContent.append("品名").append(StringUtils.repeat(" ", 16))
-                        .append("数量").append(StringUtils.repeat(" ", 2))
-                        .append("单价").append(StringUtils.repeat(" ", 2))
-                        .append("<BR>");
+            printContent.append(NoteFormatter.formatPrintOrderItemHeader(PRINT_PAPER_WIDTH)).append("<BR>");
 
             // 分割线
-            printContent.append(StringUtils.repeat("-", 32)).append("<BR>");
+            printContent.append(StringUtils.repeat("-", NoteFormatter.getRowByteLength(PRINT_PAPER_WIDTH))).append("<BR>");
 
             // 商品列表
             if (orderInfo.getGoods() != null && orderInfo.getGoods().size() > 0) {
@@ -268,10 +271,10 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
                      }
                      if (goodsIds != null && goodsIds.size() > 0) {
                          if (goodsIds.contains(goodsDto.getGoodsId())) {
-                             printContent.append(NoteFormatter.formatPrintOrderItemForNewLine80(name, goodsDto.getNum(), Double.parseDouble(goodsDto.getPrice())));
+                             printContent.append(NoteFormatter.formatPrintOrderItem(name, goodsDto.getNum(), Double.parseDouble(goodsDto.getPrice()), PRINT_PAPER_WIDTH));
                          }
                      } else {
-                         printContent.append(NoteFormatter.formatPrintOrderItemForNewLine80(name, goodsDto.getNum(), Double.parseDouble(goodsDto.getPrice())));
+                         printContent.append(NoteFormatter.formatPrintOrderItem(name, goodsDto.getNum(), Double.parseDouble(goodsDto.getPrice()), PRINT_PAPER_WIDTH));
                      }
                 }
             }
@@ -294,7 +297,7 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
                 }
                 if (StringUtil.isNotEmpty(memberName) || StringUtil.isNotEmpty(memberMobile)) {
                     // 分割线
-                    printContent.append(StringUtils.repeat("-", 32)).append("<BR>");
+                    printContent.append(StringUtils.repeat("-", NoteFormatter.getRowByteLength(PRINT_PAPER_WIDTH))).append("<BR>");
                     printContent.append("<L>")
                             .append("会员名称：").append(StringUtil.isNotEmpty(memberName) ? memberName : "-").append("<BR>")
                             .append("会员手机：").append(StringUtil.isNotEmpty(memberMobile) ? memberMobile : "-").append("<BR>");
@@ -302,14 +305,14 @@ public class PrinterServiceImpl extends ServiceImpl<MtPrinterMapper, MtPrinter> 
             }
 
             // 分割线
-            printContent.append(StringUtils.repeat("-", 32)).append("<BR>");
+            printContent.append(StringUtils.repeat("-", NoteFormatter.getRowByteLength(PRINT_PAPER_WIDTH))).append("<BR>");
 
             printContent.append("<R>").append("合计：").append(orderInfo.getPayAmount()).append("元").append("<BR></R>");
 
             // 配送订单，打印配送信息
             if (orderInfo.getOrderMode().equals(OrderModeEnum.EXPRESS.getKey())) {
                 printContent.append("<BR>");
-                printContent.append(StringUtils.repeat("-", 32)).append("<BR>");
+                printContent.append(StringUtils.repeat("-", NoteFormatter.getRowByteLength(PRINT_PAPER_WIDTH))).append("<BR>");
                 printContent.append("<L>")
                         .append("配送姓名：").append(orderInfo.getAddress().getName()).append("<BR>")
                         .append("联系电话：").append(orderInfo.getAddress().getMobile()).append("<BR>")

@@ -15,6 +15,8 @@
      * 初始化完成时触发
      */
     onLaunch(options) {
+      // 兜底未处理的 Promise 拒绝（未登录接口报错会在这里静默掉）
+      this.handleUnhandledRejection()
       // 小程序主动更新
       this.updateManager()
       // 先用本地缓存主题同步设置导航栏, 保证首帧不是 pages.json 默认色
@@ -33,6 +35,29 @@
     },
 
     methods: {
+
+      /**
+       * 兜底未处理的 Promise 拒绝：
+       * 未登录时后端返回 code 1001，utils/request 的 dataFactory 会弹登录提示并 reject；
+       * 很多页面只写 .then() 不写 .catch()，这个 rejection 没人接管，小程序就会当成
+       * 未捕获异常抛出 MiniProgramError（控制台满屏 {"code":1001,...}）。
+       * 这里注册监听后小程序不再自动抛全局错误，未登录场景静默即可 —— 登录提示已经弹过了。
+       */
+      handleUnhandledRejection() {
+        if (typeof uni.onUnhandledRejection !== 'function') {
+          return
+        }
+        uni.onUnhandledRejection(res => {
+          const reason = (res && res.reason) || {}
+          const result = reason.result || reason
+          // 1001 = 未登录/登录态过期，已由 request 的 dataFactory 处理过，不重复报错
+          if (result && result.code == 1001) {
+            return
+          }
+          // 其它未处理异常保留控制台可见（注册监听后小程序不再自动打印）
+          console.error('[unhandledRejection]', reason)
+        })
+      },
 
       /**
        * 同步设置顶部导航栏颜色
