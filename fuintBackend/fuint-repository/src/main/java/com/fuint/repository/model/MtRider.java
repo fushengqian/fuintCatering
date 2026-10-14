@@ -5,8 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -17,48 +16,48 @@ import lombok.Data;
  */
 @Data
 @TableName("mt_rider")
-@ApiModel(value = "MtRider对象", description = "骑手表")
+@Schema(name="MtRider对象", description="骑手表")
 public class MtRider implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("自增ID")
+    @Schema(description="自增ID")
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
 
-    @ApiModelProperty("会员用户ID，关联mt_user")
+    @Schema(description="会员用户ID，关联mt_user")
     private Integer userId;
 
-    @ApiModelProperty("骑手编号")
+    @Schema(description="骑手编号")
     private String riderNo;
 
-    @ApiModelProperty("所属商户ID")
+    @Schema(description="所属商户ID")
     private Integer merchantId;
 
-    @ApiModelProperty("所属店铺ID")
+    @Schema(description="所属店铺ID")
     private Integer storeId;
 
-    @ApiModelProperty("身份证号")
+    @Schema(description="身份证号")
     private String idCard;
 
-    @ApiModelProperty("身份证正面照片")
+    @Schema(description="身份证正面照片")
     private String idCardFront;
 
-    @ApiModelProperty("身份证背面照片")
+    @Schema(description="身份证背面照片")
     private String idCardBack;
 
-    @ApiModelProperty("健康证照片")
+    @Schema(description="健康证照片")
     private String healthCert;
 
-    @ApiModelProperty("状态：A=正常 B=禁用")
+    @Schema(description="状态：A=正常 B=禁用")
     private String status;
 
-    @ApiModelProperty("备注")
+    @Schema(description="备注")
     private String description;
 
-    @ApiModelProperty("创建时间")
+    @Schema(description="创建时间")
     private Date createTime;
 
-    @ApiModelProperty("更新时间")
+    @Schema(description="更新时间")
     private Date updateTime;
 }

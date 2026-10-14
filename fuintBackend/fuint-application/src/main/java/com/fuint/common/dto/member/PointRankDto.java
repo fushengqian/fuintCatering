@@ -1,6 +1,6 @@
 package com.fuint.common.dto.member;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,16 +14,16 @@ import java.io.Serializable;
 @Data
 public class PointRankDto implements Serializable {
 
-    @ApiModelProperty("会员ID")
+    @Schema(description="会员ID")
     private Integer userId;
 
-    @ApiModelProperty("会员称呼")
+    @Schema(description="会员称呼")
     private String name;
 
-    @ApiModelProperty("会员头像")
+    @Schema(description="会员头像")
     private String avatar;
 
-    @ApiModelProperty("积分数量")
+    @Schema(description="积分数量")
     private Integer point;
 
 }

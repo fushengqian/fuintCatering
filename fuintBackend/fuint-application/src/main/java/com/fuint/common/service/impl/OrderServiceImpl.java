@@ -14,6 +14,7 @@ import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.*;
 import com.fuint.common.param.OrderListParam;
 import com.fuint.common.param.RechargeParam;
+import com.fuint.common.param.RemoveGoodsParam;
 import com.fuint.common.param.SettlementParam;
 import com.fuint.common.service.*;
 import com.fuint.common.util.CommonUtil;
@@ -44,7 +45,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import weixin.popular.util.JsonUtil;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -179,6 +180,11 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     private PaymentService paymentService;
 
     /**
+     * 桌码服务接口
+     */
+    private TableService tableService;
+
+    /**
      * 云打印服务接口
      * */
     private PrinterService printerService;
@@ -189,32 +195,27 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     private StockService stockService;
 
     /**
-     * 预约单服务接口
-     */
-    private BookItemService bookItemService;
-
-    /**
      * 获取用户订单列表
      * @param  orderListParam
-     * @throws BusinessCheckException
      * @return
      * */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PaginationResponse getUserOrderList(OrderListParam orderListParam) {
-        Integer page = orderListParam.getPage() == null ? Constants.PAGE_NUMBER : orderListParam.getPage();
+        Integer pageNumber = orderListParam.getPage() == null ? Constants.PAGE_NUMBER : orderListParam.getPage();
         Integer pageSize = orderListParam.getPageSize() == null ? Constants.PAGE_SIZE : orderListParam.getPageSize();
-        Integer userId = orderListParam.getUserId() == null ? 0 : orderListParam.getUserId();
+        String userId = orderListParam.getUserId() == null ? "" : orderListParam.getUserId().toString();
         Integer merchantId = orderListParam.getMerchantId() == null ? 0 : orderListParam.getMerchantId();
         Integer storeId = orderListParam.getStoreId() == null ? 0 : orderListParam.getStoreId();
-        String status =  orderListParam.getStatus() == null ? "": orderListParam.getStatus();
-        String payStatus =  orderListParam.getPayStatus() == null ? "": orderListParam.getPayStatus();
-        String settleStatus = orderListParam.getSettleStatus() == null ? "": orderListParam.getSettleStatus();
+        String status = orderListParam.getStatus() == null ? "": orderListParam.getStatus();
+        String payStatus = orderListParam.getPayStatus() == null ? "": orderListParam.getPayStatus();
+        String settleStatus =  orderListParam.getSettleStatus() == null ? "": orderListParam.getSettleStatus();
         String dataType = orderListParam.getDataType() == null ? "": orderListParam.getDataType();
         String type = orderListParam.getType() == null ? "": orderListParam.getType();
         String orderSn = orderListParam.getOrderSn() == null ? "": orderListParam.getOrderSn();
+        String tableCode = orderListParam.getTableCode() == null ? "": orderListParam.getTableCode();
         String mobile = orderListParam.getMobile() == null ? "": orderListParam.getMobile();
-        String orderMode = orderListParam.getOrderMode() == null ? "" : orderListParam.getOrderMode();
+        String orderMode = orderListParam.getOrderMode() == null ? "": orderListParam.getOrderMode();
         String staffId = orderListParam.getStaffId() == null ? "" : orderListParam.getStaffId();
         String couponId = orderListParam.getCouponId() == null ? "" : orderListParam.getCouponId();
         String storeIds = orderListParam.getStoreIds() == null ? "" : orderListParam.getStoreIds();
@@ -225,6 +226,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         List<String> payType = orderListParam.getPayType();
 
         LambdaQueryWrapper<MtOrder> lambdaQueryWrapper = Wrappers.lambdaQuery();
+        lambdaQueryWrapper.orderByDesc(MtOrder::getId);
+        lambdaQueryWrapper.ne(MtOrder::getStatus, OrderStatusEnum.DELETED.getKey());
         lambdaQueryWrapper.ne(MtOrder::getStatus, OrderStatusEnum.DELETED.getKey());
 
         if (dataType.equals("toPay")) {
@@ -252,12 +255,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             lambdaQueryWrapper.eq(MtOrder::getType, OrderTypeEnum.GOODS.getKey());
             lambdaQueryWrapper.eq(MtOrder::getStatus, OrderStatusEnum.DELIVERY.getKey());
             lambdaQueryWrapper.eq(MtOrder::getOrderMode, OrderModeEnum.EXPRESS.getKey());
-        } else if (dataType.equals("received")) {
-            // 已收货
-            payStatus = PayStatusEnum.SUCCESS.getKey();
-            lambdaQueryWrapper.eq(MtOrder::getType, OrderTypeEnum.GOODS.getKey());
-            lambdaQueryWrapper.eq(MtOrder::getStatus, OrderStatusEnum.RECEIVED.getKey());
-            lambdaQueryWrapper.eq(MtOrder::getOrderMode, OrderModeEnum.EXPRESS.getKey());
         } else if (dataType.equals("shipped")) {
             // 已发货
             payStatus = PayStatusEnum.SUCCESS.getKey();
@@ -270,19 +267,30 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             lambdaQueryWrapper.eq(MtOrder::getStatus, OrderStatusEnum.COMPLETE.getKey());
         }
 
-        if (StringUtil.isNotEmpty(orderSn)) {
+        if (StringUtil.isNotBlank(tableCode)) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("code", tableCode);
+            params.put("status", StatusEnum.ENABLED.getKey());
+            List<MtTable> tables = tableService.queryTableListByParams(params);
+            if (tables != null && tables.size() > 0) {
+                lambdaQueryWrapper.eq(MtOrder::getTableId, tables.get(0).getId());
+            } else {
+                lambdaQueryWrapper.eq(MtOrder::getTableId, "00");
+            }
+        }
+        if (StringUtil.isNotBlank(orderSn)) {
             lambdaQueryWrapper.eq(MtOrder::getOrderSn, orderSn);
         }
-        if (StringUtil.isNotEmpty(status)) {
+        if (StringUtil.isNotBlank(status)) {
             lambdaQueryWrapper.eq(MtOrder::getStatus, status);
         }
-        if (StringUtil.isNotEmpty(payStatus)) {
+        if (StringUtil.isNotBlank(payStatus)) {
             lambdaQueryWrapper.eq(MtOrder::getPayStatus, payStatus);
         }
-        if (StringUtil.isNotEmpty(settleStatus)) {
+        if (StringUtil.isNotBlank(settleStatus)) {
             lambdaQueryWrapper.eq(MtOrder::getSettleStatus, settleStatus);
         }
-        if (StringUtil.isNotEmpty(keyword)) {
+        if (StringUtil.isNotBlank(keyword)) {
             MtUser userInfo = memberService.queryMemberByMobile(merchantId, keyword);
             if (userInfo != null) {
                 lambdaQueryWrapper.and(wq -> wq
@@ -293,13 +301,13 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 lambdaQueryWrapper.like(MtOrder::getOrderSn, keyword);
             }
         }
-        if (StringUtil.isNotEmpty(mobile)) {
+        if (StringUtil.isNotBlank(mobile)) {
             MtUser userInfo = memberService.queryMemberByMobile(merchantId, mobile);
             if (userInfo != null) {
-                userId = userInfo.getId();
+                userId = userInfo.getId().toString();
             }
         }
-        if (userId != null && userId > 0) {
+        if (StringUtil.isNotBlank(userId) && Integer.parseInt(userId) > 0) {
             lambdaQueryWrapper.eq(MtOrder::getUserId, userId);
         }
         if (merchantId != null && merchantId > 0) {
@@ -340,8 +348,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             lambdaQueryWrapper.eq(MtOrder::getPayStatus, PayStatusEnum.SUCCESS.getKey());
             lambdaQueryWrapper.eq(MtOrder::getType, OrderTypeEnum.GOODS.getKey());
         }
-        lambdaQueryWrapper.orderByDesc(MtOrder::getId);
-        Page<MtOrder> pageHelper = PageHelper.startPage(page, pageSize);
+        Page<MtOrder> pageHelper = PageHelper.startPage(pageNumber, pageSize);
         List<MtOrder> orderList = mtOrderMapper.selectList(lambdaQueryWrapper);
 
         List<UserOrderDto> dataList = new ArrayList<>();
@@ -352,7 +359,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
         }
 
-        PageRequest pageRequest = PageRequest.of(page, pageSize);
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
         PageImpl pageImpl = new PageImpl(dataList, pageRequest, pageHelper.getTotal());
         PaginationResponse<UserOrderDto> paginationResponse = new PaginationResponse(pageImpl, UserOrderDto.class);
         paginationResponse.setTotalPages(pageHelper.getPages());
@@ -374,11 +381,12 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     @OperationServiceLog(description = "提交订单信息")
     public MtOrder saveOrder(OrderDto orderDto) throws BusinessCheckException {
         logger.info("orderService.saveOrder orderDto = {}", JsonUtil.toJSONString(orderDto));
-        MtOrder mtOrder;
+        MtOrder mtOrder = new MtOrder();
         if (null != orderDto.getId() && orderDto.getId() > 0) {
-            mtOrder = mtOrderMapper.selectById(orderDto.getId());
-        } else {
-            mtOrder = new MtOrder();
+            MtOrder order = mtOrderMapper.selectById(orderDto.getId());
+            if (order != null) {
+                mtOrder = order;
+            }
         }
 
         // 检查店铺是否已被禁用
@@ -402,6 +410,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         mtOrder.setUserId(orderDto.getUserId());
         mtOrder.setMerchantId(orderDto.getMerchantId());
         mtOrder.setStoreId(orderDto.getStoreId());
+        mtOrder.setTableId(orderDto.getTableId());
+        mtOrder.setTakenTableId(orderDto.getTableId());
         mtOrder.setCouponId(orderDto.getCouponId());
         mtOrder.setParam(orderDto.getParam());
         mtOrder.setRemark(orderDto.getRemark());
@@ -431,14 +441,15 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         mtOrder.setDeliveryFee(orderDto.getDeliveryFee() == null ? new BigDecimal(0) : orderDto.getDeliveryFee());
         mtOrder.setSettleStatus(SettleStatusEnum.WAIT.getKey());
         mtOrder.setConfirmStatus(YesOrNoEnum.NO.getKey());
-
+        if (orderDto.getPeopleNum() != null && orderDto.getPeopleNum() > 0) {
+            mtOrder.setPeopleNum(orderDto.getPeopleNum());
+        }
         if (mtOrder.getId() == null || mtOrder.getId() <= 0) {
             mtOrder.setCreateTime(new Date());
         }
         if (orderDto.getPlatform() == null) {
             orderDto.setPlatform("");
         }
-        // 核销码
         if (mtOrder.getVerifyCode() == null && !orderDto.getPlatform().equals(PlatformTypeEnum.PC.getCode())) {
             mtOrder.setVerifyCode(SeqUtil.getRandomNumber(4));
         } else {
@@ -448,8 +459,18 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
         }
 
+        // 商品订单，生成取单号
+        if (orderDto.getType().equals(OrderTypeEnum.GOODS.getKey())) {
+            Integer pickupNo = mtOrderMapper.getPickupNo(mtOrder.getStoreId(), DateUtil.getDayBegin(), DateUtil.getDayEnd());
+            mtOrder.setPickupNo(pickupNo + 1);
+        }
+
         // 首先生成订单
-        mtOrderMapper.insert(mtOrder);
+        if (mtOrder.getId() == null || mtOrder.getId() < 1) {
+            mtOrderMapper.insert(mtOrder);
+        } else {
+            mtOrderMapper.updateById(mtOrder);
+        }
         MtOrder orderInfo = mtOrderMapper.selectById(mtOrder.getId());
         mtOrder.setId(orderInfo.getId());
 
@@ -577,21 +598,23 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                     MtUserCoupon userCoupon = mtUserCouponMapper.selectById(cid);
                     if (userCoupon != null) {
                         MtCoupon couponInfo = couponService.queryCouponById(userCoupon.getCouponId());
-                        List<MtCouponGoods> couponGoodsList = mtCouponGoodsMapper.getCouponGoods(couponInfo.getId());
-                        if (couponGoodsList != null && couponGoodsList.size() > 0 && cartList.size() > 0) {
-                            List<Integer> applyGoodsIds = new ArrayList<>();
-                            List<Integer> goodsIds = new ArrayList<>();
-                            for (MtCouponGoods mtCouponGoods : couponGoodsList) {
-                                applyGoodsIds.add(mtCouponGoods.getGoodsId());
-                            }
-                            for (MtCart mtCart : cartList) {
-                                goodsIds.add(mtCart.getGoodsId());
-                            }
-                            List<Integer> intersection = applyGoodsIds.stream()
-                                    .filter(goodsIds::contains)
-                                    .collect(Collectors.toList());
-                            if (intersection.size() == 0) {
-                                throw new BusinessCheckException("卡券\"" + couponInfo.getName() + "\"不适用于购买的商品列表");
+                        if (couponInfo.getApplyGoods() != null && couponInfo.getApplyGoods().equals(ApplyGoodsEnum.PARK_GOODS.getKey())) {
+                            List<MtCouponGoods> couponGoodsList = mtCouponGoodsMapper.getCouponGoods(couponInfo.getId());
+                            if (couponGoodsList != null && couponGoodsList.size() > 0 && cartList.size() > 0) {
+                                List<Integer> applyGoodsIds = new ArrayList<>();
+                                List<Integer> goodsIds = new ArrayList<>();
+                                for (MtCouponGoods mtCouponGoods : couponGoodsList) {
+                                    applyGoodsIds.add(mtCouponGoods.getGoodsId());
+                                }
+                                for (MtCart mtCart : cartList) {
+                                    goodsIds.add(mtCart.getGoodsId());
+                                }
+                                List<Integer> intersection = applyGoodsIds.stream()
+                                        .filter(goodsIds::contains)
+                                        .collect(Collectors.toList());
+                                if (intersection.size() == 0) {
+                                    throw new BusinessCheckException("卡券\"" + couponInfo.getName() + "\"不适用于购买的商品列表");
+                                }
                             }
                         }
                     }
@@ -610,19 +633,15 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                     if (userCouponInfo == null) {
                         userCouponInfo = mtUserCouponMapper.selectById(cid);
                     }
-                    if (userCouponInfo != null) {
-                        boolean isCoupon = CouponTypeEnum.COUPON.getKey().equals(userCouponInfo.getType());
-                        boolean isPrestore = userCouponInfo.getBalance() != null && userCouponInfo.getBalance().compareTo(BigDecimal.ZERO) > 0;
-                        if (isCoupon || isPrestore) {
-                            BigDecimal deductAmount = isCoupon ? remainingDiscount : remainingDiscount.min(userCouponInfo.getBalance());
-                            String useCode = couponService.useCoupon(cid, mtOrder.getUserId(), mtOrder.getStoreId(), mtOrder.getId(), deductAmount, "购物使用卡券");
-                            if (StringUtil.isNotEmpty(useCode)) {
-                                totalDeducted = totalDeducted.add(deductAmount);
-                                remainingDiscount = remainingDiscount.subtract(deductAmount);
-                            } else {
-                                allSuccess = false;
-                                break;
-                            }
+                    if (userCouponInfo != null && userCouponInfo.getBalance().compareTo(BigDecimal.ZERO) > 0) {
+                        BigDecimal deductAmount = remainingDiscount.min(userCouponInfo.getBalance());
+                        String useCode = couponService.useCoupon(cid, mtOrder.getUserId(), mtOrder.getStoreId(), mtOrder.getId(), deductAmount, "购物使用卡券");
+                        if (StringUtil.isNotEmpty(useCode)) {
+                            totalDeducted = totalDeducted.add(deductAmount);
+                            remainingDiscount = remainingDiscount.subtract(deductAmount);
+                        } else {
+                            allSuccess = false;
+                            break;
                         }
                     }
                 }
@@ -754,17 +773,10 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
             // 需要配送的订单，生成配送地址
             if (orderDto.getOrderMode().equals(OrderModeEnum.EXPRESS.getKey())) {
-                Map<String, Object> params = new HashMap<>();
-                params.put("userId", orderDto.getUserId().toString());
-                params.put("isDefault", YesOrNoEnum.YES.getKey());
-                List<MtAddress> addressList = addressService.queryListByParams(params);
-                MtAddress mtAddress;
-                if (addressList.size() > 0) {
-                    mtAddress = addressList.get(0);
-                } else {
+                MtAddress mtAddress = addressService.getDefaultAddress(orderInfo.getUserId());
+                if (mtAddress == null) {
                     throw new BusinessCheckException("配送地址出错了，请重新选择配送地址");
                 }
-
                 // 是否超出起送范围
                 MtSetting deliveryRange = settingService.querySettingByName(orderInfo.getMerchantId(), SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.DELIVERY_RANGE.getKey());
                 if (deliveryRange != null && StringUtil.isNotEmpty(deliveryRange.getValue()) && (Double.parseDouble(deliveryRange.getValue()) > 0)) {
@@ -815,8 +827,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 mtOrderAddressMapper.insert(orderAddress);
             }
         }
-
-        return orderInfo;
+        return mtOrderMapper.selectById(mtOrder.getId());
     }
 
     /**
@@ -864,12 +875,11 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> doSettle(HttpServletRequest request, SettlementParam param) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
-        String isWechat = request.getHeader("isWechat") == null ? YesOrNoEnum.NO.getKey() : request.getHeader("isWechat");
         Integer storeId = StringUtil.isEmpty(request.getHeader("storeId")) ? 0 : Integer.parseInt(request.getHeader("storeId"));
+        Integer tableId = StringUtil.isEmpty(request.getHeader("tableId")) ? 0 : Integer.parseInt(request.getHeader("tableId"));
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
         String merchantNo = request.getHeader("merchantNo") == null ? "" : request.getHeader("merchantNo");
-        String ip = CommonUtil.getIPFromHttpRequest(request);
+        String isWechat = request.getHeader("isWechat") == null ? YesOrNoEnum.NO.getKey() : request.getHeader("isWechat");
         String cartIds = param.getCartIds() == null ? "" : param.getCartIds();
         Integer targetId = param.getTargetId() == null ? 0 : Integer.parseInt(param.getTargetId()); // 储值卡、升级等级必填
         String selectNum = param.getSelectNum() == null ? "" : param.getSelectNum(); // 储值卡必填
@@ -889,8 +899,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         Double buyNum = param.getBuyNum() == null ? 1.0 : param.getBuyNum(); // 立即购买商品数量
         String orderMode = StringUtil.isEmpty(param.getOrderMode()) ? OrderModeEnum.ONESELF.getKey() : param.getOrderMode(); // 订单模式(配送or自取)
         Integer orderId = param.getOrderId() == null ? null : param.getOrderId(); // 订单ID
+        Integer tableId1 = param.getTableId() == null ? 0 : param.getTableId();
         Integer merchantId = merchantService.getMerchantId(merchantNo);
-        UserInfo loginInfo = TokenUtil.getUserInfoByToken(token);
+        UserInfo loginInfo = TokenUtil.getUserInfo();
         MtUser userInfo = null;
         if (loginInfo != null) {
             userInfo = memberService.queryMemberById(loginInfo.getId());
@@ -900,15 +911,13 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         String operator = null;
         Integer staffId = 0;
         String isVisitor = YesOrNoEnum.NO.getKey();
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (accountInfo != null) {
             operator = accountInfo.getAccountName();
             staffId = accountInfo.getStaffId() == null ? 0 : accountInfo.getStaffId();
-
             if (param.getStaffId() != null && param.getStaffId() > 0) {
                 staffId = param.getStaffId();
             }
-
             storeId = accountInfo.getStoreId();
             merchantId = accountInfo.getMerchantId();
             if (storeId <= 0) {
@@ -926,7 +935,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         }
 
         if (userInfo == null) {
-            MtUser user = memberService.getCurrentUserInfo(request, userId, token);
+            MtUser user = memberService.getCurrentUserInfo(request, userId, request.getHeader("Access-Token"));
             if (user != null) {
                 userInfo = memberService.queryMemberById(user.getId());
             }
@@ -940,26 +949,79 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
         }
 
-        MtSetting config = settingService.querySettingByName(merchantId, storeId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.IS_CLOSE.getKey());
-        if (config != null && config.getValue().equals(YesOrNoEnum.TRUE.getKey())) {
-            throw new BusinessCheckException("系统已关闭交易功能，请稍后再试！");
+        // 继续点单的订单ID
+        Integer myOrderId = 0;
+        if (tableId > 0 || tableId1 > 0) {
+            MtTable mtTable = null;
+            if (tableId > 0) {
+                mtTable = tableService.queryTableById(tableId);
+            } else if (tableId1 > 0) {
+                mtTable = tableService.queryTableById(tableId1);
+            }
+            if (mtTable != null) {
+                tableId = mtTable.getId();
+                if (mtTable.getStoreId() > 0) {
+                    storeId = mtTable.getStoreId();
+                }
+            }
+            List<MtOrder> orderList = mtOrderMapper.findByTableId(tableId);
+            if (orderList != null && orderList.size() > 0) {
+                myOrderId = orderList.get(0).getId();
+            }
         }
 
+        // 有未支付的刚下单的扫码单，就合并订单（防止顾客未扫码下单而找不到下单桌码）
+        if (myOrderId <= 0 && userInfo != null && !isVisitor.equals(YesOrNoEnum.YES.getKey())) {
+            myOrderId = mtOrderMapper.getJustNowTableOrderId(userInfo.getId(), storeId);
+        }
+
+        // 是否支持先用餐后支付
+        Boolean payFirst = true;
+        if (tableId > 0 || (myOrderId != null && myOrderId > 0)) {
+            MtSetting paySetting = settingService.querySettingByName(merchantId, storeId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.PAY_FIRST.getKey());
+            if (paySetting == null) {
+                paySetting = settingService.querySettingByName(merchantId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.PAY_FIRST.getKey());
+            }
+            if (paySetting != null && paySetting.getValue().equals(YesOrNoEnum.NO.getKey())) {
+                payFirst = false;
+            }
+        }
+
+        MtOrder myOrder = null;
+        BigDecimal myAmount = new BigDecimal(0);
+        BigDecimal myPayAmount = new BigDecimal(0);
+        BigDecimal myPointAmount = new BigDecimal(0);
+        if (myOrderId != null && myOrderId > 0) {
+            orderId = myOrderId;
+            myOrder = getOrderInfo(orderId);
+            myAmount = myOrder.getAmount();
+            myPayAmount = myOrder.getPayAmount();
+            myPointAmount = myOrder.getPointAmount();
+        }
+
+        MtSetting config = settingService.querySettingByName(merchantId, storeId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.IS_CLOSE.getKey());
+        if (config != null && config.getValue().equals(YesOrNoEnum.TRUE.getKey())) {
+            throw new BusinessCheckException("抱歉，店铺已打烊！");
+        }
+
+        // 校验商户是否已过期
+        merchantService.checkMerchantValid(merchantId);
+
         // 收银台通过手机号自动注册会员信息
-        if ((userInfo == null || StringUtil.isEmpty(token))) {
+        if ((userInfo == null || StringUtil.isEmpty(request.getHeader("Access-Token")))) {
             String mobile = param.getMobile() == null ? "" : param.getMobile();
             if (StringUtil.isNotEmpty(operator) && StringUtil.isNotEmpty(mobile)) {
                 userInfo = memberService.queryMemberByMobile(merchantId, mobile);
                 // 自动注册会员
                 if (userInfo == null) {
-                    userInfo = memberService.addMemberByMobile(merchantId, mobile, "0", ip);
+                    userInfo = memberService.addMemberByMobile(merchantId, mobile, null);
                 }
             }
         }
 
         if (userInfo == null) {
             if (StringUtil.isNotEmpty(operator)) {
-                throw new BusinessCheckException("该管理员还未关联店铺员工");
+                throw new BusinessCheckException("该管理员还未关联店铺员工，请先关联！");
             } else {
                 throw new BusinessCheckException("请先登录");
             }
@@ -992,6 +1054,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         orderDto.setUserId(userId);
         orderDto.setMerchantId(merchantId);
         orderDto.setStoreId(storeId);
+        orderDto.setTableId(tableId);
+        orderDto.setTakenTableId(tableId);
         orderDto.setType(type);
         orderDto.setGoodsId(goodsId);
         orderDto.setSkuId(skuId);
@@ -1000,10 +1064,10 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         orderDto.setOperator(operator);
         orderDto.setPayType(payType);
         orderDto.setCouponId(0);
-        orderDto.setCouponIds(couponIds);
         orderDto.setStaffId(staffId);
         orderDto.setIsVisitor(isVisitor);
         orderDto.setPlatform(platform);
+        orderDto.setPeopleNum(param.getPeopleNum());
 
         MtSetting pointSetting = settingService.querySettingByName(merchantId, SettingTypeEnum.POINT.getKey(), PointSettingEnum.CAN_USE_AS_MONEY.getKey());
         // 使用积分数量
@@ -1024,7 +1088,28 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         // 积分兑换订单：后端按商品重算所需积分（防止前端篡改），并校验库存、积分余额与限购
         boolean isPointExchange = PayTypeEnum.POINT.getKey().equals(payType) || OrderTypeEnum.EXCHANGE.getKey().equals(type);
         if (isPointExchange) {
-            MtGoods exchangeGoods = goodsService.queryGoodsById(goodsId);
+            Integer exchangeGoodsId = goodsId;
+            // 购物车模式进入结算时页面可能未传商品ID，根据购物车记录找到积分商品
+            if ((exchangeGoodsId == null || exchangeGoodsId <= 0) && StringUtil.isNotEmpty(cartIds)) {
+                String[] ids = cartIds.split(",");
+                List<Integer> idList = new ArrayList<>();
+                for (String id : ids) {
+                    if (StringUtil.isNotEmpty(id)) {
+                        idList.add(Integer.parseInt(id));
+                    }
+                }
+                if (idList.size() > 0) {
+                    List<MtCart> carts = mtCartMapper.selectBatchIds(idList);
+                    for (MtCart cart : carts) {
+                        MtGoods goods = goodsService.queryGoodsById(cart.getGoodsId());
+                        if (goods != null && YesOrNoEnum.YES.getKey().equals(goods.getIsPointGoods())) {
+                            exchangeGoodsId = goods.getId();
+                            break;
+                        }
+                    }
+                }
+            }
+            MtGoods exchangeGoods = goodsService.queryGoodsById(exchangeGoodsId);
             if (exchangeGoods == null || !YesOrNoEnum.YES.getKey().equals(exchangeGoods.getIsPointGoods())) {
                 throw new BusinessCheckException("该商品不支持积分兑换");
             }
@@ -1039,7 +1124,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             usePoint = new BigDecimal(pointPrice).multiply(new BigDecimal(num)).intValue();
             Integer limit = exchangeGoods.getExchangeLimit() == null ? 0 : exchangeGoods.getExchangeLimit();
             if (limit > 0 && userInfo != null && userInfo.getId() != null) {
-                int exchangedNum = queryExchangeNum(userInfo.getId(), goodsId);
+                int exchangedNum = queryExchangeNum(userInfo.getId(), exchangeGoodsId);
                 if ((exchangedNum + num) > limit) {
                     throw new BusinessCheckException("该商品每人限兑" + limit + "件，你已兑换" + exchangedNum + "件");
                 }
@@ -1103,8 +1188,18 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         }
 
         // 商品订单
+        List<Integer> goodsIds = new ArrayList<>();
         if (orderDto.getType().equals(OrderTypeEnum.GOODS.getKey())) {
             orderDto.setCouponId(couponId);
+            Map<String, Object> cartParams = new HashMap<>();
+            cartParams.put("status", StatusEnum.ENABLED.getKey());
+            cartParams.put("ids", orderDto.getCartIds());
+            List<MtCart> cartList = cartService.queryCartListByParams(cartParams);
+            if (cartList != null && cartList.size() > 0) {
+                for (MtCart mtCart : cartList) {
+                     goodsIds.add(mtCart.getGoodsId());
+                }
+            }
         }
 
         // 商品订单且配送要加上配送费用（积分兑换订单选择物流配送时同样计费）
@@ -1148,6 +1243,15 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             orderInfo = saveOrder(orderDto);
         } catch (BusinessCheckException e) {
             throw new BusinessCheckException(e.getMessage() == null ?  "生成订单失败" : e.getMessage());
+        }
+
+        // 继续点单，合并订单金额等信息
+        if (myOrder != null) {
+            orderInfo.setAmount(orderInfo.getAmount().add(myAmount));
+            orderInfo.setPayAmount(orderInfo.getPayAmount().add(myPayAmount));
+            orderInfo.setPointAmount(orderInfo.getPointAmount().add(myPointAmount));
+            orderInfo.setOrderSn(CommonUtil.createOrderSN(orderDto.getUserId() + ""));
+            orderInfo = updateOrder(orderInfo);
         }
 
         orderDto.setId(orderInfo.getId());
@@ -1205,7 +1309,12 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                                     }
                                 }
                                 if (canUse) {
-                                    String useCode = couponService.useCoupon(cid, orderDto.getUserId(), orderDto.getStoreId(), orderInfo.getId(), userCouponInfo.getAmount(), "核销");
+                                    // 计算卡券适用商品的金额上限（指定商品券需限制抵扣不超过订单金额）
+                                    BigDecimal maxDeduct = userCouponInfo.getAmount();
+                                    if (couponInfo.getApplyGoods() != null && couponInfo.getApplyGoods().equals(ApplyGoodsEnum.PARK_GOODS.getKey())) {
+                                        maxDeduct = maxDeduct.min(orderInfo.getAmount());
+                                    }
+                                    String useCode = couponService.useCoupon(cid, orderDto.getUserId(), orderDto.getStoreId(), orderInfo.getId(), maxDeduct, "核销");
                                     if (StringUtil.isNotEmpty(useCode)) {
                                         hasProcessed = true;
                                         orderDto.setCouponId(cid);
@@ -1216,7 +1325,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                                                 totalCouponDiscount = discount;
                                             }
                                         } else {
-                                            totalCouponDiscount = userCouponInfo.getAmount();
+                                            totalCouponDiscount = maxDeduct;
                                         }
                                     }
                                 }
@@ -1257,6 +1366,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
         // 生成支付订单
         orderInfo = getOrderInfo(orderInfo.getId());
+        String ip = CommonUtil.getIPFromHttpRequest(request);
         BigDecimal realPayAmount = orderInfo.getPayAmount();
         if (realPayAmount == null || realPayAmount.compareTo(new BigDecimal("0")) < 0) {
             realPayAmount = new BigDecimal("0");
@@ -1279,7 +1389,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
         }
 
-        MtSetting delivery = settingService.querySettingByName(merchantId, SettingTypeEnum.ORDER.getKey(),OrderSettingEnum.DELIVERY_MIN_AMOUNT.getKey());
+        // 订单起送费检查
+        MtSetting delivery = settingService.querySettingByName(merchantId, SettingTypeEnum.ORDER.getKey(), OrderSettingEnum.DELIVERY_MIN_AMOUNT.getKey());
         if (delivery != null && orderInfo.getOrderMode().equals(OrderModeEnum.EXPRESS.getKey())) {
             BigDecimal deliveryMinAmount = new BigDecimal(delivery.getValue());
             if (deliveryMinAmount.compareTo(new BigDecimal("0")) > 0 && deliveryMinAmount.compareTo(orderInfo.getAmount()) > 0) {
@@ -1295,9 +1406,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             if (payType.equals(PayTypeEnum.CASH.getKey()) && StringUtil.isNotEmpty(operator)) {
                 // 收银台现金支付，更新为已支付
                 setOrderPayed(orderInfo.getId(), null);
-            } else  if (payType.equals(PayTypeEnum.STORE.getKey())) {
-                // 门店支付，不做任何操作
-            } else if(payType.equals(PayTypeEnum.BALANCE.getKey())) {
+            } else  if (payType.equals(PayTypeEnum.STORE.getKey()) || !payFirst) {
+                // 门店支付或先用餐后支付，就不做任何操作
+            } else if (payType.equals(PayTypeEnum.BALANCE.getKey())) {
                 // 余额支付：实际支付方式为余额，需同步订单 payType。
                 // 积分兑换订单的 payType 会被记为 POINT，不纠正会导致后续按"积分支付"处理（如误返积分）
                 if (!PayTypeEnum.BALANCE.getKey().equals(orderInfo.getPayType())) {
@@ -1350,14 +1461,21 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             outParams.put("payment", null);
         }
 
-        // 发送小程序订阅消息
-        Date nowTime = new Date();
+        // 1分钟后发送小程序订阅消息
         Map<String, Object> params = new HashMap<>();
         String dateTime = DateUtil.formatDate(Calendar.getInstance().getTime(), "yyyy-MM-dd HH:mm");
         params.put("time", dateTime);
         params.put("orderSn", orderInfo.getOrderSn());
         params.put("remark", "您的订单已生成，请留意~");
-        weixinService.sendSubscribeMessage(merchantId, userInfo.getId(), userInfo.getOpenId(), WxMessageEnum.ORDER_CREATED.getKey(), "pages/order/index", params, nowTime);
+        weixinService.sendSubscribeMessage(merchantId, userInfo.getId(), userInfo.getOpenId(), WxMessageEnum.ORDER_CREATED.getKey(), "pages/order/index", params, new Date());
+
+        // 打印订单
+        try {
+            UserOrderDto userOrderDto = getOrderByOrderSn(orderInfo.getOrderSn());
+            printerService.printOrderAndLabel(userOrderDto, true, true, false, goodsIds);
+        } catch (Exception e) {
+            logger.error("订单打印出错了：" + e.getMessage());
+        }
 
         if (StringUtil.isNotEmpty(errorMessage)) {
             logger.error("doSettle支付失败 => orderId={}, userId={}, type={}, payType={}, couponId={}, realPayAmount={}, errorMessage={}",
@@ -1380,6 +1498,33 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             return null;
         }
         return mtOrderMapper.selectById(orderId);
+    }
+
+    /**
+     * 通过桌台获取订单信息
+     *
+     * @param  tableId 桌台ID
+     * @return
+     */
+    @Override
+    public UserOrderDto getOrderInfoByTableId(Integer tableId) {
+        List<MtOrder> mtOrders = mtOrderMapper.findByTableId(tableId);
+        if (mtOrders == null || mtOrders.size() == 0) {
+            return null;
+        }
+        return getOrderDetail(mtOrders.get(0), true, false);
+    }
+
+    /**
+     * 清空桌台订单信息
+     *
+     * @param  tableId 桌台ID
+     * @throws BusinessCheckException
+     * @return
+     */
+    @Override
+    public void removeTakenTableId(Integer tableId) {
+        mtOrderMapper.removeTakenTableId(tableId);
     }
 
     /**
@@ -1519,7 +1664,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
      *
      * @param orderId 订单ID
      * @param accountInfo 操作人
-     * @throws BusinessCheckException
      * @return
      */
     @Override
@@ -1843,8 +1987,8 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             try {
                 if (orderInfo.getIsVisitor().equals(YesOrNoEnum.NO.getKey())) {
                     Map<String, Object> param = new HashMap<>();
-                    param.put("STATUS", StatusEnum.ENABLED.getKey());
                     param.put("MERCHANT_ID", mtOrder.getMerchantId());
+                    param.put("STATUS", StatusEnum.ENABLED.getKey());
                     MtUser mtUser = memberService.queryMemberById(orderInfo.getUserId());
                     MtUserGrade mtUserGrade = mtUserGradeMapper.selectById(mtUser.getGradeId());
                     if (mtUserGrade == null) {
@@ -1906,7 +2050,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     private void printOrderAndSendSms(UserOrderDto orderInfo, MtOrder mtOrder) {
         try {
             // 打印订单
-            printerService.printOrder(orderInfo, true);
+            printerService.printOrderAndLabel(orderInfo, true,false, true, null);
 
             // 给商家发送通知短信
             MtStore mtStore = storeService.queryStoreById(mtOrder.getStoreId());
@@ -1950,6 +2094,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         userOrderDto.setUserId(orderInfo.getUserId());
         userOrderDto.setCouponId(orderInfo.getCouponId());
         userOrderDto.setOrderSn(orderInfo.getOrderSn());
+        userOrderDto.setPickupNo(orderInfo.getPickupNo());
         userOrderDto.setRemark(orderInfo.getRemark());
         userOrderDto.setType(orderInfo.getType());
         userOrderDto.setPayType(orderInfo.getPayType());
@@ -1964,6 +2109,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         userOrderDto.setPlatform(orderInfo.getPlatform());
         userOrderDto.setConfirmRemark(orderInfo.getConfirmRemark());
         userOrderDto.setConfirmStatus(orderInfo.getConfirmStatus());
+        userOrderDto.setPeopleNum(orderInfo.getPeopleNum());
         if (orderInfo.getConfirmTime() != null) {
             userOrderDto.setConfirmTime(DateUtil.formatDate(orderInfo.getConfirmTime(), "yyyy.MM.dd HH:mm"));
         }
@@ -2012,6 +2158,12 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         MtStore storeInfo = storeService.queryStoreById(orderInfo.getStoreId());
         userOrderDto.setStoreInfo(storeInfo);
 
+        // 订单所属桌码
+        if (orderInfo.getTableId() != null && orderInfo.getTableId() > 0) {
+            MtTable tableInfo = tableService.queryTableById(orderInfo.getTableId());
+            userOrderDto.setTableInfo(tableInfo);
+        }
+
         // 所属员工
         if (orderInfo.getStaffId() != null && orderInfo.getStaffId() > 0) {
             MtStaff staffInfo = staffService.queryStaffById(orderInfo.getStaffId());
@@ -2023,12 +2175,13 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         MtUser user = memberService.queryMemberById(orderInfo.getUserId());
         if (user != null) {
             userInfo.setId(user.getId());
-            userInfo.setNo(user.getUserNo());
             userInfo.setName(user.getName());
             if (StringUtil.isNotBlank(user.getMobile())) {
                 userInfo.setMobile(CommonUtil.hidePhone(user.getMobile()));
             }
+            userInfo.setAvatar(user.getAvatar());
             userInfo.setCardNo(user.getIdcard());
+            userInfo.setNo(user.getUserNo());
             userInfo.setAddress(user.getAddress());
             userInfo.setOpenId(user.getOpenId());
             userOrderDto.setUserInfo(userInfo);
@@ -2081,13 +2234,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                     orderGoodsDto.setPrice(orderGoods.getPrice().toString());
                     orderGoodsDto.setDiscount(orderGoods.getDiscount().toString());
                     orderGoodsDto.setGoodsId(orderGoods.getGoodsId());
-                    orderGoodsDto.setBookId(goodsInfo.getBookId());
-                    if (goodsInfo.getBookId() != null && goodsInfo.getBookId() > 0) {
-                        MtBookItem bookItem = bookItemService.getUserBookItem(goodsInfo.getBookId(), orderInfo.getUserId(), orderGoods.getId());
-                        if (bookItem != null) {
-                            orderGoodsDto.setMyBookId(bookItem.getId());
-                        }
-                   }
                     if (orderGoods.getSkuId() > 0) {
                         List<GoodsSpecValueDto> specList = goodsService.getSpecListBySkuId(orderGoods.getSkuId());
                         orderGoodsDto.setSpecList(specList);
@@ -2144,7 +2290,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             expressInfo.setExpressNo(express.get("expressNo").toString());
             expressInfo.setExpressCompany(express.get("expressCompany").toString());
             expressInfo.setExpressTime(express.get("expressTime").toString());
-            expressInfo.setExpressCode(express.get("expressCode") == null ? "" : express.get("expressCode").toString());
             userOrderDto.setExpressInfo(expressInfo);
         }
 
@@ -2194,7 +2339,6 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                         couponInfo.setType(mtCoupon.getType());
                         couponInfo.setContent(mtCoupon.getContent());
                         userOrderDto.setCouponInfo(couponInfo);
-                        userOrderDto.setCouponInfoList(Collections.singletonList(couponInfo));
                     }
                 }
             }
@@ -2364,15 +2508,18 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                     percent = new BigDecimal("1");
                 }
             }
+
             for (MtCart cart : cartList) {
                 if (storeId <= 0 && cart.getStoreId() != null) {
                     storeId = cart.getStoreId();
                 }
+
                 // 购物车商品信息
                 MtGoods mtGoodsInfo = goodsService.queryGoodsById(cart.getGoodsId());
                 if (mtGoodsInfo == null || !mtGoodsInfo.getStatus().equals(StatusEnum.ENABLED.getKey())) {
                     continue;
                 }
+
                 // 取对应sku的价格
                 if (cart.getSkuId() != null && cart.getSkuId() > 0) {
                     MtGoodsSku mtGoodsSku = mtGoodsSkuMapper.selectById(cart.getSkuId());
@@ -2380,12 +2527,14 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                         mtGoodsInfo.setPrice(mtGoodsSku.getPrice());
                     }
                 }
+
                 // 会员支付折扣
                 boolean isDiscount = mtGoodsInfo.getIsMemberDiscount().equals(YesOrNoEnum.YES.getKey()) ? true : false;
                 if (percent.compareTo(new BigDecimal("0")) > 0 && isDiscount) {
                     BigDecimal discount = mtGoodsInfo.getPrice().subtract(mtGoodsInfo.getPrice().multiply(percent)).multiply(new BigDecimal(cart.getNum()));
                     memberDiscount = memberDiscount.add(discount);
                 }
+
                 totalNum = totalNum + cart.getNum();
                 ResCartDto cartDto = new ResCartDto();
                 cartDto.setId(cart.getId());
@@ -2507,21 +2656,23 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                     }
                     // 适用商品
                     if (userCoupon != null) {
-                        List<MtCouponGoods> couponGoodsList = mtCouponGoodsMapper.getCouponGoods(couponInfo.getId());
-                        if (couponGoodsList != null && couponGoodsList.size() > 0 && cartList.size() > 0) {
-                            List<Integer> applyGoodsIds = new ArrayList<>();
-                            List<Integer> goodsIds = new ArrayList<>();
-                            for (MtCouponGoods mtCouponGoods : couponGoodsList) {
-                                applyGoodsIds.add(mtCouponGoods.getGoodsId());
-                            }
-                            for (MtCart mtCart : cartList) {
-                                goodsIds.add(mtCart.getGoodsId());
-                            }
-                            List<Integer> intersection = applyGoodsIds.stream()
-                                    .filter(goodsIds::contains)
-                                    .collect(Collectors.toList());
-                            if (intersection.size() == 0) {
-                                couponDto.setStatus(UserCouponStatusEnum.DISABLE.getKey());
+                        if (couponInfo.getApplyGoods() != null && couponInfo.getApplyGoods().equals(ApplyGoodsEnum.PARK_GOODS.getKey())) {
+                            List<MtCouponGoods> couponGoodsList = mtCouponGoodsMapper.getCouponGoods(couponInfo.getId());
+                            if (couponGoodsList != null && couponGoodsList.size() > 0 && cartList.size() > 0) {
+                                List<Integer> applyGoodsIds = new ArrayList<>();
+                                List<Integer> goodsIds = new ArrayList<>();
+                                for (MtCouponGoods mtCouponGoods : couponGoodsList) {
+                                    applyGoodsIds.add(mtCouponGoods.getGoodsId());
+                                }
+                                for (MtCart mtCart : cartList) {
+                                    goodsIds.add(mtCart.getGoodsId());
+                                }
+                                List<Integer> intersection = applyGoodsIds.stream()
+                                        .filter(goodsIds::contains)
+                                        .collect(Collectors.toList());
+                                if (intersection.size() == 0) {
+                                    couponDto.setStatus(UserCouponStatusEnum.DISABLE.getKey());
+                                }
                             }
                         }
                     }
@@ -2552,10 +2703,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                     if (couponInfo != null) {
                         boolean isEffective = couponService.isCouponEffective(couponInfo, userCouponInfo);
                         if (isEffective && userCouponInfo.getUserId().equals(userId)) {
-                            // 计算卡券适用商品的金额（有商品关联时，抵扣上限为适用商品小计）
+                            // 计算卡券适用商品的金额（指定商品时，抵扣上限为适用商品小计）
                             BigDecimal applicableAmount = totalPrice;
-                            List<MtCouponGoods> couponGoodsList = mtCouponGoodsMapper.getCouponGoods(couponInfo.getId());
-                            if (couponGoodsList != null && !couponGoodsList.isEmpty()) {
+                            if (couponInfo.getApplyGoods() != null && couponInfo.getApplyGoods().equals(ApplyGoodsEnum.PARK_GOODS.getKey())) {
                                 applicableAmount = getApplicableGoodsAmount(cartList, couponInfo.getId());
                                 if (applicableAmount.compareTo(BigDecimal.ZERO) <= 0) {
                                     continue;
@@ -2713,6 +2863,10 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
 
     /**
      * 提交充值订单
+     *
+     * @param request HttpServletRequest对象
+     * @param rechargeParam 充值参数
+     * @return
      * */
     @Override
     public MtOrder doRecharge(HttpServletRequest request, RechargeParam rechargeParam) throws BusinessCheckException {
@@ -2817,8 +2971,62 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
     }
 
     /**
-     * 解析卡券ID列表（支持逗号分隔的多个ID）
+     * 取消订单商品
+     *
+     * @param removeGoodsParam 请求参数
+     * @throws BusinessCheckException
+     * @return
      * */
+    @Override
+    public Boolean removeGoods(RemoveGoodsParam removeGoodsParam) throws BusinessCheckException {
+       MtOrderGoods mtOrderGoods = mtOrderGoodsMapper.selectById(removeGoodsParam.getId());
+       MtOrder mtOrder = mtOrderMapper.selectById(mtOrderGoods.getOrderId());
+       if (mtOrderGoods == null) {
+           throw new BusinessCheckException("该商品不存在");
+       }
+       if (mtOrder == null) {
+           throw new BusinessCheckException("该订单不存在");
+       }
+       if (mtOrder.getPayStatus().equals(PayStatusEnum.SUCCESS.getKey())) {
+           throw new BusinessCheckException("该订单已支付，不能去除");
+       }
+       mtOrderGoodsMapper.deleteById(removeGoodsParam.getId());
+       mtOrder.setAmount(mtOrder.getAmount().subtract(mtOrderGoods.getPrice()));
+       if (mtOrder.getPayAmount() != null && mtOrder.getPayAmount().compareTo(new BigDecimal("0")) > 0) {
+           mtOrder.setPayAmount(mtOrder.getPayAmount().subtract(mtOrderGoods.getPrice()));
+       }
+       mtOrder.setUpdateTime(new Date());
+       mtOrderMapper.updateById(mtOrder);
+       return true;
+    }
+
+    private BigDecimal getApplicableGoodsAmount(List<MtCart> cartList, Integer couponId) {
+        List<MtCouponGoods> couponGoodsList = mtCouponGoodsMapper.getCouponGoods(couponId);
+        if (couponGoodsList == null || couponGoodsList.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        List<Integer> applyGoodsIds = couponGoodsList.stream()
+                .map(MtCouponGoods::getGoodsId)
+                .collect(Collectors.toList());
+        BigDecimal applicableAmount = BigDecimal.ZERO;
+        for (MtCart cart : cartList) {
+            if (applyGoodsIds.contains(cart.getGoodsId())) {
+                MtGoods mtGoodsInfo = goodsService.queryGoodsById(cart.getGoodsId());
+                if (mtGoodsInfo == null || !mtGoodsInfo.getStatus().equals(StatusEnum.ENABLED.getKey())) {
+                    continue;
+                }
+                if (cart.getSkuId() != null && cart.getSkuId() > 0) {
+                    MtGoodsSku mtGoodsSku = mtGoodsSkuMapper.selectById(cart.getSkuId());
+                    if (mtGoodsSku != null && mtGoodsSku.getPrice().compareTo(BigDecimal.ZERO) > 0) {
+                        mtGoodsInfo.setPrice(mtGoodsSku.getPrice());
+                    }
+                }
+                applicableAmount = applicableAmount.add(mtGoodsInfo.getPrice().multiply(new BigDecimal(cart.getNum())));
+            }
+        }
+        return applicableAmount;
+    }
+
     private List<Integer> parseCouponIds(String couponIds, Integer couponId) {
         List<Integer> idList = new ArrayList<>();
         if (StringUtil.isNotEmpty(couponIds)) {
@@ -2840,35 +3048,5 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             idList.add(couponId);
         }
         return idList;
-    }
-
-    /**
-     * 计算购物车中卡券适用商品的总金额
-     * */
-    private BigDecimal getApplicableGoodsAmount(List<MtCart> cartList, Integer couponId) {
-        List<MtCouponGoods> couponGoodsList = mtCouponGoodsMapper.getCouponGoods(couponId);
-        if (couponGoodsList == null || couponGoodsList.isEmpty()) {
-            return BigDecimal.ZERO;
-        }
-        List<Integer> applyGoodsIds = couponGoodsList.stream()
-                .map(MtCouponGoods::getGoodsId)
-                .collect(Collectors.toList());
-        BigDecimal amount = BigDecimal.ZERO;
-        for (MtCart mtCart : cartList) {
-            if (applyGoodsIds.contains(mtCart.getGoodsId())) {
-                MtGoods mtGoodsInfo = goodsService.queryGoodsById(mtCart.getGoodsId());
-                if (mtGoodsInfo != null) {
-                    BigDecimal goodsPrice = mtGoodsInfo.getPrice();
-                    if (mtCart.getSkuId() != null && mtCart.getSkuId() > 0) {
-                        MtGoodsSku mtGoodsSku = mtGoodsSkuMapper.selectById(mtCart.getSkuId());
-                        if (mtGoodsSku != null && mtGoodsSku.getPrice().compareTo(new BigDecimal("0")) > 0) {
-                            goodsPrice = mtGoodsSku.getPrice();
-                        }
-                    }
-                    amount = amount.add(goodsPrice.multiply(new BigDecimal(mtCart.getNum())));
-                }
-            }
-        }
-        return amount;
     }
 }

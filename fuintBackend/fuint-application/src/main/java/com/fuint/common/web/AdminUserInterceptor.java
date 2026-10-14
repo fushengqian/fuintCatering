@@ -7,8 +7,8 @@ import com.fuint.common.util.TokenUtil;
 import com.fuint.utils.PropertiesUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 后台登录拦截

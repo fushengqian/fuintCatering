@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.IOException;
 import java.io.Serializable;
@@ -20,77 +20,77 @@ import java.util.List;
 @Data
 public class SettlementParam implements Serializable {
 
-    @ApiModelProperty(value="购物车Id，逗号分隔", name="cartIds")
+    @Schema(description="购物车Id，逗号分隔")
     @JsonDeserialize(using = StringOrCsvDeserializer.class)
     private String cartIds;
 
-    @ApiModelProperty(value="购买对象，购买储值卡、升级会员等级必填", name="targetId")
+    @Schema(description="购买对象，购买储值卡、升级会员等级必填")
     private String targetId;
 
-    @ApiModelProperty(value="购买储值卡数量", name="selectNum")
+    @Schema(description="购买储值卡数量")
     private String selectNum;
 
-    @ApiModelProperty(value="结算备注", name="remark")
+    @Schema(description="结算备注")
     private String remark;
 
-    @ApiModelProperty(value="订单类型，payment：付款订单、goods：商品订单、recharge：充值订单、prestore：储值卡订单、member：会员升级订单", name="type")
+    @Schema(description="订单类型，payment：付款订单、goods：商品订单、recharge：充值订单、prestore：储值卡订单、member：会员升级订单")
     private String type;
 
-    @ApiModelProperty(value="支付金额，付款类订单必填", name="payAmount")
+    @Schema(description="支付金额，付款类订单必填")
     private String payAmount;
 
-    @ApiModelProperty(value="使用积分数量", name="usePoint")
+    @Schema(description="使用积分数量")
     private Integer usePoint;
 
-    @ApiModelProperty(value="使用卡券ID", name="couponId")
+    @Schema(description="使用卡券ID")
     private Integer couponId;
 
-    @ApiModelProperty(value="使用卡券ID列表，逗号分隔（储值卡叠加使用）", name="couponIds")
+    @Schema(description="使用卡券ID列表，逗号分隔（储值卡叠加使用）")
     private String couponIds;
 
-    @ApiModelProperty(value="支付类型，CASH：现金支付，JSAPI：微信支付，MICROPAY：微信扫码支付，BALANCE：余额支付，ALISCAN：支付宝扫码", name="payType")
+    @Schema(description="支付类型，CASH：现金支付，JSAPI：微信支付，MICROPAY：微信扫码支付，BALANCE：余额支付，ALISCAN：支付宝扫码")
     private String payType;
 
-    @ApiModelProperty(value="PC端扫码支付的二维码", name="authCode")
+    @Schema(description="PC端扫码支付的二维码")
     private String authCode;
 
-    @ApiModelProperty(value="会员ID（代客下单用到）", name="userId")
+    @Schema(description="会员ID（代客下单用到）")
     private Integer userId;
 
-    @ApiModelProperty(value="会员手机号", name="mobile")
+    @Schema(description="会员手机号")
     private String mobile;
 
-    @ApiModelProperty(value="实付金额（收银台用到）", name="cashierPayAmount")
+    @Schema(description="实付金额（收银台用到）")
     private String cashierPayAmount;
 
-    @ApiModelProperty(value="优惠金额（收银台用到）", name="cashierDiscountAmount")
+    @Schema(description="优惠金额（收银台用到）")
     private String cashierDiscountAmount;
 
-    @ApiModelProperty(value="商品ID", name="goodsId")
+    @Schema(description="商品ID")
     private Integer goodsId;
 
-    @ApiModelProperty(value="商品skuID", name="skuId")
+    @Schema(description="商品skuID")
     private Integer skuId;
 
-    @ApiModelProperty(value="购买数量", name="buyNum")
+    @Schema(description="购买数量")
     private Double buyNum;
 
-    @ApiModelProperty(value="订单模式，配送（express）或自提（oneself）", name="orderMode")
+    @Schema(description="订单模式，配送（express）或自提（oneself）")
     private String orderMode;
 
-    @ApiModelProperty(value="订单ID", name="orderId")
+    @Schema(description="订单ID")
     private Integer orderId;
 
-    @ApiModelProperty(value="是否微信客户端", name="isWechat")
+    @Schema(description="是否微信客户端")
     private String isWechat;
 
-    @ApiModelProperty(value="员工ID", name="staffId")
+    @Schema(description="员工ID")
     private Integer staffId;
 
-    @ApiModelProperty(value="桌台", name="tableId")
+    @Schema(description="桌台")
     private Integer tableId;
 
-    @ApiModelProperty(value="就餐人数", name="peopleNum")
+    @Schema(description="就餐人数")
     private Integer peopleNum;
 
     /**

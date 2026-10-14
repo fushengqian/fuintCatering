@@ -1,7 +1,7 @@
 # fuint餐饮系统系统介绍
 
 #### 介绍
-fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系统基于前后端分离的架构，后端采用<b>Java SpringBoot</b> + <b>Mysql</b>，前端基于当前流行的<b>Uniapp</b>，<b>Vue3</b>，<b>Element UI Plus</b>，支持小程序、h5。提供小程序点餐，收银台，优惠券核销，点餐订单管理，会员积分，会员权益等功能。。
+fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系统基于前后端分离的架构，后端采用<b>Java SpringBoot3</b> + <b>Mysql</b>，前端基于当前流行的<b>Uniapp</b>，<b>Vue3</b>，<b>Element UI Plus</b>，支持小程序、h5。提供小程序点餐，收银台，优惠券核销，点餐订单管理，会员积分，会员权益等功能。。
 以下是前台的页面展示：
 <p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/screenshot/g1.png?v=10" alt="前台页面1"></p>
 <p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/screenshot/g2.png?v=20" alt="前台页面2"></p>
@@ -23,7 +23,7 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系
 </p>
 
 #### 软件架构
-后端：JAVA SpringBoot + MYSQL Mybatis Plus + Redis
+后端：JAVA SpringBoot3 + MYSQL Mybatis Plus + Redis
 前端：采用基于Vue3、Uniapp、Element UI Plus，前后端分离，支持微信小程序、h5等
 <p>后台截图：</p>
 <p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b0.png?v=fuint" alt="登录界面"></p>

@@ -1,6 +1,6 @@
 package com.fuint.module.backendApi.request;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serializable;
 
@@ -13,76 +13,76 @@ import java.io.Serializable;
 @Data
 public class StoreSubmitRequest implements Serializable {
 
-    @ApiModelProperty(value="店铺ID", name="id")
+    @Schema(description="店铺ID")
     private Integer id;
 
-    @ApiModelProperty(value="商户ID", name="merchantId")
+    @Schema(description="商户ID")
     private Integer merchantId;
 
-    @ApiModelProperty(value="店铺名称", name="name")
+    @Schema(description="店铺名称")
     private String name;
 
-    @ApiModelProperty(value="联系人", name="contact")
+    @Schema(description="联系人")
     private String contact;
 
-    @ApiModelProperty(value="联系手机号", name="phone")
+    @Schema(description="联系手机号")
     private String phone;
 
-    @ApiModelProperty(value="备注信息", name="description")
+    @Schema(description="备注信息")
     private String description;
 
-    @ApiModelProperty(value="是否默认店铺", name="isDefault")
+    @Schema(description="是否默认店铺")
     private String isDefault;
 
-    @ApiModelProperty(value="店铺地址", name="address")
+    @Schema(description="店铺地址")
     private String address;
 
-    @ApiModelProperty(value="营业时间", name="hours")
+    @Schema(description="营业时间")
     private String hours;
 
-    @ApiModelProperty(value="维度", name="latitude")
+    @Schema(description="维度")
     private String latitude;
 
-    @ApiModelProperty(value="经度", name="longitude")
+    @Schema(description="经度")
     private String longitude;
 
-    @ApiModelProperty(value="微信商户号", name="wxMchId")
+    @Schema(description="微信商户号")
     private String wxMchId;
 
-    @ApiModelProperty(value="支付秘钥apiV2", name="wxApiV2")
+    @Schema(description="支付秘钥apiV2")
     private String wxApiV2;
 
-    @ApiModelProperty(value="微信支付证书", name="wxCertPath")
+    @Schema(description="微信支付证书")
     private String wxCertPath;
 
-    @ApiModelProperty(value="支付宝appId", name="alipayAppId")
+    @Schema(description="支付宝appId")
     private String alipayAppId;
 
-    @ApiModelProperty(value="支付宝私钥", name="alipayPrivateKey")
+    @Schema(description="支付宝私钥")
     private String alipayPrivateKey;
 
-    @ApiModelProperty(value="支付宝公钥", name="alipayPublicKey")
+    @Schema(description="支付宝公钥")
     private String alipayPublicKey;
 
-    @ApiModelProperty(value="店铺LOGO", name="logo")
+    @Schema(description="店铺LOGO")
     private String logo;
 
-    @ApiModelProperty(value="营业执照", name="license")
+    @Schema(description="营业执照")
     private String license;
 
-    @ApiModelProperty(value="统一社会信用码", name="creditCode")
+    @Schema(description="统一社会信用码")
     private String creditCode;
 
-    @ApiModelProperty(value="银行名称", name="bankName")
+    @Schema(description="银行名称")
     private String bankName;
 
-    @ApiModelProperty(value="银行户名", name="bankCardName")
+    @Schema(description="银行户名")
     private String bankCardName;
 
-    @ApiModelProperty(value="银行卡号", name="bankCardNo")
+    @Schema(description="银行卡号")
     private String bankCardNo;
 
-    @ApiModelProperty(value="状态", name="status")
+    @Schema(description="状态")
     private String status;
 
 }

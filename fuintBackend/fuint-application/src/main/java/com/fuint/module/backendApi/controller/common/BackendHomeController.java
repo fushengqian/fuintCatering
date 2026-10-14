@@ -11,15 +11,15 @@ import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,7 +31,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-首页相关接口")
+@Tag(name="管理端-首页相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/home")
@@ -55,7 +55,7 @@ public class BackendHomeController extends BaseController {
     /**
      * 首页统计数据
      */
-    @ApiOperation(value = "首页统计数据")
+    @Operation(summary="首页统计数据")
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject index() throws BusinessCheckException {
@@ -105,7 +105,7 @@ public class BackendHomeController extends BaseController {
     /**
      * 首页图表统计数据
      */
-    @ApiOperation(value = "首页图表统计数据")
+    @Operation(summary="首页图表统计数据")
     @RequestMapping(value = "/statistic", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject statistic(HttpServletRequest request) {
@@ -123,7 +123,7 @@ public class BackendHomeController extends BaseController {
     /**
      * 获取收款结果
      */
-    @ApiOperation(value = "获取收款结果")
+    @Operation(summary="获取收款结果")
     @RequestMapping(value = "/cashierResult", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject cashierResult(HttpServletRequest request) {

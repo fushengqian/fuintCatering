@@ -14,8 +14,8 @@ import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtCommissionRelation;
 import com.fuint.repository.model.MtStore;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +30,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-分销提成邀请记录相关接口")
+@Tag(name="管理端-分销提成邀请记录相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/commissionRelation")
@@ -49,7 +49,7 @@ public class BackendCommissionRelationController extends BaseController {
     /**
      * 分销提成邀请记录列表查询
      */
-    @ApiOperation(value = "分销提成邀请记录查询")
+    @Operation(summary="分销提成邀请记录查询")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:relation:index')")
@@ -83,7 +83,7 @@ public class BackendCommissionRelationController extends BaseController {
     /**
      * 更新邀请记录状态
      */
-    @ApiOperation(value = "更新邀请记录状态")
+    @Operation(summary="更新邀请记录状态")
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:relation:index')")
@@ -107,7 +107,7 @@ public class BackendCommissionRelationController extends BaseController {
     /**
      * 删除分销提成邀请记录
      */
-    @ApiOperation(value = "删除分销提成邀请记录")
+    @Operation(summary="删除分销提成邀请记录")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:relation:index')")

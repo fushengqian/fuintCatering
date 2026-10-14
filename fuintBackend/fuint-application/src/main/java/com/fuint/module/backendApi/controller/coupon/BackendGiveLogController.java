@@ -20,14 +20,14 @@ import com.fuint.repository.mapper.MtCouponMapper;
 import com.fuint.repository.mapper.MtUserCouponMapper;
 import com.fuint.repository.model.*;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +42,7 @@ import static com.fuint.common.util.XlsUtil.objectConvertToString;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-转赠相关接口")
+@Tag(name="管理端-转赠相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/give")
@@ -62,7 +62,7 @@ public class BackendGiveLogController extends BaseController {
     /**
      * 查询转赠列表
      */
-    @ApiOperation(value = "查询转赠列表")
+    @Operation(summary="查询转赠列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject list(@ModelAttribute GivePage givePage) throws BusinessCheckException {
@@ -85,7 +85,7 @@ public class BackendGiveLogController extends BaseController {
     /**
      * 查询转赠详情
      */
-    @ApiOperation(value = "查询转赠详情")
+    @Operation(summary="查询转赠详情")
     @RequestMapping(value = "/giveItem", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject giveItem(HttpServletRequest request) {
@@ -132,7 +132,7 @@ public class BackendGiveLogController extends BaseController {
     /**
      * 导出转赠记录
      */
-    @ApiOperation(value = "导出转赠记录")
+    @Operation(summary="导出转赠记录")
     @RequestMapping(value = "/export", method = RequestMethod.GET)
     @ResponseBody
     public void export(HttpServletRequest request, HttpServletResponse response) {

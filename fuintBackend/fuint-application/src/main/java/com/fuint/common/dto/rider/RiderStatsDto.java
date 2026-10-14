@@ -1,6 +1,6 @@
 package com.fuint.common.dto.rider;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -19,27 +19,27 @@ public class RiderStatsDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("今日接单数")
+    @Schema(description="今日接单数")
     private Integer todayOrders;
 
-    @ApiModelProperty("配送中订单数")
+    @Schema(description="配送中订单数")
     private Integer deliveringOrders;
 
-    @ApiModelProperty("已完成订单数")
+    @Schema(description="已完成订单数")
     private Integer completedOrders;
 
-    @ApiModelProperty("总配送订单数")
+    @Schema(description="总配送订单数")
     private Integer totalOrders;
 
-    @ApiModelProperty("总收入")
+    @Schema(description="总收入")
     private BigDecimal totalIncome;
 
-    @ApiModelProperty("日均单量")
+    @Schema(description="日均单量")
     private BigDecimal avgDailyOrders;
 
-    @ApiModelProperty("每日配送单量趋势")
+    @Schema(description="每日配送单量趋势")
     private List<Map<String, Object>> dailyDeliveryList;
 
-    @ApiModelProperty("每日收入趋势")
+    @Schema(description="每日收入趋势")
     private List<Map<String, Object>> dailyIncomeList;
 }

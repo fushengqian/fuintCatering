@@ -14,8 +14,8 @@ import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtStore;
 import com.fuint.repository.model.MtTableArea;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +30,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-桌码区域相关接口")
+@Tag(name="管理端-桌码区域相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/tableArea")
@@ -49,7 +49,7 @@ public class BackendTableAreaController extends BaseController {
     /**
      * 桌码区域列表查询
      */
-    @ApiOperation(value = "桌码区域列表查询")
+    @Operation(summary="桌码区域列表查询")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('tableArea:list')")
@@ -75,7 +75,7 @@ public class BackendTableAreaController extends BaseController {
     /**
      * 更新桌码区域状态
      */
-    @ApiOperation(value = "更新桌码区域状态")
+    @Operation(summary="更新桌码区域状态")
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('tableArea:edit')")
@@ -97,7 +97,7 @@ public class BackendTableAreaController extends BaseController {
     /**
      * 保存桌码区域
      */
-    @ApiOperation(value = "保存桌码区域")
+    @Operation(summary="保存桌码区域")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('tableArea:add')")
@@ -125,7 +125,7 @@ public class BackendTableAreaController extends BaseController {
     /**
      * 获取桌码区域详情
      */
-    @ApiOperation(value = "获取桌码区域详情")
+    @Operation(summary="获取桌码区域详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('tableArea:list')")

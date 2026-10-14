@@ -1,5 +1,6 @@
 package com.fuint.module.clientApi.controller;
 
+import com.fuint.common.util.CommonUtil;
 import com.alipay.api.AlipayApiException;
 import com.fuint.common.dto.coupon.CouponDto;
 import com.fuint.common.dto.member.UserInfo;
@@ -20,16 +21,16 @@ import com.ijpay.alipay.AliPayApi;
 import com.ijpay.core.kit.HttpKit;
 import com.ijpay.core.kit.WxPayKit;
 import com.ijpay.wxpay.WxPayApiConfigKit;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +42,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="会员端-支付相关接口")
+@Tag(name="会员端-支付相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/clientApi/pay")
@@ -97,7 +98,7 @@ public class ClientPayController extends BaseController {
     /**
      * 支付前查询
      * */
-    @ApiOperation(value = "支付前查询")
+    @Operation(summary="支付前查询")
     @RequestMapping(value = "/prePay", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject prePay(HttpServletRequest request) {
@@ -163,7 +164,7 @@ public class ClientPayController extends BaseController {
     /**
      * 发起支付
      * */
-    @ApiOperation(value = "发起支付")
+    @Operation(summary="发起支付")
     @RequestMapping(value = "/doPay", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject doPay(HttpServletRequest request) throws BusinessCheckException {
@@ -226,7 +227,7 @@ public class ClientPayController extends BaseController {
     @RequestMapping(value = "/weixinRefundNotify", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     public String weixinRefundNotify(HttpServletRequest request) {
-        String xmlMsg = HttpKit.readData(request);
+        String xmlMsg = CommonUtil.readRequestBody(request);
         logger.info("退款通知 = " + xmlMsg);
         Map<String, String> params = WxPayKit.xmlToMap(xmlMsg);
         String returnCode = params.get("return_code");
@@ -252,7 +253,7 @@ public class ClientPayController extends BaseController {
     public String aliPayCallback(HttpServletRequest request) throws Exception {
         try {
             // 获取支付宝POST过来反馈信息
-            Map<String, String> params = AliPayApi.toMap(request);
+            Map<String, String> params = CommonUtil.requestParamsToMap(request);
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 logger.info("{} = {}", entry.getKey(), entry.getValue());
             }

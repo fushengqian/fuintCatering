@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,11 +54,6 @@ public class PaymentServiceImpl implements PaymentService {
      * 支付宝服务接口
      * */
     private AlipayService alipayService;
-
-    /**
-     * 云闪付服务接口
-     * */
-    private UnionPayService unionPayService;
 
     /**
      * 会员服务接口
@@ -106,9 +101,6 @@ public class PaymentServiceImpl implements PaymentService {
         if (orderInfo.getPayType().equals(PayTypeEnum.ALISCAN.getKey())) {
             // 支付宝支付
             responseObject = alipayService.createPrepayOrder(userInfo, orderInfo, payAmount, authCode, giveAmount, ip, platform);
-        } else if (orderInfo.getPayType().equals(PayTypeEnum.UNIONPAY.getKey())) {
-            // 云闪付支付
-            responseObject = unionPayService.createPrepayOrder(userInfo, orderInfo, payAmount, authCode, giveAmount, ip, platform);
         } else {
             // 微信支付
             responseObject = weixinService.createPrepayOrder(userInfo, orderInfo, payAmount, authCode, giveAmount, ip, platform, isWechat);
@@ -161,13 +153,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> doPay(HttpServletRequest request) throws BusinessCheckException {
-        String token = request.getHeader("Access-Token");
         String platform = request.getHeader("platform") == null ? "" : request.getHeader("platform");
         String isWechat = request.getHeader("isWechat") == null ? "" : request.getHeader("isWechat");
         String payType = request.getParameter("payType") == null ? PayTypeEnum.JSAPI.getKey() : request.getParameter("payType");
         String cashierPayAmount = request.getParameter("cashierPayAmount") == null ? "" : request.getParameter("cashierPayAmount"); // 收银台实付金额
         String cashierDiscountAmount = request.getParameter("cashierDiscountAmount") == null ? "" : request.getParameter("cashierDiscountAmount"); // 收银台优惠金额
-        UserInfo loginInfo = TokenUtil.getUserInfoByToken(token);
+        UserInfo loginInfo = TokenUtil.getUserInfo();
         String orderId = request.getParameter("orderId");
         String userId = request.getParameter("userId");
         String authCode = request.getParameter("authCode");
@@ -197,7 +188,7 @@ public class PaymentServiceImpl implements PaymentService {
         orderInfo = orderService.updateOrder(orderInfo);
 
         // 收银员操作
-        AccountInfo accountInfo = TokenUtil.getAccountInfoByToken(token);
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
         if (loginInfo == null && accountInfo != null) {
             // 游客订单绑定到会员
             if (orderInfo.getIsVisitor().equals(YesOrNoEnum.YES.getKey()) && StringUtil.isNotEmpty(userId)) {

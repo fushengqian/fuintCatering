@@ -15,12 +15,12 @@ import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 骑手端-订单相关接口
@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags = "骑手端-订单相关接口")
+@Tag(name="骑手端-订单相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/riderApi/order")
@@ -41,7 +41,7 @@ public class RiderOrderController extends BaseController {
     /**
      * 获取待接单订单池
      */
-    @ApiOperation(value = "获取待接单订单池")
+    @Operation(summary="获取待接单订单池")
     @RequestMapping(value = "/pool", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject pool(@RequestBody RiderOrderPoolParam param) throws BusinessCheckException {
@@ -53,7 +53,7 @@ public class RiderOrderController extends BaseController {
     /**
      * 骑手接单
      */
-    @ApiOperation(value = "骑手接单")
+    @Operation(summary="骑手接单")
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject accept(@RequestParam("orderId") Integer orderId) throws BusinessCheckException {
@@ -65,7 +65,7 @@ public class RiderOrderController extends BaseController {
     /**
      * 获取骑手配送订单列表
      */
-    @ApiOperation(value = "获取骑手配送订单列表")
+    @Operation(summary="获取骑手配送订单列表")
     @RequestMapping(value = "/myOrders", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject myOrders(@RequestBody RiderMyOrderParam param) throws BusinessCheckException {
@@ -77,7 +77,7 @@ public class RiderOrderController extends BaseController {
     /**
      * 获取订单详情
      */
-    @ApiOperation(value = "获取订单详情")
+    @Operation(summary="获取订单详情")
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject detail(HttpServletRequest request) throws BusinessCheckException {
@@ -92,7 +92,7 @@ public class RiderOrderController extends BaseController {
     /**
      * 确认取货
      */
-    @ApiOperation(value = "确认取货")
+    @Operation(summary="确认取货")
     @RequestMapping(value = "/pickup", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject pickup(@RequestParam("orderId") Integer orderId) throws BusinessCheckException {
@@ -104,7 +104,7 @@ public class RiderOrderController extends BaseController {
     /**
      * 确认送达
      */
-    @ApiOperation(value = "确认送达")
+    @Operation(summary="确认送达")
     @RequestMapping(value = "/deliver", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject deliver(@RequestParam("orderId") Integer orderId) throws BusinessCheckException {
@@ -116,7 +116,7 @@ public class RiderOrderController extends BaseController {
     /**
      * 搜索已完成配送订单
      */
-    @ApiOperation(value = "搜索已完成配送订单")
+    @Operation(summary="搜索已完成配送订单")
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject search(@RequestBody RiderOrderSearchParam param) throws BusinessCheckException {

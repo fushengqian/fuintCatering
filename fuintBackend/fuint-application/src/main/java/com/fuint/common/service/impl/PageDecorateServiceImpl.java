@@ -146,14 +146,6 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
         if (pageDto == null && merchantId != null && merchantId > 0) {
             pageDto = getDefaultPageByMerchant(merchantId, pageType);
         }
-        // 4. 最后兜底平台级默认装修（MERCHANT_ID=0）：平台管理员配置的默认页对所有商户生效，
-        //    避免商户端因 merchantId 不等于 0 而永远读不到装修配置（表现为小程序回落默认布局）
-        if (pageDto == null && (merchantId == null || merchantId != 0)) {
-            pageDto = getDefaultPageByStore(0, storeId, pageType);
-            if (pageDto == null && storeId != null && storeId > 0) {
-                pageDto = getDefaultPageByStore(0, 0, pageType);
-            }
-        }
         return pageDto;
     }
 
@@ -164,11 +156,11 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
         LambdaQueryWrapper<MtPage> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.eq(MtPage::getStatus, StatusEnum.ENABLED.getKey());
         lambdaQueryWrapper.eq(MtPage::getPageType, StringUtil.isBlank(pageType) ? "index" : pageType);
-        lambdaQueryWrapper.eq(MtPage::getIsDefault, YesOrNoEnum.YES.getKey());
+        lambdaQueryWrapper.eq(MtPage::getIsDefault, YesOrNoEnum.YES);
         lambdaQueryWrapper.eq(MtPage::getStoreId, storeId == null ? 0 : storeId);
-        // 严格按商户维度匹配：merchantId 为空视为平台级(MERCHANT_ID=0)，
-        // 避免平台级兜底查询时带入其它商户的默认页
-        lambdaQueryWrapper.eq(MtPage::getMerchantId, merchantId == null ? 0 : merchantId);
+        if (merchantId != null && merchantId > 0) {
+            lambdaQueryWrapper.eq(MtPage::getMerchantId, merchantId);
+        }
         lambdaQueryWrapper.orderByDesc(MtPage::getUpdateTime);
         lambdaQueryWrapper.last("limit 1");
         MtPage mtPage = mtPageMapper.selectOne(lambdaQueryWrapper);
@@ -223,12 +215,16 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
                 throw new BusinessCheckException("不同商户，无权限操作");
             }
         }
-
         if (accountInfo != null) {
-            pageDto.setMerchantId(accountInfo.getMerchantId());
-            pageDto.setStoreId(accountInfo.getStoreId());
+            if (accountInfo.getMerchantId() != null && accountInfo.getMerchantId() > 0) {
+                pageDto.setMerchantId(accountInfo.getMerchantId());
+            } else {
+                throw new BusinessCheckException("平台账号无操作权限");
+            }
+            if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0) {
+                pageDto.setStoreId(accountInfo.getStoreId());
+            }
         }
-        mtPage.setMerchantId(pageDto.getMerchantId() == null ? 0 : pageDto.getMerchantId());
         mtPage.setStoreId(pageDto.getStoreId() == null ? 0 : pageDto.getStoreId());
         mtPage.setPageName(pageDto.getPageName());
         mtPage.setPageType(pageDto.getPageType());
@@ -377,6 +373,11 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
      */
     @Override
     public boolean saveTheme(ThemeDto themeDto, AccountInfo accountInfo) throws BusinessCheckException {
+        if (accountInfo != null) {
+            if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
+                throw new BusinessCheckException("平台账号无操作权限");
+            }
+        }
         saveSetting(accountInfo, SettingTypeEnum.THEME.getKey(), themeDto);
         return true;
     }
@@ -396,7 +397,6 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
             // 历史数据兜底：有导航项即视为启用，并归一化导航地址（page/ -> pages/）
             if (dto != null && dto.getItems() != null && !dto.getItems().isEmpty()) {
                 dto.setEnabled(true);
-                dto.setImagePath(settingService.getUploadBasePath());
                 for (Map<String, Object> item : dto.getItems()) {
                     Object urlObj = item.get("url");
                     if (urlObj != null && StringUtil.isNotBlank(urlObj.toString())) {
@@ -419,6 +419,11 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
      */
     @Override
     public boolean saveTabbar(TabbarDto tabbarDto, AccountInfo accountInfo) throws BusinessCheckException {
+        if (accountInfo != null) {
+            if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
+                throw new BusinessCheckException("平台账号无操作权限");
+            }
+        }
         saveSetting(accountInfo, SettingTypeEnum.TABBAR.getKey(), tabbarDto);
         return true;
     }
@@ -446,6 +451,11 @@ public class PageDecorateServiceImpl extends ServiceImpl<MtPageMapper, MtPage> i
      */
     @Override
     public boolean saveUserPage(UserPageDto userPageDto, AccountInfo accountInfo) throws BusinessCheckException {
+        if (accountInfo != null) {
+            if (accountInfo.getMerchantId() == null || accountInfo.getMerchantId() <= 0) {
+                throw new BusinessCheckException("平台账号无操作权限");
+            }
+        }
         saveSetting(accountInfo, SettingTypeEnum.USER_PAGE.getKey(), userPageDto);
         return true;
     }

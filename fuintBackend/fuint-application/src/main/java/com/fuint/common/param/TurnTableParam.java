@@ -1,6 +1,6 @@
 package com.fuint.common.param;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serializable;
 
@@ -13,9 +13,9 @@ import java.io.Serializable;
 @Data
 public class TurnTableParam implements Serializable {
 
-    @ApiModelProperty(value="新桌台ID", name="tableId")
+    @Schema(description="新桌台ID")
     private Integer tableId;
 
-    @ApiModelProperty(value="被转桌台ID", name="turnTableId")
+    @Schema(description="被转桌台ID")
     private Integer turnTableId;
 }

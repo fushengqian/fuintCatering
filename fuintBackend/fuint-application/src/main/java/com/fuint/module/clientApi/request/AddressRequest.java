@@ -1,6 +1,6 @@
 package com.fuint.module.clientApi.request;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serializable;
 
@@ -13,31 +13,31 @@ import java.io.Serializable;
 @Data
 public class AddressRequest implements Serializable {
 
-    @ApiModelProperty(value="收货地址ID", name="addressId")
+    @Schema(description="收货地址ID")
     private Integer addressId;
 
-    @ApiModelProperty(value="收货人姓名", name="name")
+    @Schema(description="收货人姓名")
     private String name;
 
-    @ApiModelProperty(value="收货人手机号", name="mobile")
+    @Schema(description="收货人手机号")
     private String mobile;
 
-    @ApiModelProperty(value="省份ID", name="provinceId")
+    @Schema(description="省份ID")
     private Integer provinceId;
 
-    @ApiModelProperty(value="城市ID", name="cityId")
+    @Schema(description="城市ID")
     private Integer cityId;
 
-    @ApiModelProperty(value="地区ID", name="regionId")
+    @Schema(description="地区ID")
     private Integer regionId;
 
-    @ApiModelProperty(value="详细地址", name="detail")
+    @Schema(description="详细地址")
     private String detail;
 
-    @ApiModelProperty(value="状态", name="status")
+    @Schema(description="状态")
     private String status;
 
-    @ApiModelProperty(value="是否默认地址", name="isDefault")
+    @Schema(description="是否默认地址")
     private String isDefault;
 
 }

@@ -13,12 +13,12 @@ import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -27,7 +27,7 @@ import java.util.List;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="会员端-积分相关接口")
+@Tag(name="会员端-积分相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/clientApi/points")
@@ -46,7 +46,7 @@ public class ClientPointsController extends BaseController {
     /**
      * 查询我的积分明细
      */
-    @ApiOperation(value = "查询我的积分明细")
+    @Operation(summary="查询我的积分明细")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject list(@ModelAttribute PointPage pointPage) throws BusinessCheckException {
@@ -60,7 +60,7 @@ public class ClientPointsController extends BaseController {
     /**
      * 转赠积分
      */
-    @ApiOperation(value = "转赠积分")
+    @Operation(summary="转赠积分")
     @RequestMapping(value = "/doGive", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject doGive(@RequestBody GivePointParam param) throws BusinessCheckException {
@@ -81,7 +81,7 @@ public class ClientPointsController extends BaseController {
     /**
      * 获取积分排行榜
      */
-    @ApiOperation(value = "获取积分排行榜")
+    @Operation(summary="获取积分排行榜")
     @RequestMapping(value = "/rank", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject rank(HttpServletRequest request) {

@@ -25,8 +25,8 @@ import com.fuint.repository.mapper.MtGoodsSkuMapper;
 import com.fuint.repository.mapper.MtGoodsSpecMapper;
 import com.fuint.repository.model.*;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +36,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -48,7 +48,7 @@ import java.util.*;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-商品相关接口")
+@Tag(name="管理端-商品相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/goods/goods")
@@ -93,7 +93,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 分页查询商品列表
      */
-    @ApiOperation(value = "分页查询商品列表")
+    @Operation(summary="分页查询商品列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:index')")
@@ -129,7 +129,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 删除商品
      */
-    @ApiOperation(value = "删除商品")
+    @Operation(summary="删除商品")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:edit')")
@@ -151,7 +151,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 更新商品状态
      */
-    @ApiOperation(value = "更新商品状态")
+    @Operation(summary="更新商品状态")
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:edit')")
@@ -181,7 +181,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 获取商品详情
      */
-    @ApiOperation(value = "获取商品详情")
+    @Operation(summary="获取商品详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:index')")
@@ -280,7 +280,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 保存商品信息
      */
-    @ApiOperation(value = "保存商品信息")
+    @Operation(summary="保存商品信息")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:add')")
@@ -532,7 +532,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 保存商品规格
      */
-    @ApiOperation(value = "保存商品规格")
+    @Operation(summary="保存商品规格")
     @RequestMapping(value = "/saveSpecName", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:add')")
@@ -577,7 +577,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 保存商品规格值
      */
-    @ApiOperation(value = "保存商品规格值")
+    @Operation(summary="保存商品规格值")
     @RequestMapping(value = "/saveSpecValue", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:add')")
@@ -656,7 +656,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 删除商品规格
      */
-    @ApiOperation(value = "删除商品规格")
+    @Operation(summary="删除商品规格")
     @RequestMapping(value = "/deleteSpec", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:add')")
@@ -685,7 +685,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 删除商品规格值
      */
-    @ApiOperation(value = "删除商品规格值")
+    @Operation(summary="删除商品规格值")
     @RequestMapping(value = "/deleteSpecValue", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:add')")
@@ -724,7 +724,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 获取选择商品列表
      */
-    @ApiOperation(value = "获取选择商品列表")
+    @Operation(summary="获取选择商品列表")
     @RequestMapping(value = "/selectGoods", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject selectGoods(@RequestBody Map<String, Object> params) {
@@ -747,7 +747,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 下载商品导入模板
      */
-    @ApiOperation(value = "下载商品导入模板")
+    @Operation(summary="下载商品导入模板")
     @RequestMapping(value = "/downloadTemplate", method = RequestMethod.GET)
     @CrossOrigin
     public void downloadTemplate(HttpServletResponse response) throws IOException {
@@ -757,7 +757,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 上传商品导入文件
      */
-    @ApiOperation(value = "上传商品导入文件")
+    @Operation(summary="上传商品导入文件")
     @RequestMapping(value = "/uploadGoodsFile", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject uploadGoodsFile(HttpServletRequest request) throws Exception {
@@ -775,7 +775,7 @@ public class BackendGoodsController extends BaseController {
     /**
      * 获取商品条码
      */
-    @ApiOperation(value = "获取商品条码")
+    @Operation(summary="获取商品条码")
     @RequestMapping(value = "/getBarCodeList/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('goods:goods:index')")

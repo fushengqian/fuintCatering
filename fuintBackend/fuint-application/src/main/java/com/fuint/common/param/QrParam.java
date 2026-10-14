@@ -1,6 +1,6 @@
 package com.fuint.common.param;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serializable;
 
@@ -13,13 +13,13 @@ import java.io.Serializable;
 @Data
 public class QrParam implements Serializable {
 
-    @ApiModelProperty(value="ID", name="id")
+    @Schema(description="ID")
     private Integer id;
 
-    @ApiModelProperty(value="二维码类型", name="type")
+    @Schema(description="二维码类型")
     private String type;
 
-    @ApiModelProperty(value="二维码内容", name="content")
+    @Schema(description="二维码内容")
     private String content;
 
 }

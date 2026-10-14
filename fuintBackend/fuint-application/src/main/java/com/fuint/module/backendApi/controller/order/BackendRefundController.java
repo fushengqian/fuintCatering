@@ -16,8 +16,8 @@ import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +32,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-售后订单相关接口")
+@Tag(name="管理端-售后订单相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/refund")
@@ -51,7 +51,7 @@ public class BackendRefundController extends BaseController {
     /**
      * 售后列表查询
      */
-    @ApiOperation(value = "售后列表查询")
+    @Operation(summary="售后列表查询")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('refund:index')")
@@ -83,7 +83,7 @@ public class BackendRefundController extends BaseController {
     /**
      * 查询售后详情
      * */
-    @ApiOperation(value = "查询售后详情")
+    @Operation(summary="查询售后详情")
     @RequestMapping(value = "/info/{refundId}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('refund:index')")
@@ -111,7 +111,7 @@ public class BackendRefundController extends BaseController {
     /**
      * 保存售后订单
      */
-    @ApiOperation(value = "保存售后订单")
+    @Operation(summary="保存售后订单")
     @RequestMapping(value = "save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('refund:edit')")
@@ -148,7 +148,7 @@ public class BackendRefundController extends BaseController {
     /**
      * 发起退款
      */
-    @ApiOperation(value = "发起退款")
+    @Operation(summary="发起退款")
     @RequestMapping(value = "doRefund", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('refund:edit')")

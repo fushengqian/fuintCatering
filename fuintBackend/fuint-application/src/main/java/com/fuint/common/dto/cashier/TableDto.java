@@ -2,7 +2,7 @@ package com.fuint.common.dto.cashier;
 
 import com.fuint.repository.model.MtTable;
 import com.fuint.repository.model.MtUser;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.math.BigDecimal;
 
@@ -15,34 +15,34 @@ import java.math.BigDecimal;
 @Data
 public class TableDto {
 
-    @ApiModelProperty("桌台ID")
+    @Schema(description="桌台ID")
     private Integer tableId;
 
-    @ApiModelProperty("桌台编码")
+    @Schema(description="桌台编码")
     private String tableCode;
 
-    @ApiModelProperty("是否空闲")
+    @Schema(description="是否空闲")
     private Boolean isEmpty;
 
-    @ApiModelProperty("会员信息")
+    @Schema(description="会员信息")
     private MtUser memberInfo;
 
-    @ApiModelProperty("件数")
+    @Schema(description="件数")
     private Integer num;
 
-    @ApiModelProperty("金额")
+    @Schema(description="金额")
     private BigDecimal amount;
 
-    @ApiModelProperty("时间")
+    @Schema(description="时间")
     private String dateTime;
 
-    @ApiModelProperty("使用状态")
+    @Schema(description="使用状态")
     private String useStatus;
 
-    @ApiModelProperty("使用时长")
+    @Schema(description="使用时长")
     private String useTime;
 
-    @ApiModelProperty("桌台")
+    @Schema(description="桌台")
     private MtTable tableInfo;
 
 }

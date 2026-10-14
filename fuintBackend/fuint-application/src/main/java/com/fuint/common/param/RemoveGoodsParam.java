@@ -1,6 +1,6 @@
 package com.fuint.common.param;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serializable;
 
@@ -13,10 +13,10 @@ import java.io.Serializable;
 @Data
 public class RemoveGoodsParam implements Serializable {
 
-    @ApiModelProperty(value="订单商品ID", name="id")
+    @Schema(description="订单商品ID")
     private Integer id;
 
-    @ApiModelProperty(value="商品ID", name="goodsId")
+    @Schema(description="商品ID")
     private Integer goodsId;
 
 }

@@ -18,8 +18,8 @@ import com.fuint.repository.model.MtCoupon;
 import com.fuint.repository.model.MtUser;
 import com.fuint.repository.model.MtUserCoupon;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +35,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-卡券核销相关接口")
+@Tag(name="管理端-卡券核销相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/doConfirm")
@@ -61,7 +61,7 @@ public class BackendDoConfirmController extends BaseController {
     /**
      * 核销详情
      */
-    @ApiOperation(value = "核销详情")
+    @Operation(summary="核销详情")
     @RequestMapping(value = "/info", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:confirm:index')")
@@ -125,7 +125,7 @@ public class BackendDoConfirmController extends BaseController {
     /**
      * 确认核销
      */
-    @ApiOperation(value = "确认核销")
+    @Operation(summary="确认核销")
     @RequestMapping(value = "/doConfirm", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:confirm:index')")

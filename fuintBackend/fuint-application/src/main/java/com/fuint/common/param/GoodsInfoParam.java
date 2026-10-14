@@ -1,21 +1,22 @@
 package com.fuint.common.param;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serializable;
 
 /**
  * 商品详情请求参数
+ *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
 @Data
 public class GoodsInfoParam implements Serializable {
 
-    @ApiModelProperty(value="商品ID", name="goodsId")
+    @Schema(description="商品ID")
     private String goodsId;
 
-    @ApiModelProperty(value="skuNo", name="skuNo")
+    @Schema(description="skuNo")
     private String skuNo;
 
 }

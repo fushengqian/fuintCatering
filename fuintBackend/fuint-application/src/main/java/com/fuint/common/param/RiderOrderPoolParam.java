@@ -1,6 +1,6 @@
 package com.fuint.common.param;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class RiderOrderPoolParam extends PageParam {
 
-    @ApiModelProperty("店铺ID，可选过滤")
+    @Schema(description="店铺ID，可选过滤")
     private Integer storeId;
 
 }

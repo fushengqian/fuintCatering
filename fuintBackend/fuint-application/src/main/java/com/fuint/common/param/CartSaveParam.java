@@ -1,6 +1,6 @@
 package com.fuint.common.param;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serializable;
 
@@ -12,28 +12,28 @@ import java.io.Serializable;
 @Data
 public class CartSaveParam implements Serializable {
 
-    @ApiModelProperty(value="购物车ID", name="cartId")
+    @Schema(description="购物车ID")
     private Integer cartId;
 
-    @ApiModelProperty(value="商品ID", name="goodsId")
+    @Schema(description="商品ID")
     private Integer goodsId;
 
-    @ApiModelProperty(value="商品SkuID", name="skuId")
+    @Schema(description="商品SkuID")
     private Integer skuId;
 
-    @ApiModelProperty(value="商品编码", name="skuNo")
+    @Schema(description="商品编码")
     private String skuNo;
 
-    @ApiModelProperty(value="购买数量", name="buyNum")
+    @Schema(description="购买数量")
     private Double buyNum;
 
-    @ApiModelProperty(value="操作类型，+：增加，-：减少", name="action")
+    @Schema(description="操作类型，+：增加，-：减少")
     private String action;
 
-    @ApiModelProperty(value="挂单编码", name="hangNo")
-    private String hangNo;
+    @Schema(description="桌台ID")
+    private Integer tableId;
 
-    @ApiModelProperty(value="下单会员ID", name="userId")
+    @Schema(description="下单会员ID")
     private Integer userId;
 
 }

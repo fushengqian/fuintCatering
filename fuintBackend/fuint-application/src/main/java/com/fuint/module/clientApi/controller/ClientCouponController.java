@@ -16,13 +16,13 @@ import com.fuint.repository.mapper.MtUserCouponMapper;
 import com.fuint.repository.model.MtCoupon;
 import com.fuint.repository.model.MtUserCoupon;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="会员端-卡券相关接口")
+@Tag(name="会员端-卡券相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/clientApi/coupon")
@@ -69,7 +69,7 @@ public class ClientCouponController extends BaseController {
     /**
      * 获取卡券列表数据
      */
-    @ApiOperation(value = "获取卡券列表数据")
+    @Operation(summary="获取卡券列表数据")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject list(HttpServletRequest request, @RequestBody CouponListParam params) throws BusinessCheckException {
@@ -91,7 +91,7 @@ public class ClientCouponController extends BaseController {
     /**
      * 领取卡券
      * */
-    @ApiOperation(value = "领取卡券")
+    @Operation(summary="领取卡券")
     @RequestMapping(value = "/receive", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject receive(@RequestBody CouponReceiveParam couponReceiveParam) throws BusinessCheckException {
@@ -114,7 +114,7 @@ public class ClientCouponController extends BaseController {
     /**
      * 查询卡券详情
      */
-    @ApiOperation(value = "查询卡券详情")
+    @Operation(summary="查询卡券详情")
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject detail(@RequestBody CouponInfoParam params) throws BusinessCheckException {

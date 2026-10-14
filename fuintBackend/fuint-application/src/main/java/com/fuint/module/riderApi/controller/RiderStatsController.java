@@ -9,12 +9,12 @@ import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -23,7 +23,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags = "骑手端-统计相关接口")
+@Tag(name="骑手端-统计相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/riderApi/stats")
@@ -36,7 +36,7 @@ public class RiderStatsController extends BaseController {
     /**
      * 获取今日概览
      */
-    @ApiOperation(value = "获取今日概览")
+    @Operation(summary="获取今日概览")
     @RequestMapping(value = "/overview", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject overview() throws BusinessCheckException {
@@ -48,7 +48,7 @@ public class RiderStatsController extends BaseController {
     /**
      * 获取配送统计
      */
-    @ApiOperation(value = "获取配送统计")
+    @Operation(summary="获取配送统计")
     @RequestMapping(value = "/delivery", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject delivery(HttpServletRequest request) throws BusinessCheckException {
@@ -64,7 +64,7 @@ public class RiderStatsController extends BaseController {
     /**
      * 获取收入统计
      */
-    @ApiOperation(value = "获取收入统计")
+    @Operation(summary="获取收入统计")
     @RequestMapping(value = "/income", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject income(HttpServletRequest request) throws BusinessCheckException {

@@ -5,9 +5,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,12 +17,15 @@ import org.springframework.security.web.SecurityFilterChain;
 /**
  * 安全中心配置
  *
+ * Spring Security 6 变更：@EnableGlobalMethodSecurity -> @EnableMethodSecurity，
+ * antMatchers -> requestMatchers，非 lambda 链式 DSL 已移除，统一改为 lambda 写法。
+ *
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
 
     /**
@@ -31,14 +35,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 // CSRF禁用，因为不使用session
-                .csrf().disable()
+                .csrf(AbstractHttpConfigurer::disable)
                 // 基于token，所以不需要session
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 过滤请求
                 .authorizeHttpRequests(authz -> authz
                         // 允许匿名访问
-                        .antMatchers("/clientApi/**", "/backendApi/**", "/merchantApi/**", "/riderApi/**").permitAll()
-                        .antMatchers(HttpMethod.GET,
+                        .requestMatchers("/clientApi/**", "/backendApi/**", "/merchantApi/**", "/riderApi/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,
                                 "/",
                                 "/static/**",
                                 "/*.html",
@@ -46,18 +50,17 @@ public class SecurityConfig {
                                 "/**/*.css",
                                 "/**/*.js",
                                 "/profile/**",
-                                // Swagger接口文档
+                                // springdoc 接口文档地址
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/v2/api-docs",
                                 "/v3/api-docs",
-                                "/swagger-resources/**",
+                                "/v3/api-docs/**",
                                 "/webjars/**",
                                 "/favicon.ico"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .headers().frameOptions().disable();
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
 
         return http.build();
     }

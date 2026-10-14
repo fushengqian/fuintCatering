@@ -1,6 +1,6 @@
 package com.fuint.common.param;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serializable;
 
@@ -13,25 +13,25 @@ import java.io.Serializable;
 @Data
 public class TableParam implements Serializable {
 
-    @ApiModelProperty(value="商户ID", name="merchantId")
+    @Schema(description="商户ID")
     private Integer merchantId;
 
-    @ApiModelProperty(value="店铺ID", name="storeId")
+    @Schema(description="店铺ID")
     private Integer storeId;
 
-    @ApiModelProperty(value="区域ID", name="areaId")
+    @Schema(description="区域ID")
     private Integer areaId;
 
-    @ApiModelProperty(value="使用状态", name="useStatus")
+    @Schema(description="使用状态")
     private String useStatus;
 
-    @ApiModelProperty(value="会员手机号", name="mobile")
+    @Schema(description="会员手机号")
     private String mobile;
 
-    @ApiModelProperty(value="会员号", name="userNo")
+    @Schema(description="会员号")
     private String userNo;
 
-    @ApiModelProperty(value="桌码", name="code")
+    @Schema(description="桌码")
     private String code;
 
 }

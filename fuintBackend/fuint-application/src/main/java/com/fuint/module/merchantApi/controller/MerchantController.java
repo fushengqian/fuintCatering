@@ -12,8 +12,8 @@ import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtUser;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +31,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="商户端-商户信息相关接口")
+@Tag(name="商户端-商户信息相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/merchantApi/merchant")
@@ -60,7 +60,7 @@ public class MerchantController extends BaseController {
     /**
      * 查询商户信息
      */
-    @ApiOperation(value = "查询商户信息")
+    @Operation(summary="查询商户信息")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject info() throws BusinessCheckException {

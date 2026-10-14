@@ -3,7 +3,7 @@ package com.fuint.common.dto.rider;
 import com.fuint.common.dto.order.OrderGoodsDto;
 import com.fuint.common.dto.order.OrderUserDto;
 import com.fuint.repository.model.MtStore;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -21,60 +21,60 @@ public class RiderOrderDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("订单ID")
+    @Schema(description="订单ID")
     private Integer orderId;
 
-    @ApiModelProperty("订单号")
+    @Schema(description="订单号")
     private String orderSn;
 
-    @ApiModelProperty("订单状态")
+    @Schema(description="订单状态")
     private String status;
 
-    @ApiModelProperty("订单状态文本")
+    @Schema(description="订单状态文本")
     private String statusText;
 
-    @ApiModelProperty("订单金额")
+    @Schema(description="订单金额")
     private BigDecimal amount;
 
-    @ApiModelProperty("配送费")
+    @Schema(description="配送费")
     private BigDecimal deliveryFee;
 
-    @ApiModelProperty("支付金额")
+    @Schema(description="支付金额")
     private BigDecimal payAmount;
 
-    @ApiModelProperty("用户备注")
+    @Schema(description="用户备注")
     private String remark;
 
-    @ApiModelProperty("下单时间")
+    @Schema(description="下单时间")
     private String createTime;
 
-    @ApiModelProperty("支付时间")
+    @Schema(description="支付时间")
     private String payTime;
 
-    @ApiModelProperty("接单时间")
+    @Schema(description="接单时间")
     private String acceptTime;
 
-    @ApiModelProperty("取货时间")
+    @Schema(description="取货时间")
     private String pickupTime;
 
-    @ApiModelProperty("送达时间")
+    @Schema(description="送达时间")
     private String deliverTime;
 
-    @ApiModelProperty("客户信息")
+    @Schema(description="客户信息")
     private OrderUserDto userInfo;
 
-    @ApiModelProperty("配送地址")
+    @Schema(description="配送地址")
     private String userAddress;
 
-    @ApiModelProperty("店铺信息")
+    @Schema(description="店铺信息")
     private MtStore storeInfo;
 
-    @ApiModelProperty("商品列表")
+    @Schema(description="商品列表")
     private List<OrderGoodsDto> goods;
 
-    @ApiModelProperty("取餐码")
+    @Schema(description="取餐码")
     private String verifyCode;
 
-    @ApiModelProperty("取货地址(店铺地址)")
+    @Schema(description="取货地址(店铺地址)")
     private String storeAddress;
 }

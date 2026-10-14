@@ -12,8 +12,8 @@ import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtCoupon;
 import com.fuint.repository.model.MtStore;
 import com.fuint.repository.model.MtTable;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-公共接口")
+@Tag(name="管理端-公共接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/common")
@@ -68,7 +68,7 @@ public class BackendCommonController extends BaseController {
     /**
      * 生成二维码
      */
-    @ApiOperation(value = "生成二维码")
+    @Operation(summary="生成二维码")
     @RequestMapping(value = "/createQrCode", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject createQrCode(@RequestBody QrParam qrParam) throws Exception {

@@ -7,8 +7,8 @@ import com.fuint.common.util.TokenUtil;
 import com.fuint.framework.exception.BusinessCheckException;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags = "骑手端-个人信息接口")
+@Tag(name="骑手端-个人信息接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/riderApi/profile")
@@ -29,7 +29,7 @@ public class RiderProfileController extends BaseController {
     /**
      * 获取骑手个人信息
      */
-    @ApiOperation(value = "获取骑手个人信息")
+    @Operation(summary="获取骑手个人信息")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject info() throws BusinessCheckException {

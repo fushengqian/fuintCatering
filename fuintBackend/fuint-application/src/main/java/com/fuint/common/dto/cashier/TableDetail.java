@@ -1,7 +1,7 @@
 package com.fuint.common.dto.cashier;
 
 import com.fuint.common.dto.order.UserOrderDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -13,13 +13,13 @@ import lombok.Data;
 @Data
 public class TableDetail {
 
-    @ApiModelProperty("桌台ID")
+    @Schema(description="桌台ID")
     private Integer tableId;
 
-    @ApiModelProperty("桌台编码")
+    @Schema(description="桌台编码")
     private String tableCode;
 
-    @ApiModelProperty("使用状态")
+    @Schema(description="使用状态")
     private UserOrderDto orderInfo;
 
 }

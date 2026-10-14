@@ -1,7 +1,7 @@
 package com.fuint.common.dto.cashier;
 
 import com.fuint.repository.model.MtUser;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serializable;
 
@@ -14,25 +14,25 @@ import java.io.Serializable;
 @Data
 public class TableOverviewDto implements Serializable {
 
-    @ApiModelProperty("店铺ID")
+    @Schema(description="店铺ID")
     private Integer storeId;
 
-    @ApiModelProperty("桌码")
+    @Schema(description="桌码")
     private String code;
 
-    @ApiModelProperty("人数")
+    @Schema(description="人数")
     private Integer people;
 
-    @ApiModelProperty("已占用分钟数")
+    @Schema(description="已占用分钟数")
     private Integer minute;
 
-    @ApiModelProperty("金额")
+    @Schema(description="金额")
     private Integer amount;
 
-    @ApiModelProperty("会员信息")
+    @Schema(description="会员信息")
     private MtUser userInfo;
 
-    @ApiModelProperty("状态，1：空闲；2：占用")
+    @Schema(description="状态，1：空闲；2：占用")
     private String status;
 
 }

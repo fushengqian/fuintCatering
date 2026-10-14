@@ -14,8 +14,8 @@ import com.fuint.framework.pagination.PaginationResponse;
 import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtCommissionRule;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +30,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-分销提成规则相关接口")
+@Tag(name="管理端-分销提成规则相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/commissionRule")
@@ -44,7 +44,7 @@ public class BackendCommissionRuleController extends BaseController {
     /**
      * 规则列表查询
      */
-    @ApiOperation(value = "规则列表查询")
+    @Operation(summary="规则列表查询")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:rule:index')")
@@ -72,7 +72,7 @@ public class BackendCommissionRuleController extends BaseController {
     /**
      * 更新分销提成规则状态
      */
-    @ApiOperation(value = "更新分销提成规则状态")
+    @Operation(summary="更新分销提成规则状态")
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:rule:index')")
@@ -95,7 +95,7 @@ public class BackendCommissionRuleController extends BaseController {
     /**
      * 保存分销提成规则
      */
-    @ApiOperation(value = "保存分销提成规则")
+    @Operation(summary="保存分销提成规则")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:rule:index')")
@@ -119,7 +119,7 @@ public class BackendCommissionRuleController extends BaseController {
     /**
      * 获取分销提成规则详情
      */
-    @ApiOperation(value = "获取分销提成规则详情")
+    @Operation(summary="获取分销提成规则详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:rule:index')")

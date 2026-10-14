@@ -14,12 +14,12 @@ import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.*;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="会员端-系统配置相关接口")
+@Tag(name="会员端-系统配置相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/clientApi/system")
@@ -70,7 +70,7 @@ public class ClientSystemController extends BaseController {
     /**
      * 获取系统配置
      */
-    @ApiOperation(value = "获取系统配置")
+    @Operation(summary="获取系统配置")
     @RequestMapping(value = "/config", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject config(HttpServletRequest request) throws BusinessCheckException {
@@ -226,7 +226,7 @@ public class ClientSystemController extends BaseController {
     /**
      * 获取微信JSSDK配置（用于微信公众号内H5扫码等功能）
      */
-    @ApiOperation(value = "获取微信JSSDK配置")
+    @Operation(summary="获取微信JSSDK配置")
     @RequestMapping(value = "/jsSdkConfig", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject jsSdkConfig(HttpServletRequest request) {

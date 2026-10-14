@@ -17,8 +17,8 @@ import com.fuint.framework.web.ResponseObject;
 import com.fuint.module.backendApi.request.CommissionLogRequest;
 import com.fuint.module.backendApi.request.CommissionSettleRequest;
 import com.fuint.repository.model.MtStore;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-分销提成记录相关接口")
+@Tag(name="管理端-分销提成记录相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/commissionLog")
@@ -57,7 +57,7 @@ public class BackendCommissionLogController extends BaseController {
     /**
      * 分销提成记录列表查询
      */
-    @ApiOperation(value = "分销提成记录查询")
+    @Operation(summary="分销提成记录查询")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:log:index')")
@@ -93,7 +93,7 @@ public class BackendCommissionLogController extends BaseController {
     /**
      * 获取分销提成记录详情
      */
-    @ApiOperation(value = "获取分销提成记录详情")
+    @Operation(summary="获取分销提成记录详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:log:index')")
@@ -114,7 +114,7 @@ public class BackendCommissionLogController extends BaseController {
     /**
      * 修改分销提成记录
      */
-    @ApiOperation(value = "修改分销提成记录")
+    @Operation(summary="修改分销提成记录")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:log:index')")
     public ResponseObject save(@RequestBody CommissionLogRequest commissionLogRequest) throws BusinessCheckException {
@@ -129,7 +129,7 @@ public class BackendCommissionLogController extends BaseController {
     /**
      * 作废分销提成记录
      */
-    @ApiOperation(value = "作废分销提成记录")
+    @Operation(summary="作废分销提成记录")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('commission:log:index')")
@@ -152,7 +152,7 @@ public class BackendCommissionLogController extends BaseController {
     /**
      * 分销提成结算
      */
-    @ApiOperation(value = "分销提成结算")
+    @Operation(summary="分销提成结算")
     @RequestMapping(value = "/doSettle", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:log:index')")
     public ResponseObject doSettle(@RequestBody CommissionSettleRequest commissionSettleRequest) throws BusinessCheckException {

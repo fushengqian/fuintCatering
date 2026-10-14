@@ -13,8 +13,8 @@ import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtSendLog;
 import com.fuint.repository.model.MtUser;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +27,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-卡券发放相关接口")
+@Tag(name="管理端-卡券发放相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/sendLog")
@@ -51,7 +51,7 @@ public class BackendSendLogController extends BaseController {
     /**
      * 查询发券记录列表
      */
-    @ApiOperation(value = "查询发券记录列表")
+    @Operation(summary="查询发券记录列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject list(@ModelAttribute SendLogPage sendLogPage) throws BusinessCheckException {
@@ -80,7 +80,7 @@ public class BackendSendLogController extends BaseController {
     /**
      * 废除用户卡券
      */
-    @ApiOperation(value = "废除用户卡券")
+    @Operation(summary="废除用户卡券")
     @RequestMapping(value = "/removeUserCoupon/{id}", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject removeUserCoupon(@PathVariable("id") Long id) throws BusinessCheckException {

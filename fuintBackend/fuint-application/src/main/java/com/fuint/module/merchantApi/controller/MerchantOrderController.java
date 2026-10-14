@@ -19,8 +19,8 @@ import com.fuint.repository.model.MtOrder;
 import com.fuint.repository.model.MtStaff;
 import com.fuint.repository.model.MtUser;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +32,7 @@ import java.util.Date;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="商户端-订单管理相关接口")
+@Tag(name="商户端-订单管理相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/merchantApi/order")
@@ -56,7 +56,7 @@ public class MerchantOrderController extends BaseController {
     /**
      * 获取订单列表
      */
-    @ApiOperation(value = "获取订单列表")
+    @Operation(summary="获取订单列表")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject list(@RequestBody OrderListParam params) throws BusinessCheckException {
@@ -79,7 +79,7 @@ public class MerchantOrderController extends BaseController {
     /**
      * 获取订单详情
      */
-    @ApiOperation(value = "获取订单详情")
+    @Operation(summary="获取订单详情")
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject detail(@RequestBody OrderDetailParam param) throws BusinessCheckException {
@@ -104,7 +104,7 @@ public class MerchantOrderController extends BaseController {
     /**
      * 取消订单
      */
-    @ApiOperation(value = "取消订单")
+    @Operation(summary="取消订单")
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject cancel(@RequestBody OrderDetailParam param) throws BusinessCheckException {
@@ -134,7 +134,7 @@ public class MerchantOrderController extends BaseController {
     /**
      * 核销订单
      */
-    @ApiOperation(value = "核销订单")
+    @Operation(summary="核销订单")
     @RequestMapping(value = "/confirm", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject confirm(@RequestBody OrderConfirmParam param) throws BusinessCheckException {
@@ -170,7 +170,7 @@ public class MerchantOrderController extends BaseController {
     /**
      * 商户标记备货完成（骑手配送订单）
      */
-    @ApiOperation(value = "商户标记备货完成")
+    @Operation(summary="商户标记备货完成")
     @RequestMapping(value = "/ready", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject ready(@RequestBody OrderDetailParam param) throws BusinessCheckException {

@@ -16,13 +16,13 @@ import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtUser;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-券核销流水相关接口")
+@Tag(name="管理端-券核销流水相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/confirmLog")
@@ -57,7 +57,7 @@ public class BackendConfirmLogController extends BaseController {
     /**
      * 获取会员卡券核销记录列表
      */
-    @ApiOperation(value = "获取会员卡券核销记录列表")
+    @Operation(summary="获取会员卡券核销记录列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:confirmLog:index')")
@@ -112,7 +112,7 @@ public class BackendConfirmLogController extends BaseController {
     /**
      * 撤销已使用的卡券
      */
-    @ApiOperation(value = "撤销已使用的卡券")
+    @Operation(summary="撤销已使用的卡券")
     @RequestMapping(value = "/rollbackUserCoupon/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:confirmLog:index')")

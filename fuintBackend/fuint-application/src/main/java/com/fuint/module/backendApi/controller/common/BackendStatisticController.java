@@ -14,8 +14,8 @@ import com.fuint.framework.web.BaseController;
 import com.fuint.framework.web.ResponseObject;
 import com.fuint.repository.model.MtStore;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +32,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-数据统计相关接口")
+@Tag(name="管理端-数据统计相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/statistic")
@@ -61,7 +61,7 @@ public class BackendStatisticController extends BaseController {
     /**
      * 数据概况
      */
-    @ApiOperation(value = "数据概况")
+    @Operation(summary="数据概况")
     @RequestMapping(value = "/main", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject main(@RequestBody StatisticParam param) throws ParseException {
@@ -121,7 +121,7 @@ public class BackendStatisticController extends BaseController {
     /**
      * 排行榜数据
      */
-    @ApiOperation(value = "排行榜数据")
+    @Operation(summary="排行榜数据")
     @RequestMapping(value = "/top", method = RequestMethod.POST)
     @CrossOrigin
     public ResponseObject top(@RequestBody StatisticParam param) throws ParseException {
@@ -151,7 +151,7 @@ public class BackendStatisticController extends BaseController {
     /**
      * 获取会员数量
      */
-    @ApiOperation(value = "获取会员数量")
+    @Operation(summary="获取会员数量")
     @RequestMapping(value = "/totalMember", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject totalMember() {

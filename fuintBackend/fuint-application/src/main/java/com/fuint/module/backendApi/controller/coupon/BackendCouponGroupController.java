@@ -22,8 +22,8 @@ import com.fuint.repository.mapper.MtCouponMapper;
 import com.fuint.repository.model.MtCoupon;
 import com.fuint.repository.model.MtCouponGroup;
 import com.fuint.utils.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +31,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.OutputStream;
 import java.net.URL;
@@ -47,7 +47,7 @@ import java.util.Map;
  * Created by FSQ
  * CopyRight https://www.fuint.cn
  */
-@Api(tags="管理端-卡券分组相关接口")
+@Tag(name="管理端-卡券分组相关接口")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/backendApi/couponGroup")
@@ -75,7 +75,7 @@ public class BackendCouponGroupController extends BaseController {
     /**
      * 查询卡券分组列表
      */
-    @ApiOperation(value = "查询卡券分组列表")
+    @Operation(summary="查询卡券分组列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:group:index')")
@@ -146,7 +146,7 @@ public class BackendCouponGroupController extends BaseController {
     /**
      * 保存卡券分组信息
      */
-    @ApiOperation(value = "保存卡券分组信息")
+    @Operation(summary="保存卡券分组信息")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:group:edit')")
@@ -166,7 +166,7 @@ public class BackendCouponGroupController extends BaseController {
     /**
      * 删除卡券分组
      */
-    @ApiOperation(value = "删除卡券分组")
+    @Operation(summary="删除卡券分组")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:group:edit')")
@@ -190,7 +190,7 @@ public class BackendCouponGroupController extends BaseController {
     /**
      * 更新分组状态
      */
-    @ApiOperation(value = "更新分组状态")
+    @Operation(summary="更新分组状态")
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:group:edit')")
@@ -208,7 +208,7 @@ public class BackendCouponGroupController extends BaseController {
     /**
      * 获取分组详情
      */
-    @ApiOperation(value = "获取分组详情")
+    @Operation(summary="获取分组详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('coupon:group:index')")
@@ -224,7 +224,7 @@ public class BackendCouponGroupController extends BaseController {
     /**
      * 导出模板文件
      */
-    @ApiOperation(value = "导出模板文件")
+    @Operation(summary="导出模板文件")
     @RequestMapping(value = "/exportTemplate", method = RequestMethod.GET)
     @CrossOrigin
     public void exportTemplate(HttpServletRequest request, HttpServletResponse response) throws BusinessCheckException {
@@ -251,7 +251,7 @@ public class BackendCouponGroupController extends BaseController {
     /**
      * 上传文件
      */
-    @ApiOperation(value = "上传文件")
+    @Operation(summary="上传文件")
     @RequestMapping(value = "/upload/", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
     @CrossOrigin
     public ResponseObject uploadFile(HttpServletRequest request, @RequestParam("fileInput") MultipartFile file) throws Exception {
@@ -265,7 +265,7 @@ public class BackendCouponGroupController extends BaseController {
     /**
      * 查询分组列表
      * */
-    @ApiOperation(value = "查询分组列表")
+    @Operation(summary="查询分组列表")
     @RequestMapping(value = "/quickSearch", method = RequestMethod.GET)
     @CrossOrigin
     public ResponseObject quickSearch() {
