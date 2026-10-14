@@ -106,6 +106,22 @@ public class BackendStoreController extends BaseController {
     }
 
     /**
+     * 获取当前帐号的店铺列表（下拉筛选用，不带分页）
+     * */
+    @Operation(summary="获取当前帐号的店铺列表")
+    @RequestMapping(value = "/getMyStoreList", method = RequestMethod.GET)
+    @CrossOrigin
+    public ResponseObject getMyStoreList() {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
+        Integer merchantId = accountInfo.getMerchantId() == null ? 0 : accountInfo.getMerchantId();
+        Integer storeId = accountInfo.getStoreId() == null ? 0 : accountInfo.getStoreId();
+
+        List<MtStore> storeList = storeService.getActiveStoreList(merchantId, storeId, null);
+
+        return getSuccessResult(storeList);
+    }
+
+    /**
      * 更新店铺状态
      */
     @Operation(summary="更新店铺状态")
@@ -173,7 +189,7 @@ public class BackendStoreController extends BaseController {
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     @CrossOrigin
     @PreAuthorize("@pms.hasPermission('store:list')")
-    public ResponseObject getStoreInfo(@PathVariable("id") Integer id) throws BusinessCheckException {
+    public ResponseObject getStoreInfo(@PathVariable("id") Integer id) {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
 
         StoreDto storeInfo = storeService.queryStoreDtoById(id);

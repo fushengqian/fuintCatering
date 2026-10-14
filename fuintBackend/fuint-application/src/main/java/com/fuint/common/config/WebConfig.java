@@ -14,6 +14,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.CssLinkResourceTransformer;
 import org.springframework.web.servlet.resource.VersionResourceResolver;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +47,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
-        configurer.setUseTrailingSlashMatch(true);
+        PathPatternParser patternParser = new PathPatternParser();
+        patternParser.setMatchOptionalTrailingSeparator(true);
+        configurer.setPatternParser(patternParser);
     }
 
     @Bean
