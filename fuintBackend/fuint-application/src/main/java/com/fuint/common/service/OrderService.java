@@ -130,6 +130,22 @@ public interface OrderService extends IService<MtOrder> {
     MtOrder getOrderInfoByOrderSn(String orderSn);
 
     /**
+     * 根据支付单号获取订单
+     *
+     * @param paySn 支付单号
+     * @return
+     */
+    UserOrderDto getOrderByPaySn(String paySn);
+
+    /**
+     * 根据支付单号获取订单信息
+     *
+     * @param paySn 支付单号
+     * @return
+     * */
+    MtOrder getOrderInfoByPaySn(String paySn);
+
+    /**
      * 更新订单
      *
      * @param  orderDto

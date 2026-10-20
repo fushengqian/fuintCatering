@@ -78,6 +78,11 @@ public class RefundServiceImpl extends ServiceImpl<MtRefundMapper, MtRefund> imp
     private OrderService orderService;
 
     /**
+     * 订单支付单服务接口
+     * */
+    private OrderPayService orderPayService;
+
+    /**
      * 余额服务接口
      * */
     private BalanceService balanceService;
@@ -626,14 +631,23 @@ public class RefundServiceImpl extends ServiceImpl<MtRefundMapper, MtRefund> imp
             }
         }
 
+        // 渠道退款按支付单号发起：订单号在支付后不会变动，但渠道侧的交易号是 pay_sn，
+        // 同时以支付单锁定的应付金额作为 total_fee，避免运营改价后与渠道实际收款金额不符
+        String paySn = StringUtil.isNotEmpty(orderInfo.getPaySn()) ? orderInfo.getPaySn() : orderInfo.getOrderSn();
+        BigDecimal paidAmount = orderInfo.getPayAmount();
+        MtOrderPay orderPay = orderPayService.getPayLogByPaySn(paySn);
+        if (orderPay != null && orderPay.getAmount() != null) {
+            paidAmount = orderPay.getAmount();
+        }
+
         // 微信支付发起退款
         if (orderInfo.getPayType().equals(PayTypeEnum.JSAPI.getKey()) || orderInfo.getPayType().equals(PayTypeEnum.MICROPAY.getKey())) {
-            weixinService.doRefund(orderInfo.getStoreInfo() != null ? orderInfo.getStoreInfo().getId() : 0, orderInfo.getOrderSn(), orderInfo.getPayAmount(), mtRefund.getAmount(), PlatformTypeEnum.MP_WEIXIN.getCode());
+            weixinService.doRefund(orderInfo.getStoreInfo() != null ? orderInfo.getStoreInfo().getId() : 0, paySn, paidAmount, mtRefund.getAmount(), PlatformTypeEnum.MP_WEIXIN.getCode());
         }
 
         // 支付宝发起退款
         if (orderInfo.getPayType().equals(PayTypeEnum.ALISCAN.getKey())) {
-            alipayService.doRefund(orderInfo.getStoreInfo() != null ? orderInfo.getStoreInfo().getId() : 0, orderInfo.getOrderSn(), orderInfo.getPayAmount(), mtRefund.getAmount(), PlatformTypeEnum.PC.getCode());
+            alipayService.doRefund(orderInfo.getStoreInfo() != null ? orderInfo.getStoreInfo().getId() : 0, paySn, paidAmount, mtRefund.getAmount(), PlatformTypeEnum.PC.getCode());
         }
 
         return mtRefund;
