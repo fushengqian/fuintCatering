@@ -1,59 +1,59 @@
 # fuint餐饮系统系统介绍
 
 #### 介绍
-fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系统基于前后端分离的架构，后端采用<b>Java SpringBoot3</b> + <b>Mysql</b>，前端基于当前流行的<b>Uniapp</b>，<b>Vue3</b>，<b>Element UI Plus</b>，支持小程序、h5。提供小程序点餐，收银台，优惠券核销，点餐订单管理，会员积分，会员权益等功能。。
+fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系统基于前后端分离的架构，后端采用Java SpringBoot3 + Mysql，前端基于当前流行的Uniapp，Vue3，Element UI Plus，支持小程序、h5。提供小程序点餐，收银台，优惠券核销，点餐订单管理，会员积分，会员权益等功能。。
 以下是前台的页面展示：
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/screenshot/g1.png?v=10" alt="前台页面1"></p>
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/screenshot/g2.png?v=20" alt="前台页面2"></p>
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/screenshot/g3.png?v=30" alt="前台页面3"></p>
+![fuint餐饮点餐会员端页面截图1](docs/screenshot/g1.png)
+![fuint餐饮点餐会员端页面截图2](docs/screenshot/g2.png)
+![fuint餐饮点餐会员端页面截图3](docs/screenshot/g3.png)
 
 本系统侧重于线下实体店的私域流量的运营，同时提供会员端小程序和收银系统的线上线下统一渠道，帮助商户降低获客成本。顾客通过扫码支付成为私域流量，支付即可成为会员。积分和卡券功能建立起会员等级体系，通过消息推送和短信营销方便触达用户。
-<p>1、会员运营自动化：商家通过日常活动设置，如开卡礼设置，沉睡唤醒等，成为会员后自动给顾客送优惠券，让顾客更有黏性，提升会员运营效率。</p>
-<p>2、打通收银系统和会员营销的壁垒，代客下单收银，支付即成为会员。</p>
-<p>3、会员体系完整化：积分兑换、积分转赠、会员等级权益、积分加速、买单折扣。</p>
-<p>4、会员卡券齐全：储值卡、电子券、优惠券、集次卡、计次卡、实体卡购买并兑换、会员充值、余额支付。</p>
-<p>5、线上代客下单收银系统，后台管理员可帮助临柜的会员下单、扫码支付、订单云打印（自动打印小票）。</p>
-<p>6、支持手机短信、站内弹框消息、微信订阅消息：支持包括发货消息、卡券到期提醒、活动提醒、会员到期提醒、积分余额变动提醒等消息。</p>
-<b>官网演示地址：</b><br>
-<p>
-   1、会员点餐H5：<a target="_blank" href="https://www.fuint.cn/food/">https://www.fuint.cn/food/</a>（需要体验小程序版本可添加管理员微信：YanheJiShu）<br>
-   2、后台地址：<a target="_blank" href="https://www.fuint.cn/fuintFood/">https://www.fuint.cn/fuintFood/</a> 演示账号：fuint / 123456<br>
-   3、swagger接口文档：<a target="_blank" href="https://www.fuint.cn/fuint-application/swagger-ui.html">https://www.fuint.cn/fuint-application/swagger-ui.html</a><br>
-   4、完整演示功能：<a target="_blank" href="https://www.fuint.cn/docs/detail?id=25">https://www.fuint.cn/docs/detail?id=25</a>
-</p>
+1、会员运营自动化：商家通过日常活动设置，如开卡礼设置，沉睡唤醒等，成为会员后自动给顾客送优惠券，让顾客更有黏性，提升会员运营效率。
+2、打通收银系统和会员营销的壁垒，代客下单收银，支付即成为会员。
+3、会员体系完整化：积分兑换、积分转赠、会员等级权益、积分加速、买单折扣。
+4、会员卡券齐全：储值卡、电子券、优惠券、集次卡、计次卡、实体卡购买并兑换、会员充值、余额支付。
+5、线上代客下单收银系统，后台管理员可帮助临柜的会员下单、扫码支付、订单云打印（自动打印小票）。
+6、支持手机短信、站内弹框消息、微信订阅消息：支持包括发货消息、卡券到期提醒、活动提醒、会员到期提醒、积分余额变动提醒等消息。
+
+官网演示地址：
+   1、会员点餐H5：https://www.fuint.cn/food/（需要体验小程序版本可添加管理员微信：YanheJiShu）
+   2、后台地址：https://www.fuint.cn/fuintFood/ 演示账号：fuint / 123456
+   3、swagger接口文档：https://www.fuint.cn/fuint-application/swagger-ui.html
+   4、完整演示功能：https://www.fuint.cn/docs/detail?id=25
 
 #### 软件架构
 后端：JAVA SpringBoot3 + MYSQL Mybatis Plus + Redis
 前端：采用基于Vue3、Uniapp、Element UI Plus，前后端分离，支持微信小程序、h5等
-<p>后台截图：</p>
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b0.png?v=fuint" alt="登录界面"></p>
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b1.png?v=fuint" alt="后台首页"></p>
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/b2.png?v=fuint" alt="统计"></p>
 
-<p>收银系统：</p>
+后台截图：
+![fuint餐饮点餐登录界面](docs/screenshot/b0.png)
+![fuint餐饮点餐后台首页](docs/screenshot/b1.png)
+![fuint餐饮点餐后台统计界面](docs/screenshot/b2.png)
+
+收银系统：
 代客下单和收银系统，支持余额、微信、支付宝等支付渠道，已对接好扫码枪、扫码盒子、云打印机，订单提交后自动打印小票。
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/cashierV1.png" alt="收银首页"></p>
-<p><img src="https://fuint-food.oss-rg-china-mainland.aliyuncs.com/uploads/pic/cashierV2.png" alt="提交订单"></p>
+![fuint餐饮点餐收银界面1-首页](docs/screenshot/cashierV1.png)
+![fuint餐饮点餐收银界面2-提交订单](docs/screenshot/cashierV2.png)
 
-前端使用技术<br>
-2.1 Vue3<br>
-2.2 Uniapp<br>
-2.3 Element UI Plus<br>
+前端使用技术
+2.1 Vue3；
+2.2 Uniapp；
+2.3 Element UI Plus；
 2.4 Nodejs 24版本 
 
 后端使用技术<br>
-1.1 SpringBoot 3.2+<br>
-1.2 Mybatis Plus<br>
-1.3 Maven<br>
-1.4 SpringSecurity<br>
-1.5 Druid<br>
-1.6 Slf4j<br>
-1.7 Fastjson<br>
-1.8 JWT<br>
-1.9 Redis<br>
-1.10 Quartz<br>
-1.11 Mysql 5.7或8版<br>
-1.12 Swagger UI<br>
+1.1 SpringBoot 3.2+；
+1.2 Mybatis Plus；
+1.3 Maven；
+1.4 SpringSecurity；
+1.5 Druid；
+1.6 Slf4j；
+1.7 Fastjson；
+1.8 JWT；
+1.9 Redis；
+1.10 Quartz；
+1.11 Mysql 5.7或8版；
+1.12 Swagger UI；
 
 
 #### 安装步骤
@@ -61,7 +61,7 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系
 1. 导入db目录下的数据库文件。
 2. 修改config目录下的配置文件。
 3. 将工程打包，把jar包上传并执行。
-<p>提示：无后端和linux基础的朋友，可以使用<b>宝塔</b>部署，非常方便简单。</p>
+提示：无后端和linux基础的朋友，可以使用宝塔部署，非常方便简单。
 
 
 #### 前台使用说明
@@ -103,14 +103,14 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系
 4.  希望大家多多支持原创软件
 5.  请勿去除版权标签，要商用请购买源码授权（非常便宜），感谢理解！
 
-不足和待完善之处请谅解！源码仅供学习交流，更多功能欢迎进群咨询讨论，或需安装帮助请联系我们（<b>麻烦先点star！！！！！！</b>）。<br>
-官方网站：https://www.fuint.cn <br>
-开源不易，感谢支持！<br>
-<b>作者wx：fsq_better：</b><br>
-<p><img src="https://fuint-cn.oss-cn-shenzhen.aliyuncs.com/screenshots/qr.png" alt="公众号二维码"></p>
+不足和待完善之处请谅解！源码仅供学习交流，更多功能欢迎进群咨询讨论，或需安装帮助请联系我们（麻烦先点star！！！！！！）。
+官方网站：https://www.fuint.cn
+开源不易，感谢支持！
+作者wx：fsq_better：
+![公众号二维码](docs/screenshot/qr.png)
 
 
-特别鸣谢：<br>
-Mybaits Plus: https://github.com/baomidou/mybatis-plus<br>
-Vue: https://github.com/vuejs/vue<br>
+特别鸣谢：
+Mybaits Plus: https://github.com/baomidou/mybatis-plus
+Vue: https://github.com/vuejs/vue
 Element UI: https://element.eleme.cn
