@@ -3,11 +3,11 @@
 #### 介绍
 fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系统基于前后端分离的架构，后端采用Java SpringBoot3 + Mysql，前端基于当前流行的Uniapp，Vue3，Element UI Plus，支持小程序、h5。提供小程序点餐，收银台，优惠券核销，点餐订单管理，会员积分，会员权益等功能。。
 以下是前台的页面展示：
-![fuint餐饮点餐会员端页面截图1](docs/screenshot/g1.png)
+![fuint餐饮点餐会员端页面截图1](assets/g1.png)
 
-![fuint餐饮点餐会员端页面截图2](docs/screenshot/g2.png)
+![fuint餐饮点餐会员端页面截图2](assets/g2.png)
 
-![fuint餐饮点餐会员端页面截图3](docs/screenshot/g3.png)
+![fuint餐饮点餐会员端页面截图3](assets/g3.png)
 
 本系统侧重于线下实体店的私域流量的运营，同时提供会员端小程序和收银系统的线上线下统一渠道，帮助商户降低获客成本。顾客通过扫码支付成为私域流量，支付即可成为会员。积分和卡券功能建立起会员等级体系，通过消息推送和短信营销方便触达用户。
 1、会员运营自动化：商家通过日常活动设置，如开卡礼设置，沉睡唤醒等，成为会员后自动给顾客送优惠券，让顾客更有黏性，提升会员运营效率。
@@ -28,14 +28,14 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系
 前端：采用基于Vue3、Uniapp、Element UI Plus，前后端分离，支持微信小程序、h5等
 
 后台截图：
-![fuint餐饮点餐登录界面](docs/screenshot/b0.png)
-![fuint餐饮点餐后台首页](docs/screenshot/b1.png)
-![fuint餐饮点餐后台统计界面](docs/screenshot/b2.png)
+![fuint餐饮点餐登录界面](assets/b0.png)
+![fuint餐饮点餐后台首页](assets/b1.png)
+![fuint餐饮点餐后台统计界面](assets/b2.png)
 
 收银系统：
 代客下单和收银系统，支持余额、微信、支付宝等支付渠道，已对接好扫码枪、扫码盒子、云打印机，订单提交后自动打印小票。
-![fuint餐饮点餐收银界面1-首页](docs/screenshot/cashierV1.png)
-![fuint餐饮点餐收银界面2-提交订单](docs/screenshot/cashierV2.png)
+![fuint餐饮点餐收银界面1-首页](assets/cashierV1.png)
+![fuint餐饮点餐收银界面2-提交订单](assets/cashierV2.png)
 
 前端使用技术
 2.1 Vue3；
@@ -109,7 +109,7 @@ fuint餐饮系统是一套开源的餐饮行业会员管理和营销系统。系
 官方网站：https://www.fuint.cn
 开源不易，感谢支持！
 作者wx：fsq_better：
-![公众号二维码](docs/screenshot/qr.png)
+![公众号二维码](assets/qr.png)
 
 
 特别鸣谢：
