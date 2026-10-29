@@ -222,7 +222,7 @@ export const wxPayment = (option) => {
         timeStamp: options.timeStamp,
         nonceStr: options.nonceStr,
         'package': options.package,
-        signType: 'MD5',
+        signType: 'RSA',,
         paySign: options.paySign,
         success: res => resolve(res),
         fail: res => reject(res)
