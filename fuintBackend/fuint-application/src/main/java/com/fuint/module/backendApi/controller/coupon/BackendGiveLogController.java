@@ -1,5 +1,11 @@
 package com.fuint.module.backendApi.controller.coupon;
 
+
+
+
+import java.util.stream.Collectors;
+import java.util.Objects;
+import com.fuint.common.vo.GiveLogExportVo;
 import com.fuint.common.Constants;
 import com.fuint.common.dto.coupon.GiveDto;
 import com.fuint.common.dto.coupon.GiveItemDto;
@@ -23,12 +29,12 @@ import com.fuint.utils.StringUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +54,8 @@ import static com.fuint.common.util.XlsUtil.objectConvertToString;
 @RequestMapping(value = "/backendApi/give")
 public class BackendGiveLogController extends BaseController {
 
+
+    private static final Logger logger = LoggerFactory.getLogger(BackendGiveLogController.class);
     private MtUserCouponMapper mtUserCouponMapper;
 
     private MtCouponGroupMapper mtCouponGroupMapper;
@@ -142,37 +150,23 @@ public class BackendGiveLogController extends BaseController {
         PaginationResponse<GiveDto> paginationResponse = giveService.queryGiveListByPagination(givePage);
         List<GiveDto> list = paginationResponse.getContent();
 
-        // excel标题
-        String[] title = { "记录ID", "用户手机号", "转赠数量", "转赠总金额", "赠予对象手机号", "赠予时间" };
-        String fileName = "转赠记录" + System.currentTimeMillis() + ".xls";
+        // 组装导出数据（表头由 GiveLogExportVo 的 @ExcelProperty 声明）
+        List<GiveLogExportVo> data = list.stream().filter(Objects::nonNull).map(obj -> {
+            GiveLogExportVo vo = new GiveLogExportVo();
+            vo.setId(objectConvertToString(obj.getId()));
+            vo.setUserMobile(objectConvertToString(obj.getUserMobile()));
+            vo.setNum(objectConvertToString(obj.getNum()));
+            vo.setMoney(objectConvertToString(obj.getMoney()));
+            vo.setMobile(objectConvertToString(obj.getMobile()));
+            vo.setCreateTime(objectConvertToString(obj.getCreateTime()));
+            return vo;
+        }).collect(Collectors.toList());
 
-        String[][] content = null;
-        if (list.size() > 0) {
-            content= new String[list.size()][title.length];
-        }
-
-        for (int i = 0; i < list.size(); i++) {
-             GiveDto obj = list.get(i);
-             content[i][0] = objectConvertToString(obj.getId());
-             content[i][1] = objectConvertToString(obj.getUserMobile());
-             content[i][2] = objectConvertToString(obj.getNum());
-             content[i][3] = objectConvertToString(obj.getMoney());
-             content[i][4] = objectConvertToString(obj.getMobile());
-             content[i][5] = objectConvertToString(obj.getCreateTime());
-        }
-
-        // 创建HSSFWorkbook
-        HSSFWorkbook wb = ExcelUtil.getHSSFWorkbook("转赠记录", title, content, null);
-
-        // 响应到客户端
         try {
-            XlsUtil.setXlsHeader(request, response, fileName);
-            OutputStream os = response.getOutputStream();
-            wb.write(os);
-            os.flush();
-            os.close();
+            ExcelUtil.exportXlsx(response, "转赠记录" + System.currentTimeMillis(), "转赠记录", GiveLogExportVo.class, data);
+            logger.info("导出转赠记录成功...");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("导出转赠记录失败", e);
         }
     }
 }
