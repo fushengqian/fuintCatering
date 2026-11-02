@@ -24,6 +24,8 @@ public class WxPayBean {
     private String certSerialNo;
     private String privateKeyPath;
     private String payPublicKeyPath;
+    private String pubKeyId; // 微信支付公钥ID，形如 PUB_KEY_ID_xxx，放入请求头 Wechatpay-Serial
+    private String platformCertPath; // 微信支付平台证书路径，微信支付公钥切换期用于兼容验签，切换完成后可移除
     private String domain; // 填写完整的回调地址
 
     public String getAppId() {
@@ -96,6 +98,22 @@ public class WxPayBean {
 
     public void setPayPublicKeyPath(String payPublicKeyPath) {
         this.payPublicKeyPath = payPublicKeyPath;
+    }
+
+    public String getPubKeyId() {
+        return pubKeyId;
+    }
+
+    public void setPubKeyId(String pubKeyId) {
+        this.pubKeyId = pubKeyId;
+    }
+
+    public String getPlatformCertPath() {
+        return platformCertPath;
+    }
+
+    public void setPlatformCertPath(String platformCertPath) {
+        this.platformCertPath = platformCertPath;
     }
 
     public String getDomain() {
