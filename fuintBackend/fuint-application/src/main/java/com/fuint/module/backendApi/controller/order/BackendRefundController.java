@@ -8,6 +8,7 @@ import com.fuint.common.enums.RefundStatusEnum;
 import com.fuint.common.enums.RefundTypeEnum;
 import com.fuint.common.param.RefundInfoParam;
 import com.fuint.common.param.RefundPage;
+import com.fuint.common.service.CommissionLogService;
 import com.fuint.common.service.OrderService;
 import com.fuint.common.service.RefundService;
 import com.fuint.common.util.TokenUtil;
@@ -49,6 +50,11 @@ public class BackendRefundController extends BaseController {
     private OrderService orderService;
 
     /**
+     * 分佣记录服务接口（推荐奖励追回校验）
+     * */
+    private CommissionLogService commissionLogService;
+
+    /**
      * 售后列表查询
      */
     @Operation(summary="售后列表查询")
@@ -78,6 +84,21 @@ public class BackendRefundController extends BaseController {
         result.put("refundTypeList", refundTypeList);
 
         return getSuccessResult(result);
+    }
+
+    /**
+     * 退款前校验推荐奖励是否可追回
+     * */
+    @Operation(summary="退款前校验推荐奖励")
+    @RequestMapping(value = "/preCheck", method = RequestMethod.GET)
+    @CrossOrigin
+    @PreAuthorize("@pms.hasPermission('refund:index')")
+    public ResponseObject preCheck(@RequestParam Integer orderId) throws BusinessCheckException {
+        if (orderId == null || orderId <= 0) {
+            return getFailureResult(1001, "订单ID不能为空");
+        }
+        Map<String, Object> checkResult = commissionLogService.checkRewardClawback(orderId);
+        return getSuccessResult(checkResult);
     }
 
     /**
