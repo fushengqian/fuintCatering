@@ -58,7 +58,7 @@
           <jyf-parser :html="couponInfo.description"></jyf-parser>
         </view>
       </block>
-      <empty v-else tips="亲，暂无卡券描述" />
+      <empty v-else :isLoading="false" tips="亲，暂无卡券描述" />
     </view>
 
     <!-- 底部选项卡 -->
@@ -97,12 +97,14 @@
   import * as CouponApi from '@/api/coupon'
   import jyfParser from '@/components/jyf-parser/jyf-parser'
   import Shortcut from '@/components/shortcut'
+  import Empty from '@/components/empty'
   import Popup from './components/Popup'
 
   export default {
     components: {
       jyfParser,
       Shortcut,
+      Empty,
       Popup
     },
     data() {

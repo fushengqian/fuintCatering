@@ -86,7 +86,7 @@
           <jyf-parser :html="goods.description"></jyf-parser>
         </view>
       </block>
-      <empty v-else tips="亲，暂无商品描述" />
+      <empty v-else :isLoading="false" tips="亲，暂无商品描述" />
     </view>
 
     <!-- 底部选项卡 -->
@@ -147,6 +147,7 @@
   import * as CartApi from '@/api/cart'
   import jyfParser from '@/components/jyf-parser/jyf-parser'
   import Shortcut from '@/components/shortcut'
+  import Empty from '@/components/empty'
   import SlideImage from './components/SlideImage'
   import SkuPopup from './components/SkuPopup'
 
@@ -154,6 +155,7 @@
     components: {
       jyfParser,
       Shortcut,
+      Empty,
       SlideImage,
       SkuPopup,
     },

@@ -2,16 +2,30 @@
   <view v-if="!isLoading" class="container p-bottom">
 
     <!-- 顶部状态栏 -->
-    <view class="detail-header dis-flex flex-y-center">
+    <view class="detail-header">
       <view class="header-backdrop">
-        <image class="image" src="/static/order/refund-bg.png"></image>
+        <image class="image" src="/static/order/refund-bg.png" mode="aspectFill"></image>
       </view>
-      <view class="header-state">
-        <text class="f-32 col-f" v-if="detail.status == RefundStatusEnum.A.key">{{RefundStatusEnum.A.name}}</text>
-        <text class="f-32 col-f" v-if="detail.status == RefundStatusEnum.B.key">{{RefundStatusEnum.B.name}}</text>
-        <text class="f-32 col-f" v-if="detail.status == RefundStatusEnum.C.key">{{RefundStatusEnum.C.name}}</text>
-        <text class="f-32 col-f" v-if="detail.status == RefundStatusEnum.D.key">{{RefundStatusEnum.D.name}}</text>
-        <text class="f-32 col-f" v-if="detail.status == RefundStatusEnum.E.key">{{RefundStatusEnum.E.name}}</text>
+      <view class="header-mask"></view>
+      <view class="header-inner dis-flex flex-y-center">
+        <view class="status-icon">
+          <!-- 已完成 / 已同意：对勾 -->
+          <view v-if="statusStyle == 'done'" class="icon-tick"></view>
+          <!-- 已拒绝 / 已取消：叉号 -->
+          <view v-else-if="statusStyle == 'close'" class="icon-cross">
+            <view class="cross-line"></view>
+            <view class="cross-line cross-line--2"></view>
+          </view>
+          <!-- 待审核：时钟 -->
+          <view v-else class="icon-clock">
+            <view class="clock-hand clock-hand--hour"></view>
+            <view class="clock-hand clock-hand--minute"></view>
+          </view>
+        </view>
+        <view class="status-info flex-box">
+          <text class="status-title col-f">{{ statusName }}</text>
+          <text class="status-tips">{{ statusTips }}</text>
+        </view>
       </view>
     </view>
 
@@ -53,6 +67,10 @@
 
     <!-- 售后信息 -->
     <view class="detail-refund b-f m-top20">
+      <view class="card-title dis-flex flex-y-center">
+        <view class="card-title__bar"></view>
+        <text class="card-title__text">售后信息</text>
+      </view>
       <view class="detail-refund__row dis-flex">
         <view class="text">
           <text>售后类型：</text>
@@ -82,15 +100,14 @@
       </view>
     </view>
 
-    <!-- 售后信息 -->
+    <!-- 拒绝原因 -->
     <view v-if="detail.status == RefundStatusEnum.C.key" class="detail-refund b-f m-top20">
-      <view class="detail-refund__row dis-flex">
-        <view class="text">
-          <text class="col-m">拒绝原因：</text>
-        </view>
-        <view class="flex-box">
-          <text>{{ detail.remark }}</text>
-        </view>
+      <view class="card-title dis-flex flex-y-center">
+        <view class="card-title__bar card-title__bar--danger"></view>
+        <text class="card-title__text" style="color: #f56c6c">拒绝原因</text>
+      </view>
+      <view class="detail-refund__row">
+        <text class="f-26 col-6">{{ detail.remark }}</text>
       </view>
     </view>
 
@@ -179,6 +196,39 @@
       }
     },
 
+    computed: {
+
+      // 状态名称
+      statusName() {
+        const status = this.detail.status
+        return status && RefundStatusEnum[status] ? RefundStatusEnum[status].name : ''
+      },
+
+      // 状态图标类型：pending(时钟) / done(对勾) / close(叉号)
+      statusStyle() {
+        const styles = {
+          A: 'pending',
+          B: 'done',
+          C: 'close',
+          D: 'close',
+          E: 'done'
+        }
+        return styles[this.detail.status] || 'pending'
+      },
+
+      // 状态说明文案
+      statusTips() {
+        const tips = {
+          A: '商家正在审核您的售后申请，请耐心等待',
+          B: '商家已同意售后申请，请寄回商品并填写物流信息',
+          C: '很抱歉，您的售后申请未通过审核',
+          D: '售后申请已取消',
+          E: '售后已完成，退款将按原支付方式退回'
+        }
+        return tips[this.detail.status] || ''
+      }
+    },
+
     /**
      * 生命周期函数--监听页面加载
      */
@@ -262,26 +312,135 @@
   .detail-header {
     position: relative;
     width: 100%;
-    height: 140rpx;
+    padding: 40rpx 30rpx;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: $fuint-theme;
 
     .header-backdrop {
       position: absolute;
       top: 0;
       left: 0;
       z-index: 0;
+      width: 100%;
+      height: 100%;
 
       .image {
         display: block;
-        width: 750rpx;
-        height: 140rpx;
+        width: 100%;
+        height: 100%;
       }
     }
   }
 
-  .header-state {
-     padding: 0rpx 130rpx;
-     font-size: 60rpx;
-     font-weight: bold;
+  .header-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.12);
+  }
+
+  .header-inner {
+    position: relative;
+    z-index: 2;
+    min-height: 96rpx;
+  }
+
+  .status-icon {
+    flex-shrink: 0;
+    width: 96rpx;
+    height: 96rpx;
+    margin-right: 24rpx;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // 对勾
+  .icon-tick {
+    width: 36rpx;
+    height: 20rpx;
+    margin-top: -8rpx;
+    border-left: 7rpx solid #fff;
+    border-bottom: 7rpx solid #fff;
+    border-radius: 2rpx;
+    transform: rotate(-45deg);
+  }
+
+  // 叉号
+  .icon-cross {
+    position: relative;
+    width: 36rpx;
+    height: 36rpx;
+  }
+
+  .cross-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 7rpx;
+    margin-top: -3rpx;
+    border-radius: 4rpx;
+    background: #fff;
+    transform: rotate(45deg);
+  }
+
+  .cross-line--2 {
+    transform: rotate(-45deg);
+  }
+
+  // 时钟
+  .icon-clock {
+    position: relative;
+    width: 40rpx;
+    height: 40rpx;
+    box-sizing: border-box;
+    border: 5rpx solid #fff;
+    border-radius: 50%;
+  }
+
+  .clock-hand {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background: #fff;
+    border-radius: 3rpx;
+  }
+
+  .clock-hand--hour {
+    width: 5rpx;
+    height: 12rpx;
+    margin: -12rpx 0 0 -2rpx;
+  }
+
+  .clock-hand--minute {
+    width: 10rpx;
+    height: 5rpx;
+    margin: -2rpx 0 0 0;
+  }
+
+  .status-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-title {
+    font-size: 40rpx;
+    font-weight: bold;
+    line-height: 1.3;
+  }
+
+  .status-tips {
+    margin-top: 10rpx;
+    font-size: 24rpx;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.85);
   }
 
   /* 商品详情 */
@@ -334,7 +493,31 @@
 
   /* 售后详情 */
   .detail-refund {
-    padding: 15rpx 20rpx;
+    padding: 15rpx 20rpx 25rpx;
+  }
+
+  // 卡片标题
+  .card-title {
+    padding: 20rpx 0 10rpx;
+    border-bottom: 1px solid #f5f5f5;
+
+    &__bar {
+      width: 6rpx;
+      height: 26rpx;
+      border-radius: 4rpx;
+      background: $fuint-theme;
+    }
+
+    &__bar--danger {
+      background: #f56c6c;
+    }
+
+    &__text {
+      margin-left: 10rpx;
+      font-size: 28rpx;
+      font-weight: bold;
+      color: #333;
+    }
   }
 
   .detail-refund__row {
