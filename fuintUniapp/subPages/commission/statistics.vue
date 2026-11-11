@@ -153,10 +153,10 @@
       }
     },
     computed: {
-      // 奖励发放开关关闭时只展示历史统计，不展示活动规则与邀请入口
+      // 有启用中的推荐奖励方案时才展示活动规则与邀请入口
       showRules() {
         const reward = this.reward || {}
-        return !!reward.rewardEnabled && reward.rules && reward.rules.length > 0
+        return !!(reward.rules && reward.rules.length > 0)
       },
       // 无活动且无历史奖励时隐藏整个推荐奖励区块
       showReward() {
