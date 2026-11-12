@@ -30,10 +30,143 @@
   color: #fa5151;
 }
 
+/* 详情/评价 锚点Tab（吸顶） */
+.anchor-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  display: flex;
+  background: #fff;
+
+  .anchor-tab-item {
+    flex: 1;
+    height: 80rpx;
+    line-height: 80rpx;
+    text-align: center;
+    font-size: 28rpx;
+    color: #666;
+    position: relative;
+
+    &.active {
+      color: #f9211c;
+      font-weight: bold;
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0;
+        width: 48rpx;
+        height: 6rpx;
+        border-radius: 3rpx;
+        background: #f9211c;
+      }
+    }
+  }
+}
+
+/* 用户评价 */
+.goods-comment {
+  padding: 20rpx;
+  background: #fff;
+
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16rpx;
+    border-bottom: 1rpx solid #f2f3f5;
+
+    .comment-title {
+      font-size: 30rpx;
+      color: #333;
+    }
+
+    .comment-rate {
+      font-size: 24rpx;
+      color: #ff976a;
+    }
+  }
+
+  .comment-item {
+    padding: 16rpx 0;
+    border-bottom: 1rpx solid #f2f3f5;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .comment-user {
+      display: flex;
+      align-items: center;
+
+      .user-name {
+        font-size: 26rpx;
+        color: #333;
+      }
+
+      .stars {
+        margin: 0 12rpx;
+
+        .star {
+          font-size: 24rpx;
+          color: #e0e0e0;
+
+          &.active {
+            color: #ffb800;
+          }
+        }
+      }
+
+      .comment-date {
+        margin-left: auto;
+        font-size: 22rpx;
+        color: #bbb;
+      }
+    }
+
+    .comment-text {
+      padding-top: 12rpx;
+      font-size: 26rpx;
+      color: #444;
+      line-height: 1.6;
+    }
+
+    .comment-images {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 12rpx;
+
+      .c-image {
+        width: 150rpx;
+        height: 150rpx;
+        border-radius: 8rpx;
+        margin-right: 12rpx;
+        margin-bottom: 12rpx;
+      }
+    }
+
+    .comment-reply {
+      background: #f7f8fa;
+      border-radius: 8rpx;
+      padding: 12rpx 16rpx;
+      margin-top: 12rpx;
+      font-size: 24rpx;
+      color: #666;
+
+      .reply-label {
+        color: #409eff;
+      }
+    }
+  }
+}
+
 /* 商品价 */
 
 .floor-price {
   color: #fa5151;
+  font-weight: bold;
   margin-right: 15rpx;
   font-size: 38rpx;
   line-height: 1;

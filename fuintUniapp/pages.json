@@ -7,7 +7,6 @@
     "selectedColor": "#ff0000",
     "borderStyle": "black",
     "backgroundColor": "#ffffff",
-    "fontSize":"30rpx",
     "list": [{
       "pagePath": "pages/index/index",
       "iconPath": "static/tabbar/home.png",
@@ -324,6 +323,19 @@
         {
            "root": "subPages",
            "pages": [
+               {
+                 "path": "comment/index",
+                 "style": {
+                   "navigationBarTitleText": "发表评价"
+                 }
+               },
+               {
+                 "path": "comment/my",
+                 "style": {
+                   "navigationBarTitleText": "我的评价",
+                   "enablePullDownRefresh": true
+                 }
+               },
                {
                  "path": "book/index",
                  "style": {

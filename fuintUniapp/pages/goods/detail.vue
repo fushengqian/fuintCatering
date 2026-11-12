@@ -76,8 +76,52 @@
     <!-- 商品SKU弹窗 -->
     <SkuPopup v-if="!isLoading" v-model="showSkuPopup" :skuMode="skuMode" :goods="goods" @addCart="onAddCart"/>
 
+    <!-- 详情/评价 锚点Tab（滚动后吸顶） -->
+    <view id="anchor-tabs" class="anchor-tabs">
+      <view class="anchor-tab-item" :class="{ active: currentTab === 0 }" @click="onAnchorTab(0)">
+        <text>商品详情</text>
+      </view>
+      <view v-if="commentData.total > 0" class="anchor-tab-item" :class="{ active: currentTab === 1 }" @click="onAnchorTab(1)">
+        <text>用户评价（{{ commentData.total }}）</text>
+      </view>
+    </view>
+
+    <!-- 用户评价 -->
+    <view id="goods-comment" v-if="!isLoading && commentData.total > 0" class="goods-comment m-top20 b-f">
+      <view class="comment-header">
+        <text class="comment-title">用户评价（{{ commentData.total }}）</text>
+        <text class="comment-rate">{{ commentData.avgScore }}分 好评率{{ commentData.goodRate }}%</text>
+      </view>
+      <view class="comment-item" v-for="(item, index) in commentData.list" :key="index">
+        <view class="comment-user">
+          <text class="user-name">{{ item.userName || '匿名会员' }}</text>
+          <view class="stars">
+            <text v-for="s in 5" :key="s" class="star" :class="{ active: item.score >= s }">★</text>
+          </view>
+          <text class="comment-date">{{ item.createTime }}</text>
+        </view>
+        <view class="comment-text" v-if="item.content">
+          <text>{{ item.content }}</text>
+        </view>
+        <view class="comment-images" v-if="item.images && item.images.length">
+          <image
+            class="c-image"
+            v-for="(img, imgIndex) in item.images"
+            :key="imgIndex"
+            :src="img"
+            mode="aspectFill"
+            @click="onPreviewCommentImage(item.images, imgIndex)"
+          ></image>
+        </view>
+        <view class="comment-reply" v-if="item.replyContent">
+          <text class="reply-label">商家回复：</text>
+          <text>{{ item.replyContent }}</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 商品描述 -->
-    <view v-if="!isLoading" class="goods-content m-top20">
+    <view id="goods-content" v-if="!isLoading" class="goods-content m-top20">
       <view class="item-title b-f">
         <text>商品详情</text>
       </view>
@@ -144,6 +188,7 @@
 <script>
   import { setCartTabBadge, setCartTotalNum } from '@/utils/app'
   import * as GoodsApi from '@/api/goods'
+  import * as GoodsCommentApi from '@/api/goodsComment'
   import * as CartApi from '@/api/cart'
   import jyfParser from '@/components/jyf-parser/jyf-parser'
   import Shortcut from '@/components/shortcut'
@@ -179,7 +224,16 @@
         // 显示/隐藏SKU弹窗
         showSkuPopup: false,
         // 模式 1:都显示 2:只显示购物车 3:只显示立即下单
-        skuMode: 1
+        skuMode: 1,
+        // 商品评价数据
+        commentData: { total: 0, avgScore: 5.0, goodRate: 100, list: [] },
+        // 锚点Tab：0=商品详情 1=用户评价
+        currentTab: 0,
+        // 锚点Tab高度
+        tabHeight: 44,
+        // 商品详情/评价区块的文档位置
+        detailTop: 0,
+        commentTop: 0
       }
     },
 
@@ -191,16 +245,86 @@
       this.goodsId = parseInt(options.goodsId)
       // 加载页面数据
       this.onRefreshPage()
+      // 加载商品评价
+      this.getGoodsComment()
+    },
+
+    // 监听页面滚动：同步锚点Tab高亮
+    onPageScroll({ scrollTop }) {
+      const tabBottom = scrollTop + (this.tabHeight || 44)
+      if (this.commentTop > 0 && tabBottom >= this.commentTop) {
+        this.currentTab = 1
+      } else {
+        this.currentTab = 0
+      }
     },
 
     methods: {
+
+      // 测量锚点区块位置
+      measureAnchor() {
+        const app = this
+        app.$nextTick(() => {
+          const query = uni.createSelectorQuery()
+          query.select('#anchor-tabs').boundingClientRect()
+          query.select('#goods-content').boundingClientRect()
+          query.select('#goods-comment').boundingClientRect()
+          query.selectViewport().scrollOffset()
+          query.exec(res => {
+            if (!res || !res[0]) return
+            const [tabRect, detailRect, commentRect, scroll] = res
+            const scrollTop = scroll ? scroll.scrollTop : 0
+            app.tabHeight = tabRect ? tabRect.height : 44
+            app.detailTop = detailRect ? detailRect.top + scrollTop : 0
+            app.commentTop = commentRect ? commentRect.top + scrollTop : 0
+          })
+        })
+      },
+
+      // 锚点Tab切换
+      onAnchorTab(tab) {
+        const app = this
+        app.currentTab = tab
+        const target = tab === 1 ? app.commentTop : app.detailTop
+        if (target <= 0) return
+        uni.pageScrollTo({
+          scrollTop: target - (app.tabHeight || 44) + 1,
+          duration: 300
+        })
+      },
+
+      // 获取商品评价（统计+前3条）
+      getGoodsComment() {
+        const app = this
+        GoodsCommentApi.list({ goodsId: app.goodsId, page: 1, pageSize: 3 })
+          .then(result => {
+            const { statistics, paginationResponse } = result.data
+            app.commentData = {
+              total: statistics.total || 0,
+              avgScore: statistics.avgScore || 0,
+              goodRate: statistics.goodRate || 0,
+              list: paginationResponse.content || []
+            }
+            // 评价区块渲染后重新测量锚点位置
+            app.measureAnchor()
+          })
+      },
+
+      // 预览评价图片
+      onPreviewCommentImage(images, index) {
+        uni.previewImage({ urls: images, current: index })
+      },
 
       // 刷新页面数据
       onRefreshPage() {
         const app = this
         app.isLoading = true
         Promise.all([app.getGoodsDetail(), app.getCartTotal()])
-          .finally(() => app.isLoading = false)
+          .finally(() => {
+            app.isLoading = false
+            // 页面渲染后测量锚点位置
+            app.measureAnchor()
+          })
       },
 
       // 获取商品信息

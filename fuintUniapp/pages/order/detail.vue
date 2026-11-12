@@ -255,6 +255,18 @@
       </view>
     </view>
 
+    <!-- 已完成订单：去评价 -->
+    <view class="footer-fixed" v-if="order.status == OrderStatusEnum.COMPLETE.value">
+      <view class="btn-wrapper">
+        <block>
+          <view class="btn-item" @click="handleViewMyComment()">我的评价</view>
+        </block>
+        <block>
+          <view class="btn-item active" @click="handleComment(order.id)">去评价</view>
+        </block>
+      </view>
+    </view>
+
     <!-- 支付方式弹窗 -->
     <u-popup v-model="showPayPopup" mode="bottom" :closeable="true">
       <view class="pay-popup">
@@ -501,6 +513,16 @@
       // 跳转到申请售后页面
       handleApplyRefund(orderId) {
         this.$navTo('pages/refund/apply', { orderId })
+      },
+
+      // 跳转到评价页面
+      handleComment(orderId) {
+        this.$navTo('subPages/comment/index', { orderId })
+      },
+
+      // 跳转到我的评价页面
+      handleViewMyComment() {
+        this.$navTo('subPages/comment/my')
       },
       
       // 售后详情
