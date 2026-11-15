@@ -56,8 +56,16 @@
                       </view>
                       <!-- 价格 -->
                       <view class="desc_footer">
-                        <text class="price_x">¥{{ item.price }}</text>
-                        <text class="price_y col-9" v-if="item.linePrice > 0">¥{{ item.linePrice }}</text>
+                        <!-- 会员价：登录会员且商品设置了会员价时展示 -->
+                        <block v-if="isMember && item.memberPrice > 0">
+                          <text class="member-price-tag">会员价</text>
+                          <text class="price_x">¥{{ item.memberPrice }}</text>
+                          <text class="price_y col-9">¥{{ item.price }}</text>
+                        </block>
+                        <block v-else>
+                          <text class="price_x">¥{{ item.price }}</text>
+                          <text class="price_y col-9" v-if="item.linePrice > 0">¥{{ item.linePrice }}</text>
+                        </block>
                       </view>
                   </view>
                   <view class="attr-r">
@@ -79,7 +87,7 @@
   import MescrollBody from '@/components/mescroll-uni/mescroll-body.vue'
   import MescrollMixin from '@/components/mescroll-uni/mescroll-mixins'
   import * as GoodsApi from '@/api/goods'
-  import { getEmptyPaginateObj, getMoreListData } from '@/utils/app'
+  import { getEmptyPaginateObj, getMoreListData, checkLogin } from '@/utils/app'
   import Search from '@/components/search'
 
   const pageSize = 15
@@ -121,6 +129,13 @@
       this.options = options;
       // 设置默认列表显示方式
       this.setShowView();
+    },
+
+    computed: {
+      // 是否已登录会员（所有注册用户均为会员）
+      isMember() {
+        return checkLogin()
+      }
     },
 
     methods: {
@@ -444,6 +459,18 @@
 
       .price_y {
         text-decoration: line-through;
+      }
+
+      /* 会员价标签 */
+      .member-price-tag {
+        display: inline-block;
+        font-size: 18rpx;
+        line-height: 1;
+        color: #fff;
+        background: #fa5151;
+        border-radius: 4rpx;
+        padding: 4rpx 6rpx;
+        margin-right: 6rpx;
       }
     }
   }

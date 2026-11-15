@@ -30,6 +30,17 @@
   color: #fa5151;
 }
 
+/* 会员价标签 */
+.member-price-tag {
+  font-size: 22rpx;
+  line-height: 1;
+  color: #fff;
+  background: #fa5151;
+  border-radius: 6rpx;
+  padding: 4rpx 10rpx;
+  margin-right: 12rpx;
+}
+
 /* 详情/评价 锚点Tab（吸顶） */
 .anchor-tabs {
   position: sticky;
@@ -244,6 +255,8 @@
 .goods-content .item-title {
   padding: 20rpx;
   font-size: 30rpx;
+  font-weight: bold;
+  background: #f2f3f5;
 }
 .goods-content .goods-content-detail {
     padding: 20rpx;

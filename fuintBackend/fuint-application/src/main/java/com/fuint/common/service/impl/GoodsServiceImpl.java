@@ -208,6 +208,7 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
                 MtGoods::getIsSingleSpec,
                 MtGoods::getPlatform,
                 MtGoods::getPrice,
+                MtGoods::getMemberPrice,
                 MtGoods::getLinePrice,
                 MtGoods::getImages,
                 MtGoods::getLogo,
@@ -252,6 +253,7 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
             item.setCateInfo(cateInfo);
             item.setType(mtGoods.getType());
             item.setPrice(mtGoods.getPrice());
+            item.setMemberPrice(mtGoods.getMemberPrice());
             item.setLinePrice(mtGoods.getLinePrice());
             item.setSalePoint(mtGoods.getSalePoint());
             item.setSort(mtGoods.getSort());
@@ -353,6 +355,9 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
         }
         if (reqDto.getPrice() != null) {
             mtGoods.setPrice(reqDto.getPrice());
+        }
+        if (reqDto.getMemberPrice() != null) {
+            mtGoods.setMemberPrice(reqDto.getMemberPrice());
         }
         if (reqDto.getPrice() == null && reqDto.getId() <= 0) {
             mtGoods.setPrice(new BigDecimal("0.00"));
@@ -584,6 +589,9 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
             // 多规格商品的价格、库存数量
             if (goodsSkuList.size() > 0) {
                 goodsInfo.setPrice(goodsSkuList.get(0).getPrice());
+                if (goodsSkuList.get(0).getMemberPrice() != null && goodsSkuList.get(0).getMemberPrice().compareTo(BigDecimal.ZERO) > 0) {
+                    goodsInfo.setMemberPrice(goodsSkuList.get(0).getMemberPrice());
+                }
                 goodsInfo.setLinePrice(goodsSkuList.get(0).getLinePrice());
                 Double stock = 0.0;
                 for (MtGoodsSku mtGoodsSku : goodsSkuList) {
@@ -690,6 +698,9 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
                     List<MtGoodsSku> goodsSkuList = mtGoodsSkuMapper.selectByMap(param);
                     if (goodsSkuList.size() > 0) {
                         mtGoods.setPrice(goodsSkuList.get(0).getPrice());
+                        if (goodsSkuList.get(0).getMemberPrice() != null && goodsSkuList.get(0).getMemberPrice().compareTo(BigDecimal.ZERO) > 0) {
+                            mtGoods.setMemberPrice(goodsSkuList.get(0).getMemberPrice());
+                        }
                         mtGoods.setLinePrice(goodsSkuList.get(0).getLinePrice());
                         Double stock = 0.0;
                         for (MtGoodsSku mtGoodsSku : goodsSkuList) {
@@ -820,6 +831,9 @@ public class GoodsServiceImpl extends ServiceImpl<MtGoodsMapper, MtGoods> implem
                  if (goodsSkuList != null && goodsSkuList.size() > 0) {
                      goodsDto.setSkuId(goodsSkuList.get(0).getId());
                      goodsDto.setPrice(goodsSkuList.get(0).getPrice());
+                     if (goodsSkuList.get(0).getMemberPrice() != null && goodsSkuList.get(0).getMemberPrice().compareTo(BigDecimal.ZERO) > 0) {
+                         goodsDto.setMemberPrice(goodsSkuList.get(0).getMemberPrice());
+                     }
                      if (goodsSkuList.get(0).getLogo() != null && StringUtil.isNotEmpty(goodsSkuList.get(0).getLogo())) {
                          goodsDto.setLogo(goodsSkuList.get(0).getLogo());
                      }

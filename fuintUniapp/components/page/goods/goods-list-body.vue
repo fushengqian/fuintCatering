@@ -26,8 +26,16 @@
                 </view>
                 <!-- 商品价格 -->
                 <view class="desc_footer">
-                  <text v-if="showFields.includes('goodsPrice')" class="price_x">¥{{ dataItem.price ? dataItem.price : '0.00' }}</text>
-                  <text class="price_y col-9" v-if="showFields.includes('linePrice') && dataItem.linePrice > 0">¥{{ dataItem.linePrice }}</text>
+                  <!-- 会员价：登录会员且商品设置了会员价时展示 -->
+                  <block v-if="isMember && dataItem.memberPrice > 0">
+                    <text class="member-price-tag">会员价</text>
+                    <text class="price_x">¥{{ dataItem.memberPrice }}</text>
+                    <text class="price_y col-9">¥{{ dataItem.price }}</text>
+                  </block>
+                  <block v-else>
+                    <text v-if="showFields.includes('goodsPrice')" class="price_x">¥{{ dataItem.price ? dataItem.price : '0.00' }}</text>
+                    <text class="price_y col-9" v-if="showFields.includes('linePrice') && dataItem.linePrice > 0">¥{{ dataItem.linePrice }}</text>
+                  </block>
                   <view class="buy-now">去下单</view>
                 </view>
               </view>
@@ -53,8 +61,16 @@
               </view>
               <!-- 商品价格 -->
               <view class="detail-price oneline-hide">
-                <text v-if="showFields.includes('goodsPrice')" class="goods-price f-30 col-m">￥{{ dataItem.price }}</text>
-                <text v-if="showFields.includes('linePrice') && dataItem.linePrice > 0" class="line-price col-9 f-24">￥{{ dataItem.linePrice }}</text>
+                <!-- 会员价：登录会员且商品设置了会员价时展示 -->
+                <block v-if="isMember && dataItem.memberPrice > 0">
+                  <text class="member-price-tag">会员价</text>
+                  <text class="goods-price f-30 col-m">￥{{ dataItem.memberPrice }}</text>
+                  <text class="line-price col-9 f-24">￥{{ dataItem.price }}</text>
+                </block>
+                <block v-else>
+                  <text v-if="showFields.includes('goodsPrice')" class="goods-price f-30 col-m">￥{{ dataItem.price }}</text>
+                  <text v-if="showFields.includes('linePrice') && dataItem.linePrice > 0" class="line-price col-9 f-24">￥{{ dataItem.linePrice }}</text>
+                </block>
                 <text v-if="showFields.includes('goodsSales')" class="sales">已售{{ dataItem.initSale ? dataItem.initSale : 0 }}件</text>
               </view>
             </view>
@@ -66,6 +82,8 @@
 </template>
 
 <script>
+  import { checkLogin } from '@/utils/app'
+
   export default {
     name: 'GoodsListBody',
     props: {
@@ -90,6 +108,10 @@
       },
       showFields() {
         return (this.itemStyle && this.itemStyle.show) || ['goodsName', 'goodsPrice', 'linePrice', 'goodsSales']
+      },
+      // 是否已登录会员（所有注册用户均为会员）
+      isMember() {
+        return checkLogin()
       }
     },
     methods: {
@@ -326,5 +348,17 @@
         }
       }
     }
+  }
+
+  /* 会员价标签 */
+  .member-price-tag {
+    display: inline-block;
+    font-size: 18rpx;
+    line-height: 1;
+    color: #fff;
+    background: #fa5151;
+    border-radius: 4rpx;
+    padding: 4rpx 6rpx;
+    margin-right: 6rpx;
   }
 </style>

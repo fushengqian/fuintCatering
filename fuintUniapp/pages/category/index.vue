@@ -55,7 +55,13 @@
                         <text class="stock text">库存:{{ item.stock ? item.stock : 0 }} 已售:{{ item.initSale ? item.initSale : 0 }}</text>
                       </view>
                       <view class="action">
-                          <text class="price">￥{{ item.price ? item.price : 0 }}</text>
+                          <!-- 会员价：登录会员且商品设置了会员价时展示 -->
+                          <view v-if="isMember && item.memberPrice > 0" class="member-price">
+                              <text class="member-price-tag">会员价</text>
+                              <text class="price">￥{{ item.memberPrice }}</text>
+                              <text class="price-origin">￥{{ item.price }}</text>
+                          </view>
+                          <text v-else class="price">￥{{ item.price ? item.price : 0 }}</text>
                           <view class="cart">
                               <view v-if="item.isSingleSpec === 'Y'" class="singleSpec">
                                   <view class="ii do-minus" v-if="item.buyNum" :style="{ background: themeColor, borderColor: themeColor }" @click="onSaveCart(item.id, '-')">
@@ -140,7 +146,7 @@
 </template>
 
 <script>
-  import { setCartTabBadge, setCartTotalNum } from '@/utils/app'
+  import { setCartTabBadge, setCartTotalNum, checkLogin } from '@/utils/app'
   import * as CartApi from '@/api/cart'
   import * as GoodsApi from '@/api/goods'
   import * as settingApi from '@/api/setting'
@@ -202,6 +208,10 @@
     },
 
     computed: {
+      // 是否已登录会员（所有注册用户均为会员）
+      isMember() {
+        return checkLogin()
+      },
       diningStyle() {
         // 动态计算 .dining-container 高度 = viewport - footer 真实总高
         // footer 真实总高 ≈ 内容(padding-top 8rpx + .chackout-left 98rpx ≈ 55.5px)
@@ -781,6 +791,31 @@
             float: left;
             font-size: 32rpx;
             font-weight: bold;
+        }
+        /* 会员价 */
+        .member-price {
+            margin-top: 20rpx;
+            float: left;
+            .member-price-tag {
+                display: inline-block;
+                font-size: 18rpx;
+                line-height: 1;
+                color: #fff;
+                background: #fa5151;
+                border-radius: 4rpx;
+                padding: 4rpx 6rpx;
+                margin-right: 6rpx;
+            }
+            .price {
+                margin-top: 0;
+                font-size: 30rpx;
+            }
+            .price-origin {
+                margin-left: 8rpx;
+                color: #999;
+                font-size: 22rpx;
+                text-decoration: line-through;
+            }
         }
         .cart {
             margin-top: 20rpx;

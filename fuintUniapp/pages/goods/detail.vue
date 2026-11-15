@@ -21,11 +21,21 @@
         </block>
         <block v-else>
           <view class="block-left dis-flex flex-y-end">
-            <!-- 商品售价 -->
-            <text class="floor-price__samll">￥</text>
-            <text class="floor-price">{{ goods.price }}</text>
-            <!-- 划线价 -->
-            <text class="original-price">￥{{ goods.linePrice }}</text>
+            <!-- 会员价：登录会员且商品设置了会员价时展示，结算按会员价×等级折扣 -->
+            <block v-if="isMember && goods.memberPrice > 0">
+              <text class="member-price-tag">会员价</text>
+              <text class="floor-price__samll">￥</text>
+              <text class="floor-price">{{ goods.memberPrice }}</text>
+              <!-- 原价 -->
+              <text class="original-price">￥{{ goods.price }}</text>
+            </block>
+            <block v-else>
+              <!-- 商品售价 -->
+              <text class="floor-price__samll">￥</text>
+              <text class="floor-price">{{ goods.price }}</text>
+              <!-- 划线价 -->
+              <text class="original-price">￥{{ goods.linePrice }}</text>
+            </block>
           </view>
           <view class="block-right dis-flex">
             <!-- 销量 -->
@@ -76,8 +86,8 @@
     <!-- 商品SKU弹窗 -->
     <SkuPopup v-if="!isLoading" v-model="showSkuPopup" :skuMode="skuMode" :goods="goods" @addCart="onAddCart"/>
 
-    <!-- 详情/评价 锚点Tab（滚动后吸顶） -->
-    <view id="anchor-tabs" class="anchor-tabs">
+    <!-- 详情/评价 锚点Tab（滚动后吸顶，无评价时隐藏） -->
+    <view id="anchor-tabs" v-if="commentData.total > 0" class="anchor-tabs">
       <view class="anchor-tab-item" :class="{ active: currentTab === 0 }" @click="onAnchorTab(0)">
         <text>商品详情</text>
       </view>
@@ -125,12 +135,12 @@
       <view class="item-title b-f">
         <text>商品详情</text>
       </view>
-      <block v-if="goods.description != ''">
+      <block v-if="hasDescription">
         <view class="goods-content-detail b-f">
           <jyf-parser :html="goods.description"></jyf-parser>
         </view>
       </block>
-      <empty v-else :isLoading="false" tips="亲，暂无商品描述" />
+      <empty v-else :isLoading="false" tips="暂无详情信息" />
     </view>
 
     <!-- 底部选项卡 -->
@@ -186,7 +196,7 @@
 </template>
 
 <script>
-  import { setCartTabBadge, setCartTotalNum } from '@/utils/app'
+  import { setCartTabBadge, setCartTotalNum, checkLogin } from '@/utils/app'
   import * as GoodsApi from '@/api/goods'
   import * as GoodsCommentApi from '@/api/goodsComment'
   import * as CartApi from '@/api/cart'
@@ -209,6 +219,19 @@
       // 是否积分兑换商品：是则展示积分数、隐藏现金购买入口
       isPointGoods() {
         return this.goods && this.goods.isPointGoods === 'Y'
+      },
+      // 是否已登录会员（所有注册用户均为会员）
+      isMember() {
+        return checkLogin()
+      },
+      // 商品详情是否包含实质内容（空壳HTML如 <p><br></p> 视为无内容）
+      hasDescription() {
+        const desc = this.goods.description
+        if (!desc) return false
+        // 含图片/视频等媒体元素的详情视为有内容
+        if (/<(img|video|audio|iframe)/i.test(desc)) return true
+        const text = desc.replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').replace(/\s/g, '')
+        return text.length > 0
       }
     },
     data() {

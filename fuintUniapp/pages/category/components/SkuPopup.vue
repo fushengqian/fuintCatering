@@ -1,11 +1,11 @@
 <template>
   <goods-sku-popup :value="value" @input="onChangeValue" border-radius="20" :custom-action="findGoodsInfo"
-    :mode="skuMode" :defaultPrice="goods.price" :defaultStock="goods.stock" :maskCloseAble="true"
+    :mode="skuMode" :defaultPrice="defaultSkuPrice" :defaultStock="goods.stock" :maskCloseAble="true"
     @open="openSkuPopup" @close="closeSkuPopup" @add-cart="addCart" @buy-now="buyNow" />
 </template>
 
 <script>
-  import { setCartTotalNum } from '@/utils/app'
+  import { setCartTotalNum, checkLogin } from '@/utils/app'
   import * as CartApi from '@/api/cart'
   import * as GoodsApi from '@/api/goods'
   import GoodsSkuPopup from '@/components/goods-sku-popup'
@@ -42,6 +42,21 @@
       return {}
     },
 
+    computed: {
+      // 是否已登录会员（所有注册用户均为会员）
+      isMember() {
+        return checkLogin()
+      },
+      // 未选规格时的默认展示价：会员显示基础会员价
+      defaultSkuPrice() {
+        const goods = this.goods
+        if (this.isMember && parseFloat(goods.memberPrice || 0) > 0) {
+          return goods.memberPrice
+        }
+        return goods.price
+      }
+    },
+
     created() {
       const app = this
       const { goods } = app
@@ -74,17 +89,35 @@
       // 整理商品SKU列表
       getSkuList() {
         const app = this
-        const { goods: { name, logo, skuList } } = app
+        const { goods: { name, logo, skuList, price: goodsPrice, memberPrice: goodsMemberPrice } } = app
+        // 会员展示会员价：SKU级会员价优先，其次按“商品价格-商品会员价”差价平移到各规格
+        const isMember = app.isMember
+        const goodsPriceNum = parseFloat(goodsPrice || 0)
+        const goodsMemberNum = parseFloat(goodsMemberPrice || 0)
+        const delta = goodsMemberNum > 0 ? goodsPriceNum - goodsMemberNum : 0
         const skuData = []
         if (skuList) {
             skuList.forEach(item => {
+              let price = parseFloat(item.price || 0)
+              if (isMember) {
+                const skuMemberNum = parseFloat(item.memberPrice || 0)
+                let base = 0
+                if (skuMemberNum > 0) {
+                  base = skuMemberNum
+                } else if (delta > 0) {
+                  base = price - delta
+                }
+                if (base > 0) {
+                  price = Math.max(base, 0.01)
+                }
+              }
               skuData.push({
                 _id: item.id,
                 sku_id: item.skuId,
                 goods_id: item.goodsId,
                 name: name,
                 image: item.logo ? item.logo : logo,
-                price: item.price,
+                price: price,
                 stock: item.stock,
                 spec_value_ids: item.specIds,
                 sku_name_arr: app.getSkuNameArr(item.specIds)
