@@ -91,7 +91,8 @@ public class ClientOrderController extends BaseController {
         } else {
             orderInfo = orderService.getMyOrderById(Integer.parseInt(orderId));
         }
-        if (!orderInfo.getUserId().equals(userInfo.getId())) {
+        // 只能查看本人的订单
+        if (orderInfo == null || !userInfo.getId().equals(orderInfo.getUserId())) {
             return getFailureResult(201, "订单信息有误");
         }
 
@@ -176,6 +177,13 @@ public class ClientOrderController extends BaseController {
         UserOrderDto order = orderService.getOrderById(Integer.parseInt(orderId));
         if (!order.getUserId().equals(mtUser.getId())) {
             return getFailureResult(201, "订单信息有误");
+        }
+
+        // 仅已支付、已发货订单可确认收货；已收货视为幂等处理，其余状态不允许
+        if (!order.getStatus().equals(OrderStatusEnum.PAID.getKey())
+                && !order.getStatus().equals(OrderStatusEnum.DELIVERED.getKey())
+                && !order.getStatus().equals(OrderStatusEnum.RECEIVED.getKey())) {
+            return getFailureResult(201, "该订单状态不允许确认收货");
         }
 
         OrderDto reqDto = new OrderDto();

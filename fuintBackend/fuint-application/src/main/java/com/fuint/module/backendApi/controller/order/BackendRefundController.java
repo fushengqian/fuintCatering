@@ -142,6 +142,11 @@ public class BackendRefundController extends BaseController {
         if (!refundDto.getMerchantId().equals(accountInfo.getMerchantId())) {
             return getFailureResult(1004);
         }
+        // 绑定具体门店的账户只能操作本门店的售后单
+        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0
+                && refundDto.getStoreId() != null && !accountInfo.getStoreId().equals(refundDto.getStoreId())) {
+            return getFailureResult(1004);
+        }
 
         if (param.getStatus().equals(RefundStatusEnum.REJECT.getKey())) {
             RefundDto dto = new RefundDto();
@@ -180,6 +185,11 @@ public class BackendRefundController extends BaseController {
         AccountInfo accountInfo = TokenUtil.getAccountInfo();
         UserOrderDto orderInfo = orderService.getOrderById(orderId);
         if (!orderInfo.getMerchantId().equals(accountInfo.getMerchantId())) {
+            return getFailureResult(1004);
+        }
+        // 绑定具体门店的账户只能操作本门店的订单
+        if (accountInfo.getStoreId() != null && accountInfo.getStoreId() > 0
+                && orderInfo.getStoreInfo() != null && !accountInfo.getStoreId().equals(orderInfo.getStoreInfo().getId())) {
             return getFailureResult(1004);
         }
         if (orderId <= 0 || StringUtil.isEmpty(refundAmount)) {

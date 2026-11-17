@@ -577,7 +577,9 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
             }
 
             boolean isUsePoint = orderDto.getUsePoint() > 0 ? true : false;
-            cartData = calculateCartGoods(orderInfo.getMerchantId(), orderDto.getUserId(), cartList, orderDto.getCouponId(), isUsePoint, orderDto.getPlatform(), orderInfo.getOrderMode(), orderDto.getCouponIds());
+            // 游客订单按原价计价（订单归属不变）
+            Integer calcUserId = YesOrNoEnum.YES.getKey().equals(orderDto.getIsVisitor()) ? 0 : orderDto.getUserId();
+            cartData = calculateCartGoods(orderInfo.getMerchantId(), calcUserId, cartList, orderDto.getCouponId(), isUsePoint, orderDto.getPlatform(), orderInfo.getOrderMode(), orderDto.getCouponIds());
 
             mtOrder.setAmount(new BigDecimal(cartData.get("totalPrice").toString()));
             mtOrder.setUsePoint(Integer.parseInt(cartData.get("usePoint").toString()));
@@ -1818,7 +1820,11 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         }
 
         if (StringUtil.isNotBlank(orderDto.getVerifyCode())) {
-            if (orderDto.getVerifyCode().equals(mtOrder.getVerifyCode()) || StringUtil.isEmpty(mtOrder.getVerifyCode())) {
+            // 订单无核销码时不允许核销
+            if (StringUtil.isEmpty(mtOrder.getVerifyCode())) {
+                throw new BusinessCheckException("该订单无核销码，不允许核销！");
+            }
+            if (orderDto.getVerifyCode().equals(mtOrder.getVerifyCode())) {
                 mtOrder.setStatus(OrderStatusEnum.DELIVERED.getKey());
                 mtOrder.setVerifyCode("");
                 mtOrder.setConfirmStatus(YesOrNoEnum.YES.getKey());
@@ -2562,12 +2568,14 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         BigDecimal percent = new BigDecimal("0");
         Integer storeId = 0;
         if (cartList.size() > 0) {
-            // 会员折扣
-            MtUserGrade userGrade = userGradeService.queryUserGradeById(userInfo.getMerchantId(), userInfo.getGradeId() != null ? userInfo.getGradeId() : 1, userId);
-            if (userGrade != null && userGrade.getDiscount() != null && userGrade.getDiscount() > 0 && !userInfo.getIsStaff().equals(YesOrNoEnum.YES.getKey())) {
-                percent = new BigDecimal(userGrade.getDiscount()).divide(new BigDecimal("10"), BigDecimal.ROUND_CEILING, 4);
-                if (percent.compareTo(new BigDecimal("0")) <= 0) {
-                    percent = new BigDecimal("1");
+            // 会员折扣（游客不参与）
+            if (userInfo != null) {
+                MtUserGrade userGrade = userGradeService.queryUserGradeById(userInfo.getMerchantId(), userInfo.getGradeId() != null ? userInfo.getGradeId() : 1, userId);
+                if (userGrade != null && userGrade.getDiscount() != null && userGrade.getDiscount() > 0 && !YesOrNoEnum.YES.getKey().equals(userInfo.getIsStaff())) {
+                    percent = new BigDecimal(userGrade.getDiscount()).divide(new BigDecimal("10"), BigDecimal.ROUND_CEILING, 4);
+                    if (percent.compareTo(new BigDecimal("0")) <= 0) {
+                        percent = new BigDecimal("1");
+                    }
                 }
             }
 
@@ -2596,25 +2604,30 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                 // 基础会员价基数：SKU级会员价优先，其次商品级会员价（多规格按差价平移到SKU）
                 BigDecimal goodsMemberPrice = mtGoodsInfo.getMemberPrice();
                 BigDecimal memberBase = null;
-                if (percent.compareTo(new BigDecimal("0")) > 0) {
-                    BigDecimal skuMemberPrice = cartSku != null ? cartSku.getMemberPrice() : null;
-                    if (skuMemberPrice != null && skuMemberPrice.compareTo(new BigDecimal("0")) > 0) {
-                        memberBase = skuMemberPrice;
-                    } else if (goodsMemberPrice != null && goodsMemberPrice.compareTo(new BigDecimal("0")) > 0) {
-                        if (cartSku != null) {
-                            memberBase = cartSku.getPrice().subtract(originalPrice.subtract(goodsMemberPrice));
-                        } else {
-                            memberBase = goodsMemberPrice;
-                        }
+                BigDecimal skuMemberPrice = cartSku != null ? cartSku.getMemberPrice() : null;
+                if (skuMemberPrice != null && skuMemberPrice.compareTo(new BigDecimal("0")) > 0) {
+                    memberBase = skuMemberPrice;
+                } else if (goodsMemberPrice != null && goodsMemberPrice.compareTo(new BigDecimal("0")) > 0) {
+                    if (cartSku != null) {
+                        memberBase = cartSku.getPrice().subtract(originalPrice.subtract(goodsMemberPrice));
+                    } else {
+                        memberBase = goodsMemberPrice;
                     }
                 }
-                // 基础会员价：行价=会员价基数×等级折扣
-                boolean useMemberPrice = memberBase != null;
+                // 基础会员价：有等级折扣时行价=会员价基数×等级折扣，否则按会员价原价；游客不享受会员价
+                boolean useMemberPrice = memberBase != null && userInfo != null;
+                if (memberBase != null && !useMemberPrice) {
+                    mtGoodsInfo.setMemberPrice(new BigDecimal("0"));
+                }
                 if (useMemberPrice) {
                     if (memberBase.compareTo(new BigDecimal("0.01")) < 0) {
                         memberBase = new BigDecimal("0.01");
                     }
-                    mtGoodsInfo.setPrice(memberBase.multiply(percent).setScale(2, BigDecimal.ROUND_HALF_UP));
+                    if (percent.compareTo(new BigDecimal("0")) > 0) {
+                        mtGoodsInfo.setPrice(memberBase.multiply(percent).setScale(2, BigDecimal.ROUND_HALF_UP));
+                    } else {
+                        mtGoodsInfo.setPrice(memberBase.setScale(2, BigDecimal.ROUND_HALF_UP));
+                    }
                     mtGoodsInfo.setMemberPrice(memberBase);
                 }
 
@@ -2653,7 +2666,10 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
                         if (mtGoodsSku.getWeight().compareTo(new BigDecimal("0")) > 0) {
                             mtGoods.setWeight(mtGoodsSku.getWeight());
                         }
-                        mtGoods.setPrice(mtGoodsSku.getPrice());
+                        // 已按会员价计价的商品保留会员价，不覆盖回SKU原价
+                        if (!useMemberPrice) {
+                            mtGoods.setPrice(mtGoodsSku.getPrice());
+                        }
                         mtGoods.setLinePrice(mtGoodsSku.getLinePrice());
                         mtGoods.setStock(mtGoodsSku.getStock());
                     }
@@ -2840,7 +2856,7 @@ public class OrderServiceImpl extends ServiceImpl<MtOrderMapper, MtOrder> implem
         BigDecimal payPrice = totalPrice.subtract(couponAmount);
 
         // 可用积分、可用积分金额
-        Integer myPoint = userInfo.getPoint() == null ? 0 : userInfo.getPoint();
+        Integer myPoint = userInfo != null && userInfo.getPoint() != null ? userInfo.getPoint() : 0;
         Integer usePoint = 0;
         BigDecimal usePointAmount = new BigDecimal("0");
         if (hasPointGoods) {
