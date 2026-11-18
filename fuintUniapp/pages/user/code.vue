@@ -10,6 +10,7 @@
     
     <view class="info-code">
         <view class="code-text">会员号：{{ userInfo.userNo ? userInfo.userNo : '--'}}</view>
+        <image v-if="barcode" class="barcode" :src="barcode"></image>
         <image class="qrcode" :src="qrCode"></image>
     </view>
     
@@ -34,7 +35,8 @@
         // 正在加载
         isLoading: true,
         userInfo: {},
-        qrCode: ""
+        qrCode: "",
+        barcode: ""
       }
     },
 
@@ -58,6 +60,7 @@
           .then(result => {
             app.userInfo = result.data.userInfo;
             app.qrCode = result.data.qrCode;
+            app.barcode = result.data.barcode ? result.data.barcode : "";
             app.isLoading = false;
           })
       },
@@ -99,6 +102,11 @@
       margin-bottom: 30rpx;
       .code-text{
           margin-bottom: 50rpx;
+      }
+      .barcode {
+          width: 88%;
+          height: 160rpx;
+          margin: 0 auto 50rpx auto;
       }
       .qrcode {
          width: 360rpx;
