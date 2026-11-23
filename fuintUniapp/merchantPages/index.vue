@@ -118,11 +118,11 @@
   import * as OrderApi from '@/api/order'
   import { checkLogin } from '@/utils/app'
 
-  // 待办操作
+  // 待办操作（count：待办数量，从后端统计接口获取）
   const orderNavbar = [
-    { id: 'confirm', name: '核销订单', icon: 'dingdan', count: 1, url:'merchantPages/order/index?dataType=todo' },
-    { id: 'refund', name: '售后审核', icon: 'daifukuan', count: 1, url:'merchantPages/refund/index?status=1' },
-    { id: 'book', name: '预约管理', icon: 'daishouhuo', count: 3, url:'merchantPages/book/index?dataType=todo' },
+    { id: 'confirm', name: '核销订单', icon: 'dingdan', count: 0, url:'merchantPages/order/index?dataType=todo' },
+    { id: 'refund', name: '售后审核', icon: 'daifukuan', count: 0, url:'merchantPages/refund/index?status=1' },
+    { id: 'book', name: '预约管理', icon: 'daishouhuo', count: 0, url:'merchantPages/book/index' },
   ]
 
   /**
@@ -234,6 +234,12 @@
           !app.isLogin ? resolve(null) : MerchantApi.info()
             .then(result => {
               app.dataInfo = result.data
+              // 待办数量：今日待核销订单/今日待售后审核/今日预约
+              app.todoCounts = {
+                confirm: Number(result.data.todoOrderCount) || 0,
+                refund: Number(result.data.refundTodoCount) || 0,
+                book: Number(result.data.bookTodoCount) || 0
+              }
               resolve(app.dataInfo)
             })
             .catch(err => {

@@ -370,7 +370,8 @@
         const gridComp = app.getComp('serviceGrid')
         if (gridComp && gridComp.data && gridComp.data.items && gridComp.data.items.length > 0) {
           const configItems = gridComp.data.items
-          app.service = configItems.map(item => {
+          // 过滤后台禁用的服务项
+          app.service = configItems.filter(item => !item.disabled).map(item => {
             const target = defaultService.find(s => s.name === item.name)
             const isContact = (item.name && item.name.indexOf('客服') > -1) || (item.openType && item.openType === 'contact')
             return {
@@ -1202,9 +1203,19 @@
     }
   }
 
-  // 推荐信息
+  // 推荐信息（同时承担内容与 tabBar 之间的间距）
   .my-recommend {
       height: 20rpx;
+      flex-shrink: 0;
+  }
+
+  // 自定义 tabBar 占位：tabBar 高度之上多留一点间距，避免最后一行贴住 tabBar
+  .tabbar-safe-area {
+      flex-shrink: 0;
+      height: calc(120rpx + env(safe-area-inset-bottom));
+      /* #ifdef H5 */
+      height: calc(60px + env(safe-area-inset-bottom));
+      /* #endif */
   }
 
   // 会员升级

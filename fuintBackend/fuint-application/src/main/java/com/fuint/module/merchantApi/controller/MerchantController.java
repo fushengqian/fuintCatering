@@ -2,9 +2,11 @@ package com.fuint.module.merchantApi.controller;
 
 import com.fuint.common.dto.member.UserInfo;
 import com.fuint.common.dto.merchant.StaffDto;
+import com.fuint.common.service.BookItemService;
 import com.fuint.common.service.ConfirmLogService;
 import com.fuint.common.service.MemberService;
 import com.fuint.common.service.OrderService;
+import com.fuint.common.service.RefundService;
 import com.fuint.common.service.StaffService;
 import com.fuint.common.util.DateUtil;
 import com.fuint.common.util.TokenUtil;
@@ -51,6 +53,16 @@ public class MerchantController extends BaseController {
      * 卡券核销记录服务接口
      * */
     private ConfirmLogService confirmLogService;
+
+    /**
+     * 售后服务接口
+     * */
+    private RefundService refundService;
+
+    /**
+     * 预约单服务接口
+     * */
+    private BookItemService bookItemService;
 
     /**
      * 订单服务接口
@@ -101,6 +113,18 @@ public class MerchantController extends BaseController {
         // 今日活跃会员数
         Long todayUser = memberService.getActiveUserCount(staffInfo.getMerchantId(), staffInfo.getStoreId(), beginTime, endTime);
         outParams.put("todayUser", todayUser);
+
+        // 今日待核销订单数量（已支付、到店自提、未核销的实物订单，口径与商户端订单列表dataType=todo一致）
+        Long todoOrderCount = orderService.getTodoOrderCount(staffInfo.getMerchantId(), staffInfo.getStoreId(), beginTime, endTime);
+        outParams.put("todoOrderCount", todoOrderCount);
+
+        // 今日待售后审核数量（待审核的售后单，口径与商户端售后列表status=1一致）
+        Long refundTodoCount = refundService.getRefundTodoCount(staffInfo.getMerchantId(), staffInfo.getStoreId(), beginTime, endTime);
+        outParams.put("refundTodoCount", refundTodoCount);
+
+        // 今日预约数量（今日提交的预约单，口径与商户端预约列表一致）
+        Long bookTodoCount = bookItemService.getBookCount(staffInfo.getMerchantId(), staffInfo.getStoreId(), beginTime, endTime);
+        outParams.put("bookTodoCount", bookTodoCount);
 
         return getSuccessResult(outParams);
     }
