@@ -27,21 +27,22 @@
           <view class="stat-label">分佣订单</view>
         </view>
       </view>
+      <view class="withdraw-btn" v-if="canWithdraw" @click="openWithdraw">申请提现</view>
     </view>
 
     <!-- 推荐奖励区块 -->
     <view class="reward-section" v-if="showReward">
       <view class="reward-header">
-        <view class="reward-title">
-          <text class="reward-title-text">推荐奖励</text>
-          <text class="reward-title-tag">新</text>
+        <view class="reward-head-left">
+          <view class="reward-title">
+            <text class="reward-title-text">推荐奖励</text>
+            <text class="reward-title-tag">新</text>
+          </view>
+          <view class="reward-sub">邀请好友，得券和积分</view>
         </view>
-        <view class="reward-sub">邀请好友，得券和积分</view>
-      </view>
-      <view class="reward-rules" v-if="showRules">
-        <view class="rule-item" v-for="(item, index) in reward.rules" :key="index">
-          <text class="rule-dot"></text>
-          <text class="rule-text">{{ item.text }}</text>
+        <view class="reward-rule-link" @click="goRuleDesc()">
+          <text>奖励说明</text>
+          <text class="iconfont icon-xiangyoujiantou"></text>
         </view>
       </view>
       <view class="reward-stats">
@@ -116,8 +117,40 @@
           <view class="log-time">{{ formatTime(item.createTime) }}</view>
         </view>
       </view>
+    <!-- 奖励记录 -->
+    <view class="log-section" v-if="logList.length > 0">
+      <view class="section-title">奖励记录</view>
+      <view class="log-item" v-for="item in logList" :key="item.id">
+        <view class="log-icon" :class="item.rewardType == 'point' ? 'log-icon-point' : 'log-icon-coupon'">
+          <text class="iconfont" :class="item.rewardType == 'point' ? 'icon-jifen' : 'icon-youhuiquan'"></text>
+        </view>
+        <view class="log-main">
+          <view class="log-content">{{ rewardContent(item) }}</view>
+          <view class="log-source">{{ rewardSource(item) }}</view>
+        </view>
+        <view class="log-right">
+          <view class="log-status" :class="'status-' + item.status">{{ statusName(item.status) }}</view>
+          <view class="log-time">{{ formatTime(item.createTime) }}</view>
+        </view>
+      </view>
       <view class="load-status" v-if="logLoading">加载中...</view>
       <view class="load-status" v-else-if="!hasMore">没有更多了</view>
+    </view>
+
+    <!-- 申请提现弹窗 -->
+    <view class="withdraw-mask" v-if="showWithdraw" @click="closeWithdraw">
+      <view class="withdraw-dialog" @click.stop>
+        <view class="withdraw-title">申请提现</view>
+        <view class="withdraw-amount-row">
+          <text class="withdraw-symbol">￥</text>
+          <input class="withdraw-input" type="digit" v-model="withdrawAmount" placeholder="请输入提现金额" />
+        </view>
+        <view class="withdraw-tip">可提现金额 ￥{{ overview.amount || '0.00' }}，提交后由管理员审核打款</view>
+        <view class="withdraw-actions">
+          <view class="withdraw-cancel" @click="closeWithdraw">取消</view>
+          <view class="withdraw-confirm" :class="{ 'withdraw-confirm-disabled': submitting }" @click="submitWithdraw">提交申请</view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -149,10 +182,22 @@
         logList: [],
         page: 1,
         hasMore: true,
-        logLoading: false
+        logLoading: false,
+        // 申请提现
+        showWithdraw: false,
+        withdrawAmount: 
+''
+,
+        submitting: false
       }
     },
     computed: {
+      // 有可提现金额时显示申请提现按钮
+      canWithdraw() {
+        return parseFloat(this.overview.amount || 
+'0'
+) > 0
+      },
       // 有启用中的推荐奖励方案时才展示活动规则与邀请入口
       showRules() {
         const reward = this.reward || {}
@@ -303,7 +348,64 @@
        */
       goSharePage() {
         this.$navTo('pages/share/index')
+      },
+
+      /**
+       * 跳转奖励说明
+       * @param {string} tab 默认选中的tab（commission/recommend）
+       */
+      /**
+       * 跳转奖励说明
+       * @param {string} tab 默认选中的tab（commission/recommend）
+       */
+      goRuleDesc(tab) {
+        this.$navTo('subPages/commission/rules', tab ? { tab } : {})
+      },
+
+      /**
+       * 打开申请提现弹窗
+       */
+      openWithdraw() {
+        this.withdrawAmount = this.overview.amount || ''
+        this.showWithdraw = true
+      },
+
+      /**
+       * 关闭申请提现弹窗
+       */
+      closeWithdraw() {
+        this.showWithdraw = false
+      },
+
+      /**
+       * 提交提现申请（管理员审核后打款）
+       */
+      submitWithdraw() {
+        const amount = parseFloat(this.withdrawAmount)
+        if (!amount || amount <= 0) {
+          uni.showToast({ title: '请输入正确的提现金额', icon: 'none' })
+          return
+        }
+        if (amount > parseFloat(this.overview.amount || '0')) {
+          uni.showToast({ title: '提现金额不能大于可提现金额', icon: 'none' })
+          return
+        }
+        if (this.submitting) {
+          return
+        }
+        this.submitting = true
+        CommissionApi.withdraw({ amount: amount.toFixed(2) })
+          .then(() => {
+            this.showWithdraw = false
+            uni.showToast({ title: '申请已提交，等待管理员审核', icon: 'none' })
+            this.getOverview()
+          })
+          .catch(() => {})
+          .finally(() => {
+            this.submitting = false
+          })
       }
+
     }
   }
 </script>
@@ -371,6 +473,110 @@
     background: rgba(255, 255, 255, 0.3);
   }
 
+  /* 申请提现按钮 */
+  .withdraw-btn {
+    margin-top: 30rpx;
+    height: 72rpx;
+    line-height: 72rpx;
+    text-align: center;
+    background: #fff;
+    color: var(--theme-primary);
+    font-size: 28rpx;
+    font-weight: bold;
+    border-radius: 36rpx;
+  }
+
+  /* 申请提现弹窗 */
+  .withdraw-mask {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .withdraw-dialog {
+    width: 560rpx;
+    background: #fff;
+    border-radius: 20rpx;
+    padding: 40rpx 36rpx 32rpx;
+  }
+
+  .withdraw-title {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 32rpx;
+  }
+
+  .withdraw-amount-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1rpx solid #eee;
+    padding-bottom: 12rpx;
+    margin-bottom: 16rpx;
+  }
+
+  .withdraw-symbol {
+    font-size: 36rpx;
+    font-weight: bold;
+    color: #333;
+    margin-right: 8rpx;
+  }
+
+  .withdraw-input {
+    flex: 1;
+    font-size: 40rpx;
+    font-weight: bold;
+    color: #333;
+    height: 60rpx;
+    line-height: 60rpx;
+  }
+
+  .withdraw-tip {
+    font-size: 22rpx;
+    color: #999;
+    margin-bottom: 36rpx;
+  }
+
+  .withdraw-actions {
+    display: flex;
+    align-items: center;
+  }
+
+  .withdraw-cancel {
+    flex: 1;
+    height: 72rpx;
+    line-height: 72rpx;
+    text-align: center;
+    font-size: 28rpx;
+    color: #666;
+    background: #f5f5f5;
+    border-radius: 36rpx;
+    margin-right: 20rpx;
+  }
+
+  .withdraw-confirm {
+    flex: 1;
+    height: 72rpx;
+    line-height: 72rpx;
+    text-align: center;
+    font-size: 28rpx;
+    color: #fff;
+    background: var(--theme-primary);
+    border-radius: 36rpx;
+  }
+
+  .withdraw-confirm-disabled {
+    opacity: 0.6;
+  }
+
   /* 推荐奖励区块 */
   .reward-section {
     margin: 0 20rpx 20rpx;
@@ -381,7 +587,24 @@
   }
 
   .reward-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 24rpx;
+  }
+
+  .reward-rule-link {
+    display: flex;
+    align-items: center;
+    font-size: 22rpx;
+    color: #b98c58;
+    flex-shrink: 0;
+    padding: 8rpx 0 8rpx 16rpx;
+
+    .iconfont {
+      font-size: 20rpx;
+      margin-left: 4rpx;
+    }
   }
 
   .reward-title {
@@ -408,37 +631,6 @@
     font-size: 22rpx;
     color: #b98c58;
     margin-top: 6rpx;
-  }
-
-  .reward-rules {
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 12rpx;
-    padding: 20rpx 24rpx;
-    margin-bottom: 24rpx;
-  }
-
-  .rule-item {
-    display: flex;
-    align-items: flex-start;
-
-    &:not(:last-child) {
-      margin-bottom: 14rpx;
-    }
-  }
-
-  .rule-dot {
-    width: 10rpx;
-    height: 10rpx;
-    border-radius: 50%;
-    background: #ff9800;
-    margin: 14rpx 14rpx 0 0;
-    flex-shrink: 0;
-  }
-
-  .rule-text {
-    font-size: 24rpx;
-    color: #7a4a12;
-    line-height: 38rpx;
   }
 
   .reward-stats {

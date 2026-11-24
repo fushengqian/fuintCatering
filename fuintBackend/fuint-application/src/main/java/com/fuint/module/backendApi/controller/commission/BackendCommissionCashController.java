@@ -116,7 +116,7 @@ public class BackendCommissionCashController extends BaseController {
     /**
      * 支付结算金额到用户余额
      */
-    @Operation(summary="支付结算金额到用户余额")
+    @Operation(summary="付款到会员余额")
     @RequestMapping(value = "/payToBalance", method = RequestMethod.POST)
     @PreAuthorize("@pms.hasPermission('commission:cash:index')")
     public ResponseObject payToBalance(@RequestBody CommissionCashRequest commissionCashRequest) throws BusinessCheckException {
@@ -126,6 +126,22 @@ public class BackendCommissionCashController extends BaseController {
             return getFailureResult(1004);
         }
         commissionCashService.payToBalance(commissionCashRequest);
+        return getSuccessResult(true);
+    }
+
+    /**
+     * 商家转账付款到微信钱包
+     */
+    @Operation(summary="付款到微信钱包")
+    @RequestMapping(value = "/payToWechat", method = RequestMethod.POST)
+    @PreAuthorize("@pms.hasPermission('commission:cash:index')")
+    public ResponseObject payToWechat(@RequestBody CommissionCashRequest commissionCashRequest) throws BusinessCheckException {
+        AccountInfo accountInfo = TokenUtil.getAccountInfo();
+        commissionCashRequest.setOperator(accountInfo.getAccountName());
+        if (!checkOwner(commissionCashRequest.getId(), accountInfo)) {
+            return getFailureResult(1004);
+        }
+        commissionCashService.payToWechat(commissionCashRequest);
         return getSuccessResult(true);
     }
 

@@ -1783,6 +1783,80 @@ public class WeixinServiceImpl implements WeixinService {
     }
 
     /**
+     * 微信商家转账（付款到用户微信零钱，APIv3 /v3/transfer/batches）
+     *
+     * 受理成功不代表最终到账（用户确认收款模式下以微信侧结果为准），
+     * 此处仅以受理结果作为打款依据，批次单号落库供人工对账
+     *
+     * @param storeId 店铺ID（用于选取支付配置）
+     * @param platform 支付平台（决定appId）
+     * @param openId 收款用户openid
+     * @param outBatchNo 商户批次单号
+     * @param amount 转账金额（元）
+     * @param batchName 批次名称
+     * @param batchRemark 批次备注
+     * @throws BusinessCheckException
+     * @return 微信侧批次单号（batch_id）
+     * */
+    @Override
+    public String transferToUser(Integer storeId, String platform, String openId, String outBatchNo, BigDecimal amount, String batchName, String batchRemark) throws BusinessCheckException {
+        if (StringUtil.isEmpty(openId)) {
+            throw new BusinessCheckException("收款用户未绑定微信，无法转账到微信钱包");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessCheckException("转账金额不能小于等于0");
+        }
+        try {
+            getApiConfig(storeId, platform);
+            WxPayV3Config v3Config = getV3Config();
+            PrivateKey privateKey = getV3PrivateKey(v3Config);
+
+            // APIv3 商家转账，金额单位为分
+            int transferAmount = amount.multiply(new BigDecimal("100")).intValue();
+            JSONObject detail = new JSONObject();
+            detail.put("out_detail_no", outBatchNo + "D1");
+            detail.put("transfer_amount", transferAmount);
+            detail.put("openid", openId);
+            JSONArray detailList = new JSONArray();
+            detailList.add(detail);
+
+            JSONObject reqBody = new JSONObject();
+            reqBody.put("appid", v3Config.getAppId());
+            reqBody.put("out_batch_no", outBatchNo);
+            reqBody.put("batch_name", batchName);
+            reqBody.put("batch_remark", batchRemark);
+            reqBody.put("total_amount", transferAmount);
+            reqBody.put("transfer_detail_list", detailList);
+
+            logger.info("WeixinService transferToUser params: {}", reqBody.toJSONString());
+            IJPayHttpResponse response = WxPayApi.v3(RequestMethodEnum.POST,
+                    WxDomainEnum.CHINA.getDomain(),
+                    "/v3/transfer/batches",
+                    v3Config.getMchId(),
+                    v3Config.getSerialNo(),
+                    v3Config.getPubKeyId(),
+                    privateKey,
+                    reqBody.toJSONString());
+            verifyV3Response(response, v3Config, "商家转账");
+            logger.info("WeixinService transferToUser return: {}", response.getBody());
+
+            // APIv3 以 HTTP 状态码判定业务结果，非 2xx 表示转账受理失败
+            if (response.getStatus() < 200 || response.getStatus() >= 300) {
+                JSONObject result = JSONObject.parseObject(response.getBody());
+                String message = result != null ? result.getString("message") : response.getBody();
+                logger.error("微信商家转账受理失败，message = {}", message);
+                throw new BusinessCheckException("微信商家转账失败：" + message);
+            }
+            JSONObject result = JSONObject.parseObject(response.getBody());
+            return result != null ? result.getString("batch_id") : "";
+        } catch (BusinessCheckException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BusinessCheckException("WeixinService.transferToUser 微信商家转账失败：" + e.getMessage());
+        }
+    }
+
+    /**
      * 获取当前线程的微信支付 APIv3 配置
      * */
     private WxPayV3Config getV3Config() {

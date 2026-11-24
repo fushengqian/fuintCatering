@@ -82,7 +82,7 @@ public interface CommissionCashService extends IService<MtCommissionCash> {
      * @return
      */
     void payToBalance(CommissionCashRequest commissionCashRequest) throws BusinessCheckException;
-
+     /**      * 商家转账付款到微信钱包      *      * @param  commissionCashRequest 请求参数      * @throws BusinessCheckException      * @return      */     void payToWechat(CommissionCashRequest commissionCashRequest) throws BusinessCheckException;
     /**
      * 申请提现
      *

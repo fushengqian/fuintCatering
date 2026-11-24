@@ -4,11 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fuint.common.dto.commission.CommissionCashDto;
+import com.fuint.common.dto.commission.CommissionOverviewDto;
 import com.fuint.common.dto.order.OrderUserDto;
 import com.fuint.common.dto.system.AccountInfo;
 import com.fuint.common.enums.CommissionCashStatusEnum;
+import com.fuint.common.enums.CommissionPayTypeEnum;
 import com.fuint.common.enums.CommissionStatusEnum;
 import com.fuint.common.enums.CommissionTargetEnum;
+import com.fuint.common.enums.PlatformTypeEnum;
 import com.fuint.common.enums.StatusEnum;
 import com.fuint.common.param.CommissionCashPage;
 import com.fuint.common.param.WithdrawParam;
@@ -82,6 +85,11 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
      * 余额服务接口
      * */
     private BalanceService balanceService;
+
+    /**
+     * 微信服务接口（商家转账付款到微信钱包）
+     * */
+    private WeixinService weixinService;
 
     /**
      * 分页查询提现列表
@@ -437,6 +445,8 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
         }
         mtCommissionCash.setOperator(commissionCashRequest.getOperator());
         mtCommissionCash.setStatus(CommissionCashStatusEnum.PAYED.getKey());
+        mtCommissionCash.setPayType(CommissionPayTypeEnum.BALANCE.getKey());
+        mtCommissionCash.setPayTime(new Date());
         mtCommissionCash.setAmount(amount);
         mtCommissionCash.setUpdateTime(new Date());
         mtCommissionCash.setDescription(commissionCashRequest.getDescription());
@@ -464,7 +474,7 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
     }
 
     /**
-     * 申请提现
+     * 会员端申请提现（生成待审核记录，由管理员审核后付款）
      *
      * @param  withdrawParam 请求参数
      * @throws BusinessCheckException
@@ -472,11 +482,103 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
      */
     @Override
     @Transactional
-    @OperationServiceLog(description = "支付结算金额到用户余额")
+    @OperationServiceLog(description = "会员申请提现")
     public Boolean withdraw(WithdrawParam withdrawParam) throws BusinessCheckException {
         if (withdrawParam.getAmount() == null || withdrawParam.getAmount().compareTo(new BigDecimal("0")) <= 0) {
             throw new BusinessCheckException("提现金额不能为空或小于等于0");
         }
-        return true;
+        MtUser mtUser = memberService.queryMemberById(withdrawParam.getUserId());
+        if (mtUser == null) {
+            throw new BusinessCheckException("会员不存在");
+        }
+        // 存在待审核或审核通过的申请时不允许重复申请，避免超出可提现金额
+        Long processing = mtCommissionCashMapper.selectCount(Wrappers.<MtCommissionCash>lambdaQuery()
+                .eq(MtCommissionCash::getUserId, withdrawParam.getUserId())
+                .in(MtCommissionCash::getStatus, Arrays.asList(
+                        CommissionCashStatusEnum.WAIT.getKey(), CommissionCashStatusEnum.SETTLED.getKey())));
+        if (processing != null && processing > 0) {
+            throw new BusinessCheckException("您有未处理的提现申请，请等待管理员审核");
+        }
+        // 提现金额不能大于可提现金额（总佣金 - 已打款）
+        CommissionOverviewDto overview = commissionLogService.getCommissionOverview(withdrawParam.getUserId());
+        BigDecimal withdrawable = overview.getAmount() == null ? BigDecimal.ZERO : overview.getAmount();
+        if (withdrawParam.getAmount().compareTo(withdrawable) > 0) {
+            throw new BusinessCheckException("提现金额不能大于可提现金额 " + withdrawable.stripTrailingZeros().toPlainString());
+        }
+        Date time = new Date();
+        MtCommissionCash mtCommissionCash = new MtCommissionCash();
+        mtCommissionCash.setSettleNo(CommonUtil.createSettlementNo());
+        mtCommissionCash.setUuid(SeqUtil.getUUID());
+        mtCommissionCash.setMerchantId(mtUser.getMerchantId());
+        mtCommissionCash.setStoreId(mtUser.getStoreId());
+        mtCommissionCash.setUserId(withdrawParam.getUserId());
+        mtCommissionCash.setStaffId(0);
+        mtCommissionCash.setAmount(withdrawParam.getAmount());
+        mtCommissionCash.setDescription(StringUtil.isNotEmpty(withdrawParam.getRemark()) ? withdrawParam.getRemark() : "会员申请提现");
+        mtCommissionCash.setCreateTime(time);
+        mtCommissionCash.setUpdateTime(time);
+        mtCommissionCash.setOperator(StringUtil.isNotEmpty(mtUser.getMobile()) ? mtUser.getMobile() : String.valueOf(mtUser.getId()));
+        mtCommissionCash.setStatus(CommissionCashStatusEnum.WAIT.getKey());
+        return this.save(mtCommissionCash);
+    }
+
+    /**
+     * 商家转账付款到微信钱包
+     *
+     * @param commissionCashRequest 请求参数
+     * @throws BusinessCheckException
+     * @return
+     */
+    @Override
+    @Transactional
+    @OperationServiceLog(description = "付款到微信钱包")
+    public void payToWechat(CommissionCashRequest commissionCashRequest) throws BusinessCheckException {
+        MtCommissionCash mtCommissionCash = mtCommissionCashMapper.selectById(commissionCashRequest.getId());
+        if (mtCommissionCash == null) {
+            throw new BusinessCheckException("请求参数有误");
+        }
+        if (mtCommissionCash.getStatus().equals(CommissionCashStatusEnum.PAYED.getKey())) {
+            throw new BusinessCheckException("该记录已经支付过了");
+        }
+        if (mtCommissionCash.getStatus().equals(CommissionCashStatusEnum.CANCEL.getKey())) {
+            throw new BusinessCheckException("该记录已经作废了");
+        }
+        BigDecimal amount = mtCommissionCash.getAmount();
+        if (StringUtil.isNotBlank(commissionCashRequest.getAmount()) && (new BigDecimal(commissionCashRequest.getAmount()).compareTo(new BigDecimal("0")) > 0)) {
+            if (new BigDecimal(commissionCashRequest.getAmount()).compareTo(amount) > 0) {
+                throw new BusinessCheckException("付款金额不能大于" + amount);
+            }
+            amount = new BigDecimal(commissionCashRequest.getAmount());
+        }
+        // 收款会员：会员结算直接取会员；员工结算按员工手机号找对应会员
+        MtUser mtUser = null;
+        if (mtCommissionCash.getUserId() != null && mtCommissionCash.getUserId() > 0) {
+            mtUser = memberService.queryMemberById(mtCommissionCash.getUserId());
+        }
+        if (mtUser == null && mtCommissionCash.getStaffId() != null && mtCommissionCash.getStaffId() > 0) {
+            MtStaff mtStaff = staffService.queryStaffById(mtCommissionCash.getStaffId());
+            if (mtStaff != null) {
+                mtUser = memberService.queryMemberByMobile(mtCommissionCash.getMerchantId(), mtStaff.getMobile());
+            }
+        }
+        if (mtUser == null || StringUtil.isEmpty(mtUser.getOpenId())) {
+            throw new BusinessCheckException("该会员未绑定微信，无法转账到微信钱包");
+        }
+        // 调起微信商家转账（APIv3）
+        String outBatchNo = "WT" + System.currentTimeMillis() + SeqUtil.getRandomNumber(4);
+        String batchRemark = StringUtil.isNotBlank(commissionCashRequest.getDescription()) ? commissionCashRequest.getDescription() : "佣金提现";
+        String batchId = weixinService.transferToUser(mtCommissionCash.getStoreId(), PlatformTypeEnum.MP_WEIXIN.getCode(),
+                mtUser.getOpenId(), outBatchNo, amount, "佣金提现", batchRemark);
+        // 受理成功即标记已打款，批次单号落库供对账
+        Date time = new Date();
+        mtCommissionCash.setOperator(commissionCashRequest.getOperator());
+        mtCommissionCash.setStatus(CommissionCashStatusEnum.PAYED.getKey());
+        mtCommissionCash.setPayType(CommissionPayTypeEnum.WECHAT.getKey());
+        mtCommissionCash.setPayTime(time);
+        mtCommissionCash.setTransferNo(StringUtil.isNotEmpty(batchId) ? batchId : outBatchNo);
+        mtCommissionCash.setAmount(amount);
+        mtCommissionCash.setUpdateTime(time);
+        mtCommissionCash.setDescription(commissionCashRequest.getDescription());
+        mtCommissionCashMapper.updateById(mtCommissionCash);
     }
 }
