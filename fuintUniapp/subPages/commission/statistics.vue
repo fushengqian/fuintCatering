@@ -143,9 +143,13 @@
         <view class="withdraw-title">申请提现</view>
         <view class="withdraw-amount-row">
           <text class="withdraw-symbol">￥</text>
-          <input class="withdraw-input" type="digit" v-model="withdrawAmount" placeholder="请输入提现金额" />
+          <input class="withdraw-input" type="digit" v-model="withdrawAmount" disabled placeholder="提现金额为全部可提现金额" />
         </view>
-        <view class="withdraw-tip">可提现金额 ￥{{ overview.amount || '0.00' }}，提交后由管理员审核打款</view>
+        <view class="withdraw-tip">提现金额为全部可提现金额 ￥{{ overview.amount || '0.00' }}，提交后由管理员审核打款</view>
+        <view class="reward-rule-link" @click="goRuleDesc('withdraw')">
+          <text>查看提现规则说明</text>
+          <text class="iconfont icon-xiangyoujiantou"></text>
+        </view>
         <view class="withdraw-actions">
           <view class="withdraw-cancel" @click="closeWithdraw">取消</view>
           <view class="withdraw-confirm" :class="{ 'withdraw-confirm-disabled': submitting }" @click="submitWithdraw">提交申请</view>
@@ -223,7 +227,7 @@
        * 获取佣金概览
        */
       getOverview() {
-        CommissionApi.overview()
+        return CommissionApi.overview()
           .then(result => {
             if (result.data) {
               this.overview = result.data
@@ -381,13 +385,10 @@
        * 提交提现申请（管理员审核后打款）
        */
       submitWithdraw() {
-        const amount = parseFloat(this.withdrawAmount)
+        // 提现金额固定为全部可提现金额，不支持修改
+        const amount = parseFloat(this.overview.amount || '0')
         if (!amount || amount <= 0) {
-          uni.showToast({ title: '请输入正确的提现金额', icon: 'none' })
-          return
-        }
-        if (amount > parseFloat(this.overview.amount || '0')) {
-          uni.showToast({ title: '提现金额不能大于可提现金额', icon: 'none' })
+          uni.showToast({ title: '暂无可提现金额', icon: 'none' })
           return
         }
         if (this.submitting) {
@@ -395,10 +396,14 @@
         }
         this.submitting = true
         CommissionApi.withdraw({ amount: amount.toFixed(2) })
-          .then(() => {
+          .then((res) => {
             this.showWithdraw = false
-            uni.showToast({ title: '申请已提交，等待管理员审核', icon: 'none' })
-            this.getOverview()
+            const repeated = res && res.data === false
+            const message = repeated ? '提现请求已经在审核中，请耐心等待' : '申请已提交，等待管理员审核'
+            // 先刷新数据再弹提示，避免加载动画覆盖toast
+            this.getOverview().finally(() => {
+              uni.showToast({ title: message, icon: 'none' })
+            })
           })
           .catch(() => {})
           .finally(() => {

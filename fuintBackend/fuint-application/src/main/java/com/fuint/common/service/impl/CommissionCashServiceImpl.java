@@ -134,6 +134,18 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
                 lambdaQueryWrapper.eq(MtCommissionCash::getStaffId, -1);
             }
         }
+        // 分佣对象类型：member会员；staff员工
+        String userType = commissionCashPage.getUserType();
+        if ("member".equals(userType)) {
+            lambdaQueryWrapper.gt(MtCommissionCash::getUserId, 0);
+        } else if ("staff".equals(userType)) {
+            lambdaQueryWrapper.gt(MtCommissionCash::getStaffId, 0);
+        }
+        // 付款方式：A会员余额；B微信钱包
+        String payType = commissionCashPage.getPayType();
+        if (StringUtils.isNotBlank(payType)) {
+            lambdaQueryWrapper.eq(MtCommissionCash::getPayType, payType);
+        }
         String uuid = commissionCashPage.getUuid();
         if (StringUtils.isNotBlank(uuid)) {
             lambdaQueryWrapper.eq(MtCommissionCash::getUuid, uuid);
@@ -168,6 +180,12 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
                          userDto.setAddress(userInfo.getAddress());
                          userDto.setMobile(CommonUtil.hidePhone(userInfo.getMobile()));
                          commissionCashDto.setUserInfo(userDto);
+                         // 兼容历史数据：会员提现时操作人曾存手机号/会员ID，统一显示会员名称
+                         String operator = commissionCashDto.getOperator();
+                         if (StringUtil.isNotEmpty(userDto.getName())
+                                 && (StringUtil.isEmpty(operator) || operator.matches("\\d+"))) {
+                             commissionCashDto.setOperator(userDto.getName());
+                         }
                      }
                  }
                  if (mtStaff != null) {
@@ -484,26 +502,32 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
     @Transactional
     @OperationServiceLog(description = "会员申请提现")
     public Boolean withdraw(WithdrawParam withdrawParam) throws BusinessCheckException {
-        if (withdrawParam.getAmount() == null || withdrawParam.getAmount().compareTo(new BigDecimal("0")) <= 0) {
-            throw new BusinessCheckException("提现金额不能为空或小于等于0");
-        }
         MtUser mtUser = memberService.queryMemberById(withdrawParam.getUserId());
         if (mtUser == null) {
             throw new BusinessCheckException("会员不存在");
         }
-        // 存在待审核或审核通过的申请时不允许重复申请，避免超出可提现金额
-        Long processing = mtCommissionCashMapper.selectCount(Wrappers.<MtCommissionCash>lambdaQuery()
+        // 存在待审核或审核通过的申请时不重复生成，刷新已有申请的操作信息
+        List<MtCommissionCash> processingList = mtCommissionCashMapper.selectList(Wrappers.<MtCommissionCash>lambdaQuery()
                 .eq(MtCommissionCash::getUserId, withdrawParam.getUserId())
                 .in(MtCommissionCash::getStatus, Arrays.asList(
-                        CommissionCashStatusEnum.WAIT.getKey(), CommissionCashStatusEnum.SETTLED.getKey())));
-        if (processing != null && processing > 0) {
-            throw new BusinessCheckException("您有未处理的提现申请，请等待管理员审核");
+                        CommissionCashStatusEnum.WAIT.getKey(), CommissionCashStatusEnum.SETTLED.getKey()))
+                .orderByDesc(MtCommissionCash::getId));
+        if (processingList != null && !processingList.isEmpty()) {
+            MtCommissionCash updateCash = new MtCommissionCash();
+            updateCash.setId(processingList.get(0).getId());
+            Date now = new Date();
+            updateCash.setCreateTime(now);
+            updateCash.setUpdateTime(now);
+            updateCash.setOperator(StringUtil.isNotEmpty(mtUser.getName()) ? mtUser.getName()
+                    : (StringUtil.isNotEmpty(mtUser.getMobile()) ? mtUser.getMobile() : String.valueOf(mtUser.getId())));
+            mtCommissionCashMapper.updateById(updateCash);
+            return false;
         }
-        // 提现金额不能大于可提现金额（总佣金 - 已打款）
+        // 提现金额固定为全部可提现金额（总佣金 - 已打款），不支持自定义金额
         CommissionOverviewDto overview = commissionLogService.getCommissionOverview(withdrawParam.getUserId());
         BigDecimal withdrawable = overview.getAmount() == null ? BigDecimal.ZERO : overview.getAmount();
-        if (withdrawParam.getAmount().compareTo(withdrawable) > 0) {
-            throw new BusinessCheckException("提现金额不能大于可提现金额 " + withdrawable.stripTrailingZeros().toPlainString());
+        if (withdrawable.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessCheckException("暂无可提现金额");
         }
         Date time = new Date();
         MtCommissionCash mtCommissionCash = new MtCommissionCash();
@@ -513,11 +537,13 @@ public class CommissionCashServiceImpl extends ServiceImpl<MtCommissionCashMappe
         mtCommissionCash.setStoreId(mtUser.getStoreId());
         mtCommissionCash.setUserId(withdrawParam.getUserId());
         mtCommissionCash.setStaffId(0);
-        mtCommissionCash.setAmount(withdrawParam.getAmount());
+        mtCommissionCash.setAmount(withdrawable);
         mtCommissionCash.setDescription(StringUtil.isNotEmpty(withdrawParam.getRemark()) ? withdrawParam.getRemark() : "会员申请提现");
         mtCommissionCash.setCreateTime(time);
         mtCommissionCash.setUpdateTime(time);
-        mtCommissionCash.setOperator(StringUtil.isNotEmpty(mtUser.getMobile()) ? mtUser.getMobile() : String.valueOf(mtUser.getId()));
+        // 会员提现由会员本人发起，操作人记录会员名称
+        mtCommissionCash.setOperator(StringUtil.isNotEmpty(mtUser.getName()) ? mtUser.getName()
+                : (StringUtil.isNotEmpty(mtUser.getMobile()) ? mtUser.getMobile() : String.valueOf(mtUser.getId())));
         mtCommissionCash.setStatus(CommissionCashStatusEnum.WAIT.getKey());
         return this.save(mtCommissionCash);
     }

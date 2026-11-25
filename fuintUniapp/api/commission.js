@@ -7,7 +7,8 @@ const api = {
   withdraw: 'clientApi/commission/withdraw',
   inviteList: 'clientApi/share/list',
   rewards: 'clientApi/commission/rewards',
-  rewardLogs: 'clientApi/commission/rewardLogs'
+  rewardLogs: 'clientApi/commission/rewardLogs',
+  ruleDesc: 'clientApi/commission/ruleDesc'
 }
 
 // 佣金概览
@@ -38,4 +39,9 @@ export const rewards = (param) => {
 // 推荐奖励记录
 export const rewardLogs = (param) => {
   return request.get(api.rewardLogs, param)
+}
+
+// 奖励规则说明（分佣提成 + 推荐奖励）
+export const ruleDesc = (param) => {
+  return request.get(api.ruleDesc, param)
 }
