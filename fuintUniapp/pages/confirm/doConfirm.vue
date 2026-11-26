@@ -131,7 +131,6 @@
           confirmApi.doConfirm(app.detail.code, app.form.amount, app.form.remark)
             .then(result => {
                 if (result.data) {
-                    app.getCouponDetail()
                     this.$success("核销成功")
                     app.detail.status = result.data.status
                     app.detail.balance = result.data.balance
@@ -142,7 +141,9 @@
                     this.$error(result.message)
                 }
                 app.isLoading = false
-                resolve(result)
+            })
+            .catch(() => {
+                app.isLoading = false
             });
       },
       // 组织数据
