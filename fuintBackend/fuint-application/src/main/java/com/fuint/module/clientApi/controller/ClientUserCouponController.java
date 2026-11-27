@@ -1,5 +1,6 @@
 package com.fuint.module.clientApi.controller;
 
+import com.fuint.common.config.Message;
 import com.fuint.common.dto.coupon.UserCouponDto;
 import com.fuint.common.dto.member.UserInfo;
 import com.fuint.common.enums.CouponExpireTypeEnum;
